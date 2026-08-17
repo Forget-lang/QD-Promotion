@@ -16,6 +16,10 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
+# IDE 配置（本机特有，不入库）
+.idea/
+.vscode/
+
 # ============ Remotion 缓存 / 渲染产物（源码可复现，不入库） ============
 video/.cache/
 video/out/
