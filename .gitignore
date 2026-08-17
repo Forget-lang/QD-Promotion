@@ -1,0 +1,28 @@
+# ============ 密钥 / 本地环境变量（禁止提交） ============
+.env
+.env.local
+.env.*.local
+
+# ============ 独立 git 仓库（applet 有专属 git，不套进本仓库） ============
+applet/
+
+# ============ 依赖与构建产物 ============
+node_modules/
+video/node_modules/
+__pycache__/
+*.pyc
+
+# macOS 系统垃圾
+.DS_Store
+Thumbs.db
+
+# ============ Remotion 缓存 / 渲染产物（源码可复现，不入库） ============
+video/.cache/
+video/out/
+*.mp4
+*.mp3
+**/_preview/
+
+# ============ 过程产物/临时（outputs 仅提交 *.md 交付物） ============
+.doc-audit-cache/
+.tmp/

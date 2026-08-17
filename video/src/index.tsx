@@ -1,0 +1,62 @@
+import { Composition, registerRoot, staticFile } from 'remotion';
+import { VTemplate, TOTAL_FRAMES } from './VTemplate';
+import { FPS } from './palette';
+
+// ── 注入项目商用字体（@font-face，Remotion 渲染前自动等待 document.fonts.ready）──
+const FONT_CSS = `
+@font-face {
+  font-family: 'Alibaba PuHuiTi 3';
+  src: url('${staticFile('fonts/AlibabaPuHuiTi-3-55-Regular.ttf')}') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Alibaba PuHuiTi 3';
+  src: url('${staticFile('fonts/AlibabaPuHuiTi-3-65-Medium.ttf')}') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Alibaba PuHuiTi 3';
+  src: url('${staticFile('fonts/AlibabaPuHuiTi-3-85-Bold.ttf')}') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Alibaba PuHuiTi 3';
+  src: url('${staticFile('fonts/AlibabaPuHuiTi-3-95-ExtraBold.ttf')}') format('truetype');
+  font-weight: 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'DeyiHei';
+  src: url('${staticFile('fonts/得意黑.ttf')}') format('truetype');
+  font-weight: 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Alimama FangYuan';
+  src: url('${staticFile('fonts/阿里妈妈方圆体.ttf')}') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+`;
+
+const RemotionRoot: React.FC = () => {
+  return (
+    <>
+      {/* 全局字体声明 */}
+      <style dangerouslySetInnerHTML={{ __html: FONT_CSS }} />
+      <Composition
+        id="G02-TeaCoffee"
+        component={VTemplate}
+        fps={FPS}
+        width={1080}
+        height={1920}
+        durationInFrames={TOTAL_FRAMES}
+      />
+    </>
+  );
+};
+
+registerRoot(RemotionRoot);

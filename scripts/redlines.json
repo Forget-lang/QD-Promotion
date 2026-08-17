@@ -1,0 +1,22 @@
+{
+  "description": "券到卡包短视频红线违禁词登记表（唯一数据源）。scripts/check-redlines.mjs 与 AI 全量对齐流程都以此为准，禁止在脚本外另起清单。",
+  "codeBanned": {
+    "scope": ["video/src/**/*.tsx", "video/src/**/*.ts"],
+    "note": "Remotion 渲染代码层 = 抖音/小红书短视频画面真相源。以下词一旦出现在可见文本（注释已自动剥离）即硬失败：短视频绝不允许出现任何微信相关导流或小程序码；也禁止把颜色写成「BRAND」类暗示品牌注入的命名常量（配色须来自设计稿，见 skill §三）。「券到卡包」作为结尾署名允许上屏，故不在此硬禁，仅在 outputsReview 层供确认。",
+    "exitOnHit": true,
+    "tokens": ["微信", "微信搜", "微信小程序", "小程序", "小程序码", "搜券到卡包", "搜索框", "BRAND", "免费", "企业微信", "企微"]
+  },
+  "outputsReview": {
+    "scope": ["outputs/**/*.md"],
+    "exclude": ["outputs/archive/**"],
+    "note": "短视频文案/分镜/封面指引层。以下词仅允许出现在「规则说明句」中（搜狐长文导流位已作废，三平台文章/视频均禁用）。脚本列出全部命中供 AI 逐条人工确认（非硬失败）。",
+    "exitOnHit": false,
+    "tokens": ["微信搜", "小程序码", "券到卡包", "微信小程序", "免费"]
+  },
+  "docsInfo": {
+    "scope": ["docs/**/*.md", ".workbuddy/skills/quandao-content/**/*.md"],
+    "note": "规则/红线文档层，命中多为规则描述，仅作信息提示（不失败）。",
+    "exitOnHit": false,
+    "tokens": ["微信搜", "小程序码"]
+  }
+}
