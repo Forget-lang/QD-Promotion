@@ -1,17 +1,22 @@
-// S4 裂变·流程图 · 读 scene/style 数据渲染
-// M5 修复：箭头动画由 CSS transition（Remotion 帧渲染不生效）改为 interpolate 驱动
+// S4 裂变·流程图 · 2026-08-17 专业级优化
+// - 修复节点点亮：原 boolean `lit = f > threshold` 导致颜色/透明度瞬切；
+//   改为 interpolate + interpolateColors 平滑过渡
+// - 箭头缓动统一 EASE_OUT
+// - motion 透传 style.motion
 import React from 'react';
-import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
-import { FONT_BODY, FONT_ROUND, FONT_TITLE, INK, PALETTES, PAPER } from '../palette';
+import { AbsoluteFill, interpolate, interpolateColors, useCurrentFrame } from 'remotion';
+import { INK, PALETTES, PAPER, TYPOGRAPHY } from '../palette';
 import type { Scene, StyleConfig } from '../types';
 import { Ico } from '../components/icons';
-import { FadeInUp, ScaleIn } from '../components/animations';
+import { FadeInUp, ScaleIn, EASE_OUT } from '../components/animations';
 import { SlideTag } from '../components/ui';
+import { GlowOrb } from '../components/background';
 
 const ArrowNode: React.FC<{ i: number; color: string }> = ({ i, color }) => {
   const f = useCurrentFrame();
-  const lit = interpolate(f, [20 + i * 22 + 10, 20 + i * 22 + 16], [0, 1], {
+  const lit = interpolate(f, [20 + i * 22 + 10, 20 + i * 22 + 20], [0, 1], {
     extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+    easing: EASE_OUT,
   });
   return (
     <div style={{
@@ -25,14 +30,17 @@ export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
   scene, style, index, total,
 }) => {
   const p = PALETTES[style.palette];
+  const typo = TYPOGRAPHY[style.typography];
   const f = useCurrentFrame();
   const nodes = scene.nodes ?? [];
   return (
     <AbsoluteFill style={{ background: `linear-gradient(150deg, ${p.bgDark} 0%, ${p.bgDark2} 100%)`, justifyContent: 'center' }}>
       <SlideTag cur={index + 1} total={total} dark />
+      <GlowOrb x={-80} y={-60} size={450} color={`${p.accent}30`} />
+      <GlowOrb x={650} y={1100} size={380} color={`${p.accent}20`} delay={12} />
       <div style={{ position: 'absolute', top: 130, width: '100%', padding: '0 56px' }}>
-        <FadeInUp>
-          <div style={{ fontFamily: FONT_TITLE, fontSize: 58, fontWeight: 900, color: PAPER, textAlign: 'center' }}>
+        <FadeInUp motion={style.motion}>
+          <div style={{ fontFamily: typo.family, fontSize: 58, fontWeight: typo.titleWeight, color: PAPER, textAlign: 'center' }}>
             {scene.title}
           </div>
         </FadeInUp>
@@ -40,21 +48,30 @@ export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
 
       <AbsoluteFill style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingTop: 150 }}>
         {nodes.map((n, i) => {
-          const lit = f > 20 + i * 22; // 节点依次亮起
+          // 平滑点亮：0→1 在 15 帧内过渡，而非 boolean 瞬切
+          const litProgress = interpolate(f, [20 + i * 22, 20 + i * 22 + 15], [0, 1], {
+            extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT,
+          });
+          const bgColor = interpolateColors(litProgress, [0, 1], ['rgba(255,255,255,0.08)', '#ffffff']);
+          const borderColor = interpolateColors(litProgress, [0, 1], ['rgba(255,255,255,0.15)', n.color]);
+          const textColor = interpolateColors(litProgress, [0, 1], ['rgba(255,255,255,0.5)', INK]);
+          const iconColor = interpolateColors(litProgress, [0, 1], ['rgba(255,255,255,0.4)', n.color]);
+          const opacity = interpolate(litProgress, [0, 1], [0.5, 1]);
+
           return (
             <React.Fragment key={i}>
-              <ScaleIn delay={18 + i * 22}>
+              <ScaleIn delay={18 + i * 22} motion={style.motion}>
                 <div style={{
                   width: 210, height: 210, borderRadius: 26,
-                  backgroundColor: lit ? '#fff' : 'rgba(255,255,255,0.08)',
-                  border: `3px solid ${lit ? n.color : 'rgba(255,255,255,0.15)'}`,
+                  backgroundColor: bgColor,
+                  border: `3px solid ${borderColor}`,
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12,
-                  opacity: lit ? 1 : 0.5,
+                  opacity,
                 }}>
-                  <div style={{ width: 70, height: 70 }}>{Ico[n.icon](lit ? n.color : 'rgba(255,255,255,0.4)')}</div>
+                  <div style={{ width: 70, height: 70 }}>{Ico[n.icon](iconColor)}</div>
                   <div style={{
-                    fontFamily: FONT_BODY, fontSize: 27, fontWeight: 700,
-                    color: lit ? INK : 'rgba(255,255,255,0.5)',
+                    fontFamily: typo.bodyFamily, fontSize: 27, fontWeight: typo.bodyWeight,
+                    color: textColor,
                   }}>{n.title}</div>
                 </div>
               </ScaleIn>
@@ -64,9 +81,9 @@ export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
         })}
       </AbsoluteFill>
       <AbsoluteFill style={{ justifyContent: 'flex-end', alignItems: 'center', paddingBottom: 150 }}>
-        <FadeInUp delay={110}>
+        <FadeInUp delay={110} motion={style.motion}>
           <div style={{
-            fontFamily: FONT_ROUND, fontSize: 34, color: 'rgba(255,255,255,0.85)',
+            fontFamily: typo.bodyFamily, fontSize: 34, color: 'rgba(255,255,255,0.85)',
             backgroundColor: 'rgba(255,255,255,0.1)', padding: '12px 32px', borderRadius: 999,
           }}>
             {scene.footnote}

@@ -4,7 +4,7 @@ import type { IconKey } from './components/icons';
 
 export type SceneType = 'hook' | 'pain' | 'solution' | 'flow' | 'grid' | 'panel' | 'cta';
 
-// 风格配置六大维度（风格轮换方案落地：配色/版式/转场/钩子/动画/字体）
+// 风格配置五维（style 五维：配色/动画性格/字体/转场/钩子）
 export type MotionKey = 'bouncy' | 'snappy' | 'buttery' | 'heavy';
 export type TypographyKey = 'impact' | 'clean' | 'friendly';
 export type TransitionKey = 'slide' | 'zoom' | 'wipe' | 'dissolve' | 'pop';
@@ -36,6 +36,7 @@ export interface Scene {
   dur: number; // 秒
   title?: string;
   sub?: string;
+  layout?: 'vertical' | 'horizontal'; // 版式变体（solution 等场景使用）
   // pain
   leftTitle?: string;
   leftItems?: string[];

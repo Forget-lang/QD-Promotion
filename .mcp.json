@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "icon-mcp-server": {
+      "command": "npx",
+      "args": ["-y", "icon-mcp-server"],
+      "env": {
+        "LOGGING_ENABLED": "true"
+      }
+    }
+  }
+}

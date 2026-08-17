@@ -1,7 +1,10 @@
-// 基础动画组件（仅提效，非模板）· 2026-08-15 组件库化 + spring 性格化
-// 默认配置 = 原 VTemplate 值（G02 画面不变）；motion 为风格维度，供后续视频差异化
+// 基础动画组件（仅提效，非模板）· 2026-08-17 专业级优化
+// - 全部 spring 动画透传 motion（修复 buttery 声明未生效的 Bug）
+// - 新增 WipeIn（clip-path 擦入，对齐设计稿「wipe 入」描述）
+// - 新增 Pulse（瞬时强调脉冲，用于数字/箭头强调）
+// - 非 spring 插值统一使用 Easing.bezier(0.16,1,0.3,1)（expo-out）
 import React from 'react';
-import { interpolate, spring, useCurrentFrame } from 'remotion';
+import { interpolate, spring, Easing, useCurrentFrame } from 'remotion';
 import { FPS } from '../palette';
 import type { MotionKey } from '../types';
 
@@ -11,6 +14,9 @@ export const SPRING_CONFIG: Record<MotionKey, { damping: number; stiffness: numb
   buttery: { damping: 50, stiffness: 50 },
   heavy: { damping: 30, stiffness: 80, mass: 3 },
 };
+
+/** expo-out：所有非 spring 动画的标准缓动 */
+export const EASE_OUT = Easing.bezier(0.16, 1, 0.3, 1);
 
 export const FadeInUp: React.FC<{
   children: React.ReactNode; delay?: number; dist?: number; motion?: MotionKey;
@@ -57,17 +63,57 @@ export const SlideInRight: React.FC<{ children: React.ReactNode; delay?: number;
   );
 };
 
-export const ScaleIn: React.FC<{ children: React.ReactNode; delay?: number; motion?: MotionKey }> = ({
-  children, delay = 0, motion = 'bouncy',
+export const ScaleIn: React.FC<{ children: React.ReactNode; delay?: number; motion?: MotionKey; startScale?: number }> = ({
+  children, delay = 0, motion = 'bouncy', startScale = 0.82,
 }) => {
   const f = useCurrentFrame();
   const spr = spring({ frame: f - delay, fps: FPS, config: SPRING_CONFIG[motion] });
   return (
     <div style={{
       opacity: interpolate(spr, [0, 0.3], [0, 1], { extrapolateRight: 'clamp' }),
-      transform: `scale(${interpolate(spr, [0, 1], [0.82, 1])})`,
+      transform: `scale(${interpolate(spr, [0, 1], [startScale, 1])})`,
     }}>
       {children}
     </div>
   );
+};
+
+/**
+ * WipeIn — clip-path 擦入 reveal
+ * 对齐设计稿「标题 wipe 入」「节点依次 wipe 入」描述。
+ * direction='left' 从左向右擦开；'up' 从下向上擦开。
+ */
+export const WipeIn: React.FC<{
+  children: React.ReactNode; delay?: number; duration?: number; direction?: 'left' | 'up';
+}> = ({ children, delay = 0, duration = 22, direction = 'left' }) => {
+  const f = useCurrentFrame();
+  const progress = interpolate(f - delay, [0, duration], [0, 1], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+    easing: EASE_OUT,
+  });
+  const clipPath = direction === 'left'
+    ? `inset(0 ${(1 - progress) * 100}% 0 0)`
+    : `inset(${(1 - progress) * 100}% 0 0 0)`;
+  return (
+    <div style={{ clipPath, WebkitClipPath: clipPath }}>
+      {children}
+    </div>
+  );
+};
+
+/**
+ * Pulse — 单次脉冲强调（scale 1 → 1+intensity → 1）
+ * 用于数字「10」、箭头 ↑/↓ 等需要瞬时强调的元素。
+ */
+export const Pulse: React.FC<{
+  children: React.ReactNode; delay?: number; intensity?: number; duration?: number;
+}> = ({ children, delay = 0, intensity = 0.06, duration = 20 }) => {
+  const f = useCurrentFrame();
+  const scale = interpolate(f - delay, [0, duration * 0.5, duration], [1, 1 + intensity, 1], {
+    extrapolateLeft: 'clamp',
+    extrapolateRight: 'clamp',
+    easing: EASE_OUT,
+  });
+  return <div style={{ transform: `scale(${scale})`, display: 'inline-block' }}>{children}</div>;
 };
