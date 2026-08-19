@@ -6,7 +6,6 @@ import { INK, PALETTES, TYPOGRAPHY } from '../palette';
 import type { Scene, StyleConfig } from '../types';
 import { Ico } from '../components/icons';
 import { FadeInUp, ScaleIn } from '../components/animations';
-import { SlideTag } from '../components/ui';
 import { DotGrid } from '../components/background';
 
 export const GridScene: React.FC<{ scene: Scene; style: StyleConfig; index: number; total: number }> = ({
@@ -15,9 +14,8 @@ export const GridScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
   const p = PALETTES[style.palette];
   const typo = TYPOGRAPHY[style.typography];
   return (
-    <AbsoluteFill style={{ background: p.bg, justifyContent: 'center' }}>
+    <AbsoluteFill style={{ background: `${p.bg}bf`, justifyContent: 'center' }}>
       <DotGrid color={`${p.accent}0d`} spacing={44} size={3} />
-      <SlideTag cur={index + 1} total={total} />
       <div style={{ position: 'absolute', top: 120, width: '100%', padding: '0 56px' }}>
         <FadeInUp motion={style.motion}>
           <div style={{ fontFamily: typo.family, fontSize: 58, fontWeight: typo.titleWeight, color: INK, textAlign: 'center' }}>

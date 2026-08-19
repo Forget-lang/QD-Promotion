@@ -12,7 +12,6 @@ import { FPS } from '../palette';
 import type { Scene, StyleConfig } from '../types';
 import { Ico } from '../components/icons';
 import { FadeInUp, ScaleIn, WipeIn, Pulse, EASE_OUT, SPRING_CONFIG } from '../components/animations';
-import { SlideTag } from '../components/ui';
 import { GlowOrb } from '../components/background';
 
 export const HookScene: React.FC<{ scene: Scene; style: StyleConfig; index: number; total: number }> = ({
@@ -24,12 +23,10 @@ export const HookScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
   const float = Math.sin(f / 15) * 8;
 
   return (
-    <AbsoluteFill style={{ background: `linear-gradient(160deg, ${p.bgDark} 0%, ${p.bgDark2} 100%)` }}>
+    <AbsoluteFill style={{ background: `linear-gradient(160deg, ${p.bgDark}b3 0%, ${p.bgDark2}b3 100%)` }}>
       {/* 柔光层 */}
       <GlowOrb x={-100} y={-80} size={500} color={`${p.accent}40`} />
       <GlowOrb x={700} y={1200} size={400} color={`${p.accent}25`} delay={10} />
-
-      <SlideTag cur={index + 1} total={total} dark />
 
       {/* 装饰：右上浮动图标 */}
       <div style={{
@@ -43,6 +40,7 @@ export const HookScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
         {style.hookStyle === 'number' && <NumberHook scene={scene} style={style} typo={typo} p={p} />}
         {style.hookStyle === 'contrast' && <ContrastHook scene={scene} style={style} typo={typo} p={p} />}
         {style.hookStyle === 'question' && <QuestionHook scene={scene} style={style} typo={typo} p={p} />}
+        {style.hookStyle === 'clock' && <ClockHook scene={scene} style={style} typo={typo} p={p} />}
       </AbsoluteFill>
     </AbsoluteFill>
   );
@@ -83,6 +81,48 @@ const NumberHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family: s
         <div style={{
           marginTop: 36, fontFamily: FONT_BODY, fontSize: 40,
           color: 'rgba(255,255,255,0.78)', textAlign: 'center', lineHeight: 1.5,
+        }}>
+          {scene.sub}
+        </div>
+      </FadeInUp>
+    </>
+  );
+};
+
+// 时钟型钩子：下午3点时钟 + 文字
+const ClockHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family: string; titleWeight: number; bodyWeight: number }; p: typeof PALETTES['mint-cool'] }> = ({ scene, style, typo, p }) => {
+  return (
+    <>
+      <ScaleIn delay={2} motion={style.motion} startScale={0.3}>
+        <Pulse delay={20} intensity={0.06} duration={24}>
+          <svg width="220" height="220" viewBox="0 0 240 240" style={{ marginBottom: 16 }}>
+            <circle cx="120" cy="120" r="108" fill="none" stroke={p.accent} strokeWidth="2" opacity="0.15" />
+            <circle cx="120" cy="120" r="92" fill="none" stroke={p.accent} strokeWidth="4" opacity="0.4" />
+            <circle cx="120" cy="120" r="82" fill="rgba(0,0,0,0.3)" stroke={p.accent} strokeWidth="5" />
+            {[0, 90, 180, 270].map((deg) => (
+              <line key={deg} x1="120" y1="44" x2="120" y2="56"
+                stroke={p.accent} strokeWidth="4" strokeLinecap="round"
+                transform={`rotate(${deg} 120 120)`} />
+            ))}
+            <line x1="120" y1="120" x2="172" y2="120" stroke="#fff" strokeWidth="8" strokeLinecap="round" />
+            <line x1="120" y1="120" x2="120" y2="58" stroke="#fff" strokeWidth="5" strokeLinecap="round" />
+            <circle cx="120" cy="120" r="8" fill={p.accent} />
+          </svg>
+        </Pulse>
+      </ScaleIn>
+      <WipeIn delay={12} duration={16}>
+        <div style={{
+          fontFamily: typo.family, fontSize: 82, fontWeight: typo.titleWeight,
+          color: p.paper, textAlign: 'center', lineHeight: 1.2,
+          textShadow: '0 4px 30px rgba(0,0,0,0.5)',
+        }}>
+          {scene.title}
+        </div>
+      </WipeIn>
+      <FadeInUp delay={28} motion={style.motion}>
+        <div style={{
+          marginTop: 32, fontFamily: FONT_BODY, fontSize: 36,
+          color: 'rgba(255,255,255,0.72)', textAlign: 'center', lineHeight: 1.5,
         }}>
           {scene.sub}
         </div>
@@ -138,21 +178,18 @@ const ContrastHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family:
 
 // 提问型钩子：大问号 + 提问文字
 const QuestionHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family: string; titleWeight: number; bodyWeight: number }; p: typeof PALETTES['mint-cool'] }> = ({ scene, style, typo, p }) => {
-  const f = useCurrentFrame();
-  const qSpr = spring({ frame: f - 2, fps: FPS, config: { damping: 10, stiffness: 80 } });
-  const qPulse = interpolate(f - 20, [0, 20], [1, 1.08], { extrapolateRight: 'clamp', easing: EASE_OUT });
-
   return (
     <>
       <ScaleIn delay={2} motion={style.motion} startScale={0.2}>
-        <div style={{
-          fontFamily: typo.family, fontSize: 180, fontWeight: typo.titleWeight,
-          color: p.accent, lineHeight: 1, marginBottom: 20,
-          transform: `scale(${qSpr * qPulse})`,
-          textShadow: `0 0 50px ${p.accent}66`,
-        }}>
-          ?
-        </div>
+        <Pulse delay={20} intensity={0.08} duration={20}>
+          <div style={{
+            fontFamily: typo.family, fontSize: 180, fontWeight: typo.titleWeight,
+            color: p.accent, lineHeight: 1, marginBottom: 20,
+            textShadow: `0 0 50px ${p.accent}66`,
+          }}>
+            ?
+          </div>
+        </Pulse>
       </ScaleIn>
       <WipeIn delay={12} duration={16}>
         <div style={{

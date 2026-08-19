@@ -7,8 +7,12 @@
  * 用法（可在任意目录运行）：
  *   cd /Users/qxy/Desktop/baijiang/quandao && node scripts/check-redlines.mjs
  *   或：node /Users/qxy/Desktop/baijiang/quandao/scripts/check-redlines.mjs
- *   - video/src 层命中 = 硬失败（退出码 1），因为那是实际渲染画面。
- *   - outputs / docs 层命中 = 列出供 AI 人工确认（退出码 0），AI 须逐条判是规则说明或搜狐合规导流位。
+ *
+ * 四层检查（按严格程度递减）：
+ *   1. codeBanned    — 画面层硬禁（video/src 所有 ts/tsx），命中 = 硬失败
+ *   2. voiceBanned   — 口播/文案层硬禁（data/*.ts + outputs/*.md），命中 = 硬失败
+ *   3. outputsReview — 文案层需确认（outputs/*.md），命中 = 列出人工确认
+ *   4. docsInfo      — 文档层仅提示（docs/** + skill），命中 = 信息提示
  *
  * 注意：本脚本只读取文件、不删除任何东西，不受 WorkBuddy safe-delete 拦截影响。
  */
@@ -109,20 +113,33 @@ for (const [key, cfg] of Object.entries(CONFIG)) {
 
 // 输出
 console.log('\n══════════════ 红线守门扫描结果 ════════════\n');
+const keyLabels = {
+  codeBanned: '① 画面层硬禁',
+  voiceBanned: '② 口播/文案层硬禁',
+  outputsReview: '③ 文案层需确认',
+  docsInfo: '④ 文档层仅提示',
+};
 for (const r of report) {
+  const label = keyLabels[r.key] || r.key;
   const tag = r.hits.length === 0 ? '✅ 通过' : (CONFIG[r.key]?.exitOnHit ? '❌ 硬失败' : '⚠️ 需确认');
-  console.log(`【${r.key}】${tag} —— 命中 ${r.hits.length} 处`);
+  console.log(`${label}  ${tag} —— 命中 ${r.hits.length} 处`);
   if (r.hits.length) {
     for (const h of r.hits) console.log(`   ${h.file}:${h.line}  «${h.token}»`);
   }
 }
 console.log('\n────────────────────────────────────────────');
-if (hardFail) {
-  console.log('❌ 存在 code 层红线违禁词（video/src 渲染真相源）。未修复前不得声明「已对齐/已完成」。');
-  console.log('   请修改 VTemplate.tsx 等合成代码，移除上述违禁词后重跑本脚本。\n');
+const hardFailCount = report.filter(r => CONFIG[r.key]?.exitOnHit && r.hits.length > 0).length;
+if (hardFailCount > 0) {
+  console.log(`❌ 存在 ${hardFailCount} 个硬失败层级（画面/口播违禁词）。未修复前不得声明「已对齐/已完成」。`);
+  console.log('   请修改对应文件，移除违禁词后重跑本脚本。\n');
   process.exit(1);
 } else {
-  console.log('✅ code 层零命中（画面真相源合规）。');
-  console.log('   outputs/docs 层命中请逐条确认是「规则说明句」（三平台文章/视频均禁用微信搜索/免费/小程序，无合规导流例外），确认无误即可收口。\n');
+  console.log('✅ 硬禁层零命中（画面 + 口播均合规）。');
+  const reviewCount = report.find(r => r.key === 'outputsReview')?.hits.length || 0;
+  if (reviewCount > 0) {
+    console.log(`⚠️ 文案层有 ${reviewCount} 处需人工确认，请逐条判断是否为「规则说明句」。`);
+    console.log('   三平台文章/视频均禁用微信搜索/小程序导流，无合规导流例外。');
+  }
+  console.log('   确认无误即可收口。\n');
   process.exit(0);
 }

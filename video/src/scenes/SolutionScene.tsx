@@ -10,7 +10,7 @@ import { FONT_BODY, PALETTES, TYPOGRAPHY } from '../palette';
 import type { Scene, StyleConfig } from '../types';
 import { Ico } from '../components/icons';
 import { FadeInUp } from '../components/animations';
-import { SlideTag, SectionTitle } from '../components/ui';
+import { SectionTitle } from '../components/ui';
 import { DotGrid } from '../components/background';
 
 export const SolutionScene: React.FC<{ scene: Scene; style: StyleConfig; index: number; total: number }> = ({
@@ -21,9 +21,8 @@ export const SolutionScene: React.FC<{ scene: Scene; style: StyleConfig; index: 
   const isHorizontal = scene.layout === 'horizontal';
 
   return (
-    <AbsoluteFill style={{ background: p.paper, justifyContent: 'center' }}>
+    <AbsoluteFill style={{ background: `${p.paper}bf`, justifyContent: 'center' }}>
       <DotGrid color={`${p.accent}10`} spacing={44} size={3} />
-      <SlideTag cur={index + 1} total={total} />
       <div style={{ position: 'absolute', top: 110, width: '100%', padding: '0 56px' }}>
         <SectionTitle text={scene.title ?? ''} color={p.ink} size={60} underline={p.accent} />
       </div>
@@ -69,14 +68,14 @@ export const SolutionScene: React.FC<{ scene: Scene; style: StyleConfig; index: 
                 width: 860, height: 140, backgroundColor: '#fff', borderRadius: 24,
                 display: 'flex', alignItems: 'center', gap: 32, padding: '0 40px',
                 boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-                borderLeft: `6px solid ${p.accent}`,
+                borderLeft: `6px solid ${it.color}`,
               }}>
                 <div style={{
-                  width: 72, height: 72, backgroundColor: `${p.accent}15`,
+                  width: 72, height: 72, backgroundColor: `${it.color}26`,
                   borderRadius: 18, padding: 16, flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  {Ico[it.icon](p.accent)}
+                  {Ico[it.icon](it.color)}
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{

@@ -9,7 +9,6 @@ import { INK, PALETTES, PAPER, TYPOGRAPHY } from '../palette';
 import type { Scene, StyleConfig } from '../types';
 import { Ico } from '../components/icons';
 import { FadeInUp, ScaleIn, EASE_OUT } from '../components/animations';
-import { SlideTag } from '../components/ui';
 import { GlowOrb } from '../components/background';
 
 const ArrowNode: React.FC<{ i: number; color: string }> = ({ i, color }) => {
@@ -34,8 +33,7 @@ export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
   const f = useCurrentFrame();
   const nodes = scene.nodes ?? [];
   return (
-    <AbsoluteFill style={{ background: `linear-gradient(150deg, ${p.bgDark} 0%, ${p.bgDark2} 100%)`, justifyContent: 'center' }}>
-      <SlideTag cur={index + 1} total={total} dark />
+    <AbsoluteFill style={{ background: `linear-gradient(150deg, ${p.bgDark}b3 0%, ${p.bgDark2}b3 100%)`, justifyContent: 'center' }}>
       <GlowOrb x={-80} y={-60} size={450} color={`${p.accent}30`} />
       <GlowOrb x={650} y={1100} size={380} color={`${p.accent}20`} delay={12} />
       <div style={{ position: 'absolute', top: 130, width: '100%', padding: '0 56px' }}>

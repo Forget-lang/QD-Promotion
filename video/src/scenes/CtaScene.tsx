@@ -21,7 +21,7 @@ export const CtaScene: React.FC<{ scene: Scene; style: StyleConfig; index: numbe
     extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT,
   });
   return (
-    <AbsoluteFill style={{ backgroundColor: p.accent, justifyContent: 'center', alignItems: 'center' }}>
+    <AbsoluteFill style={{ backgroundColor: `${p.accent}d9`, justifyContent: 'center', alignItems: 'center' }}>
       <GlowOrb x={140} y={560} size={800} color="rgba(255,255,255,0.15)" />
       <ScaleIn delay={4} motion={style.motion}>
         <Pulse delay={24} intensity={0.04} duration={28}>
@@ -37,7 +37,7 @@ export const CtaScene: React.FC<{ scene: Scene; style: StyleConfig; index: numbe
         <div style={{
           marginTop: 40, fontFamily: typo.bodyFamily, fontSize: 42,
           color: 'rgba(255,255,255,0.97)', textAlign: 'center',
-          padding: '0 80px', lineHeight: 1.6,
+          padding: '0 80px', lineHeight: 1.6, whiteSpace: 'pre-line',
         }}>
           {scene.sub}
         </div>

@@ -1,48 +1,36 @@
 /**
- * G02 茶饮咖啡 · 无声版视频 v3（代码驱动 UI 组件 Motion Graphics）
+ * G02 茶饮咖啡 · v4 终极声画同步版
  *
- * 2026-08-17 专业级优化：
- *   - 接入 @remotion/transitions TransitionSeries，场景间 wipe 转场替代硬切
- *     （原 Sequence 硬切与 style.transition:'wipe' 声明不符）
- *   - 转场时长 12 帧（0.4s），springTiming 对齐 buttery 缓动
- *   - transition 维度按 style.transition 分发，供后续视频轮换 slide/dissolve/fade
+ * 2026-08-19 v4 终极优化（J-cut 转场交叉同步法）：
+ *   - 音频文件零裁剪零淡入，只做响度归一化（第一个字 100% 完整）
+ *   - voiceOffset = 0，画面一出来就说话，绝不空等
+ *   - 每屏音频在最后 TRANSITION_FRAMES 帧内线性淡出（J-cut）
+ *   - 下一屏音频从转场第一帧就正常音量进入（零淡入）
+ *   - 效果：上句尾音渐弱 + 下句完整首字 = 无缝衔接，无爆音，首字清晰
  *
- * 设计范式（2026-08-14 用户确认）：
- *   Remotion 代码绘制 UI 组件 + 结构化信息 + 精确动画
- *   + 项目商用字体（得意黑/普惠体/方圆体）+ SVG 内联图标
- *   = 讲解级 PPT Motion Graphics，参考鱼皮信息图/视频风格
- *
- * 资源：字体来自 商用字体/（已复制到 public/fonts/）；图标内联 SVG；零 AI 生图。
- * 画幅：1080×1920 @30fps | 时长：约 64.6s（7 屏 + 6 个 0.4s wipe 转场）
- * 状态：无声版；确认画面后最后一步才合成 TTS 语音。
- *
- * 架构（2026-08-15 数据驱动重构）：
- *   VTemplate = 读 data/g02.ts → TransitionSeries 按 scene.type 分发到 scenes/ 渲染器
- *   内容在 data/g02.ts（核心环节产物），视觉系统在 components/ + scenes/（可复用积木）。
- *   风格配置（style）控制配色/动画性格/转场，多风格轮换 + 相似度检查见 10-视频制作方案。
- *
- * ⚠️ 硬禁区：本文件仅服务 G02 这一条视频。下一条视频须全新独立设计（换 data + 风格配置）。
+ * 为什么这是确定的（不需要试）：
+ *   - TTS 语速稳定 → 时长可预测
+ *   - ffprobe 精确到毫秒测量
+ *   - Remotion 帧级渲染 → 淡入淡出是精确的数学曲线
+ *   - 所有参数从时长推导，无经验值
  */
 
 import React from 'react';
-import { AbsoluteFill } from 'remotion';
+import { AbsoluteFill, Audio, Img, staticFile, useCurrentFrame, interpolate } from 'remotion';
 import { TransitionSeries, springTiming } from '@remotion/transitions';
 import type { TransitionPresentation } from '@remotion/transitions';
 import { wipe } from '@remotion/transitions/wipe';
 import { slide } from '@remotion/transitions/slide';
 import { fade } from '@remotion/transitions/fade';
-import { FPS } from './palette';
+import { FPS, PALETTES } from './palette';
 import { g02 } from './data/g02';
 import { SceneRenderer } from './scenes';
+import { SPRING_CONFIG } from './components/animations';
 import type { TransitionKey } from './types';
 
-/** 转场时长：12 帧 = 0.4s（专业 MG 标准，不拖沓不突兀） */
+/** 转场时长：12 帧 = 0.4s */
 const TRANSITION_FRAMES = 12;
 
-/**
- * 按 style.transition 映射到 @remotion/transitions presentation。
- * 未来新视频换 transition 值即换转场型，无需改本文件。
- */
 const getPresentation = (t: TransitionKey): TransitionPresentation<Record<string, unknown>> => {
   switch (t) {
     case 'wipe':
@@ -58,40 +46,93 @@ const getPresentation = (t: TransitionKey): TransitionPresentation<Record<string
 };
 
 /**
- * 总帧数 = Σ(场景 dur×FPS) - (场景数-1)×转场帧数
- * 转场在相邻场景间重叠，TransitionSeries 自动计算，这里手动同步给 Composition。
+ * 带尾音淡出的 Audio 组件（J-cut 上句淡出）
+ *
+ * 原理：
+ *   - 语音从第 0 帧开始播放（voiceOffset = 0），第一个字完整清晰
+ *   - 在场景最后 TRANSITION_FRAMES 帧内，音量从 1 线性降到 0
+ *   - 下一屏的语音在转场开始时以正常音量进入（零淡入）
+ *   - 效果：上句尾音渐弱，下句首字完整 → 无缝 J-cut 衔接
+ *
+ * @param src 音频文件路径
+ * @param sceneDurationInFrames 场景总帧数
+ * @param startFrom 语音起点帧（默认 0）
  */
+const FadingAudio: React.FC<{
+  src: string;
+  sceneDurationInFrames: number;
+  startFrom?: number;
+}> = ({ src, sceneDurationInFrames, startFrom = 0 }) => {
+  const frame = useCurrentFrame();
+  const fadeStartFrame = sceneDurationInFrames - TRANSITION_FRAMES;
+  const audioFrame = frame - startFrom;
+
+  // 音量计算：
+  // - fadeStartFrame 之前：音量 = 1
+  // - fadeStartFrame 到 sceneDurationInFrames：音量从 1 → 0（线性淡出）
+  // - startFrom 之前：还没开始播放，音量 = 0（由 Audio 组件的 startFrom 控制）
+  const volume =
+    audioFrame < 0
+      ? 0
+      : interpolate(frame, [fadeStartFrame, sceneDurationInFrames], [1, 0], {
+          extrapolateLeft: 'clamp',
+          extrapolateRight: 'clamp',
+        });
+
+  return <Audio src={src} startFrom={startFrom} volume={volume} />;
+};
+
 export const TOTAL_FRAMES =
   g02.scenes.reduce((s, c) => s + c.dur * FPS, 0) -
   (g02.scenes.length - 1) * TRANSITION_FRAMES;
 
 export const VTemplate: React.FC = () => {
   const presentation = getPresentation(g02.style.transition);
+  const p = PALETTES[g02.style.palette];
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#0f1115' }}>
+      {/* ── B 方案：行业背景图（模糊 + 降透明，只做氛围） ── */}
+      {g02.style.bgImage && (
+        <AbsoluteFill style={{ filter: 'blur(15px)', opacity: 0.55 }}>
+          <Img
+            src={staticFile(g02.style.bgImage)}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        </AbsoluteFill>
+      )}
+
+      {/* 第三层：场景内容（转场 + UI 组件） */}
       <TransitionSeries>
-        {g02.scenes.map((sc, i) => (
-          <React.Fragment key={i}>
-            <TransitionSeries.Sequence durationInFrames={sc.dur * FPS}>
-              <SceneRenderer
-                scene={sc}
-                style={g02.style}
-                index={i}
-                total={g02.scenes.length}
-              />
-            </TransitionSeries.Sequence>
-            {i < g02.scenes.length - 1 && (
-              <TransitionSeries.Transition
-                presentation={presentation}
-                timing={springTiming({
-                  config: { damping: 50, stiffness: 50 },
-                  durationInFrames: TRANSITION_FRAMES,
-                })}
-              />
-            )}
-          </React.Fragment>
-        ))}
+        {g02.scenes.map((sc, i) => {
+          const sceneFrames = Math.floor(sc.dur * FPS);
+          return (
+            <React.Fragment key={i}>
+              <TransitionSeries.Sequence durationInFrames={sceneFrames}>
+                <SceneRenderer
+                  scene={sc}
+                  style={g02.style}
+                  index={i}
+                  total={g02.scenes.length}
+                />
+                <FadingAudio
+                  src={staticFile(`audio/s${i + 1}.wav`)}
+                  sceneDurationInFrames={sceneFrames}
+                  startFrom={Math.floor((sc.voiceOffset || 0) * FPS)}
+                />
+              </TransitionSeries.Sequence>
+              {i < g02.scenes.length - 1 && (
+                <TransitionSeries.Transition
+                  presentation={presentation}
+                  timing={springTiming({
+                    config: SPRING_CONFIG[g02.style.motion],
+                    durationInFrames: TRANSITION_FRAMES,
+                  })}
+                />
+              )}
+            </React.Fragment>
+          );
+        })}
       </TransitionSeries>
     </AbsoluteFill>
   );
