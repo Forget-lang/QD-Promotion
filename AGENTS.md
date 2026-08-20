@@ -4,7 +4,7 @@
 > 本文件是「入口卡片」：告诉 AI 去哪读权威信息、守什么硬约束。**权威状态永远在 `docs/` + skill，不在此文件重述。**
 
 ## 项目一句话
-面向实体店的电子券工具（做券→发券→领券→扫码核销→统计）的内容运营项目，当前做宣传推广线冷启动（抖音/小红书短视频 + 搜狐长文）。
+面向实体店的电子券工具（做券→发券→领券→扫码核销→统计）的内容运营项目，当前做宣传推广线冷启动（抖音短视频 + 小红书图文 + 搜狐长文）。
 
 ## AI 角色与协作范式（开工前必读）
 
@@ -29,7 +29,7 @@
 
 ## 开工必读（按序）
 1. `docs/工作流指引.md` —— **AI 接手手册**：新会话读它即明确如何开工（行业单元端到端范式）
-2. `.workbuddy/skills/quandao-content/SKILL.md` —— **红线/核心模型/SOP 单一权威**（§二 铁律红线 / §五 生产 SOP / §六 风格库）
+2. `.workbuddy/skills/quandao-content/SKILL.md` —— **开工导航页**（红线唯一真源=14 号文档，核心模型与 SOP 见 `docs/internal/`）
 3. `.workbuddy/memory/MEMORY.md` —— **项目长期记忆**（决策锚 / 进度 / 协作准则）
 4. `docs/战略简报.md` —— 用户唯一需读的人话简报（AI 也应了解）
 
@@ -41,7 +41,7 @@
 - **内容质量唯一源**：`docs/internal/08-内容质量三层标准.md`（三层结构：硬边界/方向锚/创作自由）
 - **SOP 唯一源**：`docs/internal/12-宣传产品工作完整操作流程.md`
 - **视频技术唯一源**：`docs/internal/13-Remotion技术规范与设计稿工作流.md`（动画硬规则/设计稿模板/图片素材规格表/风格五维落地状态）
-- **红线唯一源**：`quandao-content` skill §二（`scripts/redlines.json` 为违禁词机器守卫数据源）
+- **红线唯一源**：`docs/internal/14-内容红线.md`（红线唯一真源，`scripts/redlines.json` 为违禁词机器守卫数据源）
 - **记忆唯一源**：`.workbuddy/memory/MEMORY.md`（决策锚/进度/经验沉淀/决策日志，所有更新直接写此文件）；`YYYY-MM-DD.md` 仅为可选过程流水，非权威。
 
 > 产品文档三兄弟：策划选题翻 05（找卖点）→ 写文案查 00（对事实）→ 写教程查 02（对流程）。任何对外描述以 00 号为最终裁决。
@@ -57,13 +57,13 @@
 ## 目录规范
 ```
 promotion/
-├── docs/internal/   权威文档（00-13），只此一份，outputs 不放副本
+├── docs/internal/   权威文档（00-14），只此一份，outputs 不放副本
 ├── outputs/
 │   ├── gXX-行业/     行业单元最终交付物（四件套/攻略/设计稿/视频）
 │   └── archive/     过程文件/审计报告/调研资料（日期前缀）
 ├── scripts/         红线闸门等工具
 ├── video/           Remotion 工程
-└── .workbuddy/      AI 工作区（memory=MEMORY.md / skills / tmp）
+└── .workbuddy/      AI 工作区（memory=MEMORY.md / skills）
 ```
 - `outputs/` 根目录不放散文件；非交付物一律进 `archive/`。
 - 权威文档需要复制时从 `docs/internal/` 取，不在 `outputs/` 建副本（避免不同步）。

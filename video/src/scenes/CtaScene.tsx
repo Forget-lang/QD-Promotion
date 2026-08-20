@@ -8,6 +8,7 @@ import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
 import { PALETTES, TYPOGRAPHY } from '../palette';
 import type { Scene, StyleConfig } from '../types';
 import { FadeInUp, ScaleIn, Pulse, EASE_OUT } from '../components/animations';
+import { CharReveal } from '../components/ui';
 import { GlowOrb } from '../components/background';
 
 export const CtaScene: React.FC<{ scene: Scene; style: StyleConfig; index: number; total: number }> = ({
@@ -28,8 +29,9 @@ export const CtaScene: React.FC<{ scene: Scene; style: StyleConfig; index: numbe
           <div style={{
             fontFamily: typo.family, fontSize: 104, fontWeight: typo.titleWeight, color: '#fff',
             textAlign: 'center', lineHeight: 1.25, padding: '0 60px',
+            letterSpacing: '-0.01em', textShadow: '0 6px 40px rgba(0,0,0,0.35)',
           }}>
-            {scene.title}
+            <CharReveal text={scene.title ?? ''} delay={8} stagger={4} />
           </div>
         </Pulse>
       </ScaleIn>

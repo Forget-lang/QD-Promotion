@@ -12,6 +12,7 @@ import { FPS } from '../palette';
 import type { Scene, StyleConfig } from '../types';
 import { Ico } from '../components/icons';
 import { FadeInUp, ScaleIn, WipeIn, Pulse, EASE_OUT, SPRING_CONFIG } from '../components/animations';
+import { CharReveal } from '../components/ui';
 import { GlowOrb } from '../components/background';
 
 export const HookScene: React.FC<{ scene: Scene; style: StyleConfig; index: number; total: number }> = ({
@@ -46,13 +47,35 @@ export const HookScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
   );
 };
 
-// 数字型钩子：标题中拆出数字，accent 色弹入 + Pulse
+// 数字型钩子：从 scene.hookNumber / hookUnit 读取数字和单位，不传则降级为普通标题
 const NumberHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family: string; titleWeight: number; bodyWeight: number }; p: typeof PALETTES['mint-cool'] }> = ({ scene, style, typo, p }) => {
+  const hasNumber = scene.hookNumber && scene.hookNumber.length > 0;
   const title = scene.title ?? '';
-  const splitIdx = title.indexOf('十次');
-  const before = splitIdx >= 0 ? title.slice(0, splitIdx) : title;
-  const after = splitIdx >= 0 ? title.slice(splitIdx + 2) : '';
 
+  // 如果没有数字字段，降级为普通标题（文字居中，无强调）
+  if (!hasNumber) {
+    return (
+      <>
+        <div style={{
+          fontFamily: typo.family, fontSize: 108, fontWeight: typo.titleWeight, color: p.paper,
+          textAlign: 'center', lineHeight: 1.15, letterSpacing: '-0.01em',
+          textShadow: '0 4px 30px rgba(0,0,0,0.5)',
+        }}>
+          <CharReveal text={title} delay={2} />
+        </div>
+        <FadeInUp delay={20} motion={style.motion}>
+          <div style={{
+            marginTop: 36, fontFamily: FONT_BODY, fontSize: 40,
+            color: 'rgba(255,255,255,0.78)', textAlign: 'center', lineHeight: 1.5,
+          }}>
+            {scene.sub}
+          </div>
+        </FadeInUp>
+      </>
+    );
+  }
+
+  // 有数字：数字弹入 + Pulse 强调
   return (
     <>
       <WipeIn delay={2} duration={18}>
@@ -61,20 +84,21 @@ const NumberHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family: s
           textAlign: 'center', lineHeight: 1.15,
           textShadow: '0 4px 30px rgba(0,0,0,0.5)',
         }}>
-          {before}
-          {splitIdx >= 0 && (
-            <ScaleIn delay={8} motion={style.motion} startScale={0.3}>
-              <Pulse delay={28} intensity={0.08} duration={24}>
-                <span style={{
-                  fontSize: 148, color: p.accent,
-                  textShadow: `0 0 40px ${p.accent}55`,
-                }}>
-                  10<span style={{ fontSize: 80 }}>次</span>
-                </span>
-              </Pulse>
-            </ScaleIn>
-          )}
-          {after}
+          {title.split(scene.hookNumber!)[0]}
+          <ScaleIn delay={8} motion={style.motion} startScale={0.3}>
+            <Pulse delay={28} intensity={0.08} duration={24}>
+              <span style={{
+                fontSize: 148, color: p.accent,
+                textShadow: `0 0 40px ${p.accent}55`,
+              }}>
+                {scene.hookNumber}
+                {scene.hookUnit && (
+                  <span style={{ fontSize: 80 }}>{scene.hookUnit}</span>
+                )}
+              </span>
+            </Pulse>
+          </ScaleIn>
+          {title.split(scene.hookNumber!)[1] ?? ''}
         </div>
       </WipeIn>
       <FadeInUp delay={20} motion={style.motion}>
@@ -113,10 +137,10 @@ const ClockHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family: st
       <WipeIn delay={12} duration={16}>
         <div style={{
           fontFamily: typo.family, fontSize: 82, fontWeight: typo.titleWeight,
-          color: p.paper, textAlign: 'center', lineHeight: 1.2,
+          color: p.paper, textAlign: 'center', lineHeight: 1.2, letterSpacing: '-0.01em',
           textShadow: '0 4px 30px rgba(0,0,0,0.5)',
         }}>
-          {scene.title}
+          <CharReveal text={scene.title ?? ''} delay={14} />
         </div>
       </WipeIn>
       <FadeInUp delay={28} motion={style.motion}>
@@ -194,10 +218,10 @@ const QuestionHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family:
       <WipeIn delay={12} duration={16}>
         <div style={{
           fontFamily: typo.family, fontSize: 88, fontWeight: typo.titleWeight,
-          color: p.paper, textAlign: 'center', lineHeight: 1.2,
+          color: p.paper, textAlign: 'center', lineHeight: 1.2, letterSpacing: '-0.01em',
           textShadow: '0 4px 30px rgba(0,0,0,0.5)',
         }}>
-          {scene.title}
+          <CharReveal text={scene.title ?? ''} delay={14} />
         </div>
       </WipeIn>
       <FadeInUp delay={28} motion={style.motion}>

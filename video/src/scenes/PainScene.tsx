@@ -8,7 +8,8 @@ import { ACCENT_RED, PALETTES, TYPOGRAPHY } from '../palette';
 import { FPS } from '../palette';
 import type { Scene, StyleConfig } from '../types';
 import { Ico } from '../components/icons';
-import { FadeInUp, SlideInLeft, SlideInRight, SPRING_CONFIG } from '../components/animations';
+import { FadeInUp, SlideInLeft, SPRING_CONFIG } from '../components/animations';
+import { CharReveal } from '../components/ui';
 import { DotGrid } from '../components/background';
 
 export const PainScene: React.FC<{ scene: Scene; style: StyleConfig; index: number; total: number }> = ({
@@ -26,11 +27,14 @@ export const PainScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
     <AbsoluteFill style={{ background: `${p.bg}bf`, justifyContent: 'center' }}>
       <DotGrid color={`${p.accent}0d`} spacing={44} size={3} />
       <div style={{ position: 'absolute', top: 110, width: '100%', padding: '0 56px' }}>
-        <FadeInUp motion={style.motion}>
-          <div style={{ fontFamily: typo.family, fontSize: 56, fontWeight: typo.titleWeight, color: p.ink, textAlign: 'center', lineHeight: 1.25 }}>
-            {scene.title}
-          </div>
-        </FadeInUp>
+        <CharReveal
+          text={scene.title ?? ''}
+          delay={2}
+          style={{
+            fontFamily: typo.family, fontSize: 56, fontWeight: typo.titleWeight, color: p.ink,
+            textAlign: 'center', lineHeight: 1.25,
+          }}
+        />
       </div>
 
       <AbsoluteFill style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 28, paddingTop: 120 }}>
@@ -38,7 +42,8 @@ export const PainScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
         <SlideInLeft delay={10} motion={style.motion}>
           <div style={{
             width: 460, height: 560, backgroundColor: '#fff', borderRadius: 28,
-            boxShadow: '0 18px 50px rgba(239,83,80,0.18)', border: '3px solid #FFCDD2',
+            boxShadow: '0 18px 50px rgba(239,83,80,0.16), 0 2px 8px rgba(15,17,21,0.06)',
+            border: '3px solid #FFCDD2',
             padding: 40, display: 'flex', flexDirection: 'column',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
@@ -67,7 +72,7 @@ export const PainScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
           <div style={{
             width: 460, height: 560, borderRadius: 28,
             background: `linear-gradient(150deg, ${p.accent} 0%, ${p.accentDark} 100%)`,
-            boxShadow: `0 18px 50px ${p.accent}47`,
+            boxShadow: `0 18px 50px ${p.accent}40, inset 0 1px 0 rgba(255,255,255,0.25)`,
             padding: 44, display: 'flex', flexDirection: 'column', justifyContent: 'center',
           }}>
             <div style={{ width: 56, height: 56, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 14, padding: 12, marginBottom: 24 }}>{Ico.check('#fff')}</div>

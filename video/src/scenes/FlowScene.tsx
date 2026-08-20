@@ -9,6 +9,7 @@ import { INK, PALETTES, PAPER, TYPOGRAPHY } from '../palette';
 import type { Scene, StyleConfig } from '../types';
 import { Ico } from '../components/icons';
 import { FadeInUp, ScaleIn, EASE_OUT } from '../components/animations';
+import { CharReveal } from '../components/ui';
 import { GlowOrb } from '../components/background';
 
 const ArrowNode: React.FC<{ i: number; color: string }> = ({ i, color }) => {
@@ -37,11 +38,14 @@ export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
       <GlowOrb x={-80} y={-60} size={450} color={`${p.accent}30`} />
       <GlowOrb x={650} y={1100} size={380} color={`${p.accent}20`} delay={12} />
       <div style={{ position: 'absolute', top: 130, width: '100%', padding: '0 56px' }}>
-        <FadeInUp motion={style.motion}>
-          <div style={{ fontFamily: typo.family, fontSize: 58, fontWeight: typo.titleWeight, color: PAPER, textAlign: 'center' }}>
-            {scene.title}
-          </div>
-        </FadeInUp>
+        <CharReveal
+          text={scene.title ?? ''}
+          delay={2}
+          style={{
+            fontFamily: typo.family, fontSize: 58, fontWeight: typo.titleWeight, color: PAPER,
+            textAlign: 'center', lineHeight: 1.2, letterSpacing: '-0.01em',
+          }}
+        />
       </div>
 
       <AbsoluteFill style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingTop: 150 }}>
@@ -63,6 +67,7 @@ export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
                   width: 210, height: 210, borderRadius: 26,
                   backgroundColor: bgColor,
                   border: `3px solid ${borderColor}`,
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.10)',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12,
                   opacity,
                 }}>
@@ -83,6 +88,7 @@ export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
           <div style={{
             fontFamily: typo.bodyFamily, fontSize: 34, color: 'rgba(255,255,255,0.85)',
             backgroundColor: 'rgba(255,255,255,0.1)', padding: '12px 32px', borderRadius: 999,
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
           }}>
             {scene.footnote}
           </div>

@@ -4,8 +4,8 @@ import React from 'react';
 import { AbsoluteFill } from 'remotion';
 import { INK, PALETTES, TYPOGRAPHY } from '../palette';
 import type { Scene, StyleConfig } from '../types';
-import { Ico } from '../components/icons';
-import { FadeInUp, ScaleIn } from '../components/animations';
+import { ScaleIn } from '../components/animations';
+import { CharReveal, IconBadge, elevation } from '../components/ui';
 import { DotGrid } from '../components/background';
 
 export const GridScene: React.FC<{ scene: Scene; style: StyleConfig; index: number; total: number }> = ({
@@ -17,21 +17,24 @@ export const GridScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
     <AbsoluteFill style={{ background: `${p.bg}bf`, justifyContent: 'center' }}>
       <DotGrid color={`${p.accent}0d`} spacing={44} size={3} />
       <div style={{ position: 'absolute', top: 120, width: '100%', padding: '0 56px' }}>
-        <FadeInUp motion={style.motion}>
-          <div style={{ fontFamily: typo.family, fontSize: 58, fontWeight: typo.titleWeight, color: INK, textAlign: 'center' }}>
-            {scene.title}
-          </div>
-        </FadeInUp>
+        <CharReveal
+          text={scene.title ?? ''}
+          delay={2}
+          style={{
+            fontFamily: typo.family, fontSize: 58, fontWeight: typo.titleWeight, color: INK,
+            textAlign: 'center', lineHeight: 1.2, letterSpacing: '-0.01em',
+          }}
+        />
       </div>
       <AbsoluteFill style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 26, paddingTop: 200 }}>
         {(scene.cards ?? []).map((c, i) => (
           <ScaleIn key={i} delay={10 + i * 10} motion={style.motion}>
             <div style={{
               width: 400, height: 220, backgroundColor: '#fff', borderRadius: 24,
-              boxShadow: '0 12px 32px rgba(0,0,0,0.08)', padding: 28,
+              boxShadow: `${elevation(2)}, inset 0 1px 0 rgba(255,255,255,0.6)`, padding: 28,
               display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10,
             }}>
-              <div style={{ width: 56, height: 56, backgroundColor: `${c.color}1a`, borderRadius: 14, padding: 12 }}>{Ico[c.icon](c.color)}</div>
+              <IconBadge icon={c.icon} color={c.color} size={56} pad={12} radius={14} />
               <div style={{ fontFamily: typo.family, fontSize: 38, fontWeight: typo.titleWeight, color: INK }}>{c.title}</div>
               <div style={{ fontFamily: typo.bodyFamily, fontSize: 26, color: '#888' }}>{c.desc}</div>
             </div>

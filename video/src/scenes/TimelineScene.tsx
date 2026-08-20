@@ -106,7 +106,7 @@ export const TimelineScene: React.FC<{
   const curveColor = isSolution && liftProgress > 0.5 ? p.accent : (isSolution ? ACCENT_RED : p.ink);
 
   return (
-    <AbsoluteFill style={{ background: p.bg, justifyContent: 'flex-start' }}>
+    <AbsoluteFill style={{ background: `${p.bg}bf`, justifyContent: 'flex-start' }}>
       <DotGrid color={`${p.accent}0d`} spacing={44} size={3} />
 
       {/* 标题 */}

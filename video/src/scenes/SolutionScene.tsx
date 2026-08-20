@@ -8,9 +8,8 @@ import { AbsoluteFill } from 'remotion';
 import { FONT_BODY, PALETTES, TYPOGRAPHY } from '../palette';
 // FONT_BODY 保留用于 fallback；正文实际使用 typo.bodyFamily
 import type { Scene, StyleConfig } from '../types';
-import { Ico } from '../components/icons';
 import { FadeInUp } from '../components/animations';
-import { SectionTitle } from '../components/ui';
+import { SectionTitle, IconBadge, elevation } from '../components/ui';
 import { DotGrid } from '../components/background';
 
 export const SolutionScene: React.FC<{ scene: Scene; style: StyleConfig; index: number; total: number }> = ({
@@ -34,16 +33,11 @@ export const SolutionScene: React.FC<{ scene: Scene; style: StyleConfig; index: 
             <FadeInUp key={i} delay={10 + i * 12} motion={style.motion}>
               <div style={{
                 width: 300, height: 460, backgroundColor: '#fff', borderRadius: 28,
-                boxShadow: '0 12px 40px rgba(0,0,0,0.08)',
+                boxShadow: `${elevation(2)}, inset 0 1px 0 rgba(255,255,255,0.6)`,
                 borderTop: `6px solid ${p.accent}`,
                 padding: 40, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 20,
               }}>
-                <div style={{
-                  width: 90, height: 90, backgroundColor: `${p.accent}15`,
-                  borderRadius: 24, padding: 20, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  {Ico[it.icon](p.accent)}
-                </div>
+                <IconBadge icon={it.icon} color={p.accent} size={90} pad={20} radius={24} />
                 <div style={{
                   fontFamily: typo.family, fontSize: 38, fontWeight: typo.titleWeight, color: p.ink, lineHeight: 1.3,
                 }}>
@@ -67,16 +61,10 @@ export const SolutionScene: React.FC<{ scene: Scene; style: StyleConfig; index: 
               <div style={{
                 width: 860, height: 140, backgroundColor: '#fff', borderRadius: 24,
                 display: 'flex', alignItems: 'center', gap: 32, padding: '0 40px',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                boxShadow: elevation(1),
                 borderLeft: `6px solid ${it.color}`,
               }}>
-                <div style={{
-                  width: 72, height: 72, backgroundColor: `${it.color}26`,
-                  borderRadius: 18, padding: 16, flexShrink: 0,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  {Ico[it.icon](it.color)}
-                </div>
+                <IconBadge icon={it.icon} color={it.color} size={72} pad={16} radius={18} />
                 <div style={{ flex: 1 }}>
                   <div style={{
                     fontFamily: typo.family, fontSize: 40, fontWeight: typo.titleWeight, color: p.ink, lineHeight: 1.2,

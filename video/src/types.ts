@@ -52,8 +52,14 @@ export interface Scene {
   dur: number;
   /** 语音起点偏移（秒）：画面先出现，延迟 X 秒后开口说话。默认 0。 */
   voiceOffset?: number;
+  /** 语音实测时长（秒，ffprobe 回填）：淡出从语音实际结束点开始，尾字零削波；不填退回固定 12 帧淡出 */
+  voiceDur?: number;
   /** 字幕文本（底部安全区显示，建议每行不超 16 字） */
   subtitle?: string;
+  /** number 型钩子：数字部分（如 "10"），不传则降级为普通标题 */
+  hookNumber?: string;
+  /** number 型钩子：单位部分（如 "次"） */
+  hookUnit?: string;
   title?: string;
   sub?: string;
   layout?: 'vertical' | 'horizontal';

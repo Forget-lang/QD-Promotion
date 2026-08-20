@@ -1,9 +1,298 @@
-// 通用 UI 组件（仅提效，非模板）· 2026-08-17 专业级优化
-// - SectionTitle 下划线宽度按中文字符精确估算 + EASE_OUT 缓动
+// 通用 UI 组件（仅提效，非模板）· 2026-08-17 专业级优化 · 2026-08-20 质感升级 + 内容四件套
+// - SectionTitle 下划线宽度按中文字符精确估算 + EASE_OUT 缓动 + 逐字入场
+// - 质感积木：CharReveal / AccentWord / IconBadge / PhoneMockup / elevation
+// - 内容四件套：CouponCard / StatCounter+StatCard / StepFlow / CompareCard（生长机制见 13 号 §8.5）
 import React from 'react';
-import { interpolate, useCurrentFrame } from 'remotion';
-import { FONT_BODY, FONT_TITLE, INK, PAPER } from '../palette';
-import { EASE_OUT } from './animations';
+import { interpolate, interpolateColors, spring, useCurrentFrame } from 'remotion';
+import { ACCENT_GREEN, ACCENT_RED, FONT_BODY, FONT_TITLE, FPS, INK, PAPER } from '../palette';
+import { EASE_OUT, SPRING_CONFIG } from './animations';
+import { Ico } from './icons';
+import type { IconKey } from './icons';
+
+/** 三级投影（浅底/深底两套），全片光影方向统一向下 */
+export const elevation = (level: 1 | 2 | 3, dark = false): string => {
+  const light = ['0 2px 8px rgba(15,17,21,0.08)', '0 12px 36px rgba(15,17,21,0.12)', '0 24px 64px rgba(15,17,21,0.20)'];
+  const darkShadows = ['0 2px 10px rgba(0,0,0,0.30)', '0 12px 36px rgba(0,0,0,0.38)', '0 24px 64px rgba(0,0,0,0.52)'];
+  return (dark ? darkShadows : light)[level - 1];
+};
+
+/** 逐字 mask 入场：每字从下方 reveal，stagger 默认 2 帧（大标题专用，贵感来源） */
+export const CharReveal: React.FC<{
+  text: string; delay?: number; stagger?: number; duration?: number; style?: React.CSSProperties;
+}> = ({ text, delay = 0, stagger = 2, duration = 14, style }) => {
+  const f = useCurrentFrame();
+  return (
+    <div style={{ display: 'inline-block', ...style }}>
+      {text.split('').map((ch, i) => {
+        const p = interpolate(f - delay - i * stagger, [0, duration], [0, 1], {
+          extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT,
+        });
+        return (
+          <span key={i} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'top' }}>
+            <span style={{
+              display: 'inline-block',
+              transform: `translateY(${(1 - p) * 110}%)`,
+              opacity: Math.min(1, p * 1.6),
+            }}>{ch}</span>
+          </span>
+        );
+      })}
+    </div>
+  );
+};
+
+/** 重音词大字：字号 + 颜色同时弹入（对齐口播重音帧使用，位置由各视频设计稿决定） */
+export const AccentWord: React.FC<{
+  text: string; color: string; delay?: number; peak?: number; family?: string;
+}> = ({ text, color, delay = 0, peak = 96, family = FONT_TITLE }) => {
+  const f = useCurrentFrame();
+  const spr = spring({ frame: f - delay, fps: FPS, config: { damping: 18, stiffness: 140 } });
+  const c = interpolateColors(spr, [0, 1], [INK, color]);
+  return (
+    <div style={{
+      fontFamily: family, fontSize: peak, fontWeight: 900, color: c, lineHeight: 1.1,
+      transform: `scale(${interpolate(spr, [0, 1], [0.55, 1])})`,
+      opacity: interpolate(spr, [0, 0.3], [0, 1], { extrapolateRight: 'clamp' }),
+      textShadow: `0 6px 30px ${color}44`, display: 'inline-block',
+    }}>
+      {text}
+    </div>
+  );
+};
+
+/** 图标容器：squircle 底 + 主色 tint + 内高光（图标不裸放，G03 起统一用） */
+export const IconBadge: React.FC<{
+  icon: IconKey; color: string; size?: number; pad?: number; radius?: number;
+}> = ({ icon, color, size = 90, pad = 20, radius = 26 }) => (
+  <div style={{
+    width: size, height: size, backgroundColor: `${color}1c`, borderRadius: radius, padding: pad,
+    display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+    boxShadow: `inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -2px 6px ${color}22`,
+  }}>
+    {Ico[icon](color)}
+  </div>
+);
+
+/** 手机样机：内嵌产品真实 UI 用（bezel + 灵动岛 + 玻璃高光），场景内 children 自由设计 */
+export const PhoneMockup: React.FC<{
+  children: React.ReactNode; width?: number; height?: number;
+}> = ({ children, width = 560, height = 1140 }) => (
+  <div style={{
+    width, height, borderRadius: 64, padding: 14, backgroundColor: '#101216',
+    boxShadow: `${elevation(3, true)}, inset 0 1px 0 rgba(255,255,255,0.18)`,
+    position: 'relative',
+  }}>
+    <div style={{
+      width: '100%', height: '100%', borderRadius: 50, overflow: 'hidden',
+      position: 'relative', backgroundColor: '#fff',
+    }}>
+      <div style={{
+        position: 'absolute', top: 18, left: '50%', transform: 'translateX(-50%)',
+        width: 120, height: 32, borderRadius: 16, backgroundColor: '#101216', zIndex: 10,
+      }} />
+      {children}
+    </div>
+  </div>
+);
+
+
+/** 券面卡片：票券标准件（大字金额 + 虚线分隔 + 条码感装饰）。
+ *  holeColor 必须传「卡片底下的场景背景色」才能在卡边打出缺口，不传则无缺口；条码为纯装饰非真实数据 */
+export const CouponCard: React.FC<{
+  title: string; amount?: string; validity?: string; note?: string;
+  accent: string; width?: number; delay?: number; dark?: boolean; holeColor?: string;
+}> = ({ title, amount, validity, note, accent, width = 560, delay = 0, dark = false, holeColor }) => {
+  const f = useCurrentFrame();
+  const spr = spring({ frame: f - delay, fps: FPS, config: { damping: 20, stiffness: 120 } });
+  const BARS = [4, 2, 6, 3, 2, 5, 2, 4, 3, 6, 2, 3, 5, 2, 4, 3];
+  const PAD = 32;
+  return (
+    <div style={{
+      width, padding: PAD, borderRadius: 28,
+      backgroundColor: dark ? 'rgba(255,255,255,0.07)' : PAPER,
+      boxShadow: `${elevation(2, dark)}, inset 0 1px 0 rgba(255,255,255,${dark ? 0.12 : 0.6})`,
+      transform: `translateY(${(1 - spr) * 24}px) scale(${0.92 + spr * 0.08}) rotate(${(1 - spr) * -2}deg)`,
+      opacity: interpolate(spr, [0, 0.4], [0, 1], { extrapolateRight: 'clamp' }),
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
+        {amount && (
+          <div style={{
+            fontFamily: FONT_TITLE, fontSize: 84, fontWeight: 900, color: accent,
+            lineHeight: 1, letterSpacing: '-0.02em', flexShrink: 0,
+          }}>{amount}</div>
+        )}
+        <div style={{ flex: 1, textAlign: amount ? 'left' : 'center' }}>
+          <div style={{ fontFamily: FONT_BODY, fontSize: 32, fontWeight: 700, color: dark ? '#fff' : INK, lineHeight: 1.3 }}>{title}</div>
+          {note && <div style={{ fontFamily: FONT_BODY, fontSize: 24, color: dark ? 'rgba(255,255,255,0.55)' : '#777', marginTop: 8 }}>{note}</div>}
+        </div>
+      </div>
+      <div style={{ position: 'relative', margin: '28px 0 20px' }}>
+        <div style={{ borderTop: `2px dashed ${dark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.14)'}` }} />
+        {holeColor && <>
+          <div style={{ position: 'absolute', left: -(PAD + 10), top: -10, width: 20, height: 20, borderRadius: '50%', backgroundColor: holeColor }} />
+          <div style={{ position: 'absolute', right: -(PAD + 10), top: -10, width: 20, height: 20, borderRadius: '50%', backgroundColor: holeColor }} />
+        </>}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {validity && <div style={{ fontFamily: FONT_BODY, fontSize: 24, color: dark ? 'rgba(255,255,255,0.55)' : '#888' }}>{validity}</div>}
+        <div style={{ display: 'flex', gap: 4, alignItems: 'flex-end', height: 30, opacity: 0.75, marginLeft: 'auto' }}>
+          {BARS.map((w, i) => (
+            <div key={i} style={{ width: w, height: i % 3 === 2 ? 18 : 30, backgroundColor: dark ? 'rgba(255,255,255,0.7)' : INK }} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/** 数字滚动：0→value 计数入场。只用于真实可述口径（发了多少张/用了多少张/第几天），禁止虚构营销数据 */
+export const StatCounter: React.FC<{
+  value: number; suffix?: string; delay?: number; duration?: number; color?: string; size?: number;
+}> = ({ value, suffix, delay = 0, duration = 18, color = INK, size = 88 }) => {
+  const f = useCurrentFrame();
+  const p = interpolate(f - delay, [0, duration], [0, 1], {
+    extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT,
+  });
+  return (
+    <div style={{
+      fontFamily: FONT_TITLE, fontSize: size, fontWeight: 900, color, lineHeight: 1,
+      fontVariantNumeric: 'tabular-nums', display: 'flex', alignItems: 'baseline',
+    }}>
+      {Math.round(value * p)}
+      {suffix && <span style={{ fontSize: size * 0.38, marginLeft: 8, fontWeight: 800 }}>{suffix}</span>}
+    </div>
+  );
+};
+
+/** 数据卡：图标 + 标签 + 滚动数字 + 说明，grid/panel 数据屏通用 */
+export const StatCard: React.FC<{
+  label: string; value: number; suffix?: string; caption?: string; icon?: IconKey;
+  accent: string; delay?: number; dark?: boolean; width?: number;
+}> = ({ label, value, suffix, caption, icon, accent, delay = 0, dark = false, width = 300 }) => {
+  const f = useCurrentFrame();
+  const spr = spring({ frame: f - delay, fps: FPS, config: { damping: 20, stiffness: 130 } });
+  return (
+    <div style={{
+      width, padding: '32px 28px', borderRadius: 24,
+      backgroundColor: dark ? 'rgba(255,255,255,0.07)' : PAPER,
+      boxShadow: `${elevation(1, dark)}, inset 0 1px 0 rgba(255,255,255,${dark ? 0.12 : 0.6})`,
+      textAlign: 'center',
+      transform: `translateY(${(1 - spr) * 20}px)`,
+      opacity: interpolate(spr, [0, 0.4], [0, 1], { extrapolateRight: 'clamp' }),
+    }}>
+      {icon && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+          <IconBadge icon={icon} color={accent} size={72} pad={16} radius={20} />
+        </div>
+      )}
+      <div style={{ fontFamily: FONT_BODY, fontSize: 26, fontWeight: 600, color: dark ? 'rgba(255,255,255,0.65)' : '#777', marginBottom: 8 }}>{label}</div>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <StatCounter value={value} suffix={suffix} delay={delay + 4} color={accent} size={80} />
+      </div>
+      {caption && <div style={{ fontFamily: FONT_BODY, fontSize: 22, color: dark ? 'rgba(255,255,255,0.5)' : '#999', marginTop: 10 }}>{caption}</div>}
+    </div>
+  );
+};
+
+/** 步骤条：连接线擦入 + 步骤逐个弹入（图标 + 标题 + 说明），flow 屏通用 */
+export const StepFlow: React.FC<{
+  steps: { icon: IconKey; title: string; note?: string }[];
+  accent: string; delay?: number; stagger?: number; dark?: boolean; width?: number;
+}> = ({ steps, accent, delay = 0, stagger = 10, dark = false, width = 960 }) => {
+  const f = useCurrentFrame();
+  const badgeSize = 92;
+  const colW = width / steps.length - 24;
+  const lineP = interpolate(f - delay, [0, (steps.length - 1) * stagger + 10], [0, 1], {
+    extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT,
+  });
+  return (
+    <div style={{ position: 'relative', width, display: 'flex', justifyContent: 'space-between' }}>
+      <div style={{
+        position: 'absolute', top: badgeSize / 2 - 2, left: colW / 2, right: colW / 2,
+        height: 4, borderRadius: 2,
+        backgroundColor: dark ? 'rgba(255,255,255,0.16)' : `${accent}30`,
+        transform: `scaleX(${lineP})`, transformOrigin: 'left center',
+      }} />
+      {steps.map((s, i) => {
+        const spr = spring({ frame: f - delay - i * stagger, fps: FPS, config: { damping: 16, stiffness: 150 } });
+        return (
+          <div key={i} style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', width: colW,
+            opacity: interpolate(spr, [0, 0.35], [0, 1], { extrapolateRight: 'clamp' }),
+            transform: `scale(${0.6 + spr * 0.4})`,
+          }}>
+            <IconBadge icon={s.icon} color={accent} size={badgeSize} radius={26} />
+            <div style={{ fontFamily: FONT_BODY, fontSize: 30, fontWeight: 800, color: dark ? '#fff' : INK, marginTop: 18 }}>{s.title}</div>
+            {s.note && (
+              <div style={{ fontFamily: FONT_BODY, fontSize: 23, color: dark ? 'rgba(255,255,255,0.55)' : '#888', marginTop: 6, textAlign: 'center', lineHeight: 1.4 }}>{s.note}</div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+/** 左右对比卡：痛点(红) vs 解法(主色，默认绿)，中缝 VS 徽章，左卡左入/右卡右入/条目错帧 */
+export const CompareCard: React.FC<{
+  left: { title: string; items: string[] };
+  right: { title: string; items: string[] };
+  accent?: string; delay?: number; dark?: boolean; width?: number;
+}> = ({ left, right, accent = ACCENT_GREEN, delay = 0, dark = false, width = 940 }) => {
+  const f = useCurrentFrame();
+  const cardW = (width - 56) / 2;
+  const enterOpacity = interpolate(f - delay, [0, 8], [0, 1], {
+    extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+  });
+  const vsSpr = spring({ frame: f - delay - 16, fps: FPS, config: { damping: 14, stiffness: 160 } });
+
+  const renderSide = (
+    cfg: { title: string; items: string[] }, color: string, iconKey: 'x' | 'check', dir: -1 | 1,
+  ) => (
+    <div style={{
+      width: cardW, padding: '30px 28px', borderRadius: 24,
+      backgroundColor: dark ? 'rgba(255,255,255,0.07)' : PAPER,
+      boxShadow: `${elevation(1, dark)}, inset 0 1px 0 rgba(255,255,255,${dark ? 0.12 : 0.6})`,
+      transform: `translateX(${interpolate(f - delay, [0, 14], [dir * 60, 0], {
+        extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT,
+      })}px)`,
+      opacity: enterOpacity,
+    }}>
+      <div style={{
+        display: 'inline-block', fontFamily: FONT_BODY, fontSize: 30, fontWeight: 800, color,
+        padding: '6px 18px', borderRadius: 12, backgroundColor: `${color}18`, marginBottom: 20,
+      }}>{cfg.title}</div>
+      {cfg.items.map((it, i) => {
+        const ip = interpolate(f - delay - 10 - i * 3, [0, 10], [0, 1], {
+          extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT,
+        });
+        return (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 14, opacity: ip, transform: `translateX(${(1 - ip) * 16}px)` }}>
+            <div style={{ width: 26, height: 26, flexShrink: 0 }}>{Ico[iconKey](color)}</div>
+            <div style={{ fontFamily: FONT_BODY, fontSize: 26, fontWeight: 500, color: dark ? 'rgba(255,255,255,0.85)' : '#333', lineHeight: 1.4 }}>{it}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  return (
+    <div style={{ position: 'relative', width, display: 'flex', justifyContent: 'space-between' }}>
+      {renderSide(left, ACCENT_RED, 'x', -1)}
+      {renderSide(right, accent, 'check', 1)}
+      <div style={{
+        position: 'absolute', left: '50%', top: '50%',
+        transform: `translate(-50%, -50%) scale(${0.4 + vsSpr * 0.6})`,
+        width: 92, height: 92, borderRadius: '50%',
+        backgroundColor: dark ? '#1f2238' : PAPER,
+        boxShadow: elevation(2, dark),
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontFamily: FONT_TITLE, fontSize: 34, fontWeight: 900, color: dark ? '#fff' : INK,
+        opacity: interpolate(vsSpr, [0, 0.4], [0, 1], { extrapolateRight: 'clamp' }),
+      }}>VS</div>
+    </div>
+  );
+};
 
 
 /** 段落标题（大，带可选装饰下划线，wipe 擦入） */
@@ -22,10 +311,11 @@ export const SectionTitle: React.FC<{ text: string; color?: string; size?: numbe
     <div style={{ textAlign: 'center' }}>
       <div style={{
         fontFamily: FONT_TITLE, fontSize: size, fontWeight: 900,
-        color, lineHeight: 1.2, padding: '0 48px',
+        color, lineHeight: 1.15, padding: '0 48px',
+        letterSpacing: '-0.01em', fontVariantNumeric: 'tabular-nums',
         textShadow: color === PAPER ? '0 2px 20px rgba(0,0,0,0.35)' : 'none',
       }}>
-        {text}
+        <CharReveal text={text} delay={2} />
       </div>
       {underline && (
         <div style={{

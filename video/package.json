@@ -5,9 +5,8 @@
   "description": "券到卡包宣传视频 Remotion 合成工程（S7）",
   "scripts": {
     "dev": "remotion studio",
-    "render": "remotion render src/index.tsx G02-TeaCoffee ../outputs/g02-茶饮咖啡/2026-08-15-9x16-无声版.mp4 --crf 18 --jpeg-quality 90",
-    "render:final": "remotion render src/index.tsx G02-TeaCoffee ../outputs/g02-茶饮咖啡/2026-08-15-9x16-成片.mp4 --crf 18 --jpeg-quality 90",
-    "render:4k": "remotion render src/index.tsx G02-TeaCoffee ../outputs/g02-茶饮咖啡/2026-08-15-9x16-4K.mp4 --crf 18 --jpeg-quality 90 --scale 2"
+    "render": "remotion render src/index.tsx",
+    "render:g02": "remotion render src/index.tsx G02-TeaCoffee ../outputs/g02-茶饮咖啡/g02-final.mp4 --crf 18 --jpeg-quality 90"
   },
   "dependencies": {
     "@remotion/cli": "4.0.507",

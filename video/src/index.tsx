@@ -1,6 +1,8 @@
 import { Composition, registerRoot, staticFile } from 'remotion';
-import { VTemplate, TOTAL_FRAMES } from './VTemplate';
+import { VTemplate, computeTotalFrames } from './VTemplate';
 import { FPS } from './palette';
+import * as videoModules from './data';
+import type { VideoData } from './types';
 
 // ── 注入项目商用字体（@font-face，Remotion 渲染前自动等待 document.fonts.ready）──
 const FONT_CSS = `
@@ -42,19 +44,26 @@ const FONT_CSS = `
 }
 `;
 
+// 收集所有视频数据（从 data/index.ts 统一导出）
+const videos: VideoData[] = Object.values(videoModules);
+
 const RemotionRoot: React.FC = () => {
   return (
     <>
       {/* 全局字体声明 */}
       <style dangerouslySetInnerHTML={{ __html: FONT_CSS }} />
-      <Composition
-        id="G02-TeaCoffee"
-        component={VTemplate}
-        fps={FPS}
-        width={1080}
-        height={1920}
-        durationInFrames={TOTAL_FRAMES}
-      />
+      {videos.map((video) => (
+        <Composition
+          key={video.id}
+          id={video.id}
+          component={VTemplate}
+          fps={FPS}
+          width={1080}
+          height={1920}
+          durationInFrames={computeTotalFrames(video)}
+          defaultProps={{ video }}
+        />
+      ))}
     </>
   );
 };
