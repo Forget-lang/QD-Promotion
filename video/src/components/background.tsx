@@ -64,13 +64,13 @@ export const AccentOverlay: React.FC<{ color: string; opacity?: number }> = ({ c
   }} />
 );
 
-/** Ken Burns 背景图：模糊 + 降透明 + 全片极慢推近，只做氛围不承担信息 */
+/** Ken Burns 背景图：全质量显示 + 全片极慢推近，只做氛围不承担信息 */
 export const KenBurnsBg: React.FC<{
   src: string;
   blur?: number;
   opacity?: number;
   endScale?: number;
-}> = ({ src, blur = 15, opacity = 0.55, endScale = 1.04 }) => {
+}> = ({ src, blur = 0, opacity = 1, endScale = 1.04 }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const scale = interpolate(frame, [0, durationInFrames], [1, endScale], {

@@ -147,7 +147,7 @@ export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#0f1115' }}>
-      {/* 行业背景图（模糊 + 降透明 + Ken Burns 微动，只做氛围） */}
+      {/* 背景模板图（全质量显示 + Ken Burns 微动，只做氛围） */}
       {video.style.bgImage && <KenBurnsBg src={video.style.bgImage} />}
 
       {/* 主色统调：背景图与 UI 色系融合（soft-light 只混下层） */}
