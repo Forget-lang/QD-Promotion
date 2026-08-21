@@ -37,7 +37,7 @@ export const g02: VideoData = {
       leftTitle: '充卡',
       rightTitle: '次卡',
       sub: '换个思路，锁客反而更牢',
-      subtitle: '别再让顾客充卡了，换个思路锁客更牢',
+      subtitles: [{ text: '别再让顾客充卡了，换个思路锁客更牢', startFrame: 0, endFrame: 428 }],
     },
 
     // ── S2 痛点：充卡的两难（19.9s）──
@@ -64,7 +64,7 @@ export const g02: VideoData = {
           desc: '新店越开越多，新鲜感一过就跑，生意好一天坏一天没个准谱',
         },
       ],
-      subtitle: '充卡的两难：推不动，又不能不推',
+      subtitles: [{ text: '充卡的两难：推不动，又不能不推', startFrame: 0, endFrame: 596 }],
     },
 
     // ── S3 方案：十杯次卡（21.1s）──
@@ -96,7 +96,7 @@ export const g02: VideoData = {
           desc: '也就两三百块，顾客没什么心理负担',
         },
       ],
-      subtitle: '十杯次卡，一样锁客，顾客没压力',
+      subtitles: [{ text: '十杯次卡，一样锁客，顾客没压力', startFrame: 0, endFrame: 632 }],
     },
 
     // ── S4 流程：三步操作（20.7s）──
@@ -113,7 +113,7 @@ export const g02: VideoData = {
         { icon: 'check', color: ACCENT_GREEN,  title: '扫码核销' },
       ],
       footnote: '每天可用一次，咖啡一天一杯刚刚好',
-      subtitle: '三步搞定：创建、发券、扫码核销',
+      subtitles: [{ text: '三步搞定：创建、发券、扫码核销', startFrame: 0, endFrame: 620 }],
     },
 
     // ── S5 判断：你的店适合做次卡吗（21.9s）──
@@ -146,7 +146,7 @@ export const g02: VideoData = {
           desc: '客单价波动大、顾客只来一次的，别做',
         },
       ],
-      subtitle: '两个半标准，对号入座看看适不适合',
+      subtitles: [{ text: '两个半标准，对号入座看看适不适合', startFrame: 0, endFrame: 656 }],
     },
 
     // ── S6 进阶：转赠裂变（17.7s）──
@@ -164,7 +164,7 @@ export const g02: VideoData = {
         { icon: 'users',  color: ACCENT_GREEN,  title: '再得一张' },
       ],
       footnote: '老客带新客，一杯变三杯，自然就发生了',
-      subtitle: '进阶玩法：转赠裂变，老客自然带新客',
+      subtitles: [{ text: '进阶玩法：转赠裂变，老客自然带新客', startFrame: 0, endFrame: 530 }],
     },
 
     // ── S7 数据：滚动数字（10.1s）──
@@ -182,7 +182,7 @@ export const g02: VideoData = {
         { icon: 'check', color: ACCENT_GREEN,  title: '已核销', dir: '↑', desc: '次' },
         { icon: 'users', color: ACCENT_GREEN,  title: '转赠人数', dir: '↑', desc: '人' },
       ],
-      subtitle: '发了多少、用了多少，后台都看得见',
+      subtitles: [{ text: '发了多少、用了多少，后台都看得见', startFrame: 0, endFrame: 302 }],
     },
 
     // ── S8 CTA：品牌收尾（7.3s）──
@@ -194,7 +194,7 @@ export const g02: VideoData = {
       voiceDur: 7.186,
       title: '券到卡包',
       sub: '精品咖啡店的电子券工具',
-      subtitle: '券到卡包 · 免费实体店电子券工具',
+      subtitles: [{ text: '券到卡包 · 精品咖啡店的电子券工具', startFrame: 15, endFrame: 260 }],
     },
   ],
 };

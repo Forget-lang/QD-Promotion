@@ -18,6 +18,9 @@ export const SPRING_CONFIG: Record<MotionKey, { damping: number; stiffness: numb
 /** expo-out：所有非 spring 动画的标准缓动 */
 export const EASE_OUT = Easing.bezier(0.16, 1, 0.3, 1);
 
+/** expo-in：淡出/离场用的加速缓动（与 EASE_OUT 对称） */
+export const EASE_IN = Easing.bezier(0.7, 0, 0.84, 0);
+
 export const FadeInUp: React.FC<{
   children: React.ReactNode; delay?: number; dist?: number; motion?: MotionKey;
 }> = ({ children, delay = 0, dist = 50, motion = 'bouncy' }) => {

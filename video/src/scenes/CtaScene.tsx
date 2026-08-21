@@ -1,54 +1,74 @@
-// S7 结束语 · 2026-08-17 专业级优化
-// - 品牌装饰线改为从中心向两侧 draw-on（原 width% 从左展开）
-// - 标题入场后加一次微脉冲（品牌锁定感）
-// - motion 透传 style.motion
-// - 合规：绝口不提微信/搜索/小程序/关注/收藏
+// S8 结尾·品牌大字 · 2026-08-21 v4 视觉红线版
+// - 品牌名超大（130px）做绝对焦点
+// - 加装饰线条和光效，不单薄
 import React from 'react';
 import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
-import { PALETTES, TYPOGRAPHY } from '../palette';
+import { FONT_BODY, PALETTES, TYPOGRAPHY } from '../palette';
 import type { Scene, StyleConfig } from '../types';
 import { FadeInUp, ScaleIn, Pulse, EASE_OUT } from '../components/animations';
 import { CharReveal } from '../components/ui';
-import { GlowOrb } from '../components/background';
 
 export const CtaScene: React.FC<{ scene: Scene; style: StyleConfig; index: number; total: number }> = ({
   scene, style,
 }) => {
-  const p = PALETTES[style.palette];
   const typo = TYPOGRAPHY[style.typography];
+  const p = PALETTES[style.palette];
   const f = useCurrentFrame();
-  // 装饰线从中心向两侧展开（scaleX 0→1，transformOrigin center）
-  const lineGrow = interpolate(f, [18, 48], [0, 1], {
+
+  const lineGrow = interpolate(f, [20, 50], [0, 1], {
     extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT,
   });
+
   return (
-    <AbsoluteFill style={{ backgroundColor: `${p.accent}d9`, justifyContent: 'center', alignItems: 'center' }}>
-      <GlowOrb x={140} y={560} size={800} color="rgba(255,255,255,0.15)" />
-      <ScaleIn delay={4} motion={style.motion}>
-        <Pulse delay={24} intensity={0.04} duration={28}>
+    <AbsoluteFill style={{ background: 'transparent', justifyContent: 'center', alignItems: 'center' }}>
+      {/* 装饰光晕 */}
+      <div style={{
+        position: 'absolute', top: '50%', left: '50%',
+        width: 600, height: 600, borderRadius: '50%',
+        background: `radial-gradient(circle, ${p.accent}25 0%, transparent 70%)`,
+        transform: 'translate(-50%, -50%)',
+      }} />
+
+      {/* 上装饰线 */}
+      <div style={{
+        position: 'absolute', top: '30%', left: '50%',
+        width: 400, height: 4, transform: `translateX(-50%) scaleX(${lineGrow})`,
+        background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)`,
+        borderRadius: 2, transformOrigin: 'center',
+      }} />
+
+      {/* 品牌名 */}
+      <ScaleIn delay={6} motion={style.motion} startScale={0.8}>
+        <Pulse delay={30} intensity={0.05} duration={30}>
           <div style={{
-            fontFamily: typo.family, fontSize: 104, fontWeight: typo.titleWeight, color: '#fff',
-            textAlign: 'center', lineHeight: 1.25, padding: '0 60px',
-            letterSpacing: '-0.01em', textShadow: '0 6px 40px rgba(0,0,0,0.35)',
+            fontFamily: typo.family, fontSize: 140, fontWeight: typo.titleWeight, color: '#fff',
+            textAlign: 'center', lineHeight: 1.2, padding: '0 60px',
+            letterSpacing: '0.02em',
+            textShadow: `0 0 60px ${p.accent}40, 0 6px 30px rgba(0,0,0,0.5)`,
           }}>
-            <CharReveal text={scene.title ?? ''} delay={8} stagger={4} />
+            <CharReveal text={scene.title ?? ''} delay={10} stagger={5} />
           </div>
         </Pulse>
       </ScaleIn>
-      <FadeInUp delay={20} motion={style.motion}>
+
+      {/* 副标题 */}
+      <FadeInUp delay={28} motion={style.motion}>
         <div style={{
-          marginTop: 40, fontFamily: typo.bodyFamily, fontSize: 42,
-          color: 'rgba(255,255,255,0.97)', textAlign: 'center',
-          padding: '0 80px', lineHeight: 1.6, whiteSpace: 'pre-line',
+          marginTop: 48, fontFamily: FONT_BODY, fontSize: 48,
+          color: 'rgba(255,255,255,0.9)', textAlign: 'center',
+          padding: '0 80px', lineHeight: 1.5,
+          textShadow: '0 2px 16px rgba(0,0,0,0.4)',
         }}>
           {scene.sub}
         </div>
       </FadeInUp>
-      {/* 品牌装饰线：从中心 draw-on */}
+
+      {/* 下装饰线 */}
       <div style={{
-        position: 'absolute', bottom: 140, left: '50%',
-        width: 280, height: 5, transform: `translateX(-50%) scaleX(${lineGrow})`,
-        backgroundColor: 'rgba(255,255,255,0.5)', borderRadius: 3,
+        position: 'absolute', bottom: '28%', left: '50%',
+        width: 300, height: 4, transform: `translateX(-50%) scaleX(${lineGrow})`,
+        background: `linear-gradient(90deg, transparent, ${p.accent}99, transparent)`,
+        borderRadius: 2, transformOrigin: 'center',
       }} />
     </AbsoluteFill>
   );

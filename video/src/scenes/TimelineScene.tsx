@@ -4,11 +4,11 @@
 // solution 模式：券标落入空位，谷底升起，曲线变橙
 import React from 'react';
 import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
-import { ACCENT_RED, PALETTES, TYPOGRAPHY } from '../palette';
+import { ACCENT_RED, PALETTES, PAPER, TYPOGRAPHY } from '../palette';
 import type { Scene, StyleConfig, TimelinePoint } from '../types';
 import { Ico } from '../components/icons';
 import { FadeInUp, EASE_OUT } from '../components/animations';
-import { DotGrid } from '../components/background';
+import { DotGrid, GlowOrb } from '../components/background';
 
 // ── 坐标映射 ──
 const CHART_X0 = 60;
@@ -103,18 +103,21 @@ export const TimelineScene: React.FC<{
   });
 
   // 曲线颜色
-  const curveColor = isSolution && liftProgress > 0.5 ? p.accent : (isSolution ? ACCENT_RED : p.ink);
+  const curveColor = isSolution && liftProgress > 0.5 ? p.accent : (isSolution ? ACCENT_RED : '#fff');
 
   return (
-    <AbsoluteFill style={{ background: `${p.bg}bf`, justifyContent: 'flex-start' }}>
-      <DotGrid color={`${p.accent}0d`} spacing={44} size={3} />
+    <AbsoluteFill style={{ background: `linear-gradient(160deg, ${p.bgDark}b3 0%, ${p.bgDark2}b3 100%)`, justifyContent: 'flex-start' }}>
+      <GlowOrb x={-100} y={-60} size={480} color={`${p.accent}30`} />
+      <GlowOrb x={700} y={1200} size={380} color={`${p.accent}20`} delay={10} />
+      <DotGrid color={`${p.accent}14`} spacing={44} size={3} />
 
       {/* 标题 */}
       <div style={{ position: 'absolute', top: 110, width: '100%', padding: '0 56px' }}>
         <FadeInUp motion={style.motion}>
           <div style={{
             fontFamily: typo.family, fontSize: 56, fontWeight: typo.titleWeight,
-            color: p.ink, textAlign: 'center', lineHeight: 1.3,
+            color: PAPER, textAlign: 'center', lineHeight: 1.3,
+            textShadow: '0 2px 20px rgba(0,0,0,0.3)',
           }}>
             {scene.title}
           </div>

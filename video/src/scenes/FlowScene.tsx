@@ -1,99 +1,151 @@
-// S4 裂变·流程图 · 2026-08-17 专业级优化
-// - 修复节点点亮：原 boolean `lit = f > threshold` 导致颜色/透明度瞬切；
-//   改为 interpolate + interpolateColors 平滑过渡
-// - 箭头缓动统一 EASE_OUT
-// - motion 透传 style.motion
+// S4 流程·大步骤卡 · 2026-08-21 v4 视觉红线版
+// - 纵向大步骤卡，步骤号超大做视觉锤
+// - 每步全宽 960px，高 320px，填满上 2/3
+// - 透明背景，白色玻璃卡浮在背景图上
 import React from 'react';
-import { AbsoluteFill, interpolate, interpolateColors, useCurrentFrame } from 'remotion';
-import { INK, PALETTES, PAPER, TYPOGRAPHY } from '../palette';
-import type { Scene, StyleConfig } from '../types';
+import { AbsoluteFill, spring, useCurrentFrame } from 'remotion';
+import { FONT_BODY, PALETTES, TYPOGRAPHY } from '../palette';
+import { FPS } from '../palette';
+import type { MotionKey, Scene, StyleConfig } from '../types';
 import { Ico } from '../components/icons';
-import { FadeInUp, ScaleIn, EASE_OUT } from '../components/animations';
-import { CharReveal } from '../components/ui';
-import { GlowOrb } from '../components/background';
-
-const ArrowNode: React.FC<{ i: number; color: string }> = ({ i, color }) => {
-  const f = useCurrentFrame();
-  const lit = interpolate(f, [20 + i * 22 + 10, 20 + i * 22 + 20], [0, 1], {
-    extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
-    easing: EASE_OUT,
-  });
-  return (
-    <div style={{
-      width: 48, height: 48, opacity: lit,
-      transform: `translateX(${interpolate(lit, [0, 1], [-16, 0])}px)`,
-    }}>{Ico.arrow(color)}</div>
-  );
-};
+import { FadeInUp, ScaleIn, SPRING_CONFIG } from '../components/animations';
+import { CharReveal, elevation } from '../components/ui';
 
 export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: number; total: number }> = ({
-  scene, style, index, total,
+  scene, style,
 }) => {
   const p = PALETTES[style.palette];
   const typo = TYPOGRAPHY[style.typography];
-  const f = useCurrentFrame();
   const nodes = scene.nodes ?? [];
+
   return (
-    <AbsoluteFill style={{ background: `linear-gradient(150deg, ${p.bgDark}b3 0%, ${p.bgDark2}b3 100%)`, justifyContent: 'center' }}>
-      <GlowOrb x={-80} y={-60} size={450} color={`${p.accent}30`} />
-      <GlowOrb x={650} y={1100} size={380} color={`${p.accent}20`} delay={12} />
-      <div style={{ position: 'absolute', top: 130, width: '100%', padding: '0 56px' }}>
+    <AbsoluteFill style={{ background: 'transparent' }}>
+      {/* 标题区 top: 100 */}
+      <div style={{ position: 'absolute', top: 100, width: '100%', padding: '0 60px' }}>
         <CharReveal
           text={scene.title ?? ''}
           delay={2}
           style={{
-            fontFamily: typo.family, fontSize: 58, fontWeight: typo.titleWeight, color: PAPER,
+            fontFamily: typo.family, fontSize: 72, fontWeight: typo.titleWeight, color: '#fff',
             textAlign: 'center', lineHeight: 1.2, letterSpacing: '-0.01em',
+            textShadow: '0 4px 24px rgba(0,0,0,0.5)',
           }}
         />
+        {scene.sub && (
+          <FadeInUp delay={18} motion={style.motion}>
+            <div style={{
+              marginTop: 16, fontFamily: FONT_BODY, fontSize: 34,
+              color: 'rgba(255,255,255,0.85)', textAlign: 'center', lineHeight: 1.4,
+              textShadow: '0 2px 12px rgba(0,0,0,0.4)',
+            }}>
+              {scene.sub}
+            </div>
+          </FadeInUp>
+        )}
       </div>
 
-      <AbsoluteFill style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingTop: 150 }}>
+      {/* 步骤卡片区：从 y:280 开始，纵向排列 */}
+      <div style={{
+        position: 'absolute', top: 280, left: 60, right: 60,
+        display: 'flex', flexDirection: 'column', gap: 28, alignItems: 'center',
+      }}>
         {nodes.map((n, i) => {
-          // 平滑点亮：0→1 在 15 帧内过渡，而非 boolean 瞬切
-          const litProgress = interpolate(f, [20 + i * 22, 20 + i * 22 + 15], [0, 1], {
-            extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT,
-          });
-          const bgColor = interpolateColors(litProgress, [0, 1], ['rgba(255,255,255,0.08)', '#ffffff']);
-          const borderColor = interpolateColors(litProgress, [0, 1], ['rgba(255,255,255,0.15)', n.color]);
-          const textColor = interpolateColors(litProgress, [0, 1], ['rgba(255,255,255,0.5)', INK]);
-          const iconColor = interpolateColors(litProgress, [0, 1], ['rgba(255,255,255,0.4)', n.color]);
-          const opacity = interpolate(litProgress, [0, 1], [0.5, 1]);
-
+          const delay = 12 + i * 20;
+          const nodeColor = n.color || p.accent;
           return (
-            <React.Fragment key={i}>
-              <ScaleIn delay={18 + i * 22} motion={style.motion}>
+            <ScaleIn key={i} delay={delay} motion={style.motion} startScale={0.88}>
+              <div style={{
+                width: 960, height: 320,
+                backgroundColor: 'rgba(255,255,255,0.96)',
+                borderRadius: 36,
+                boxShadow: `${elevation(3)}, inset 0 1px 0 rgba(255,255,255,0.8)`,
+                display: 'flex', alignItems: 'center', gap: 40, padding: '0 52px',
+                backdropFilter: 'blur(12px)',
+                borderLeft: `10px solid ${nodeColor}`,
+              }}>
+                <StepNumber num={i + 1} color={nodeColor} delay={delay} motion={style.motion} typo={typo} />
+
                 <div style={{
-                  width: 210, height: 210, borderRadius: 26,
-                  backgroundColor: bgColor,
-                  border: `3px solid ${borderColor}`,
-                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.10)',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12,
-                  opacity,
+                  width: 130, height: 130, borderRadius: 36,
+                  background: `linear-gradient(135deg, ${nodeColor}20, ${nodeColor}08)`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0,
                 }}>
-                  <div style={{ width: 70, height: 70 }}>{Ico[n.icon](iconColor)}</div>
-                  <div style={{
-                    fontFamily: typo.bodyFamily, fontSize: 27, fontWeight: typo.bodyWeight,
-                    color: textColor,
-                  }}>{n.title}</div>
+                  <div style={{ width: 68, height: 68 }}>{Ico[n.icon](nodeColor)}</div>
                 </div>
-              </ScaleIn>
-              {i < nodes.length - 1 && <ArrowNode i={i} color={p.accent} />}
-            </React.Fragment>
+
+                <div style={{ flex: 1 }}>
+                  <div style={{
+                    fontFamily: typo.family, fontSize: 58, fontWeight: typo.titleWeight,
+                    color: '#1a1a1a', lineHeight: 1.2,
+                  }}>
+                    {n.title}
+                  </div>
+                  <StepSubtitle index={i} />
+                </div>
+              </div>
+            </ScaleIn>
           );
         })}
-      </AbsoluteFill>
-      <AbsoluteFill style={{ justifyContent: 'flex-end', alignItems: 'center', paddingBottom: 150 }}>
-        <FadeInUp delay={110} motion={style.motion}>
-          <div style={{
-            fontFamily: typo.bodyFamily, fontSize: 34, color: 'rgba(255,255,255,0.85)',
-            backgroundColor: 'rgba(255,255,255,0.1)', padding: '12px 32px', borderRadius: 999,
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
-          }}>
-            {scene.footnote}
-          </div>
-        </FadeInUp>
-      </AbsoluteFill>
+      </div>
+
+      {/* 底部脚注 */}
+      {scene.footnote && (
+        <div style={{ position: 'absolute', bottom: 190, width: '100%', padding: '0 60px', textAlign: 'center' }}>
+          <FadeInUp delay={120} motion={style.motion}>
+            <div style={{
+              fontFamily: FONT_BODY, fontSize: 32, color: 'rgba(255,255,255,0.92)',
+              background: 'rgba(255,255,255,0.15)', padding: '18px 44px', borderRadius: 999,
+              display: 'inline-block',
+              backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.25)',
+              textShadow: '0 2px 10px rgba(0,0,0,0.3)',
+            }}>
+              {scene.footnote}
+            </div>
+          </FadeInUp>
+        </div>
+      )}
     </AbsoluteFill>
+  );
+};
+
+const StepNumber: React.FC<{
+  num: number; color: string; delay: number; motion: MotionKey; typo: { family: string; titleWeight: number };
+}> = ({ num, color, delay, motion, typo }) => {
+  const f = useCurrentFrame();
+  const spr = spring({
+    frame: f - delay - 6, fps: FPS,
+    config: SPRING_CONFIG[motion] ?? SPRING_CONFIG.snappy,
+  });
+  return (
+    <div style={{
+      width: 120, height: 120, borderRadius: '50%',
+      background: `linear-gradient(135deg, ${color}, ${color}ee)`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      flexShrink: 0,
+      boxShadow: `0 10px 30px ${color}50`,
+      transform: `scale(${0.3 + 0.7 * spr})`,
+    }}>
+      <span style={{
+        fontFamily: typo.family, fontSize: 58, fontWeight: typo.titleWeight,
+        color: '#fff', lineHeight: 1,
+        textShadow: '0 2px 8px rgba(0,0,0,0.2)',
+      }}>{num}</span>
+    </div>
+  );
+};
+
+const StepSubtitle: React.FC<{ index: number }> = ({ index }) => {
+  const subs = [
+    '分享券 + 回馈券，设好转赠奖励规则',
+    '老客扫码领券，一键转赠给朋友',
+    '朋友核销，奖励自动到账，全程不用你管',
+  ];
+  return (
+    <div style={{
+      fontFamily: FONT_BODY, fontSize: 28, color: '#888', marginTop: 10, lineHeight: 1.5,
+    }}>
+      {subs[index]}
+    </div>
   );
 };

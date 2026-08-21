@@ -1,88 +1,86 @@
-// S3 解决方案·三特性卡 · 2026-08-17 视觉升级
-// - 版式变体：vertical（纵向通栏，默认）/ horizontal（三卡横排）
-// - typography 落地：读取 style.typography
-// - 浅底增加 DotGrid 点阵纹理
-// - 卡片增加 accent 色顶部装饰条，强化视觉层次
+// S3/S5 解决方案·纵向大卡 · 2026-08-21 v4 视觉红线版
+// - 纵向全宽大卡片，填满上 2/3
+// - 每卡高 280px，宽 960px，左图标右文字
+// - 透明背景，白色玻璃卡
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
 import { FONT_BODY, PALETTES, TYPOGRAPHY } from '../palette';
-// FONT_BODY 保留用于 fallback；正文实际使用 typo.bodyFamily
 import type { Scene, StyleConfig } from '../types';
 import { FadeInUp } from '../components/animations';
-import { SectionTitle, IconBadge, elevation } from '../components/ui';
-import { DotGrid } from '../components/background';
+import { CharReveal, IconBadge, elevation } from '../components/ui';
 
 export const SolutionScene: React.FC<{ scene: Scene; style: StyleConfig; index: number; total: number }> = ({
-  scene, style, index, total,
+  scene, style,
 }) => {
   const p = PALETTES[style.palette];
   const typo = TYPOGRAPHY[style.typography];
-  const isHorizontal = scene.layout === 'horizontal';
+  const items = scene.items ?? [];
 
   return (
-    <AbsoluteFill style={{ background: `${p.paper}bf`, justifyContent: 'center' }}>
-      <DotGrid color={`${p.accent}10`} spacing={44} size={3} />
-      <div style={{ position: 'absolute', top: 110, width: '100%', padding: '0 56px' }}>
-        <SectionTitle text={scene.title ?? ''} color={p.ink} size={60} underline={p.accent} />
+    <AbsoluteFill style={{ background: 'transparent' }}>
+      {/* 标题区 top: 100 */}
+      <div style={{ position: 'absolute', top: 100, width: '100%', padding: '0 60px' }}>
+        <CharReveal
+          text={scene.title ?? ''}
+          delay={2}
+          style={{
+            fontFamily: typo.family, fontSize: 72, fontWeight: typo.titleWeight, color: '#fff',
+            textAlign: 'center', lineHeight: 1.2, letterSpacing: '-0.01em',
+            textShadow: '0 4px 24px rgba(0,0,0,0.5)',
+          }}
+        />
+        {scene.sub && (
+          <FadeInUp delay={18} motion={style.motion}>
+            <div style={{
+              marginTop: 16, fontFamily: FONT_BODY, fontSize: 34,
+              color: 'rgba(255,255,255,0.85)', textAlign: 'center', lineHeight: 1.4,
+              textShadow: '0 2px 12px rgba(0,0,0,0.4)',
+            }}>
+              {scene.sub}
+            </div>
+          </FadeInUp>
+        )}
       </div>
 
-      {isHorizontal ? (
-        // 横向三卡排列
-        <AbsoluteFill style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 28, paddingTop: 200 }}>
-          {(scene.items ?? []).map((it, i) => (
-            <FadeInUp key={i} delay={10 + i * 12} motion={style.motion}>
+      {/* 卡片区：从 y:280 开始，纵向排列 */}
+      <div style={{
+        position: 'absolute', top: 280, left: 60, right: 60,
+        display: 'flex', flexDirection: 'column', gap: 28, alignItems: 'center',
+      }}>
+        {items.map((it, i) => {
+          const cardColor = it.color || p.accent;
+          return (
+            <FadeInUp key={i} delay={12 + i * 16} motion={style.motion} dist={40}>
               <div style={{
-                width: 300, height: 460, backgroundColor: '#fff', borderRadius: 28,
-                boxShadow: `${elevation(2)}, inset 0 1px 0 rgba(255,255,255,0.6)`,
-                borderTop: `6px solid ${p.accent}`,
-                padding: 40, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 20,
+                width: 960, height: 280,
+                backgroundColor: 'rgba(255,255,255,0.96)', borderRadius: 36,
+                boxShadow: `${elevation(3)}, inset 0 1px 0 rgba(255,255,255,0.8)`,
+                display: 'flex', alignItems: 'center', gap: 36, padding: '0 48px',
+                backdropFilter: 'blur(12px)',
+                borderLeft: `10px solid ${cardColor}`,
               }}>
-                <IconBadge icon={it.icon} color={p.accent} size={90} pad={20} radius={24} />
-                <div style={{
-                  fontFamily: typo.family, fontSize: 38, fontWeight: typo.titleWeight, color: p.ink, lineHeight: 1.3,
-                }}>
-                  {it.title}
-                </div>
-                <div style={{
-                  fontFamily: typo.bodyFamily, fontSize: 26, fontWeight: typo.bodyWeight,
-                  color: '#888', lineHeight: 1.55,
-                }}>
-                  {it.desc}
-                </div>
-              </div>
-            </FadeInUp>
-          ))}
-        </AbsoluteFill>
-      ) : (
-        // 纵向通栏（默认）
-        <AbsoluteFill style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 26, paddingTop: 200 }}>
-          {(scene.items ?? []).map((it, i) => (
-            <FadeInUp key={i} delay={10 + i * 12} motion={style.motion}>
-              <div style={{
-                width: 860, height: 140, backgroundColor: '#fff', borderRadius: 24,
-                display: 'flex', alignItems: 'center', gap: 32, padding: '0 40px',
-                boxShadow: elevation(1),
-                borderLeft: `6px solid ${it.color}`,
-              }}>
-                <IconBadge icon={it.icon} color={it.color} size={72} pad={16} radius={18} />
+                <IconBadge icon={it.icon} color={cardColor} size={120} pad={26} radius={32} />
                 <div style={{ flex: 1 }}>
                   <div style={{
-                    fontFamily: typo.family, fontSize: 40, fontWeight: typo.titleWeight, color: p.ink, lineHeight: 1.2,
+                    fontFamily: typo.family, fontSize: 50, fontWeight: typo.titleWeight,
+                    color: '#1a1a1a', lineHeight: 1.3,
                   }}>
                     {it.title}
                   </div>
-                  <div style={{
-                    fontFamily: typo.bodyFamily, fontSize: 28, fontWeight: typo.bodyWeight,
-                    color: '#888', marginTop: 6,
-                  }}>
-                    {it.desc}
-                  </div>
+                  {it.desc && (
+                    <div style={{
+                      fontFamily: FONT_BODY, fontSize: 28, fontWeight: typo.bodyWeight,
+                      color: '#666', marginTop: 10, lineHeight: 1.5,
+                    }}>
+                      {it.desc}
+                    </div>
+                  )}
                 </div>
               </div>
             </FadeInUp>
-          ))}
-        </AbsoluteFill>
-      )}
+          );
+        })}
+      </div>
     </AbsoluteFill>
   );
 };

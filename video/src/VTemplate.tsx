@@ -17,7 +17,7 @@ import { fade } from '@remotion/transitions/fade';
 import { FPS, PALETTES } from './palette';
 import { SceneRenderer } from './scenes';
 import { SPRING_CONFIG } from './components/animations';
-import { AccentOverlay, Grain, KenBurnsBg, Vignette } from './components/background';
+import { KenBurnsBg } from './components/background';
 import type { TransitionKey, VideoData } from './types';
 
 /** 转场时长：12 帧 = 0.4s */
@@ -148,10 +148,7 @@ export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
   return (
     <AbsoluteFill style={{ backgroundColor: '#0f1115' }}>
       {/* 背景模板图（全质量显示 + Ken Burns 微动，只做氛围） */}
-      {video.style.bgImage && <KenBurnsBg src={video.style.bgImage} />}
-
-      {/* 主色统调：背景图与 UI 色系融合（soft-light 只混下层） */}
-      {video.style.bgImage && <AccentOverlay color={p.accent} />}
+      {video.style.bgImage && <KenBurnsBg src={video.style.bgImage} blur={video.style.bgBlur ?? 0} />}
 
       {/* 场景内容（转场 + UI 组件） */}
       <TransitionSeries>
@@ -166,12 +163,14 @@ export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
                   index={i}
                   total={video.scenes.length}
                 />
-                <FadingAudio
-                  src={staticFile(`audio/s${i + 1}.wav`)}
-                  sceneDurationInFrames={sceneFrames}
-                  voiceOffsetFrames={Math.floor((sc.voiceOffset || 0) * FPS)}
-                  voiceDurationInFrames={sc.voiceDur != null ? Math.floor(sc.voiceDur * FPS) : undefined}
-                />
+                {video.hasAudio && (
+                  <FadingAudio
+                    src={staticFile(`audio/${video.id}/s${i + 1}.wav`)}
+                    sceneDurationInFrames={sceneFrames}
+                    voiceOffsetFrames={Math.floor((sc.voiceOffset || 0) * FPS)}
+                    voiceDurationInFrames={sc.voiceDur != null ? Math.floor(sc.voiceDur * FPS) : undefined}
+                  />
+                )}
               </TransitionSeries.Sequence>
               {i < video.scenes.length - 1 && (
                 <TransitionSeries.Transition
@@ -186,10 +185,6 @@ export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
           );
         })}
       </TransitionSeries>
-
-      {/* 全片氛围层：暗角聚焦 + 颗粒质感（所有场景之上，字幕之下无遮挡问题：暗角只压四角） */}
-      <Vignette />
-      <Grain />
     </AbsoluteFill>
   );
 };

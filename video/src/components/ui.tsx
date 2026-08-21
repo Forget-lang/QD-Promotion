@@ -5,7 +5,7 @@
 import React from 'react';
 import { interpolate, interpolateColors, spring, useCurrentFrame } from 'remotion';
 import { ACCENT_GREEN, ACCENT_RED, FONT_BODY, FONT_TITLE, FPS, INK, PAPER } from '../palette';
-import { EASE_OUT, SPRING_CONFIG } from './animations';
+import { EASE_OUT, EASE_IN, SPRING_CONFIG } from './animations';
 import { Ico } from './icons';
 import type { IconKey } from './icons';
 
@@ -329,23 +329,24 @@ export const SectionTitle: React.FC<{ text: string; color?: string; size?: numbe
 };
 
 /**
- * 底部字幕
+ * 底部多行字幕（帧级精确同步）
  * - 位置：底部安全区，距底部 60px
  * - 白色字 + 黑色描边，任何背景下都清晰
- * - 入场：淡入 + 轻微上浮
+ * - 每行独立的 startFrame / endFrame，跟口播逐行对齐
+ * - 入场：淡入 + 轻微上浮；出场：淡出 + 轻微下沉
+ * - 最多同时显示 2 行（避免遮挡画面）
  */
-export const Subtitle: React.FC<{ text: string; delay?: number }> = ({ text, delay = 6 }) => {
+export const Subtitle: React.FC<{ lines: { text: string; startFrame: number; endFrame: number }[] }> = ({ lines }) => {
   const f = useCurrentFrame();
-  const opacity = interpolate(f, [delay, delay + 10], [0, 1], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-    easing: EASE_OUT,
-  });
-  const translateY = interpolate(f, [delay, delay + 10], [8, 0], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-    easing: EASE_OUT,
-  });
+  const FADE_FRAMES = 6;
+
+  // 过滤出当前帧应该显示的行
+  const activeLines = lines
+    .map((line, i) => ({ ...line, index: i }))
+    .filter((line) => f >= line.startFrame && f <= line.endFrame);
+
+  // 最多显示最后 2 行（最新的两句），避免堆太多行
+  const visibleLines = activeLines.slice(-2);
 
   return (
     <div style={{
@@ -355,26 +356,57 @@ export const Subtitle: React.FC<{ text: string; delay?: number }> = ({ text, del
       bottom: 60,
       textAlign: 'center',
       padding: '0 60px',
-      opacity,
-      transform: `translateY(${translateY}px)`,
+      pointerEvents: 'none',
     }}>
-      <span style={{
-        fontFamily: FONT_BODY,
-        fontSize: 34,
-        fontWeight: 600,
-        lineHeight: 1.4,
-        color: '#ffffff',
-        textShadow: `
-          -2px -2px 0 rgba(0,0,0,0.8),
-           2px -2px 0 rgba(0,0,0,0.8),
-          -2px  2px 0 rgba(0,0,0,0.8),
-           2px  2px 0 rgba(0,0,0,0.8),
-           0 3px 12px rgba(0,0,0,0.5)
-        `,
-        letterSpacing: 1,
-      }}>
-        {text}
-      </span>
+      {visibleLines.map((line) => {
+        const lineAge = visibleLines.length - 1 - visibleLines.indexOf(line); // 最新一行在最下面 = 0
+        // 入场：startFrame 开始淡入
+        const entranceProgress = interpolate(f, [line.startFrame, line.startFrame + FADE_FRAMES], [0, 1], {
+          extrapolateLeft: 'clamp',
+          extrapolateRight: 'clamp',
+          easing: EASE_OUT,
+        });
+        // 出场：endFrame 前 FADE_FRAMES 开始淡出
+        const exitProgress = interpolate(f, [line.endFrame - FADE_FRAMES, line.endFrame], [1, 0], {
+          extrapolateLeft: 'clamp',
+          extrapolateRight: 'clamp',
+          easing: EASE_IN,
+        });
+        const opacity = Math.min(entranceProgress, exitProgress);
+        const translateY = interpolate(opacity, [0, 1], [6, 0], {
+          extrapolateLeft: 'clamp',
+          extrapolateRight: 'clamp',
+        });
+
+        return (
+          <div
+            key={line.index}
+            style={{
+              opacity,
+              transform: `translateY(${translateY}px)`,
+              marginBottom: 8,
+            }}
+          >
+            <span style={{
+              fontFamily: FONT_BODY,
+              fontSize: 34,
+              fontWeight: 600,
+              lineHeight: 1.4,
+              color: '#ffffff',
+              textShadow: `
+                -2px -2px 0 rgba(0,0,0,0.8),
+                 2px -2px 0 rgba(0,0,0,0.8),
+                -2px  2px 0 rgba(0,0,0,0.8),
+                 2px  2px 0 rgba(0,0,0,0.8),
+                 0 3px 12px rgba(0,0,0,0.5)
+              `,
+              letterSpacing: 1,
+            }}>
+              {line.text}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 };

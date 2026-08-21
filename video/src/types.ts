@@ -47,6 +47,15 @@ export interface TimelineCoupon {
   lift: number;     // 把客流抬升多少（0-100）
 }
 
+export interface SubtitleLine {
+  /** 字幕文本（单行，建议 10-20 字） */
+  text: string;
+  /** 字幕出现帧（相对本屏起点，0 为屏首帧） */
+  startFrame: number;
+  /** 字幕消失帧（相对本屏起点） */
+  endFrame: number;
+}
+
 export interface Scene {
   type: SceneType;
   dur: number;
@@ -54,8 +63,8 @@ export interface Scene {
   voiceOffset?: number;
   /** 语音实测时长（秒，ffprobe 回填）：淡出从语音实际结束点开始，尾字零削波；不填退回固定 12 帧淡出 */
   voiceDur?: number;
-  /** 字幕文本（底部安全区显示，建议每行不超 16 字） */
-  subtitle?: string;
+  /** 字幕多行数组（口播全文，按语义断句分行，每行有独立起止帧；无声版均匀分布占位，有声版按 TTS 实测精修） */
+  subtitles?: SubtitleLine[];
   /** number 型钩子：数字部分（如 "10"），不传则降级为普通标题 */
   hookNumber?: string;
   /** number 型钩子：单位部分（如 "次"） */
@@ -95,10 +104,14 @@ export interface StyleConfig {
   hookStyle: HookStyleKey;
   /** 行业专属背景图路径（B 方案，public 下相对路径，如 'backgrounds/g02/bg.jpg'） */
   bgImage?: string;
+  /** 背景图模糊程度（px，毛玻璃微虚化效果，推荐 2-6），0 = 不模糊 */
+  bgBlur?: number;
 }
 
 export interface VideoData {
   id: string;
   style: StyleConfig;
   scenes: Scene[];
+  /** 是否已生成语音文件（无声版=false，有声版=true） */
+  hasAudio?: boolean;
 }

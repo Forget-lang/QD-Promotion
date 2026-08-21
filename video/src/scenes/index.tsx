@@ -34,7 +34,7 @@ export const SceneRenderer: React.FC<{ scene: Scene; style: StyleConfig; index: 
   return (
     <AbsoluteFill>
       {content}
-      {scene.subtitle && <Subtitle text={scene.subtitle} delay={8} />}
+      {scene.subtitles && scene.subtitles.length > 0 && <Subtitle lines={scene.subtitles} />}
     </AbsoluteFill>
   );
 };

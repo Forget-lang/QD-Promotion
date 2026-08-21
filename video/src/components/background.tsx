@@ -49,7 +49,7 @@ export const Grain: React.FC<{ opacity?: number }> = ({ opacity = 0.035 }) => (
   }} />
 );
 
-/** 暗角：只压四角聚焦中部视线，顺带压住模糊背景图边缘发灰 */
+/** 暗角：压四角聚焦中部视线，增强画面层次感 */
 export const Vignette: React.FC<{ strength?: number }> = ({ strength = 0.25 }) => (
   <AbsoluteFill style={{
     pointerEvents: 'none',
