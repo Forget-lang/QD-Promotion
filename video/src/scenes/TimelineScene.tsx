@@ -3,7 +3,7 @@
 // problem 模式：曲线下午塌陷，红色高亮空桌区
 // solution 模式：券标落入空位，谷底升起，曲线变橙
 import React from 'react';
-import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
+import { AbsoluteFill, interpolate, interpolateColors, useCurrentFrame } from 'remotion';
 import { ACCENT_RED, PALETTES, PAPER, TYPOGRAPHY } from '../palette';
 import type { Scene, StyleConfig, TimelinePoint } from '../types';
 import { Ico } from '../components/icons';
@@ -94,16 +94,18 @@ export const TimelineScene: React.FC<{
   const hlX0 = highlight ? hourToX(highlight.startHour) : 0;
   const hlX1 = highlight ? hourToX(highlight.endHour) : 0;
   const hlOpacity = !isSolution
-    ? interpolate(f, [75, 100], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })
-    : interpolate(f, [75, 95], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+    ? interpolate(f, [75, 100], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT })
+    : interpolate(f, [75, 95], [1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
 
   // 区域填充透明度
   const areaOpacity = interpolate(f, [50, 80], [0, 0.12], {
-    extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+    extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT,
   });
 
-  // 曲线颜色
-  const curveColor = isSolution && liftProgress > 0.5 ? p.accent : (isSolution ? ACCENT_RED : '#fff');
+  // 曲线颜色：solution 模式下随抬升进度从红渐变到 accent（interpolateColors，禁止瞬切）
+  const curveColor = isSolution
+    ? interpolateColors(f, [100, 130], [ACCENT_RED, p.accent])
+    : '#ffffff';
 
   return (
     <AbsoluteFill style={{ background: `linear-gradient(160deg, ${p.bgDark}b3 0%, ${p.bgDark2}b3 100%)`, justifyContent: 'flex-start' }}>
@@ -112,7 +114,7 @@ export const TimelineScene: React.FC<{
       <DotGrid color={`${p.accent}14`} spacing={44} size={3} />
 
       {/* 标题 */}
-      <div style={{ position: 'absolute', top: 110, width: '100%', padding: '0 56px' }}>
+      <div style={{ position: 'absolute', top: 120, width: '100%', padding: '0 56px' }}>
         <FadeInUp motion={style.motion}>
           <div style={{
             fontFamily: typo.family, fontSize: 56, fontWeight: typo.titleWeight,
@@ -133,7 +135,7 @@ export const TimelineScene: React.FC<{
         <line
           x1={CHART_X0} y1={CHART_Y1} x2={CHART_X1} y2={CHART_Y1}
           stroke="#ccc" strokeWidth={2} strokeDasharray="6 4"
-          opacity={interpolate(f, [15, 35], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })}
+          opacity={interpolate(f, [15, 35], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT })}
         />
 
         {/* 问题模式：红色塌陷高亮区 */}
@@ -181,7 +183,7 @@ export const TimelineScene: React.FC<{
 
         {/* 时间刻度 */}
         {TIME_TICKS.map((h) => (
-          <g key={h} opacity={interpolate(f, [25, 45], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })}>
+          <g key={h} opacity={interpolate(f, [25, 45], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT })}>
             <line
               x1={hourToX(h)} y1={CHART_Y1} x2={hourToX(h)} y2={CHART_Y1 + 10}
               stroke="#999" strokeWidth={2}
@@ -208,7 +210,7 @@ export const TimelineScene: React.FC<{
             extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT,
           });
           const labelOpacity = interpolate(f, [dropDelay + 15, dropDelay + 35], [0, 1], {
-            extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
+            extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT,
           });
 
           return (

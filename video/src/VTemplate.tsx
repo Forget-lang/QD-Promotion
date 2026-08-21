@@ -17,7 +17,7 @@ import { fade } from '@remotion/transitions/fade';
 import { FPS, PALETTES } from './palette';
 import { SceneRenderer } from './scenes';
 import { SPRING_CONFIG } from './components/animations';
-import { KenBurnsBg } from './components/background';
+import { KenBurnsBg, Grain, Vignette, AccentOverlay } from './components/background';
 import type { TransitionKey, VideoData } from './types';
 
 /** 转场时长：12 帧 = 0.4s */
@@ -149,6 +149,8 @@ export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
     <AbsoluteFill style={{ backgroundColor: '#0f1115' }}>
       {/* 背景模板图（全质量显示 + Ken Burns 微动，只做氛围） */}
       {video.style.bgImage && <KenBurnsBg src={video.style.bgImage} blur={video.style.bgBlur ?? 0} />}
+      {/* 主色调和：背景图与 UI 色系融合（soft-light 只混下层背景） */}
+      {video.style.bgImage && <AccentOverlay color={p.accent} opacity={0.18} />}
 
       {/* 场景内容（转场 + UI 组件） */}
       <TransitionSeries>
@@ -185,6 +187,10 @@ export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
           );
         })}
       </TransitionSeries>
+
+      {/* 全片氛围层（质感三件套：暗角聚焦 + 颗粒杀色带 + 主色调和，始终挂载） */}
+      <Grain opacity={0.035} />
+      <Vignette strength={0.25} />
     </AbsoluteFill>
   );
 };

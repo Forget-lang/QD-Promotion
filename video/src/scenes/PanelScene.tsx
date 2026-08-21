@@ -6,8 +6,8 @@ import { AbsoluteFill } from 'remotion';
 import { FONT_BODY, PALETTES, TYPOGRAPHY } from '../palette';
 import type { Scene, StyleConfig } from '../types';
 import { Ico } from '../components/icons';
-import { FadeInUp, ScaleIn } from '../components/animations';
-import { CharReveal, elevation } from '../components/ui';
+import { FadeInUp, ScaleIn, Pulse } from '../components/animations';
+import { CharReveal, StatCounter, elevation } from '../components/ui';
 
 export const PanelScene: React.FC<{ scene: Scene; style: StyleConfig; index: number; total: number }> = ({
   scene, style,
@@ -18,8 +18,8 @@ export const PanelScene: React.FC<{ scene: Scene; style: StyleConfig; index: num
 
   return (
     <AbsoluteFill style={{ background: 'transparent' }}>
-      {/* 标题区 top: 100 */}
-      <div style={{ position: 'absolute', top: 100, width: '100%', padding: '0 60px' }}>
+      {/* 标题区 top: 120（安全区 ≥120px） */}
+      <div style={{ position: 'absolute', top: 120, width: '100%', padding: '0 60px' }}>
         <CharReveal
           text={scene.title ?? ''}
           delay={2}
@@ -61,7 +61,7 @@ export const PanelScene: React.FC<{ scene: Scene; style: StyleConfig; index: num
 
                 {/* 文字区 */}
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
                     <span style={{
                       fontFamily: typo.family, fontSize: 52, fontWeight: typo.titleWeight,
                       color: '#1a1a1a', lineHeight: 1.2,
@@ -69,13 +69,27 @@ export const PanelScene: React.FC<{ scene: Scene; style: StyleConfig; index: num
                       {m.title}
                     </span>
                     {m.dir === '↑' && (
-                      <span style={{
-                        fontSize: 40, color: '#43A047', fontWeight: 'bold',
-                      }}>↑</span>
+                      <Pulse delay={delay + 14} intensity={0.35} duration={18}>
+                        <span style={{
+                          fontSize: 36, color: '#43A047', fontWeight: 'bold',
+                          display: 'inline-block',
+                        }}>↑</span>
+                      </Pulse>
                     )}
                   </div>
+                  {/* 焦点数字（可选）：真实可述口径才填，禁止虚构营销数据 */}
+                  {m.value != null && (
+                    <StatCounter
+                      value={m.value}
+                      suffix={m.suffix}
+                      delay={delay + 6}
+                      color={mColor}
+                      size={76}
+                    />
+                  )}
                   <div style={{
                     fontFamily: FONT_BODY, fontSize: 30, color: '#666', lineHeight: 1.5,
+                    marginTop: m.value != null ? 4 : 8,
                   }}>
                     {m.desc}
                   </div>
@@ -86,20 +100,22 @@ export const PanelScene: React.FC<{ scene: Scene; style: StyleConfig; index: num
         })}
       </div>
 
-      {/* 底部说明 */}
-      <div style={{ position: 'absolute', bottom: 190, width: '100%', padding: '0 60px', textAlign: 'center' }}>
-        <FadeInUp delay={90} motion={style.motion}>
-          <div style={{
-            fontFamily: FONT_BODY, fontSize: 30, color: 'rgba(255,255,255,0.85)',
-            background: 'rgba(255,255,255,0.12)', padding: '16px 40px', borderRadius: 999,
-            display: 'inline-block',
-            backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.2)',
-            textShadow: '0 2px 10px rgba(0,0,0,0.3)',
-          }}>
-            后台清清楚楚，每一分钱花在哪都看得见
-          </div>
-        </FadeInUp>
-      </div>
+      {/* 底部说明（从数据读取，禁止硬编码） */}
+      {scene.footnote && (
+        <div style={{ position: 'absolute', bottom: 190, width: '100%', padding: '0 60px', textAlign: 'center' }}>
+          <FadeInUp delay={90} motion={style.motion}>
+            <div style={{
+              fontFamily: FONT_BODY, fontSize: 30, color: 'rgba(255,255,255,0.85)',
+              background: 'rgba(255,255,255,0.12)', padding: '16px 40px', borderRadius: 999,
+              display: 'inline-block',
+              backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.2)',
+              textShadow: '0 2px 10px rgba(0,0,0,0.3)',
+            }}>
+              {scene.footnote}
+            </div>
+          </FadeInUp>
+        </div>
+      )}
     </AbsoluteFill>
   );
 };

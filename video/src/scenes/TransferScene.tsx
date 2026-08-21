@@ -30,8 +30,8 @@ export const TransferScene: React.FC<{
 
   return (
     <AbsoluteFill style={{ background: 'transparent' }}>
-      {/* 标题区 top: 100 */}
-      <div style={{ position: 'absolute', top: 100, width: '100%', padding: '0 60px' }}>
+      {/* 标题区 top: 120（安全区 ≥120px） */}
+      <div style={{ position: 'absolute', top: 120, width: '100%', padding: '0 60px' }}>
         <FadeInUp motion={style.motion}>
           <div style={{
             fontFamily: typo.family, fontSize: 72, fontWeight: typo.titleWeight,

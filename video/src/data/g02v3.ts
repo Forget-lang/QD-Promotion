@@ -52,7 +52,7 @@ export const g02v3: VideoData = {
         { text: '投抖音吧，点击贵、转化低；', startFrame: 65, endFrame: 170 },
         { text: '打折促销吧，', startFrame: 155, endFrame: 220 },
         { text: '吸引来的都是薅羊毛的，薅完就走。', startFrame: 205, endFrame: 340 },
-        { text: '其实最便宜、最有效的拉新方式，', startFrame: 320, endFrame: 430 },
+        { text: '其实更省钱、更好用的拉新方式，', startFrame: 320, endFrame: 430 },
         { text: '一直就在你身边——老客的口碑。', startFrame: 410, endFrame: 474 },
       ],
     },
@@ -148,6 +148,7 @@ export const g02v3: VideoData = {
       voiceOffset: 0,
       voiceDur: 10.7,
       title: '效果好不好，数据说话',
+      footnote: '后台清清楚楚，每一分钱花在哪都看得见',
       metrics: [
         { icon: 'gift', color: '#1a4d3e', title: '发出量', dir: '↑', desc: '发了多少张券一目了然' },
         { icon: 'users', color: '#2d6a4f', title: '核销率', dir: '↑', desc: '实际到店转化看得见' },

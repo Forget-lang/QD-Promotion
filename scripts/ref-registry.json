@@ -1,0 +1,29 @@
+{
+  "description": "权威文档注册表：check-doc-references / check-facts 读取本文件。维护规则：新增权威文档时在此登记；文档清单变化时更新 aliases。",
+  "docsDir": "docs/internal",
+  "extraDocs": ["AGENTS.md"],
+  "excludeDirs": [],
+  "aliases": {
+    "AGENTS": "AGENTS.md",
+    "M1": "M1-内容策划手册.md",
+    "M2": "M2-视频制作手册.md",
+    "M3": "M3-平台发布手册.md",
+    "R1": "R1-产品事实表.md",
+    "R2": "R2-业务流程.md",
+    "R3": "R3-Remotion技术参考.md",
+    "R4": "R4-最佳实践库.md",
+    "R5": "R5-内容红线.md"
+  },
+  "factChecks": [
+    { "desc": "G02 V3 背景图（data 引用）", "path": "video/public/backgrounds/g02v3/bg.jpg" },
+    { "desc": "BG-ABS-002 冰蓝柔光底（素材库登记）", "path": "背景素材/抽象模板/冷色系/BG-ABS-002-冰蓝柔光底.png" },
+    { "desc": "得意黑字体（bundle）", "path": "video/public/fonts/得意黑.ttf" },
+    { "desc": "普惠体 Regular（bundle）", "path": "video/public/fonts/AlibabaPuHuiTi-3-55-Regular.ttf" },
+    { "desc": "图标组件库", "path": "video/src/components/icons.tsx" },
+    { "desc": "动画组件库", "path": "video/src/components/animations.tsx" },
+    { "desc": "G02 数据文件", "path": "video/src/data/g02v3.ts" },
+    { "desc": "编排引擎 VTemplate", "path": "video/src/VTemplate.tsx" },
+    { "desc": "红线机器数据源", "path": "scripts/redlines.json" },
+    { "desc": "changelog 变更日志", "path": "outputs/archive/changelog.md" }
+  ]
+}

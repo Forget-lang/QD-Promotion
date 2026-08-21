@@ -390,7 +390,7 @@ export const Subtitle: React.FC<{ lines: { text: string; startFrame: number; end
             <span style={{
               fontFamily: FONT_BODY,
               fontSize: 34,
-              fontWeight: 600,
+              fontWeight: 500,
               lineHeight: 1.4,
               color: '#ffffff',
               textShadow: `

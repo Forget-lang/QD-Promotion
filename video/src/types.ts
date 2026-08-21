@@ -31,6 +31,10 @@ export interface SceneMetric {
   title: string;
   dir: '↑' | '↓';
   desc: string;
+  /** 焦点数字（可选）：填了用 StatCounter 滚动显示；**禁止虚构营销数据**——无真实可述数字时不填 */
+  value?: number;
+  /** 数字单位（如「张」「次」），随 value 显示 */
+  suffix?: string;
 }
 
 // ── 时间线场景 ──

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "remotion studio",
     "render": "remotion render src/index.tsx",
-    "render:g02": "remotion render src/index.tsx G02-TeaCoffee ../outputs/g02-茶饮咖啡/g02-final.mp4 --crf 18 --jpeg-quality 90"
+    "render:g02": "remotion render src/index.tsx G02-TeaCoffee-V3 ../outputs/g02-茶饮咖啡/g02-final.mp4 --crf 18 --jpeg-quality 90"
   },
   "dependencies": {
     "@remotion/cli": "4.0.507",

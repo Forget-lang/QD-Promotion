@@ -144,7 +144,21 @@ const ClockHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family: st
 
 const ContrastHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family: string; titleWeight: number; bodyWeight: number }; p: typeof PALETTES['mint-cool'] }> = ({ scene, style, typo, p }) => {
   return (
-    <>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+      {/* 主标题（主题引入，VS 对比仍是焦点） */}
+      {scene.title && (
+        <div style={{ marginBottom: 64 }}>
+          <CharReveal
+            text={scene.title}
+            delay={2}
+            style={{
+              fontFamily: typo.family, fontSize: 76, fontWeight: typo.titleWeight,
+              color: '#fff', textAlign: 'center', lineHeight: 1.25,
+              textShadow: '0 4px 30px rgba(0,0,0,0.5)',
+            }}
+          />
+        </div>
+      )}
       <div style={{ display: 'flex', alignItems: 'center', gap: 30, marginBottom: 40 }}>
         <div style={{
           fontFamily: typo.family, fontSize: 120, fontWeight: typo.titleWeight,
@@ -177,7 +191,7 @@ const ContrastHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family:
           {scene.sub}
         </div>
       </FadeInUp>
-    </>
+    </div>
   );
 };
 

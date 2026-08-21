@@ -49,9 +49,9 @@ export const PainScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
   return (
     <AbsoluteFill style={{ background: 'transparent' }}>
 
-      {/* ===== 标题（y:100） ===== */}
+      {/* ===== 标题（y:120） ===== */}
       <div style={{
-        position: 'absolute', top: 100, left: 60, right: 60,
+        position: 'absolute', top: 120, left: 60, right: 60,
         transform: `translateY(${(1 - titleSpr) * -30}px)`,
         opacity: titleSpr,
       }}>

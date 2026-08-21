@@ -18,8 +18,8 @@ export const SolutionScene: React.FC<{ scene: Scene; style: StyleConfig; index: 
 
   return (
     <AbsoluteFill style={{ background: 'transparent' }}>
-      {/* 标题区 top: 100 */}
-      <div style={{ position: 'absolute', top: 100, width: '100%', padding: '0 60px' }}>
+      {/* 标题区 top: 120（安全区 ≥120px） */}
+      <div style={{ position: 'absolute', top: 120, width: '100%', padding: '0 60px' }}>
         <CharReveal
           text={scene.title ?? ''}
           delay={2}
