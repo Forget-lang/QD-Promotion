@@ -3,6 +3,11 @@
 # 音频后处理脚本 · J-cut 同步方案标准工具
 # ============================================================================
 #
+# ⚠️ 环境注意（2026-08-22）：本机无系统 ffmpeg；Remotion 自带 ffmpeg 为
+#    macOS 15 构建、macOS 14 无法运行（Abort trap）。请用 ffmpeg-static：
+#    export PATH="$PWD/video/node_modules/ffmpeg-static:$PATH"
+#    然后 bash scripts/process-audio.sh <输入目录> <输出目录>
+#
 # 用途：对 TTS 生成的原始语音做标准化后处理，用于 Remotion 视频配音
 # 处理：响度归一化到 -16 LUFS（短视频行业标准）
 #
@@ -12,6 +17,7 @@
 #   - 只做响度归一化 → 保证 7 段音量一致
 #
 # 用法：
+#   export PATH="$PWD/video/node_modules/ffmpeg-static:$PATH"
 #   bash scripts/process-audio.sh <输入目录> <输出目录>
 #
 # 示例：

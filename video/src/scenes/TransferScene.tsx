@@ -35,7 +35,7 @@ export const TransferScene: React.FC<{
         <FadeInUp motion={style.motion}>
           <div style={{
             fontFamily: typo.family, fontSize: 72, fontWeight: typo.titleWeight,
-            color: '#fff', textAlign: 'center',
+            color: scene.darkText ? p.ink : '#fff', textAlign: 'center',
             textShadow: '0 4px 24px rgba(0,0,0,0.5)',
           }}>
             {scene.title}
@@ -75,13 +75,13 @@ export const TransferScene: React.FC<{
           {/* 箭头线 */}
           <div style={{
             position: 'absolute', left: 0, right: 0, top: '50%', height: 4,
-            background: `linear-gradient(90deg, ${p.accent}00, ${p.accent}, #43A047)`,
+            background: `linear-gradient(90deg, ${p.accent}00, ${p.accent}, ${p.accent})`,
             borderRadius: 2, transform: 'translateY(-50%)',
             opacity: flySpr,
           }} />
           <div style={{
             position: 'absolute', right: 0, top: '50%', transform: `translateY(-50%) translateX(${interpolate(flySpr, [0.5, 1], [-20, 0], { extrapolateLeft: 'clamp' })}px)`,
-            opacity: flySpr, color: '#43A047',
+            opacity: flySpr, color: p.accent,
           }}>
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6" />
@@ -93,13 +93,13 @@ export const TransferScene: React.FC<{
             position: 'absolute', left: 0, top: '50%', transform: `translate(${cardX}px, -50%)`,
             width: 160, height: 100, borderRadius: 20,
             backgroundColor: 'rgba(255,255,255,0.95)',
-            boxShadow: '0 12px 30px rgba(67,160,71,0.4), 0 4px 12px rgba(0,0,0,0.15)',
+            boxShadow: `0 12px 30px ${p.accent}66, 0 4px 12px rgba(0,0,0,0.15)`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             border: '2px solid rgba(255,255,255,0.8)',
             backdropFilter: 'blur(20px)',
             opacity: flySpr,
           }}>
-            <div style={{ width: 48, height: 48 }}>{Ico.gift('#43A047')}</div>
+            <div style={{ width: 48, height: 48 }}>{Ico.gift(p.accent)}</div>
           </div>
         </div>
 
@@ -111,11 +111,11 @@ export const TransferScene: React.FC<{
         }}>
           <div style={{
             width: 200, height: 200, borderRadius: '50%',
-            background: 'linear-gradient(135deg, rgba(67,160,71,0.3), rgba(67,160,71,0.1))',
-            border: '4px solid #43A047',
+            background: `linear-gradient(135deg, ${p.accent}4d, ${p.accent}1a)`,
+            border: `4px solid ${p.accent}`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             margin: '0 auto 20px',
-            boxShadow: '0 12px 40px rgba(67,160,71,0.3)',
+            boxShadow: `0 12px 40px ${p.accent}4d`,
           }}>
             <div style={{ width: 100, height: 100 }}>{Ico.users('#fff')}</div>
           </div>

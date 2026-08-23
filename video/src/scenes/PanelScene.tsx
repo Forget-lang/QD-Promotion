@@ -24,7 +24,7 @@ export const PanelScene: React.FC<{ scene: Scene; style: StyleConfig; index: num
           text={scene.title ?? ''}
           delay={2}
           style={{
-            fontFamily: typo.family, fontSize: 72, fontWeight: typo.titleWeight, color: '#fff',
+            fontFamily: typo.family, fontSize: 72, fontWeight: typo.titleWeight, color: scene.darkText ? p.ink : '#fff',
             textAlign: 'center', lineHeight: 1.2, letterSpacing: '-0.01em',
             textShadow: '0 4px 24px rgba(0,0,0,0.5)',
           }}

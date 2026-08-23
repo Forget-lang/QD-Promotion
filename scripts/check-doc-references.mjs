@@ -78,7 +78,8 @@ for (const [file, path] of allDocs) {
 
     // 行内所有文档引用（文件名/别名），记录位置
     const docHits = [];
-    const fileRefRe = /`?([A-Z]\d-[^`\s，。；：、()（）"']+\.md|AGENTS\.md)`?/g;
+    // 字母开头（M1-xx.md / R1-xx.md）或数字开头旧编号（00-xx.md / 13-xx.md）的文件名引用
+    const fileRefRe = /`?((?:[A-Z]\d|\d{2})-[^`\s，。；：、()（）"']+\.md|AGENTS\.md)`?/g;
     let m;
     while ((m = fileRefRe.exec(line)) !== null) {
       const name = m[1];

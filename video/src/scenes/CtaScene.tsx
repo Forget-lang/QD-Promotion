@@ -41,10 +41,12 @@ export const CtaScene: React.FC<{ scene: Scene; style: StyleConfig; index: numbe
       <ScaleIn delay={6} motion={style.motion} startScale={0.8}>
         <Pulse delay={30} intensity={0.05} duration={30}>
           <div style={{
-            fontFamily: typo.family, fontSize: 140, fontWeight: typo.titleWeight, color: '#fff',
+            fontFamily: typo.family, fontSize: 140, fontWeight: typo.titleWeight, color: scene.darkText ? p.ink : '#fff',
             textAlign: 'center', lineHeight: 1.2, padding: '0 60px',
             letterSpacing: '0.02em',
-            textShadow: `0 0 60px ${p.accent}40, 0 6px 30px rgba(0,0,0,0.5)`,
+            textShadow: scene.darkText
+              ? `0 0 60px ${p.accent}40, 0 6px 30px rgba(255,255,255,0.4)`
+              : `0 0 60px ${p.accent}40, 0 6px 30px rgba(0,0,0,0.5)`,
           }}>
             <CharReveal text={scene.title ?? ''} delay={10} stagger={5} />
           </div>
@@ -55,9 +57,9 @@ export const CtaScene: React.FC<{ scene: Scene; style: StyleConfig; index: numbe
       <FadeInUp delay={28} motion={style.motion}>
         <div style={{
           marginTop: 48, fontFamily: FONT_BODY, fontSize: 48,
-          color: 'rgba(255,255,255,0.9)', textAlign: 'center',
+          color: scene.darkText ? 'rgba(26,26,26,0.85)' : 'rgba(255,255,255,0.9)', textAlign: 'center',
           padding: '0 80px', lineHeight: 1.5,
-          textShadow: '0 2px 16px rgba(0,0,0,0.4)',
+          textShadow: scene.darkText ? '0 1px 6px rgba(255,255,255,0.4)' : '0 2px 16px rgba(0,0,0,0.4)',
         }}>
           {scene.sub}
         </div>

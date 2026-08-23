@@ -23,6 +23,8 @@ export interface SceneNode {
   icon: IconKey;
   color: string;
   title: string;
+  /** 步骤补充说明（可选，无则不显示） */
+  sub?: string;
 }
 
 export interface SceneMetric {
@@ -75,6 +77,10 @@ export interface Scene {
   hookUnit?: string;
   title?: string;
   sub?: string;
+  /** 浅色背景适配：true = 背景较浅，标题用深色 ink（默认 false = 深底白字）。背景图为浅色系时必须设 true */
+  darkText?: boolean;
+  /** 卡片样式变体（防连续屏卡片千篇一律，R4 E-011）：border-left=左边框卡（默认）/ center-icon=无边框大图标卡 / numbered=编号圆卡 */
+  cardVariant?: 'border-left' | 'center-icon' | 'numbered';
   layout?: 'vertical' | 'horizontal';
   // pain
   leftTitle?: string;

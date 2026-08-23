@@ -212,8 +212,8 @@ const QuestionHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family:
       <WipeIn delay={14} duration={18}>
         <div style={{
           fontFamily: typo.family, fontSize: 88, fontWeight: typo.titleWeight,
-          color: '#fff', textAlign: 'center', lineHeight: 1.2,
-          textShadow: '0 4px 30px rgba(0,0,0,0.5)',
+          color: scene.darkText ? p.ink : '#fff', textAlign: 'center', lineHeight: 1.2,
+          textShadow: scene.darkText ? '0 2px 10px rgba(255,255,255,0.4)' : '0 4px 30px rgba(0,0,0,0.5)',
         }}>
           <CharReveal text={scene.title ?? ''} delay={14} />
         </div>
@@ -221,8 +221,8 @@ const QuestionHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family:
       <FadeInUp delay={30} motion={style.motion}>
         <div style={{
           marginTop: 32, fontFamily: FONT_BODY, fontSize: 38,
-          color: 'rgba(255,255,255,0.8)', textAlign: 'center', lineHeight: 1.5,
-          textShadow: '0 2px 12px rgba(0,0,0,0.4)',
+          color: scene.darkText ? 'rgba(26,26,26,0.8)' : 'rgba(255,255,255,0.8)', textAlign: 'center', lineHeight: 1.5,
+          textShadow: scene.darkText ? 'none' : '0 2px 12px rgba(0,0,0,0.4)',
         }}>
           {scene.sub}
         </div>

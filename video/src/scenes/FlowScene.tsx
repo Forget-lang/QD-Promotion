@@ -26,7 +26,7 @@ export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
           text={scene.title ?? ''}
           delay={2}
           style={{
-            fontFamily: typo.family, fontSize: 72, fontWeight: typo.titleWeight, color: '#fff',
+            fontFamily: typo.family, fontSize: 72, fontWeight: typo.titleWeight, color: scene.darkText ? p.ink : '#fff',
             textAlign: 'center', lineHeight: 1.2, letterSpacing: '-0.01em',
             textShadow: '0 4px 24px rgba(0,0,0,0.5)',
           }}
@@ -81,7 +81,7 @@ export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
                   }}>
                     {n.title}
                   </div>
-                  <StepSubtitle index={i} />
+                  <StepSubtitle sub={nodes[i].sub} />
                 </div>
               </div>
             </ScaleIn>
@@ -135,17 +135,13 @@ const StepNumber: React.FC<{
   );
 };
 
-const StepSubtitle: React.FC<{ index: number }> = ({ index }) => {
-  const subs = [
-    '分享券 + 回馈券，设好转赠奖励规则',
-    '老客扫码领券，一键转赠给朋友',
-    '朋友核销，奖励自动到账，全程不用你管',
-  ];
+const StepSubtitle: React.FC<{ sub?: string }> = ({ sub }) => {
+  if (!sub) return null;
   return (
     <div style={{
       fontFamily: FONT_BODY, fontSize: 28, color: '#888', marginTop: 10, lineHeight: 1.5,
     }}>
-      {subs[index]}
+      {sub}
     </div>
   );
 };

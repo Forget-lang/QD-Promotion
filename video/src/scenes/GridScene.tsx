@@ -24,44 +24,40 @@ export const GridScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
           text={scene.title ?? ''}
           delay={2}
           style={{
-            fontFamily: typo.family, fontSize: 58, fontWeight: typo.titleWeight, color: '#fff',
+            fontFamily: typo.family, fontSize: 58, fontWeight: typo.titleWeight, color: scene.darkText ? p.ink : '#fff',
             textAlign: 'center', lineHeight: 1.2, letterSpacing: '-0.01em',
-            textShadow: '0 3px 20px rgba(0,0,0,0.4)',
+            textShadow: scene.darkText ? '0 2px 10px rgba(255,255,255,0.4)' : '0 3px 20px rgba(0,0,0,0.4)',
           }}
         />
       </div>
 
-      {/* 三卡纵向排列 · 居中 */}
-      <AbsoluteFill style={{
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 24,
-        paddingTop: 140,
+      {/* 三卡纵向排列 · 顶部对齐（与其他屏一致，top:280） */}
+      <div style={{
+        position: 'absolute', top: 280, left: 0, right: 0,
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24,
       }}>
         {cards.map((c, i) => (
           <ScaleIn key={i} delay={10 + i * 12} motion={style.motion}>
             <div style={{
-              width: 820,
-              height: 180,
+              width: 920,
+              minHeight: 230,
               backgroundColor: 'rgba(255,255,255,0.95)',
               backdropFilter: 'blur(8px)',
-              borderRadius: 24,
+              borderRadius: 28,
               boxShadow: elevation(2),
-              borderLeft: `8px solid ${c.color}`,
-              padding: '0 40px',
+              padding: '36px 40px',
               display: 'flex',
               alignItems: 'center',
-              gap: 28,
+              gap: 32,
             }}>
-              {/* 左侧图标徽章 */}
-              <IconBadge icon={c.icon} color={c.color} size={72} pad={16} radius={18} />
+              {/* 左侧图标徽章（居中卡片无左边框，靠图标+阴影区分，区别于 solution/panel 的左边框卡） */}
+              <IconBadge icon={c.icon} color={c.color} size={84} pad={18} radius={22} />
 
               {/* 右侧文字 */}
               <div style={{ flex: 1 }}>
                 <div style={{
                   fontFamily: typo.family,
-                  fontSize: 40,
+                  fontSize: 44,
                   fontWeight: typo.titleWeight,
                   color: p.ink,
                   lineHeight: 1.2,
@@ -81,7 +77,7 @@ export const GridScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
             </div>
           </ScaleIn>
         ))}
-      </AbsoluteFill>
+      </div>
     </AbsoluteFill>
   );
 };

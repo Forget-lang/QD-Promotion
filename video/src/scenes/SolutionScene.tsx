@@ -24,7 +24,7 @@ export const SolutionScene: React.FC<{ scene: Scene; style: StyleConfig; index: 
           text={scene.title ?? ''}
           delay={2}
           style={{
-            fontFamily: typo.family, fontSize: 72, fontWeight: typo.titleWeight, color: '#fff',
+            fontFamily: typo.family, fontSize: 72, fontWeight: typo.titleWeight, color: scene.darkText ? p.ink : '#fff',
             textAlign: 'center', lineHeight: 1.2, letterSpacing: '-0.01em',
             textShadow: '0 4px 24px rgba(0,0,0,0.5)',
           }}
@@ -49,20 +49,35 @@ export const SolutionScene: React.FC<{ scene: Scene; style: StyleConfig; index: 
       }}>
         {items.map((it, i) => {
           const cardColor = it.color || p.accent;
+          const variant = scene.cardVariant ?? 'border-left';
+          const cardRadius = variant === 'numbered' ? 32 : 36;
           return (
             <FadeInUp key={i} delay={12 + i * 16} motion={style.motion} dist={40}>
               <div style={{
-                width: 960, height: 280,
-                backgroundColor: 'rgba(255,255,255,0.96)', borderRadius: 36,
+                width: 960, minHeight: 230,
+                backgroundColor: 'rgba(255,255,255,0.96)', borderRadius: cardRadius,
                 boxShadow: `${elevation(3)}, inset 0 1px 0 rgba(255,255,255,0.8)`,
-                display: 'flex', alignItems: 'center', gap: 36, padding: '0 48px',
+                display: 'flex', alignItems: 'center', gap: 36, padding: '36px 48px',
                 backdropFilter: 'blur(12px)',
-                borderLeft: `10px solid ${cardColor}`,
+                // 变体差异：border-left=左边框 / center-icon=无边框 / numbered=无边框+编号圆
+                borderLeft: variant === 'border-left' ? `10px solid ${cardColor}` : 'none',
               }}>
+                {/* 编号圆（numbered 变体） */}
+                {variant === 'numbered' && (
+                  <div style={{
+                    width: 76, height: 76, borderRadius: '50%', flexShrink: 0,
+                    background: `linear-gradient(135deg, ${cardColor}, ${cardColor}dd)`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: `0 8px 24px ${cardColor}55`,
+                    fontFamily: typo.family, fontSize: 40, fontWeight: 900, color: '#fff',
+                  }}>
+                    {i + 1}
+                  </div>
+                )}
                 <IconBadge icon={it.icon} color={cardColor} size={120} pad={26} radius={32} />
                 <div style={{ flex: 1 }}>
                   <div style={{
-                    fontFamily: typo.family, fontSize: 50, fontWeight: typo.titleWeight,
+                    fontFamily: typo.family, fontSize: 44, fontWeight: typo.titleWeight,
                     color: '#1a1a1a', lineHeight: 1.3,
                   }}>
                     {it.title}

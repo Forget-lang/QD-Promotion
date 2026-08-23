@@ -12,11 +12,14 @@
     "R2": "R2-业务流程.md",
     "R3": "R3-Remotion技术参考.md",
     "R4": "R4-最佳实践库.md",
-    "R5": "R5-内容红线.md"
+    "R5": "R5-内容红线.md",
+    "素材索引表": "素材索引表.md"
   },
   "factChecks": [
     { "desc": "G02 V3 背景图（data 引用）", "path": "video/public/backgrounds/g02v3/bg.jpg" },
-    { "desc": "BG-ABS-002 冰蓝柔光底（素材库登记）", "path": "背景素材/抽象模板/冷色系/BG-ABS-002-冰蓝柔光底.png" },
+    { "desc": "BG-ABS-001 暖奶油卡片底（素材索引表登记）", "path": "背景素材/抽象模板/暖色系/BG-ABS-001-暖奶油卡片底.png" },
+    { "desc": "BG-ABS-002 冰蓝柔光底（素材索引表登记）", "path": "背景素材/抽象模板/冷色系/BG-ABS-002-冰蓝柔光底.png" },
+    { "desc": "IL-COMMON-001 优惠券票券插画（素材索引表登记）", "path": "插图库/物体插画/通用/IL-COMMON-001-优惠券票券.png" },
     { "desc": "得意黑字体（bundle）", "path": "video/public/fonts/得意黑.ttf" },
     { "desc": "普惠体 Regular（bundle）", "path": "video/public/fonts/AlibabaPuHuiTi-3-55-Regular.ttf" },
     { "desc": "图标组件库", "path": "video/src/components/icons.tsx" },

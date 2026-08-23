@@ -8,6 +8,7 @@ import { ACCENT_GREEN, ACCENT_RED, FONT_BODY, FONT_TITLE, FPS, INK, PAPER } from
 import { EASE_OUT, EASE_IN, SPRING_CONFIG } from './animations';
 import { Ico } from './icons';
 import type { IconKey } from './icons';
+import type { MotionKey } from '../types';
 
 /** 三级投影（浅底/深底两套），全片光影方向统一向下 */
 export const elevation = (level: 1 | 2 | 3, dark = false): string => {
@@ -43,10 +44,10 @@ export const CharReveal: React.FC<{
 
 /** 重音词大字：字号 + 颜色同时弹入（对齐口播重音帧使用，位置由各视频设计稿决定） */
 export const AccentWord: React.FC<{
-  text: string; color: string; delay?: number; peak?: number; family?: string;
-}> = ({ text, color, delay = 0, peak = 96, family = FONT_TITLE }) => {
+  text: string; color: string; delay?: number; peak?: number; family?: string; motion?: MotionKey;
+}> = ({ text, color, delay = 0, peak = 96, family = FONT_TITLE, motion = 'snappy' }) => {
   const f = useCurrentFrame();
-  const spr = spring({ frame: f - delay, fps: FPS, config: { damping: 18, stiffness: 140 } });
+  const spr = spring({ frame: f - delay, fps: FPS, config: SPRING_CONFIG[motion] });
   const c = interpolateColors(spr, [0, 1], [INK, color]);
   return (
     <div style={{
@@ -100,10 +101,10 @@ export const PhoneMockup: React.FC<{
  *  holeColor 必须传「卡片底下的场景背景色」才能在卡边打出缺口，不传则无缺口；条码为纯装饰非真实数据 */
 export const CouponCard: React.FC<{
   title: string; amount?: string; validity?: string; note?: string;
-  accent: string; width?: number; delay?: number; dark?: boolean; holeColor?: string;
-}> = ({ title, amount, validity, note, accent, width = 560, delay = 0, dark = false, holeColor }) => {
+  accent: string; width?: number; delay?: number; dark?: boolean; holeColor?: string; motion?: MotionKey;
+}> = ({ title, amount, validity, note, accent, width = 560, delay = 0, dark = false, holeColor, motion = 'snappy' }) => {
   const f = useCurrentFrame();
-  const spr = spring({ frame: f - delay, fps: FPS, config: { damping: 20, stiffness: 120 } });
+  const spr = spring({ frame: f - delay, fps: FPS, config: SPRING_CONFIG[motion] });
   const BARS = [4, 2, 6, 3, 2, 5, 2, 4, 3, 6, 2, 3, 5, 2, 4, 3];
   const PAD = 32;
   return (
@@ -167,10 +168,10 @@ export const StatCounter: React.FC<{
 /** 数据卡：图标 + 标签 + 滚动数字 + 说明，grid/panel 数据屏通用 */
 export const StatCard: React.FC<{
   label: string; value: number; suffix?: string; caption?: string; icon?: IconKey;
-  accent: string; delay?: number; dark?: boolean; width?: number;
-}> = ({ label, value, suffix, caption, icon, accent, delay = 0, dark = false, width = 300 }) => {
+  accent: string; delay?: number; dark?: boolean; width?: number; motion?: MotionKey;
+}> = ({ label, value, suffix, caption, icon, accent, delay = 0, dark = false, width = 300, motion = 'snappy' }) => {
   const f = useCurrentFrame();
-  const spr = spring({ frame: f - delay, fps: FPS, config: { damping: 20, stiffness: 130 } });
+  const spr = spring({ frame: f - delay, fps: FPS, config: SPRING_CONFIG[motion] });
   return (
     <div style={{
       width, padding: '32px 28px', borderRadius: 24,
@@ -197,8 +198,8 @@ export const StatCard: React.FC<{
 /** 步骤条：连接线擦入 + 步骤逐个弹入（图标 + 标题 + 说明），flow 屏通用 */
 export const StepFlow: React.FC<{
   steps: { icon: IconKey; title: string; note?: string }[];
-  accent: string; delay?: number; stagger?: number; dark?: boolean; width?: number;
-}> = ({ steps, accent, delay = 0, stagger = 10, dark = false, width = 960 }) => {
+  accent: string; delay?: number; stagger?: number; dark?: boolean; width?: number; motion?: MotionKey;
+}> = ({ steps, accent, delay = 0, stagger = 10, dark = false, width = 960, motion = 'snappy' }) => {
   const f = useCurrentFrame();
   const badgeSize = 92;
   const colW = width / steps.length - 24;
@@ -214,7 +215,7 @@ export const StepFlow: React.FC<{
         transform: `scaleX(${lineP})`, transformOrigin: 'left center',
       }} />
       {steps.map((s, i) => {
-        const spr = spring({ frame: f - delay - i * stagger, fps: FPS, config: { damping: 16, stiffness: 150 } });
+        const spr = spring({ frame: f - delay - i * stagger, fps: FPS, config: SPRING_CONFIG[motion] });
         return (
           <div key={i} style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', width: colW,
@@ -237,14 +238,14 @@ export const StepFlow: React.FC<{
 export const CompareCard: React.FC<{
   left: { title: string; items: string[] };
   right: { title: string; items: string[] };
-  accent?: string; delay?: number; dark?: boolean; width?: number;
-}> = ({ left, right, accent = ACCENT_GREEN, delay = 0, dark = false, width = 940 }) => {
+  accent?: string; delay?: number; dark?: boolean; width?: number; motion?: MotionKey;
+}> = ({ left, right, accent = ACCENT_GREEN, delay = 0, dark = false, width = 940, motion = 'snappy' }) => {
   const f = useCurrentFrame();
   const cardW = (width - 56) / 2;
   const enterOpacity = interpolate(f - delay, [0, 8], [0, 1], {
     extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
   });
-  const vsSpr = spring({ frame: f - delay - 16, fps: FPS, config: { damping: 14, stiffness: 160 } });
+  const vsSpr = spring({ frame: f - delay - 16, fps: FPS, config: SPRING_CONFIG[motion] });
 
   const renderSide = (
     cfg: { title: string; items: string[] }, color: string, iconKey: 'x' | 'check', dir: -1 | 1,

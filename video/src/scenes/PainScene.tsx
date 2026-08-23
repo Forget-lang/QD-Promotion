@@ -141,7 +141,7 @@ export const PainScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
 
         {/* 底部结论区 */}
         <div style={{
-          background: `linear-gradient(135deg, ${ACCENT_RED} 0%, #c0392b 100%)`,
+          background: `linear-gradient(135deg, ${ACCENT_RED} 0%, ${ACCENT_RED}cc 100%)`,
           padding: '40px 56px',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20,
           opacity: conclusionSpr,
