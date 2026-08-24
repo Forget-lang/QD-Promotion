@@ -1,6 +1,6 @@
 # R3 · Remotion 技术参考（原理层）
 
-> 最后校验：2026-08-21（从原 13 号文档拆分，本文件=原理与 API 参考）
+> 最后校验：2026-08-24（从原 13 号文档拆分，本文件=原理与 API 参考；08-24 修订语速参数口径）
 > 这份文档是**参考层**：解释"为什么"和"组件怎么用"。正常做视频**不需要**读它，按 `M2-视频制作手册.md` 操作即可；遇到渲染异常、需要新建积木/组件/图标、或想理解声画同步原理时，再查本文件。
 > 操作步骤（怎么做出片）在 `M2-视频制作手册.md`，本文件不重复操作流程。
 
@@ -48,7 +48,7 @@ const frames = Math.round(duration * 30);
 **预览 vs 渲染差异**：Remotion Studio 预览时音频和画面可能因性能有轻微延迟，**最终 `npx remotion render` 渲染结果一定同步——以渲染结果为准，不以预览为准**。
 
 **音频预处理（零裁剪、零淡入，只做响度归一化）**：
-- TTS 略快语速生成（seed-tts-2.0, speech_rate=1，约 5.5-6 字/秒），**禁止 atempo 调速**
+- TTS 略快语速生成（seed-tts-2.0, speed_ratio>1 略快档，约 5.5-6 字/秒；具体值按 M2-视频制作手册 §五 阶段二「TTS 语速实测验证」选定），**禁止 atempo 调速**
 - 仅用 ffmpeg `loudnorm=I=-16:TP=-1.5:LRA=11` 做响度归一化（`scripts/process-audio.sh`）
 - 不裁剪首尾静音，不做文件级淡入淡出（淡入淡出在代码层用 `<Audio volume={f}>` 帧级控制）
 
@@ -184,6 +184,7 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 | `AccentOverlay` | color/opacity=0.18 | 背景图主色统调（VTemplate 挂载，soft-light 只混下层） |
 
 > ⚠️ 氛围层三件套（Grain/Vignette/AccentOverlay）是**全片必挂**（VTemplate 统一挂载，场景与设计稿无需处理），是画面"质感"的关键来源。缺失时画面偏平偏黑。
+> 注意挂载条件：Grain/Vignette 无条件挂全片；AccentOverlay 仅在 `video.style.bgImage` 存在（有背景图）时挂载（代码条件渲染，无背景图时不挂）。
 
 ### 3.5 风格五维（video/src/palette.ts + data/gXX.ts style）
 
