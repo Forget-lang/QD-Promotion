@@ -48,7 +48,7 @@ const frames = Math.round(duration * 30);
 **预览 vs 渲染差异**：Remotion Studio 预览时音频和画面可能因性能有轻微延迟，**最终 `npx remotion render` 渲染结果一定同步——以渲染结果为准，不以预览为准**。
 
 **音频预处理（零裁剪、零淡入，只做响度归一化）**：
-- TTS 自然语速生成（seed-tts-2.0, speech_rate=0），**禁止 atempo 调速**
+- TTS 略快语速生成（seed-tts-2.0, speech_rate=1，约 5.5-6 字/秒），**禁止 atempo 调速**
 - 仅用 ffmpeg `loudnorm=I=-16:TP=-1.5:LRA=11` 做响度归一化（`scripts/process-audio.sh`）
 - 不裁剪首尾静音，不做文件级淡入淡出（淡入淡出在代码层用 `<Audio volume={f}>` 帧级控制）
 

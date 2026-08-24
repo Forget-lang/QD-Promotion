@@ -115,7 +115,7 @@ promotion/
 │       └── 素材索引表.md      素材登记（入库=登记，AI 选素材查这张表）
 ├── outputs/                 交付物
 │   ├── gXX-行业/             行业单元最终交付（四件套/攻略/设计稿/视频/封面）
-│   └── archive/             过程文件/审计/调研（日期前缀）+ changelog.md
+│   └── archive/             README.md（阅读纪律）+ changelog.md + 过程文件/审计/调研（日期前缀）
 ├── scripts/                 闸门与工具（check-redlines 等）
 ├── video/                   Remotion 工程（内容在 src/data/，组件在 src/components/ + src/scenes/）
 └── .workbuddy/              AI 工作区（MEMORY.md / skills）

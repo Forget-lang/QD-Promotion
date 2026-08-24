@@ -25,6 +25,7 @@
     { "desc": "图标组件库", "path": "video/src/components/icons.tsx" },
     { "desc": "动画组件库", "path": "video/src/components/animations.tsx" },
     { "desc": "G02 数据文件", "path": "video/src/data/g02v3.ts" },
+    { "desc": "G03 数据文件", "path": "video/src/data/g03.ts" },
     { "desc": "编排引擎 VTemplate", "path": "video/src/VTemplate.tsx" },
     { "desc": "红线机器数据源", "path": "scripts/redlines.json" },
     { "desc": "changelog 变更日志", "path": "outputs/archive/changelog.md" }
