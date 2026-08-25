@@ -8,7 +8,7 @@ import { AbsoluteFill, useCurrentFrame, interpolate, spring } from 'remotion';
 import { ACCENT_RED, PALETTES, TYPOGRAPHY, FPS } from '../palette';
 import type { Scene, StyleConfig, MotionKey } from '../types';
 import { Ico } from '../components/icons';
-import { SPRING_CONFIG } from '../components/animations';
+import { FadeInUp, SPRING_CONFIG } from '../components/animations';
 import { elevation } from '../components/ui';
 
 function AnimatedItem({ children, delay, motion }: { children: React.ReactNode; delay: number; motion: MotionKey }) {
@@ -34,6 +34,11 @@ export const PainScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
   const f = useCurrentFrame();
   const leftItems = scene.leftItems ?? [];
 
+  // 编号列表变体（R3 §5.6 呈现手法 ref-01，S2 用）：大编号 + 红色下划线标题 + 正文，网格纸感
+  if (scene.layout === 'numbered-list') {
+    return <NumberedListPain scene={scene} style={style} typo={typo} p={p} />;
+  }
+
   const titleSpr = spring({
     frame: f - 2, fps: FPS, config: SPRING_CONFIG[style.motion],
   });
@@ -51,7 +56,7 @@ export const PainScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
 
       {/* ===== 标题（y:120） ===== */}
       <div style={{
-        position: 'absolute', top: 120, left: 60, right: 60,
+        position: 'absolute', top: 120, left: 80, right: 80,
         transform: `translateY(${(1 - titleSpr) * -30}px)`,
         opacity: titleSpr,
       }}>
@@ -74,7 +79,7 @@ export const PainScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
 
       {/* ===== 大卡片（y:240 → bottom:420，填满中部，离字幕区更近） ===== */}
       <div style={{
-        position: 'absolute', top: 240, left: 60, right: 60, bottom: 420,
+        position: 'absolute', top: 240, left: 80, right: 80, bottom: 420,
         backgroundColor: 'rgba(255,255,255,0.96)',
         borderRadius: 32,
         boxShadow: elevation(3),
@@ -160,6 +165,89 @@ export const PainScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
 
       {/* y:1500 以下留空给字幕（bottom:420 = 1920-420=1500，字幕从1760开始，留260px呼吸空间） */}
 
+    </AbsoluteFill>
+  );
+};
+
+
+// ── 编号列表变体（R3 §5.6 ref-01：大编号 + 标题红色下划线 + 正文，网格纸感）──
+const NumberedListPain: React.FC<{
+  scene: Scene; style: StyleConfig;
+  typo: { family: string; titleWeight: number; bodyWeight: number; bodyFamily: string };
+  p: (typeof PALETTES)['berry-purple'];
+}> = ({ scene, style, typo, p }) => {
+  const items = scene.leftItems ?? [];
+  const itemsSub = scene.leftItemsSub ?? [];
+  const titleSpr = spring({ frame: useCurrentFrame() - 2, fps: FPS, config: SPRING_CONFIG[style.motion] });
+  return (
+    <AbsoluteFill style={{ background: 'transparent' }}>
+      {/* 标题（深紫顶栏，与其他屏一致） */}
+      <div style={{
+        position: 'absolute', top: 120, left: 80, right: 80,
+        transform: `translateY(${(1 - titleSpr) * -30}px)`, opacity: titleSpr,
+      }}>
+        <div style={{
+          backgroundColor: p.accentDark, borderRadius: 24, padding: '28px 48px',
+          boxShadow: elevation(3), display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <span style={{
+            fontFamily: typo.family, fontSize: 64, fontWeight: typo.titleWeight,
+            color: '#fff', lineHeight: 1.2, letterSpacing: '0.01em',
+            textShadow: '0 2px 8px rgba(0,0,0,0.2)',
+          }}>{scene.title ?? ''}</span>
+        </div>
+      </div>
+
+      {/* 内容区（半透明白纸，网格质感由背景 BG-ABS-003 直接透出） */}
+      <div style={{
+        position: 'absolute', top: 240, left: 80, right: 80, bottom: 400,
+        backgroundColor: 'rgba(255,255,255,0.82)', borderRadius: 32,
+        boxShadow: elevation(3), backdropFilter: 'blur(6px)',
+        padding: '48px 56px', display: 'flex', flexDirection: 'column', gap: 26,
+      }}>
+        {items.map((item, i) => (
+          <FadeInUp key={i} delay={10 + i * 14} motion={style.motion}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 32, width: '100%' }}>
+              {/* 大编号（主题色，ref-01 编号高亮） */}
+              <div style={{
+                fontFamily: typo.family, fontSize: 76, fontWeight: 900,
+                color: p.accent, lineHeight: 1, flexShrink: 0, width: 92, textAlign: 'center',
+              }}>{i + 1}</div>
+              {/* 正文 + 红色下划线（ref-01 标题下划线）+ 痛点深挖副行（小字，为什么/后果，干货直接显示） */}
+              <div style={{ flex: 1 }}>
+                <div style={{
+                  fontFamily: typo.bodyFamily, fontSize: 46, fontWeight: typo.bodyWeight,
+                  color: '#222', lineHeight: 1.4,
+                  borderBottom: `6px solid ${ACCENT_RED}cc`,
+                  paddingBottom: 10, display: 'inline-block',
+                }}>{item}</div>
+                {itemsSub[i] && (
+                  <div style={{
+                    fontFamily: typo.bodyFamily, fontSize: 28, color: '#888', lineHeight: 1.5,
+                    marginTop: 12,
+                  }}>{itemsSub[i]}</div>
+                )}
+              </div>
+            </div>
+          </FadeInUp>
+        ))}
+      </div>
+
+      {/* 底部红色结论条 */}
+      <FadeInUp delay={56} motion={style.motion}>
+        <div style={{
+          position: 'absolute', left: 80, right: 80, bottom: 280,
+          background: `linear-gradient(135deg, ${ACCENT_RED} 0%, ${ACCENT_RED}cc 100%)`,
+          borderRadius: 24, padding: '32px 48px', boxShadow: elevation(2),
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20,
+        }}>
+          <div style={{ width: 48, height: 48 }}>{Ico.bolt('#fff')}</div>
+          <span style={{
+            fontFamily: typo.family, fontSize: 52, fontWeight: typo.titleWeight,
+            color: '#fff', lineHeight: 1.2, textShadow: '0 2px 8px rgba(0,0,0,0.2)',
+          }}>{scene.rightSub ?? '钱花了，人没来'}</span>
+        </div>
+      </FadeInUp>
     </AbsoluteFill>
   );
 };

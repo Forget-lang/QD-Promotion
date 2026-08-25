@@ -4,7 +4,7 @@ import type { IconKey } from './components/icons';
 
 export type SceneType =
   | 'hook' | 'pain' | 'solution' | 'flow' | 'grid' | 'panel' | 'cta'
-  | 'timeline' | 'transfer';
+  | 'timeline' | 'transfer' | 'cardface' | 'bracket-group' | 'usetips';
 
 // 风格配置五维（style 五维：配色/动画性格/字体/转场/钩子）
 export type MotionKey = 'bouncy' | 'snappy' | 'buttery' | 'heavy';
@@ -17,6 +17,8 @@ export interface SceneItem {
   color: string;
   title: string;
   desc: string;
+  /** 表单式字段明细行（solution numbered 变体：icon + label:value，值 ≥32px；有 fields 时不显示 desc） */
+  fields?: { icon?: IconKey; label: string; value: string }[];
 }
 
 export interface SceneNode {
@@ -25,6 +27,21 @@ export interface SceneNode {
   title: string;
   /** 步骤补充说明（可选，无则不显示） */
   sub?: string;
+}
+
+// ── 次卡磁条卡面（cardface，R3 §5.4）──
+export interface CardField {
+  icon: IconKey;
+  label: string;   // 字段名（如「核销间隔」）
+  value: string;   // 字段值（如「3 天」），渲染 ≥32px
+}
+
+// ── 括号分组（bracket-group，R3 §5.6 呈现手法：左竖排标签 + 大括号 + 右明细）──
+export interface BracketGroup {
+  index: string;        // 编号（如「1」）
+  label: string;        // 左侧竖排标签（如「说送卡」）
+  detail: string;       // 右侧明细（单行或多行，`|` 分隔换行）
+  highlight?: boolean;  // 重点高亮（黄色）
 }
 
 export interface SceneMetric {
@@ -79,12 +96,14 @@ export interface Scene {
   sub?: string;
   /** 浅色背景适配：true = 背景较浅，标题用深色 ink（默认 false = 深底白字）。背景图为浅色系时必须设 true */
   darkText?: boolean;
-  /** 卡片样式变体（防连续屏卡片千篇一律，R4 E-011）：border-left=左边框卡（默认）/ center-icon=无边框大图标卡 / numbered=编号圆卡 */
-  cardVariant?: 'border-left' | 'center-icon' | 'numbered';
-  layout?: 'vertical' | 'horizontal';
+  /** 卡片样式变体（防连续屏卡片千篇一律，R4 E-011）：border-left=左边框卡（默认）/ center-icon=无边框大图标卡 / numbered=编号圆卡 / number-focus=数字焦点卡（grid 专用，title=数字大字主色） */
+  cardVariant?: 'border-left' | 'center-icon' | 'numbered' | 'number-focus';
+  layout?: 'vertical' | 'horizontal' | 'numbered-list' | 'multi-section' | 'ranking';
   // pain
   leftTitle?: string;
   leftItems?: string[];
+  /** 痛点深挖副行（numbered-list 变体：每条痛点的后果/为什么，小字显示，填满画面/干货直接显示） */
+  leftItemsSub?: string[];
   rightTitle?: string;
   rightSub?: string;
   // solution
@@ -104,6 +123,29 @@ export interface Scene {
   // transfer（新）
   transferFrom?: string;
   transferTo?: string;
+  // cardface（次卡磁条卡面，R3 §5.4）
+  /** 卡名（如「六次养护卡」） */
+  cardName?: string;
+  /** 底部类型徽章（如「次卡」） */
+  cardType?: string;
+  /** 卡面右上商户名（行业泛称，如「美容院」） */
+  merchantName?: string;
+  /** 次数焦点大字（如 6） */
+  times?: number;
+  /** 总次数（"/ 共 {total} 次"） */
+  total?: number;
+  /** 底部有效期文案（如「有效期 90 天」） */
+  validLabel?: string;
+  /** 卡面主题底色（9 色深色系，如御紫 #3E2060，applet utils/theme.js） */
+  cardTheme?: string;
+  /** 附加字段（≤4 项；次数/有效期已在卡面主体，不重复） */
+  cardFields?: CardField[];
+  /** 卡面下使用说明（按使用场景，R1 真实功能；如「到店出示：顾客出示卡，店员扫码核销」） */
+  useTips?: { icon: IconKey; text: string }[];
+  // bracket-group（括号分组，R3 §5.6）
+  bracketGroups?: BracketGroup[];
+  // transfer/通用：操作要点列表（编号 ①②③ + 文字，填满画面/信息密度用）
+  points?: string[];
 }
 
 export interface StyleConfig {

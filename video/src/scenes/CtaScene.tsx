@@ -42,7 +42,7 @@ export const CtaScene: React.FC<{ scene: Scene; style: StyleConfig; index: numbe
         <Pulse delay={30} intensity={0.05} duration={30}>
           <div style={{
             fontFamily: typo.family, fontSize: 140, fontWeight: typo.titleWeight, color: scene.darkText ? p.ink : '#fff',
-            textAlign: 'center', lineHeight: 1.2, padding: '0 60px',
+            textAlign: 'center', lineHeight: 1.2, padding: '0 80px',
             letterSpacing: '0.02em',
             textShadow: scene.darkText
               ? `0 0 60px ${p.accent}40, 0 6px 30px rgba(255,255,255,0.4)`

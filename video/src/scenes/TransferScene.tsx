@@ -31,12 +31,12 @@ export const TransferScene: React.FC<{
   return (
     <AbsoluteFill style={{ background: 'transparent' }}>
       {/* 标题区 top: 120（安全区 ≥120px） */}
-      <div style={{ position: 'absolute', top: 120, width: '100%', padding: '0 60px' }}>
+      <div style={{ position: 'absolute', top: 120, width: '100%', padding: '0 80px' }}>
         <FadeInUp motion={style.motion}>
           <div style={{
             fontFamily: typo.family, fontSize: 72, fontWeight: typo.titleWeight,
             color: scene.darkText ? p.ink : '#fff', textAlign: 'center',
-            textShadow: '0 4px 24px rgba(0,0,0,0.5)',
+            textShadow: scene.darkText ? '0 2px 10px rgba(255,255,255,0.4)' : '0 4px 24px rgba(0,0,0,0.5)',
           }}>
             {scene.title}
           </div>
@@ -59,11 +59,11 @@ export const TransferScene: React.FC<{
               margin: '0 auto 20px',
               boxShadow: `0 12px 40px ${p.accent}30`,
             }}>
-              <div style={{ width: 100, height: 100 }}>{Ico.users('#fff')}</div>
+              <div style={{ width: 100, height: 100 }}>{Ico.users(scene.darkText ? p.accent : '#fff')}</div>
             </div>
             <div style={{
-              fontFamily: typo.family, fontSize: 44, color: '#fff', fontWeight: typo.titleWeight,
-              textShadow: '0 2px 12px rgba(0,0,0,0.4)',
+              fontFamily: typo.family, fontSize: 44, color: scene.darkText ? p.ink : '#fff', fontWeight: typo.titleWeight,
+              textShadow: scene.darkText ? 'none' : '0 2px 12px rgba(0,0,0,0.4)',
             }}>
               {scene.transferFrom ?? '老客'}
             </div>
@@ -117,30 +117,60 @@ export const TransferScene: React.FC<{
             margin: '0 auto 20px',
             boxShadow: `0 12px 40px ${p.accent}4d`,
           }}>
-            <div style={{ width: 100, height: 100 }}>{Ico.users('#fff')}</div>
+            <div style={{ width: 100, height: 100 }}>{Ico.users(scene.darkText ? p.accent : '#fff')}</div>
           </div>
           <div style={{
-            fontFamily: typo.family, fontSize: 44, color: '#fff', fontWeight: typo.titleWeight,
-            textShadow: '0 2px 12px rgba(0,0,0,0.4)',
+            fontFamily: typo.family, fontSize: 44, color: scene.darkText ? p.ink : '#fff', fontWeight: typo.titleWeight,
+            textShadow: scene.darkText ? 'none' : '0 2px 12px rgba(0,0,0,0.4)',
           }}>
             {scene.transferTo ?? '新客'}
           </div>
         </div>
       </div>
 
+      {/* 转赠操作要点列表（points，信息密度：转赠怎么操作，可截图抄作业） */}
+      {scene.points && scene.points.length > 0 && (
+        <div style={{
+          position: 'absolute', top: 720, left: 80, right: 80,
+          display: 'flex', flexDirection: 'column', gap: 22,
+        }}>
+          {scene.points.map((pt, i) => (
+            <FadeInUp key={i} delay={40 + i * 12} motion={style.motion}>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 22,
+                background: scene.darkText ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.12)',
+                backdropFilter: 'blur(8px)', borderRadius: 20,
+                padding: '20px 28px', border: scene.darkText ? '1px solid rgba(0,0,0,0.06)' : '1px solid rgba(255,255,255,0.2)',
+              }}>
+                <div style={{
+                  fontFamily: typo.family, fontSize: 40, fontWeight: 900,
+                  color: p.accent, flexShrink: 0, width: 56, textAlign: 'center',
+                }}>{i + 1}</div>
+                <div style={{
+                  fontFamily: typo.bodyFamily, fontSize: 36, fontWeight: 500,
+                  color: scene.darkText ? '#222' : '#fff', lineHeight: 1.4,
+                }}>{pt}</div>
+              </div>
+            </FadeInUp>
+          ))}
+        </div>
+      )}
+
       {/* 底部大说明卡 */}
       {scene.sub && (
-        <div style={{ position: 'absolute', bottom: 200, left: 60, right: 60 }}>
+        <div style={{ position: 'absolute', bottom: 200, left: 80, right: 80 }}>
           <FadeInUp delay={80} motion={style.motion}>
             <div style={{
-              background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255,255,255,0.25)', borderRadius: 32,
+              background: scene.darkText ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.15)',
+              backdropFilter: 'blur(12px)',
+              border: scene.darkText ? '1px solid rgba(255,255,255,0.8)' : '1px solid rgba(255,255,255,0.25)',
+              borderRadius: 32,
               padding: '36px 48px', textAlign: 'center',
             }}>
               <div style={{
                 fontFamily: typo.family, fontSize: 42, fontWeight: typo.titleWeight,
-                color: '#fff', lineHeight: 1.4,
-                textShadow: '0 2px 12px rgba(0,0,0,0.3)',
+                color: scene.darkText ? p.ink : '#fff', lineHeight: 1.4,
+                textShadow: scene.darkText ? 'none' : '0 2px 12px rgba(0,0,0,0.3)',
               }}>
                 {scene.sub}
               </div>

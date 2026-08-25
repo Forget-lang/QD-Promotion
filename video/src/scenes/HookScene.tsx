@@ -3,10 +3,10 @@
 // - 标题整体居中，去掉碎装饰
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
-import { FONT_BODY, PALETTES, TYPOGRAPHY } from '../palette';
+import { ACCENT_GREEN, FONT_BODY, PALETTES, TYPOGRAPHY } from '../palette';
 import type { Scene, StyleConfig } from '../types';
 import { FadeInUp, ScaleIn, WipeIn, Pulse } from '../components/animations';
-import { CharReveal } from '../components/ui';
+import { CharReveal, HighLightText } from '../components/ui';
 
 export const HookScene: React.FC<{ scene: Scene; style: StyleConfig; index: number; total: number }> = ({
   scene, style,
@@ -15,7 +15,7 @@ export const HookScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
   const typo = TYPOGRAPHY[style.typography];
 
   return (
-    <AbsoluteFill style={{ background: 'transparent', justifyContent: 'center', alignItems: 'center', padding: '0 60px' }}>
+    <AbsoluteFill style={{ background: 'transparent', justifyContent: 'center', alignItems: 'center', padding: '0 80px' }}>
       {style.hookStyle === 'number' && <NumberHook scene={scene} style={style} typo={typo} p={p} />}
       {style.hookStyle === 'contrast' && <ContrastHook scene={scene} style={style} typo={typo} p={p} />}
       {style.hookStyle === 'question' && <QuestionHook scene={scene} style={style} typo={typo} p={p} />}
@@ -143,6 +143,7 @@ const ClockHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family: st
 };
 
 const ContrastHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family: string; titleWeight: number; bodyWeight: number }; p: typeof PALETTES['mint-cool'] }> = ({ scene, style, typo, p }) => {
+  const dark = scene.darkText ?? false;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
       {/* 主标题（主题引入，VS 对比仍是焦点） */}
@@ -153,40 +154,36 @@ const ContrastHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family:
             delay={2}
             style={{
               fontFamily: typo.family, fontSize: 76, fontWeight: typo.titleWeight,
-              color: '#fff', textAlign: 'center', lineHeight: 1.25,
-              textShadow: '0 4px 30px rgba(0,0,0,0.5)',
+              color: dark ? p.ink : '#fff', textAlign: 'center', lineHeight: 1.25,
+              textShadow: dark ? '0 2px 10px rgba(255,255,255,0.4)' : '0 4px 30px rgba(0,0,0,0.5)',
             }}
           />
         </div>
       )}
       <div style={{ display: 'flex', alignItems: 'center', gap: 30, marginBottom: 40 }}>
-        <div style={{
-          fontFamily: typo.family, fontSize: 120, fontWeight: typo.titleWeight,
-          color: '#EF5350',
-          textShadow: '0 4px 30px rgba(239,83,80,0.5)',
-        }}>
-          {scene.leftTitle ?? '降价'}
-        </div>
+        <HighLightText
+          text={scene.leftTitle ?? '降价'}
+          color="#EF5350" textColor="#EF5350"
+          fontSize={120} delay={2} motion={style.motion}
+        />
         <div style={{
           fontFamily: typo.family, fontSize: 56, fontWeight: typo.titleWeight,
-          color: 'rgba(255,255,255,0.5)',
-          textShadow: '0 2px 12px rgba(0,0,0,0.3)',
+          color: dark ? 'rgba(26,26,26,0.45)' : 'rgba(255,255,255,0.5)',
+          textShadow: dark ? 'none' : '0 2px 12px rgba(0,0,0,0.3)',
         }}>
           VS
         </div>
-        <div style={{
-          fontFamily: typo.family, fontSize: 120, fontWeight: typo.titleWeight,
-          color: p.accent,
-          textShadow: `0 4px 30px ${p.accent}60`,
-        }}>
-          {scene.rightTitle ?? '锁客'}
-        </div>
+        <HighLightText
+          text={scene.rightTitle ?? '锁客'}
+          color={ACCENT_GREEN} textColor={ACCENT_GREEN}
+          fontSize={120} delay={2} motion={style.motion}
+        />
       </div>
       <FadeInUp delay={30} motion={style.motion}>
         <div style={{
-          fontFamily: FONT_BODY, fontSize: 40, color: 'rgba(255,255,255,0.85)',
+          fontFamily: FONT_BODY, fontSize: 40, color: dark ? 'rgba(26,26,26,0.8)' : 'rgba(255,255,255,0.85)',
           textAlign: 'center', lineHeight: 1.5,
-          textShadow: '0 2px 12px rgba(0,0,0,0.4)',
+          textShadow: dark ? 'none' : '0 2px 12px rgba(0,0,0,0.4)',
         }}>
           {scene.sub}
         </div>

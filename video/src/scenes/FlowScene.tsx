@@ -21,22 +21,22 @@ export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
   return (
     <AbsoluteFill style={{ background: 'transparent' }}>
       {/* 标题区 top: 120（安全区 ≥120px） */}
-      <div style={{ position: 'absolute', top: 120, width: '100%', padding: '0 60px' }}>
+      <div style={{ position: 'absolute', top: 120, width: '100%', padding: '0 80px' }}>
         <CharReveal
           text={scene.title ?? ''}
           delay={2}
           style={{
             fontFamily: typo.family, fontSize: 72, fontWeight: typo.titleWeight, color: scene.darkText ? p.ink : '#fff',
             textAlign: 'center', lineHeight: 1.2, letterSpacing: '-0.01em',
-            textShadow: '0 4px 24px rgba(0,0,0,0.5)',
+            textShadow: scene.darkText ? '0 2px 10px rgba(255,255,255,0.4)' : '0 4px 24px rgba(0,0,0,0.5)',
           }}
         />
         {scene.sub && (
           <FadeInUp delay={18} motion={style.motion}>
             <div style={{
               marginTop: 16, fontFamily: FONT_BODY, fontSize: 34,
-              color: 'rgba(255,255,255,0.85)', textAlign: 'center', lineHeight: 1.4,
-              textShadow: '0 2px 12px rgba(0,0,0,0.4)',
+              color: scene.darkText ? 'rgba(26,26,26,0.8)' : 'rgba(255,255,255,0.85)', textAlign: 'center', lineHeight: 1.4,
+              textShadow: scene.darkText ? 'none' : '0 2px 12px rgba(0,0,0,0.4)',
             }}>
               {scene.sub}
             </div>
@@ -46,7 +46,7 @@ export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
 
       {/* 步骤卡片区：从 y:280 开始，纵向排列 */}
       <div style={{
-        position: 'absolute', top: 280, left: 60, right: 60,
+        position: 'absolute', top: 280, left: 80, right: 80,
         display: 'flex', flexDirection: 'column', gap: 28, alignItems: 'center',
       }}>
         {nodes.map((n, i) => {
@@ -55,7 +55,7 @@ export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
           return (
             <ScaleIn key={i} delay={delay} motion={style.motion} startScale={0.88}>
               <div style={{
-                width: 960, height: 320,
+                width: 920, height: 320,
                 backgroundColor: 'rgba(255,255,255,0.96)',
                 borderRadius: 36,
                 boxShadow: `${elevation(3)}, inset 0 1px 0 rgba(255,255,255,0.8)`,
@@ -91,14 +91,16 @@ export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
 
       {/* 底部脚注 */}
       {scene.footnote && (
-        <div style={{ position: 'absolute', bottom: 190, width: '100%', padding: '0 60px', textAlign: 'center' }}>
+        <div style={{ position: 'absolute', bottom: 190, width: '100%', padding: '0 80px', textAlign: 'center' }}>
           <FadeInUp delay={120} motion={style.motion}>
             <div style={{
-              fontFamily: FONT_BODY, fontSize: 32, color: 'rgba(255,255,255,0.92)',
-              background: 'rgba(255,255,255,0.15)', padding: '18px 44px', borderRadius: 999,
+              fontFamily: FONT_BODY, fontSize: 32, color: scene.darkText ? 'rgba(26,26,26,0.85)' : 'rgba(255,255,255,0.92)',
+              background: scene.darkText ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.15)',
+              padding: '18px 44px', borderRadius: 999,
               display: 'inline-block',
-              backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.25)',
-              textShadow: '0 2px 10px rgba(0,0,0,0.3)',
+              backdropFilter: 'blur(8px)',
+              border: scene.darkText ? '1px solid rgba(255,255,255,0.8)' : '1px solid rgba(255,255,255,0.25)',
+              textShadow: scene.darkText ? 'none' : '0 2px 10px rgba(0,0,0,0.3)',
             }}>
               {scene.footnote}
             </div>

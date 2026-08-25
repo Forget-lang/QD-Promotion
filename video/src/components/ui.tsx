@@ -411,3 +411,52 @@ export const Subtitle: React.FC<{ lines: { text: string; startFrame: number; end
     </div>
   );
 };
+
+/** 手写高亮文字（R3 §5.6 呈现手法 ref-02）：大字 + 半透明高亮条（微倾斜 2°）+ 可选波浪下划线 */
+export const HighLightText: React.FC<{
+  text: string;
+  color: string;              // 高亮条颜色
+  textColor?: string;
+  fontSize?: number;
+  fontWeight?: number;
+  wavy?: boolean;             // 波浪下划线
+  delay?: number;
+  motion?: MotionKey;
+  style?: React.CSSProperties;
+}> = ({ text, color, textColor = '#1a1a1a', fontSize = 44, fontWeight = 900, wavy, delay = 0, motion = 'snappy', style }) => {
+  const f = useCurrentFrame();
+  const spr = spring({ frame: f - delay, fps: FPS, config: SPRING_CONFIG[motion] });
+  return (
+    <span style={{ position: 'relative', display: 'inline-block', transform: `translateY(${(1 - spr) * 14}px)`, opacity: spr, ...style }}>
+      {/* 半透明高亮条（微倾斜，ref-02 荧光笔感） */}
+      <span style={{
+        position: 'absolute', left: -10, right: -10, top: '46%', height: '42%',
+        background: hexToRgbaLocal(color, 0.38),
+        transform: 'rotate(-1.8deg)', borderRadius: 6, pointerEvents: 'none',
+      }} />
+      {/* 主文字 */}
+      <span style={{
+        position: 'relative', zIndex: 1,
+        fontFamily: FONT_TITLE, fontSize, fontWeight, color: textColor, lineHeight: 1.25,
+      }}>{text}</span>
+      {/* 波浪下划线（SVG，ref-02 第二层级标记） */}
+      {wavy && (
+        <svg width="100%" height="14" viewBox="0 0 120 14" preserveAspectRatio="none"
+          style={{ position: 'absolute', left: 0, right: 0, bottom: -14 }}>
+          <path d="M0 7 Q 7.5 0 15 7 T 30 7 T 45 7 T 60 7 T 75 7 T 90 7 T 105 7 T 120 7"
+            fill="none" stroke={color} strokeWidth="4" strokeLinecap="round" />
+        </svg>
+      )}
+    </span>
+  );
+};
+
+/** 本地 hex→rgba（HighLightText 内部用，不导出） */
+const hexToRgbaLocal = (hex: string, alpha: number): string => {
+  const v = String(hex || '').replace('#', '');
+  if (v.length !== 6) return `rgba(0,0,0,${alpha})`;
+  const r = parseInt(v.slice(0, 2), 16);
+  const g = parseInt(v.slice(2, 4), 16);
+  const b = parseInt(v.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};

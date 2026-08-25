@@ -11,6 +11,9 @@ import { PanelScene } from './PanelScene';
 import { CtaScene } from './CtaScene';
 import { TimelineScene } from './TimelineScene';
 import { TransferScene } from './TransferScene';
+import { CardFaceScene } from './CardFaceScene';
+import { BracketGroupScene } from './BracketGroupScene';
+import { UseTipsScene } from './UseTipsScene';
 import { Subtitle } from '../components/ui';
 
 export const SceneRenderer: React.FC<{ scene: Scene; style: StyleConfig; index: number; total: number }> = ({
@@ -28,6 +31,9 @@ export const SceneRenderer: React.FC<{ scene: Scene; style: StyleConfig; index: 
     case 'cta': content = <CtaScene {...props} />; break;
     case 'timeline': content = <TimelineScene {...props} />; break;
     case 'transfer': content = <TransferScene {...props} />; break;
+    case 'cardface': content = <CardFaceScene {...props} />; break;
+    case 'bracket-group': content = <BracketGroupScene {...props} />; break;
+    case 'usetips': content = <UseTipsScene {...props} />; break;
     default: content = null;
   }
 
