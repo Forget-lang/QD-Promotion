@@ -1,0 +1,66 @@
+[
+  {
+    "file": "T03-S1-hook.png",
+    "template": "T03",
+    "source": "G04 美容院 · v2 交付版",
+    "screen": "S1",
+    "role": "钩子（contrast：卖卡 vs 送卡）",
+    "note": "G04 交付版关键帧；左右对照词钩子落地样例"
+  },
+  {
+    "file": "T03-S2-pain.png",
+    "template": "T03",
+    "source": "G04 美容院 · v2 交付版",
+    "screen": "S2",
+    "role": "痛点（numbered-list + 后果副行）",
+    "note": "G04 交付版关键帧；编号列表 + 每条后果副行，干货填满画面"
+  },
+  {
+    "file": "T03-S3-cardface.png",
+    "template": "T03",
+    "source": "G04 美容院 · v2 交付版",
+    "screen": "S3",
+    "role": "方案（cardface 次卡卡面焦点屏）",
+    "note": "G04 交付版关键帧；applet 次卡卡面重绘：次数大字焦点 + 字段网格 + 使用说明条，全参数贴画面"
+  },
+  {
+    "file": "T03-S4-bracket-group.png",
+    "template": "T03",
+    "source": "G04 美容院 · v2 交付版",
+    "screen": "S4",
+    "role": "步骤（bracket-group 括号分组）",
+    "note": "G04 交付版关键帧；ref-05 手法落地：左竖排标签 + 大括号 + 右明细，重点行高亮，可截图抄作业"
+  },
+  {
+    "file": "T03-S5-grid.png",
+    "template": "T03",
+    "source": "G04 美容院 · v2 交付版",
+    "screen": "S5",
+    "role": "证明（grid 为什么好使）",
+    "note": "G04 交付版关键帧"
+  },
+  {
+    "file": "T03-S6-transfer.png",
+    "template": "T03",
+    "source": "G04 美容院 · v2 交付版",
+    "screen": "S6",
+    "role": "进阶（transfer 转赠递进）",
+    "note": "G04 交付版关键帧"
+  },
+  {
+    "file": "T03-S7-panel.png",
+    "template": "T03",
+    "source": "G04 美容院 · v2 交付版",
+    "screen": "S7",
+    "role": "数据（panel 统计项）",
+    "note": "G04 交付版关键帧；统计项取自 R1 真实维度"
+  },
+  {
+    "file": "T03-S8-cta.png",
+    "template": "T03",
+    "source": "G04 美容院 · v2 交付版",
+    "screen": "S8",
+    "role": "收尾（cta 品牌）",
+    "note": "G04 交付版关键帧"
+  }
+]
