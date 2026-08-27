@@ -53,7 +53,7 @@
     "source": "G04 美容院 · v2 交付版",
     "screen": "S7",
     "role": "数据（panel 统计项）",
-    "note": "G04 交付版关键帧；统计项取自 R1 真实维度"
+    "note": "G04 交付版关键帧；统计项取自 spec/facts.json 真实维度"
   },
   {
     "file": "T03-S8-cta.png",

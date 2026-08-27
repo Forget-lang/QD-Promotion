@@ -7,7 +7,7 @@
  *   node scripts/check-doc-references.mjs
  *
  * 检查内容：
- *   1. 文档间文件名引用（如 `R1-产品事实表.md`、`M2-视频制作手册.md`）→ 被引文件必须存在于 docs/internal/
+ *   1. 文档间文件名引用（如 `workflow/pipeline.md`、`R2-业务流程.md`）→ 被引文件必须是注册文档（docs/internal/ + workflow/ + AGENTS.md + 战略简报）
  *   2. 章节引用（如 §2.9、§布局模式库、§5.9.7）→ 解析到被引文档（§ 前最近出现的文档名；无则视为本文档自引用）并验证锚点存在
  *   3. 归档注记（如「原 13 §5.9」）与反例代码块 → 跳过，不误报
  *
@@ -74,6 +74,10 @@ const nameAlt = uniqNames.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).j
 const fileRefRe = new RegExp('`?(' + nameAlt + ')`?', 'g');
 // 旧编号文档名（M1-/R5-/00-…/素材索引表）：未注册 = 已归档，命中即报断链
 const legacyRefRe = /`?((?:[A-Z]\d|\d{2})-[^`\s，。；：、()（）"']+\.md|素材索引表\.md)`?/g;
+// 08-27 审计补：无 .md 后缀的旧文档「编号-名称」引用（如 M1-内容策划手册 / R5-内容红线）同样算断链
+const legacyNameRe = /\b(?:M[123]|R[0145])-(?:内容策划手册|视频制作手册|平台发布手册|业务深度图谱|产品事实表|最佳实践库|内容红线)/g;
+// 迁移溯源注记行（迁入/迁移合并/原文存档/存档可查）与「最后校验」头部：属历史说明，不算引用
+const provenanceRe = /迁入|迁移合并|原文存档|存档可查|最后校验/;
 // 别名引用（AGENTS/R2/R3/pipeline/craft 等，不带 .md）
 const aliasKeys = Object.keys(REGISTRY.aliases || {}).sort((a, b) => b.length - a.length);
 const aliasRe = aliasKeys.length
@@ -101,7 +105,13 @@ for (const [file, path] of allDocs) {
     legacyRefRe.lastIndex = 0;
     while ((m = legacyRefRe.exec(line)) !== null) {
       if (!allDocs.has(m[1])) {
-        hardFails.push({ file: rel, line: lineNo, ref: m[1], why: '被引文档不存在（已归档进 docs/archive-legacy/，请改指新结构）' });
+        hardFails.push({ file: rel, line: lineNo, ref: m[1], why: '被引文档不存在（旧手册已清理删除，原文在 git 历史；请改指 spec/ 或 workflow/ 新真源）' });
+      }
+    }
+    if (!provenanceRe.test(line)) {
+      legacyNameRe.lastIndex = 0;
+      while ((m = legacyNameRe.exec(line)) !== null) {
+        hardFails.push({ file: rel, line: lineNo, ref: m[0], why: '引用已归档旧文档（编号-名称形态，无 .md 也断链；请改指 spec/ 或 workflow/ 新真源）' });
       }
     }
     if (aliasRe) {

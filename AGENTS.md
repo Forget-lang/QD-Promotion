@@ -1,6 +1,6 @@
 # 券到卡包 · 内容运营项目（AI 入口）
 
-> 最后校验：2026-08-27（文档架构重构阶段 3：旧文档存档 docs/archive-legacy/，入口切换到 spec/ 三真源 + workflow/ 四散文 + R2/R3；08-26 文档体系重构 v2）
+> 最后校验：2026-08-27（三轮架构审计：§六 doc 引用闸门扫描范围描述补列 `docs/AI使用手册.md`，与 ref-registry 实际一致；此前同日旧文档清理：删除 `docs/archive-legacy/` 全部旧手册 + `outputs/archive/` 5 份过时过程文件 + 渲染副产品，原文保留在 git 历史；再前审计修订二轮——目录树与磁盘对齐、AI使用手册/启动提示词按新结构重写、引用闸门扩扫；更早文档架构重构：入口切换到 spec/ 三真源 + workflow/ 四散文 + R2/R3，旧文档先存档后清理）
 > 任何 AI 助手在本仓库开工前，先读本文件（约 3 分钟）。读完按「§二 开工三动作」执行：跑盘点脚本 → 读 changelog 近况 → 按「任务 → 手册映射」读对应手册，**不需要**读全部文档。
 > 本项目面向实体店电子券工具（做券→发券→领券→扫码核销→统计），当前做宣传推广线冷启动：抖音短视频 + 小红书图文 + 搜狐长文。
 > 产品源码位于 `../applet/`（本文件所在 `promotion/` 的上级目录），功能有疑问时直接查阅代码验证。
@@ -122,7 +122,7 @@
 > `node scripts/check-redlines.mjs` && `node scripts/check-doc-references.mjs` && `node scripts/check-facts.mjs`
 
 - **红线闸门** `check-redlines.mjs`（读 `spec/redlines.json`）：①画面层/②口播文案层=硬禁（`video/src` 零命中）；④文档层命中=描述红线规则属正常提示
-- **文档引用检查** `check-doc-references.mjs`：扫描 AGENTS + workflow/ + docs/internal/ 的「文件名/章节名」引用，失效即报错（防引用断链/残留旧编号）
+- **文档引用检查** `check-doc-references.mjs`：扫描 AGENTS + 战略简报 + AI使用手册 + workflow/ + docs/internal/ 的「文件名/章节名」引用，失效即报错（防引用断链/残留旧编号；旧文档「编号-名称」形态无 .md 后缀也报断链）
 - **事实检查** `check-facts.mjs`：验证文档依赖的关键资产路径在磁盘存在（注册表 `scripts/ref-registry.json` 维护）
 - **变更记录**：每次改动权威文档，在 `outputs/archive/changelog.md` 顶部追加一条（最新在前）
 
@@ -142,19 +142,19 @@ promotion/
 │   └── 发布弹药库.md          封面/CTA/平台细则/标题话题
 ├── docs/
 │   ├── 战略简报.md            用户简报（人话版，AI 也应了解）
-│   ├── internal/             保留参考（低频查阅）
-│   │   ├── R2-业务流程.md     全链路操作步骤/状态流转/渠道枚举
-│   │   └── R3-Remotion技术参考.md  技术原理/组件 API/制作硬规则
-│   └── archive-legacy/       旧文档存档（只读，不引用；2026-08-27 归档 M1/M2/M3/R0/R1/R4/R5/素材索引表）
+│   ├── AI使用手册.md          给用户看的 AI 协作使用方法（人话版）
+│   └── internal/             保留参考（低频查阅）
+│       ├── R2-业务流程.md     全链路操作步骤/状态流转/渠道枚举
+│       └── R3-Remotion技术参考.md  技术原理/组件 API/制作硬规则
 ├── outputs/                 交付物
 │   ├── gXX-行业/             行业单元最终交付（四件套/攻略/设计稿/视频/封面）
-│   ├── 模板库/ 样本库/        设计模板与参照样本
+│   ├── 样本库/               模板样本帧 + 排版参照图（模板定义在 video/src/templates/）
 │   └── archive/             README.md（阅读纪律）+ changelog.md + 过程文件（日期前缀）
 ├── scripts/                 闸门与工具（check-* 三闸门 + list-assets 盘点）
-├── video/                   Remotion 工程（内容在 src/data/，组件在 src/components/ + src/scenes/）
+├── video/                   Remotion 工程（内容在 src/data/，组件在 src/components/ + src/scenes/，模板在 src/templates/，封面合成在 src/covers/）
 └── .workbuddy/              AI 工作区（MEMORY.md / skills）
 ```
 
 - `outputs/` 根目录不放散文件；非交付物一律进 `archive/`
-- `docs/archive-legacy/` 只读存档：历史查证可看，**新内容一律不引用不追加**
 - 权威文档需要复制时从 `spec/`、`workflow/`、`docs/internal/` 取，不在 `outputs/` 建副本（避免不同步）
+- 重构前旧文档（M1-M3/R0/R1/R4/R5/素材索引表）已于 2026-08-27 清理删除，原文在 git 历史可查（提交 `227e05a` 及之前）；任何文档不得再引用这些旧编号

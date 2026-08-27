@@ -24,7 +24,7 @@
 6. `docs/internal/R2-业务流程.md`、`docs/internal/R3-Remotion技术参考.md` —— 保留参考，按需查
 7. `outputs/archive/changelog.md` —— 文档变更日志
 
-> 2026-08-27 文档架构重构阶段 3：旧文档（M1/M2/M3/R0/R1/R4/R5/素材索引表）全量存档 `docs/archive-legacy/`（只读，不引用）。
+> 2026-08-27 文档架构重构阶段 3：旧文档（M1/M2/M3/R0/R1/R4/R5/素材索引表）已存档后于同日清理删除，原文在 git 历史（提交 `227e05a` 及之前）可查，新内容一律不引用。
 
 ## 环境/工具知识（WorkBuddy 使用经验）
 

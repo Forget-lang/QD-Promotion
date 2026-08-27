@@ -159,7 +159,7 @@ if (existsSync(tplDir)) {
       out(`| ${id} | ${name} | ${source} | ${preset} | ${slots.join(' → ')} |`);
     }
     out();
-    out('> 用法：设计稿按玩法选模板 → 逐屏填 `fill` 槽（内容来自 M1 干货提取）→ palette 按背景图色调选定（预设不含 palette）；模板覆盖不了的屏按 M2 标 new:xxx。');
+    out('> 用法：设计稿按玩法选模板 → 逐屏填 `fill` 槽（内容来自 pipeline.md 步骤 3.5 干货提取）→ palette 按背景图色调选定（预设不含 palette）；模板覆盖不了的屏按 R3-Remotion技术参考 §五 扩展流程标 new:xxx。');
   }
 } else {
   out('（templates/ 目录未建）');
