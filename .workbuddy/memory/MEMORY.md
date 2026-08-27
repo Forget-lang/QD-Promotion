@@ -1,28 +1,30 @@
 # 项目记忆 · 券到卡包（quandao 工作区）
 
-> 最后校验：2026-08-21（瘦身版：仅便利贴，重要记忆已迁权威层）
-> ⚠️ **本文件是 WorkBuddy 工具便利贴，非权威真源**（工具每次运行可能自动更新，换工具不读取）。项目重要记忆一律在 `docs/internal/` 权威层，本文件只放工具使用经验 + 导航。
+> 最后校验：2026-08-27（文档架构重构阶段 3：指向切换到 spec/ + workflow/ 新结构）
+> ⚠️ **本文件是 WorkBuddy 工具便利贴，非权威真源**（工具每次运行可能自动更新，换工具不读取）。项目重要记忆一律在权威层（spec/ + workflow/ + AGENTS.md），本文件只放工具使用经验 + 导航。
 
 ---
 
 ## 权威记忆去哪看（重要记忆不在此文件）
 
 - 决策/变更历史 → `outputs/archive/changelog.md`（最新在前）
-- 待验证课题/经验假设 → `docs/internal/R4-最佳实践库.md` §8 待验证假设（HYP-001~005）
-- 红线 → `docs/internal/R5-内容红线.md`；速记在 `AGENTS.md` §三铁律
-- 内容模式/质量标准 → `docs/internal/M1-内容策划手册.md`
+- 待验证课题/经验假设 → `workflow/策划弹药库.md` §6 待验证假设（HYP）
+- 红线 → `spec/redlines.json`；速记在 `AGENTS.md` §三铁律
+- 产品事实/业务深度 → `spec/facts.json`
+- 内容模式/质量标准 → `workflow/pipeline.md`
 - 项目规则/协作 → `AGENTS.md`
 
 ## 开工必读索引
 
 1. `AGENTS.md` —— 入口卡片（项目/铁律/任务→手册映射/协作规则/闸门）
-2. `docs/internal/M1-内容策划手册.md` —— 内容策划（行业/玩法/文案/口播）
-3. `docs/internal/M2-视频制作手册.md` —— 视频制作（设计稿→无声版→TTS→成片）
-4. `docs/internal/M3-平台发布手册.md` —— 平台发布（封面/CTA/三平台规则）
-5. `docs/internal/R1~R5` —— 参考层（事实/流程/技术原理/经验/红线），按需查
-6. `outputs/archive/changelog.md` —— 文档变更日志
+2. `workflow/pipeline.md` —— 流程唯一主线：策划→视频→发布 + 全部闸门
+3. `workflow/craft.md` —— 审美与视觉原则（层级参数/排版参照/布局模式）
+4. `workflow/策划弹药库.md` / `workflow/发布弹药库.md` —— 策划与发布弹药
+5. `spec/facts.json` / `spec/redlines.json` / `spec/assets.json` —— 事实/红线/素材登记三真源
+6. `docs/internal/R2-业务流程.md`、`docs/internal/R3-Remotion技术参考.md` —— 保留参考，按需查
+7. `outputs/archive/changelog.md` —— 文档变更日志
 
-> 2026-08-21 文档体系重构：15 份 → 9 份（旧文档在 `outputs/archive/docs/` 保留历史）。
+> 2026-08-27 文档架构重构阶段 3：旧文档（M1/M2/M3/R0/R1/R4/R5/素材索引表）全量存档 `docs/archive-legacy/`（只读，不引用）。
 
 ## 环境/工具知识（WorkBuddy 使用经验）
 

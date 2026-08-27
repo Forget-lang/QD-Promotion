@@ -1,6 +1,6 @@
 # R3 · Remotion 技术参考（原理层）
 
-> 最后校验：2026-08-27（文档重构阶段 2：吸收 M2 §三 技术硬规则为 §七「制作硬规则（操作版）」；「与 M2 的关系」改指 `workflow/pipeline.md`）（08-25 新增 §5.4 CardFaceScene 规格、§5.5 产品 UI 参考+统计核对、§5.6 呈现手法库、atempo 语速；08-26 atempo 口径对齐——G04 定稿 1.2 后续沿用；08-26 组件状态纠错：§5.4 改为规格示例（CardFaceScene 已实现）、§5.6 手法状态对齐代码 + 真源指向资产盘点脚本）（从原 13 号文档拆分，本文件=原理与 API 参考；08-24 修订语速参数口径）
+> 最后校验：2026-08-27（文档重构阶段 3：R1/R5/M2 残留引用改指 `spec/facts.json`、`spec/redlines.json`、`workflow/pipeline.md`）（文档重构阶段 2：吸收 M2 §三 技术硬规则为 §七「制作硬规则（操作版）」；「与 M2 的关系」改指 `workflow/pipeline.md`）（08-25 新增 §5.4 CardFaceScene 规格、§5.5 产品 UI 参考+统计核对、§5.6 呈现手法库、atempo 语速；08-26 atempo 口径对齐——G04 定稿 1.2 后续沿用；08-26 组件状态纠错：§5.4 改为规格示例（CardFaceScene 已实现）、§5.6 手法状态对齐代码 + 真源指向资产盘点脚本）（从原 13 号文档拆分，本文件=原理与 API 参考；08-24 修订语速参数口径）
 > 这份文档是**参考层**：解释"为什么"和"组件怎么用"。正常做视频**不需要**读它，按 `workflow/pipeline.md` §2（视频）操作即可；遇到渲染异常、需要新建积木/组件/图标、或想理解声画同步原理时，再查本文件。
 > 操作流程（怎么做出片）在 `workflow/pipeline.md`，制作硬规则（动画/转场/布局/代码结构操作版）在本文件 §七，本文件不重复流程环节。
 
@@ -48,7 +48,7 @@ const frames = Math.round(duration * 30);
 **预览 vs 渲染差异**：Remotion Studio 预览时音频和画面可能因性能有轻微延迟，**最终 `npx remotion render` 渲染结果一定同步——以渲染结果为准，不以预览为准**。
 
 **音频预处理（零裁剪、零淡入，只做响度归一化）**：
-- TTS 语速控制：**seed-tts-2.0 的 speed_ratio 参数实测无效**（G04 2026-08-25 实测 0.5~2.0 时长不变），语速一律用 **ffmpeg atempo** 达成 5.5-6 字/秒（**G04 定稿 1.2，后续视频沿用**；如需其他值在 1.15~1.2 内选定并回写；纯变速不变调）；详见 M2-视频制作手册 §五 阶段二「TTS 语速实测验证」
+- TTS 语速控制：**seed-tts-2.0 的 speed_ratio 参数实测无效**（G04 2026-08-25 实测 0.5~2.0 时长不变），语速一律用 **ffmpeg atempo** 达成 5.5-6 字/秒（**G04 定稿 1.2，后续视频沿用**；如需其他值在 1.15~1.2 内选定并回写；纯变速不变调）；详见 `workflow/pipeline.md` §2.5 阶段二
 - 仅用 ffmpeg `loudnorm=I=-16:TP=-1.5:LRA=11` 做响度归一化（`scripts/process-audio.sh`）
 - 不裁剪首尾静音，不做文件级淡入淡出（淡入淡出在代码层用 `<Audio volume={f}>` 帧级控制）
 
@@ -156,7 +156,7 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 | `IconBadge` | icon/color/size/pad/radius | 图标容器：squircle 底 + 主色 tint + 内高光，图标不裸放 |
 | `PhoneMockup` | children/width/height | 手机样机：bezel+灵动岛+玻璃高光，不使用真实小程序截图 |
 | `elevation(level, dark)` | — | 三级投影常量（浅底/深底两套），卡片统一取用，全片光影方向一致 |
-| `CouponCard` | — | 券面票券标准件：大字金额+虚线分隔+条码感装饰+可选撕边缺口；文案必须查 R1 事实表，禁止虚构券规则 |
+| `CouponCard` | — | 券面票券标准件：大字金额+虚线分隔+条码感装饰+可选撕边缺口；文案必须查 `spec/facts.json`，禁止虚构券规则 |
 | `StatCounter` | value/suffix/delay/duration/color/size | 数字滚动 0→value；只用于真实可述口径，禁止虚构营销数据 |
 | `StatCard` | label/value/suffix/caption/icon/accent | 数据卡：图标+标签+滚动数字+说明，grid/panel 数据屏通用 |
 | `StepFlow` | steps[{icon,title,note}]/accent/stagger | 步骤条：连接线擦入+步骤逐个弹入，flow 屏通用 |
@@ -246,7 +246,7 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
    - `scenes/index.tsx` 的 `SceneRenderer` switch 注册新类型
    - 新图标按 §3.3 流程；新动画模式在 `components/animations.tsx` 加组件
 4. **验证**：`npx tsc --noEmit` 零错误 → 至少渲染 1 帧 still → 复杂时序渲染多帧 → 跑红线闸门
-5. **文档回写**：M2 场景积木表加一行；本文件组件表补充；当日记忆记录
+5. **文档回写**：本文件组件表补充；组件清单由 `node scripts/list-assets.mjs` 实时生成；当日记忆记录
 
 ### 5.3 新积木质量标准
 
@@ -259,9 +259,9 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 
 > 按 5.2 步骤 1 的五要素写全，编码 agent 直接按此实现（2026-08-25 定规格；CardFaceScene 已于 G04 S3 落地，本节留作新积木的规格写法示例）。
 
-**① 名称用途**：`cardface` 次卡磁条卡面屏——展示次卡产品的完整卡面（R1 §3.3：次卡=磁条卡面+9 色深色系）。用于方案屏展示"这张卡长什么样、有哪些字段"，是信息密度升级核心（替代 solution 白卡列表，防"换皮同款"）。
+**① 名称用途**：`cardface` 次卡磁条卡面屏——展示次卡产品的完整卡面（`spec/facts.json`：次卡=磁条卡面+9 色深色系）。用于方案屏展示"这张卡长什么样、有哪些字段"，是信息密度升级核心（替代 solution 白卡列表，防"换皮同款"）。
 
-**①.5 产品原型参考（2026-08-25 加，必读）**：真实产品卡面在 `../applet/components/m/m-card-magnetic-face/m-card-magnetic-face.vue`（顾客端"我的卡包"次卡磁条卡面组件），CardFaceScene 按此视觉结构重绘（只参考样式，不截真实界面图，R5 §5）：
+**①.5 产品原型参考（2026-08-25 加，必读）**：真实产品卡面在 `../applet/components/m/m-card-magnetic-face/m-card-magnetic-face.vue`（顾客端"我的卡包"次卡磁条卡面组件），CardFaceScene 按此视觉结构重绘（只参考样式，不截真实界面图，`spec/redlines.json` rules.video_visual）：
 - 卡面结构：深色主题底 + 磁卡质感背景图 + 右上角光晕（radial-gradient circle at 88% 6% 白 22%）+ 主题色渐变蒙层（165deg：主题色 15% → 透明 42% → 底部黑 12%）
 - 信息层级（真实产品）：**次数大字是焦点**（64rpx/700）> 卡名（44rpx/700）> 单位/总数（30rpx/22rpx 半透明白）> 底部徽章+有效期（22rpx 白 72-88%）
 - 底部：左类型徽章（白 88% + 1rpx 白 35% 描边圆角）+ 右有效期文案（右对齐）
@@ -320,16 +320,16 @@ fields?: { icon: IconKey; label: string; value: string }[];  // 附加字段网�
 | 优惠券券面（6 型） | `components/m/m-coupon-tpl/`、`m-coupon-combo/` | 券面展示屏 |
 | 领取页（公开/私密/转赠） | `pages_user/coupon/public_receive.vue`、`private_receive.vue`、`pages_user/card/private_receive.vue` | 流程链路屏（顾客视角） |
 | 核销页 | `pages_card/verify/verify.vue` | 操作步骤屏 |
-| 统计页（指标+排行） | `pages_card/stat/home.vue`、`*_rank.vue` | 数据屏（R1：无趋势图，指标卡+排行） |
+| 统计页（指标+排行） | `pages_card/stat/home.vue`、`*_rank.vue` | 数据屏（`spec/facts.json`：无趋势图，指标卡+排行） |
 | 9 色主题 | `utils/theme.js`（尊享红 #8B1A32 等） | 卡面/券面配色 |
 
-**统计维度核对规则（2026-08-25 加，防编造指标）**：设计数据屏前**先核对 R1 §4.3/§4.4 真实统计维度**，禁止凭印象编造统计项（G04 教训：S7 编造"转赠数"指标，实际只有"顾客转赠排行"）。真实维度：指标卡=我的业绩（有效发放/核销率/在店核销）/本店数据/券详情即时数据（已领取/已核销/核销率/剩余库存）；排行榜=渠道/门店/员工/顾客转赠/顾客核销排行；数据用途=领取明细、核销明细导出 Excel、筛选（时间/渠道/门店/员工/券码）。
+**统计维度核对规则（2026-08-25 加，防编造指标）**：设计数据屏前**先核对 `spec/facts.json` deep 层真实统计维度**，禁止凭印象编造统计项（G04 教训：S7 编造"转赠数"指标，实际只有"顾客转赠排行"）。真实维度：指标卡=我的业绩（有效发放/核销率/在店核销）/本店数据/券详情即时数据（已领取/已核销/核销率/剩余库存）；排行榜=渠道/门店/员工/顾客转赠/顾客核销排行；数据用途=领取明细、核销明细导出 Excel、筛选（时间/渠道/门店/员工/券码）。
 
 **换算与边界**：
 - rpx（750 设计稿）→ px（1080 画幅）按 1:1.44 等比放大（字号/间距/圆角）
-- 只参考样式重绘，**不截真实界面图**（R5 §5 视频主视觉）
-- 界面字段必须 R1 可查（不虚构 UI）；统计屏不填真实商户数据
-- 不出现企微/微信系界面（R5 §1）、商户认证/审核类界面（R1：不提审核）
+- 只参考样式重绘，**不截真实界面图**（`spec/redlines.json` rules.video_visual）
+- 界面字段必须 `spec/facts.json` 可查（不虚构 UI）；统计屏不填真实商户数据
+- 不出现企微/微信系界面（`spec/redlines.json` rules.platform_diversion）、商户认证/审核类界面（`spec/facts.json`：不提审核）
 
 ### 5.6 呈现手法库（2026-08-25 定，防审美疲劳）
 
@@ -337,8 +337,8 @@ fields?: { icon: IconKey; label: string; value: string }[];  // 附加字段网�
 
 **使用规则**：
 1. 设计稿每屏标注「呈现手法」字段（7 选 1：卡片 / 编号列表 / 手写高亮 / 多层分区 / 撕纸笔记 / 括号分组 / 药丸徽章）
-2. 相邻屏手法不同；内容屏（solution/flow/grid/panel）至少 2 屏手法与上一条视频不同（配合 M2 §2.3 视觉观感比对）
-3. 手法组件是**变体优先**（同 type 用 scene.layout 切换，M2 §四），结构差异大的才新建场景组件
+2. 相邻屏手法不同；内容屏（solution/flow/grid/panel）至少 2 屏手法与上一条视频不同（配合 `workflow/pipeline.md` §2.2 相似度检查）
+3. 手法组件是**变体优先**（同 type 用 scene.layout 切换，组件清单跑 `list-assets.mjs` 核对），结构差异大的才新建场景组件
 
 **手法规格表**：
 

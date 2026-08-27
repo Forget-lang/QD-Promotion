@@ -1,14 +1,14 @@
 ---
 name: quandao-content
-description: 券到卡包内容运营项目开工导航。AI 接手必读：项目一句话 + 三大铁律 + 任务→手册映射。详细知识见 docs/internal/。
-version: 4.0.0
+description: 券到卡包内容运营项目开工导航。AI 接手必读：项目一句话 + 三大铁律 + 任务→手册映射。详细知识见 spec/ 与 workflow/。
+version: 5.0.0
 ---
 
 # 券到卡包 · 开工导航
 
-> 最后校验：2026-08-21（文档体系重构 v2：15 份 → 9 份）
+> 最后校验：2026-08-27（文档架构重构阶段 3：切换到 spec/ 三真源 + workflow/ 四散文 + R2/R3）
 > **这是什么**：AI 接手本项目的第一站——30 秒搞清楚项目是什么、不能碰什么、该去哪找答案。
-> **这不是什么**：完整知识库。详细知识在 `docs/internal/`，按任务取用，不在这里复述。
+> **这不是什么**：完整知识库。详细知识在 `spec/`（数据真源）与 `workflow/`（流程与弹药），按任务取用，不在这里复述。
 
 ---
 
@@ -21,9 +21,9 @@ version: 4.0.0
 
 ## 二、三大铁律（不可破）
 
-1. **不虚假宣传** —— 功能边界查 `docs/internal/R1-产品事实表.md`，不编店名/案例/数据
-2. **不触平台红线** —— 三平台不提微信/小程序/搜索，导流仅限账号资料位；完整红线见 `docs/internal/R5-内容红线.md`
-3. **统一口径** —— 决策/口径/红线必须回写权威文档，不能只留在聊天里
+1. **不虚假宣传** —— 功能边界查 `spec/facts.json`，不编店名/案例/数据
+2. **不触平台红线** —— 三平台不提微信/小程序/搜索，导流仅限账号资料位；完整红线见 `spec/redlines.json`
+3. **统一口径** —— 决策/口径/红线必须回写权威文档（spec/ 或 workflow/），不能只留在聊天里
 
 ## 三、开工第一步
 
@@ -31,19 +31,19 @@ version: 4.0.0
 
 | 你要做的事 | 读 | 查 |
 |---|---|---|
-| 内容策划（行业/玩法/文案/口播） | `docs/internal/M1-内容策划手册.md` | R1/R2/R4 |
-| 视频制作（设计稿→成片） | `docs/internal/M2-视频制作手册.md` | R3/R4 |
-| 平台发布（封面/CTA/三平台规则） | `docs/internal/M3-平台发布手册.md` | R5 |
-| 教程长文需要操作步骤 | `docs/internal/R2-业务流程.md` | R1 |
-| 合规争议 | `docs/internal/R5-内容红线.md` | — |
-| 句式/排版参照/踩坑 | `docs/internal/R4-最佳实践库.md` | — |
+| 内容策划（行业/玩法/文案/口播） | `workflow/pipeline.md` §1 + `workflow/策划弹药库.md` | spec/facts.json、R2 |
+| 视频制作（设计稿→成片） | `workflow/pipeline.md` §2 + `workflow/craft.md` | R3 |
+| 平台发布（封面/CTA/三平台规则） | `workflow/pipeline.md` §3 + `workflow/发布弹药库.md` | spec/redlines.json |
+| 教程长文需要操作步骤 | `docs/internal/R2-业务流程.md` | spec/facts.json |
+| 合规争议 | `spec/redlines.json` | — |
+| 句式/排版参照/审美 | `workflow/craft.md` + `workflow/策划弹药库.md` §句式 | — |
 
 ## 四、行为准则（AI 怎么干活）
 
 - **AI = 策划者 + 设计者，不是执行者** —— 用户给方向，AI 拿方案
 - **两步确认法** —— 先理解确认，再规划确认，然后才动手
 - **改一处，全量对齐** —— 改完跑 `node scripts/check-redlines.mjs`（code 层零命中）+ 更新 changelog
-- **生产回顾是强制动作** —— 每次做完沉淀进 `docs/internal/R4-最佳实践库.md`
+- **生产回顾是强制动作** —— 每次做完沉淀进对应文档（审美→craft、句式→策划弹药库、流程教训→pipeline），假设记入策划弹药库 §6
 
 ## 五、渲染注意
 

@@ -15,7 +15,7 @@
  */
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -66,9 +66,23 @@ for (const [file, path] of allDocs) anchorsByFile.set(file, extractAnchors(path)
 const hardFails = [];
 const reviews = [];
 
+// 文件名引用正则：从注册文档动态构建（全路径与基名都可识别，长名优先）
+const docNames = [...allDocs.keys()].flatMap((k) => [k, k.split('/').pop()]);
+for (const v of Object.values(REGISTRY.aliases || {})) docNames.push(v, v.split('/').pop());
+const uniqNames = [...new Set(docNames)].filter(Boolean).sort((a, b) => b.length - a.length);
+const nameAlt = uniqNames.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+const fileRefRe = new RegExp('`?(' + nameAlt + ')`?', 'g');
+// 旧编号文档名（M1-/R5-/00-…/素材索引表）：未注册 = 已归档，命中即报断链
+const legacyRefRe = /`?((?:[A-Z]\d|\d{2})-[^`\s，。；：、()（）"']+\.md|素材索引表\.md)`?/g;
+// 别名引用（AGENTS/R2/R3/pipeline/craft 等，不带 .md）
+const aliasKeys = Object.keys(REGISTRY.aliases || {}).sort((a, b) => b.length - a.length);
+const aliasRe = aliasKeys.length
+  ? new RegExp('(?:^|[^A-Za-z0-9])(' + aliasKeys.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')(?:[^A-Za-z0-9]|$)', 'g')
+  : null;
+
 for (const [file, path] of allDocs) {
   const lines = readFileSync(path, 'utf8').split('\n');
-  const rel = file === 'AGENTS.md' ? file : `${REGISTRY.docsDir}/${file}`;
+  const rel = relative(ROOT, path);
   let inCodeBlock = false;
 
   lines.forEach((line, i) => {
@@ -78,26 +92,29 @@ for (const [file, path] of allDocs) {
 
     // 行内所有文档引用（文件名/别名），记录位置
     const docHits = [];
-    // 字母开头（M1-xx.md / R1-xx.md）或数字开头旧编号（00-xx.md / 13-xx.md）的文件名引用
-    const fileRefRe = /`?((?:[A-Z]\d|\d{2})-[^`\s，。；：、()（）"']+\.md|AGENTS\.md)`?/g;
     let m;
+    fileRefRe.lastIndex = 0;
     while ((m = fileRefRe.exec(line)) !== null) {
-      const name = m[1];
-      if (!allDocs.has(name)) {
-        hardFails.push({ file: rel, line: lineNo, ref: name, why: '被引文档不存在（docs/internal/ 中无此文件，或已归档）' });
-      } else {
-        docHits.push({ idx: m.index, file: name });
+      const name = allDocs.has(m[1]) ? m[1] : [...allDocs.keys()].find((k) => k === m[1] || k.split('/').pop() === m[1]);
+      if (name) docHits.push({ idx: m.index, file: name });
+    }
+    legacyRefRe.lastIndex = 0;
+    while ((m = legacyRefRe.exec(line)) !== null) {
+      if (!allDocs.has(m[1])) {
+        hardFails.push({ file: rel, line: lineNo, ref: m[1], why: '被引文档不存在（已归档进 docs/archive-legacy/，请改指新结构）' });
       }
     }
-    // 别名引用（M1/R1 等，不带 .md）
-    const aliasRe = /(?:^|[^A-Za-z0-9])(M[123]|R[1-5]|AGENTS)(?:[^A-Za-z0-9]|$)/g;
-    while ((m = aliasRe.exec(line)) !== null) {
-      const file = aliasMap.get(m[1]);
-      if (file) docHits.push({ idx: m.index + 1, file });
+    if (aliasRe) {
+      aliasRe.lastIndex = 0;
+      while ((m = aliasRe.exec(line)) !== null) {
+        const file2 = aliasMap.get(m[1]);
+        if (file2) docHits.push({ idx: m.index + 1, file: file2 });
+      }
     }
+    docHits.sort((a, b) => a.idx - b.idx);
 
-    // 归档注记模式：「原 13 §x」「原 07-渠道与执行 §3」「13-Remotion技术规范 §5.9」——跳过
-    const isArchivalNote = /(?:原\s*[^，。；：]*|(?:0\d|1[0-4])-[^，。；：]*)\s*§/.test(line);
+    // 归档注记模式：「原 13 §x」「原 07-渠道与执行 §3」——跳过；「最后校验」头部溯源行——跳过
+    const isArchivalNote = /(?:原\s*[^，。；：]*|(?:0\d|1[0-4])-[^，。；：]*)\s*§/.test(line) || /最后校验/.test(line);
     // 反例/规则说明行（举例"错"或"禁止/不使用"）——跳过章节引用检查
     const isCounterExample = /(❌|错：|禁止|不使用|不重复|不用「)/.test(line);
 

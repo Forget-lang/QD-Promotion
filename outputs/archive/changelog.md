@@ -6,6 +6,40 @@
 
 ---
 
+## 2026-08-27 · 文档架构重构 · 阶段 3：旧文档存档 + AGENTS/SKILL 切换新结构（重构收口）
+
+**背景**：阶段 2 建成 workflow/ 四散文并验证无丢失。本阶段执行迁移地图最后一步——8 份旧文档存档、入口文档切换到「spec/ 数据真源 + workflow/ 散文」新结构，并完成全库残留引用清理。
+
+### 变更
+- **存档**：8 份旧文档 `git mv` 进 `docs/archive-legacy/`（M1/M2/M3/R0/R1/R4/R5/素材索引表），只读保留、不再维护；`docs/internal/` 仅留 R2（业务流程）、R3（Remotion 技术参考）
+- `docs/internal/R2-业务流程.md`：删尾部「引用关系」节；R1 引用改指 `spec/facts.json`
+- `scripts/ref-registry.json`：aliases 瘦身为 AGENTS/R2/R3 + 新增 pipeline/craft/策划弹药库/发布弹药库；extraDocs 登记 workflow/ 四文档；`excludeDirs` 排除 archive-legacy
+- `scripts/check-doc-references.mjs`：文件名引用正则改为从注册表动态构建（识别 workflow/ 全路径与基名）；旧编号文档名（M1-/R5-/00-/素材索引表）命中即报断链；跳过「最后校验」头部溯源行
+- `AGENTS.md`：瘦身重写——任务→手册映射改指 workflow/ 四文档；内容归属判定表（事实/红线→spec/，流程/审美/弹药→workflow/）；目录树与闸门命令更新
+- `.workbuddy/skills/quandao-content/SKILL.md` + `.workbuddy/memory/MEMORY.md`：权威指针全部切到新结构
+- `docs/internal/R3-Remotion技术参考.md`：12 处 R1/R5/M2 残留引用改指 `spec/facts.json`（产品事实/统计维度/界面字段）、`spec/redlines.json` rules.video_visual/platform_diversion（主视觉/平台红线）、`workflow/pipeline.md` §2.2/§2.5（相似度检查/语速）；场景积木表回写改跑 `list-assets.mjs`
+- `workflow/pipeline.md`：9 处 § 引用改为可验证写法（策划弹药库 §1 玩法库/§2 卖点/§4 句式库；craft §2.4 反馈翻译表/§6 拆解模板）
+- `workflow/craft.md`：反馈翻译表「本文 §8」改显式 `craft.md §8`
+- `workflow/策划弹药库.md`：新增 §6 待验证假设 HYP-001~006（自 R4 迁入，含验证方法）
+- `docs/战略简报.md`：产品事实指针 R1 → `spec/facts.json`
+
+### 验证
+- check-redlines：硬禁层零命中（文案层 12 处均为既有产出的品牌名/规则说明句，预期内）✅
+- check-doc-references：失效引用 0、无需人工确认项 ✅（修复前 17 处硬失败全部清零）
+- check-facts：15/15 关键资产在位 + 素材登记 33/33 + D 级 88/88 对账 ✅
+- 全库残留扫描：活文档中旧文档名引用仅剩脚本自身注释与 outputs/ 历史产出快照（不追溯修改）✅
+
+### 新结构定稿
+```
+spec/       facts.json（产品事实）· redlines.json（红线）· assets.json（素材登记）
+workflow/   pipeline.md（流程）· craft.md（审美）· 策划弹药库.md · 发布弹药库.md
+docs/internal/  R2（业务流程）· R3（Remotion 技术参考）
+docs/archive-legacy/  8 份旧文档（只读）
+```
+文档冻结政策延续：权威文档只允许纠错变更；重构全程基线提交 `3219e29` 可回退。
+
+---
+
 ## 2026-08-27 · 文档架构重构 · 阶段 2：workflow/ 四散文 + R3 吸收 M2 §三
 
 **背景**：阶段 1（spec/ 三数据文件 + 脚本升级）验证通过。本阶段按迁移地图建 workflow/ 散文层——旧文档的流程/审美/弹药内容迁出成 4 份新文档，M2 §三 技术硬规则吸收进 R3。旧文档仍原地不动（阶段 3 存档切换）。
