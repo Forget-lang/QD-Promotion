@@ -185,4 +185,30 @@ if (existsSync(sampleIndexFile)) {
   out('（样本库未建）');
 }
 
+// ── 8. 素材登记视图（真源 = spec/assets.json）──
+out();
+out('## 8. 素材登记视图（真源 = spec/assets.json）');
+out();
+const assetsFile = join(root, 'spec', 'assets.json');
+if (existsSync(assetsFile)) {
+  const assets = JSON.parse(read(assetsFile));
+  out('### A 级 · 抽象背景模板（视频背景优先用）');
+  out();
+  out('| 编号 | 名称 | 色系 | 深字 | 状态 |');
+  out('|---|---|---|---|---|');
+  for (const bg of assets.A.abstract) {
+    out(`| ${bg.id} | ${bg.name} | ${bg.colorScheme} | ${bg.darkText ? '是（浅底）' : '否'} | ${bg.status} |`);
+  }
+  for (const d of assets.A.abstractDeleted) out(`> 🚫 ${d.id} ${d.name} 已删除（${d.deletedAt}），${d.ban}；替代：${d.replacement}`);
+  out();
+  const caution = assets.A.xhs.filter((x) => x.caution);
+  out(`- **A 级 · 小红书风格背景**：${assets.A.xhs.length} 张已登记（图文封面/配图氛围用）${caution.length ? `；⚠️ 慎用：${caution.map((x) => `${x.id}（${x.caution}）`).join('、')}` : ''}`);
+  out(`- **B 级**：${assets.B.map((b) => `${b.id} ${b.name}（${b.status}）`).join('、')}`);
+  out(`- **C 级字体**（已 bundle）：${assets.C.map((f) => f.font).join('、')}`);
+  const dTotal = assets.D.categories.reduce((n, c) => n + c.files.length, 0) + assets.D.banned.wecom.files.length + assets.D.banned.wechatSearch.files.length;
+  out(`- **D 级截图**（${assets.D.dir}${dTotal} 张登记）：配图先查分类表；🚫 企微系 ${assets.D.banned.wecom.files.length} 张 + 微信搜索 ${assets.D.banned.wechatSearch.files.length} 张三平台禁用`);
+} else {
+  out('（spec/assets.json 未建）');
+}
+
 console.log(lines.join('\n'));

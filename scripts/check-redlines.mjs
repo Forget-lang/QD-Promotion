@@ -2,11 +2,10 @@
 /**
  * check-redlines.mjs —— 券到卡包短视频红线守门脚本
  *
- * 唯一数据源：同目录 redlines.json
+ * 唯一数据源：spec/redlines.json（机检四层 = 其中带 scope 的层；_meta/rules 为规则全量，不参与扫描）
  * 用途：改完任何红线/CTA 口径后运行，作为「全量对齐」的收口闸门。
- * 用法（可在任意目录运行）：
- *   cd /Users/qxy/Desktop/baijiang/quandao && node scripts/check-redlines.mjs
- *   或：node /Users/qxy/Desktop/baijiang/quandao/scripts/check-redlines.mjs
+ * 用法（项目根运行）：
+ *   node scripts/check-redlines.mjs
  *
  * 四层检查（按严格程度递减）：
  *   1. codeBanned    — 画面层硬禁（video/src 所有 ts/tsx），命中 = 硬失败
@@ -23,7 +22,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
-const CONFIG = JSON.parse(readFileSync(join(__dirname, 'redlines.json'), 'utf8'));
+const CONFIG = JSON.parse(readFileSync(join(__dirname, '..', 'spec', 'redlines.json'), 'utf8'));
 
 // 把 scope 里的 glob（**/*.tsx 等）展开成具体文件
 function expand(scopeList, excludeList = []) {

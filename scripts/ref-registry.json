@@ -27,7 +27,9 @@
     { "desc": "G02 数据文件", "path": "video/src/data/g02v3.ts" },
     { "desc": "G03 数据文件", "path": "video/src/data/g03.ts" },
     { "desc": "编排引擎 VTemplate", "path": "video/src/VTemplate.tsx" },
-    { "desc": "红线机器数据源", "path": "scripts/redlines.json" },
+    { "desc": "产品事实真源", "path": "spec/facts.json" },
+    { "desc": "内容红线真源（机检层 + 规则全量）", "path": "spec/redlines.json" },
+    { "desc": "素材登记真源", "path": "spec/assets.json" },
     { "desc": "changelog 变更日志", "path": "outputs/archive/changelog.md" }
   ]
 }
