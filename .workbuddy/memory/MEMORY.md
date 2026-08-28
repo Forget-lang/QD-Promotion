@@ -1,30 +1,28 @@
 # 项目记忆 · 券到卡包（quandao 工作区）
 
-> 最后校验：2026-08-27（文档架构重构阶段 3：指向切换到 spec/ + workflow/ 新结构）
-> ⚠️ **本文件是 WorkBuddy 工具便利贴，非权威真源**（工具每次运行可能自动更新，换工具不读取）。项目重要记忆一律在权威层（spec/ + workflow/ + AGENTS.md），本文件只放工具使用经验 + 导航。
+> 最后校验：2026-08-29（文档收敛：`workflow/` 四份 + 模板库 + T03 认可帧归档至 `outputs/archive/20260829-文档收敛归档/`，作业文档收敛为 SKILL 唯一；R4→R6）
+> ⚠️ **本文件是 WorkBuddy 工具便利贴，非权威真源**（工具每次运行可能自动更新，换工具不读取）。项目重要记忆一律在权威层（`SKILL.md` + `spec/` + `AGENTS.md`），本文件只放工具使用经验 + 导航。
 
 ---
 
 ## 权威记忆去哪看（重要记忆不在此文件）
 
 - 决策/变更历史 → `outputs/archive/changelog.md`（最新在前）
-- 待验证课题/经验假设 → `workflow/策划弹药库.md` §6 待验证假设（HYP）
-- 红线 → `spec/redlines.json`；速记在 `AGENTS.md` §三铁律
+- 红线 → `spec/redlines.json`；速记在 `AGENTS.md` §四 三铁律
 - 产品事实/业务深度 → `spec/facts.json`
-- 内容模式/质量标准 → `workflow/pipeline.md`
-- 项目规则/协作 → `AGENTS.md`
+- 内容模式/质量标准 → `.workbuddy/skills/quandao-content/SKILL.md`（唯一作业文档，七步法）
+- 项目规则/协作 → `AGENTS.md`（入口）
+- 旧生产文档（pipeline/craft/两份弹药库/模板库）→ 已归档 `outputs/archive/20260829-文档收敛归档/`，不再作为执行依据
 
 ## 开工必读索引
 
-1. `AGENTS.md` —— 入口卡片（项目/铁律/任务→手册映射/协作规则/闸门）
-2. `workflow/pipeline.md` —— 流程唯一主线：策划→视频→发布 + 全部闸门
-3. `workflow/craft.md` —— 审美与视觉原则（层级参数/排版参照/布局模式）
-4. `workflow/策划弹药库.md` / `workflow/发布弹药库.md` —— 策划与发布弹药
-5. `spec/facts.json` / `spec/redlines.json` / `spec/assets.json` —— 事实/红线/素材登记三真源
-6. `docs/internal/R2-业务流程.md`、`docs/internal/R3-Remotion技术参考.md` —— 保留参考，按需查
-7. `outputs/archive/changelog.md` —— 文档变更日志
+1. `AGENTS.md` —— 入口卡片（项目/真源表/开工三动作/三铁律/协作要点）
+2. `.workbuddy/skills/quandao-content/SKILL.md` —— 唯一作业文档：一条视频的七步法 + 量化验收线
+3. `spec/facts.json` / `spec/redlines.json` / `spec/assets.json` —— 事实/红线/素材登记三真源
+4. `docs/internal/R2-业务流程.md`、`docs/internal/R3-Remotion技术参考.md`、`docs/internal/R6-applet前端UI储备.md` —— 保留参考，按需查
+5. `outputs/archive/changelog.md` —— 文档变更日志
 
-> 2026-08-27 文档架构重构阶段 3：旧文档（M1/M2/M3/R0/R1/R4/R5/素材索引表）已存档后于同日清理删除，原文在 git 历史（提交 `227e05a` 及之前）可查，新内容一律不引用。
+> 2026-08-27 文档架构重构阶段 3：旧文档（M1/M2/M3/R0/R1/R4/R5/素材索引表）已存档后于同日清理删除，原文在 git 历史（提交 `227e05a` 及之前）可查，新内容一律不引用。2026-08-29 文档收敛：`workflow/` 体系整体归档（见上），原 `R4-applet前端UI储备` 改名 `R6`（避让退役编号）。
 
 ## 环境/工具知识（WorkBuddy 使用经验）
 
