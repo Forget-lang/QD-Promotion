@@ -1,5 +1,5 @@
 {
-  "description": "权威文档注册表：check-doc-references / check-facts 读取本文件。维护规则：新增权威文档时在此登记；文档清单变化时更新 aliases。",
+  "description": "权威文档注册表：check-doc-references / check-facts 读取本文件。维护规则：新增权威文档时在此登记；文档清单变化时更新 aliases；关键计数（玩法/卖点/布局/手法等）变化时同步更新 counts。",
   "docsDir": "docs/internal",
   "extraDocs": [
     "AGENTS.md",
@@ -20,6 +20,42 @@
     "策划弹药库": "workflow/策划弹药库.md",
     "发布弹药库": "workflow/发布弹药库.md"
   },
+  "counts": [
+    {
+      "name": "玩法库条目",
+      "source": { "file": "workflow/策划弹药库.md", "from": "### 1.1", "to": "### 1.2", "regex": "^\\| P-\\d+ \\|" },
+      "claims": [
+        { "label": "玩法编号段", "regex": "P-01~P-(\\d+)" }
+      ],
+      "stale": ["P-01~P-07", "P-01~07", "7 套通用玩法", "7套通用玩法", "七大玩法", "§1.9 矩阵", "1.9 矩阵"]
+    },
+    {
+      "name": "特色卖点条目",
+      "source": { "file": "workflow/策划弹药库.md", "regex": "^#### 卖点 \\d+" },
+      "claims": [
+        { "label": "卖点计数", "regex": "(\\d+)\\s*大(?:特色)?卖点" }
+      ],
+      "stale": ["十大卖点", "10 大卖点", "10大卖点", "10 大特色卖点"]
+    },
+    {
+      "name": "布局模式条目",
+      "source": { "file": "workflow/craft.md", "from": "## 8.", "to": "## 9.", "regex": "^\\| L-\\d{2} \\|" },
+      "claims": [
+        { "label": "布局模式段", "regex": "L-01~L-(\\d+)" },
+        { "label": "布局模式种数", "regex": "布局模式库 (\\d+) 种" }
+      ],
+      "stale": []
+    },
+    {
+      "name": "呈现手法条目",
+      "source": { "file": "docs/internal/R3-Remotion技术参考.md", "from": "### 5.6", "to": "## 六", "regex": "^\\| \\*\\*" },
+      "claims": [
+        { "label": "手法选 1 计数", "regex": "(\\d+) 选 1" },
+        { "label": "手法个数", "regex": "（(\\d+) 手法" }
+      ],
+      "stale": []
+    }
+  ],
   "factChecks": [
     { "desc": "G02 V3 背景图（data 引用）", "path": "video/public/backgrounds/g02v3/bg.jpg" },
     { "desc": "BG-ABS-001 暖奶油卡片底（素材登记）", "path": "背景素材/抽象模板/暖色系/BG-ABS-001-暖奶油卡片底.png" },

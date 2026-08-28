@@ -160,19 +160,63 @@ for (const [file, path] of allDocs) {
   });
 }
 
+// ── 3.5 计数/旧号扫描（防纯文字计数漂移与"锚点仍在、语义已变"；ref-registry.json counts 登记） ──
+const countFails = [];
+const countInfo = [];
+for (const item of REGISTRY.counts || []) {
+  const srcPath = allDocs.get(item.source.file) || join(ROOT, item.source.file);
+  let srcLines = readFileSync(srcPath, 'utf8').split('\n');
+  if (item.source.from || item.source.to) {
+    const start = item.source.from ? srcLines.findIndex((l) => l.startsWith('#') && l.includes(item.source.from)) : 0;
+    const end = item.source.to ? srcLines.findIndex((l, i) => i > start && l.startsWith('#') && l.includes(item.source.to)) : -1;
+    srcLines = srcLines.slice(start === -1 ? 0 : start, end === -1 ? srcLines.length : end);
+  }
+  const srcRe = new RegExp(item.source.regex);
+  const actual = srcLines.filter((l) => srcRe.test(l)).length;
+  countInfo.push(`${item.name} 真源实际 ${actual}（${item.source.file}）`);
+  for (const file of allDocs.keys()) {
+    const lines = readFileSync(allDocs.get(file), 'utf8').split('\n');
+    for (const claim of item.claims || []) {
+      const cre = new RegExp(claim.regex, 'g');
+      lines.forEach((line, i) => {
+        let m;
+        cre.lastIndex = 0;
+        while ((m = cre.exec(line)) !== null) {
+          const claimed = Number(m[1]);
+          if (claimed !== actual) {
+            countFails.push({ file: relative(ROOT, allDocs.get(file)), line: i + 1, ref: `${item.name}/${claim.label}`, why: `声称 ${claimed}，真源实际 ${actual}（${item.source.file}）` });
+          }
+        }
+      });
+    }
+    for (const pat of item.stale || []) {
+      const sre = new RegExp(pat);
+      lines.forEach((line, i) => {
+        if (sre.test(line)) {
+          countFails.push({ file: relative(ROOT, allDocs.get(file)), line: i + 1, ref: pat, why: `命中已淘汰旧值「${pat}」（${item.name} 现为 ${actual}）` });
+        }
+      });
+    }
+  }
+}
+
 // ── 4. 输出 ──
 const distinctHard = [...new Map(hardFails.map((h) => [`${h.file}:${h.line}:${h.ref}`, h])).values()];
 const distinctRev = [...new Map(reviews.map((h) => [`${h.file}:${h.line}:${h.ref}`, h])).values()];
+const distinctCount = [...new Map(countFails.map((h) => [`${h.file}:${h.line}:${h.ref}`, h])).values()];
 console.log('\n══════════════ 文档引用守门扫描结果 ════════════\n');
 console.log(`① 文件/章节引用失效  ${distinctHard.length === 0 ? '✅ 通过' : '❌ 硬失败'} —— ${distinctHard.length} 处`);
 for (const h of distinctHard) console.log(`   ${h.file}:${h.line}  «${h.ref}» — ${h.why}`);
 console.log(`② 无法判定（需人工确认）  ${distinctRev.length === 0 ? '✅ 无' : '⚠️ ' + distinctRev.length + ' 处'}`);
 for (const h of distinctRev) console.log(`   ${h.file}:${h.line}  «${h.ref}» — ${h.why}`);
+console.log(`③ 计数/旧号扫描  ${distinctCount.length === 0 ? '✅ 通过' : '❌ 硬失败'} —— ${distinctCount.length} 处`);
+for (const info of countInfo) console.log(`   · ${info}`);
+for (const h of distinctCount) console.log(`   ${h.file}:${h.line}  «${h.ref}» — ${h.why}`);
 console.log('\n────────────────────────────────────────────');
-if (distinctHard.length > 0) {
-  console.log('❌ 存在失效引用。修复后重跑本脚本，全部通过才能声明「文档对齐」。\n');
+if (distinctHard.length > 0 || distinctCount.length > 0) {
+  console.log('❌ 存在失效引用或计数漂移。修复后重跑本脚本，全部通过才能声明「文档对齐」。\n');
   process.exit(1);
 } else {
-  console.log('✅ 文档引用检查通过（失效引用 0 处）。\n');
+  console.log('✅ 文档引用检查通过（失效引用 0 处、计数漂移 0 处）。\n');
   process.exit(0);
 }

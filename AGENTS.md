@@ -1,6 +1,6 @@
 # 券到卡包 · 内容运营项目（AI 入口）
 
-> 最后校验：2026-08-27（三轮架构审计：§六 doc 引用闸门扫描范围描述补列 `docs/AI使用手册.md`，与 ref-registry 实际一致；此前同日旧文档清理：删除 `docs/archive-legacy/` 全部旧手册 + `outputs/archive/` 5 份过时过程文件 + 渲染副产品，原文保留在 git 历史；再前审计修订二轮——目录树与磁盘对齐、AI使用手册/启动提示词按新结构重写、引用闸门扩扫；更早文档架构重构：入口切换到 spec/ 三真源 + workflow/ 四散文 + R2/R3，旧文档先存档后清理）
+> 最后校验：2026-08-27（闸门升级：doc 引用闸门新增③计数/旧号扫描层——ref-registry `counts` 登记玩法 13/卖点 11/布局模式 12/呈现手法 7，自动核对「声称数 vs 真源数」并扫描已淘汰旧值，改编号/计数不再靠人工记忆；此前同日三轮架构审计：§六 doc 引用闸门扫描范围描述补列 `docs/AI使用手册.md`，与 ref-registry 实际一致；再前旧文档清理：删除 `docs/archive-legacy/` 全部旧手册 + `outputs/archive/` 5 份过时过程文件 + 渲染副产品，原文保留在 git 历史；审计修订二轮——目录树与磁盘对齐、AI使用手册/启动提示词按新结构重写、引用闸门扩扫；更早文档架构重构：入口切换到 spec/ 三真源 + workflow/ 四散文 + R2/R3，旧文档先存档后清理）
 > 任何 AI 助手在本仓库开工前，先读本文件（约 3 分钟）。读完按「§二 开工三动作」执行：跑盘点脚本 → 读 changelog 近况 → 按「任务 → 手册映射」读对应手册，**不需要**读全部文档。
 > 本项目面向实体店电子券工具（做券→发券→领券→扫码核销→统计），当前做宣传推广线冷启动：抖音短视频 + 小红书图文 + 搜狐长文。
 > 产品源码位于 `../applet/`（本文件所在 `promotion/` 的上级目录），功能有疑问时直接查阅代码验证。
@@ -122,7 +122,7 @@
 > `node scripts/check-redlines.mjs` && `node scripts/check-doc-references.mjs` && `node scripts/check-facts.mjs`
 
 - **红线闸门** `check-redlines.mjs`（读 `spec/redlines.json`）：①画面层/②口播文案层=硬禁（`video/src` 零命中）；④文档层命中=描述红线规则属正常提示
-- **文档引用检查** `check-doc-references.mjs`：扫描 AGENTS + 战略简报 + AI使用手册 + workflow/ + docs/internal/ 的「文件名/章节名」引用，失效即报错（防引用断链/残留旧编号；旧文档「编号-名称」形态无 .md 后缀也报断链）
+- **文档引用检查** `check-doc-references.mjs`：扫描 AGENTS + 战略简报 + AI使用手册 + workflow/ + docs/internal/ 的「文件名/章节名」引用，失效即报错（防引用断链/残留旧编号；旧文档「编号-名称」形态无 .md 后缀也报断链）；**另做 ③计数/旧号扫描**——`ref-registry.json` `counts` 登记关键计数（玩法/卖点/布局模式/呈现手法）与其已淘汰旧值清单（stale），自动核对「真源实际条数 vs 各文档声称数」并全库扫描旧值命中，专防纯文字计数漂移与"锚点仍在、语义已变"；**计数/编号变化时必须同步更新 counts 登记**（本文档及任何权威文档不得直书旧值字面量，否则会被本层命中——举例请指向 registry）
 - **事实检查** `check-facts.mjs`：验证文档依赖的关键资产路径在磁盘存在（注册表 `scripts/ref-registry.json` 维护）
 - **变更记录**：每次改动权威文档，在 `outputs/archive/changelog.md` 顶部追加一条（最新在前）
 
