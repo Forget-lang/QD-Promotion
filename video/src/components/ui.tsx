@@ -1,10 +1,11 @@
 // 通用 UI 组件（仅提效，非模板）· 2026-08-17 专业级优化 · 2026-08-20 质感升级 + 内容四件套
-// - SectionTitle 下划线宽度按中文字符精确估算 + EASE_OUT 缓动 + 逐字入场
 // - 质感积木：CharReveal / AccentWord / IconBadge / PhoneMockup / elevation
-// - 内容四件套：CouponCard / StatCounter+StatCard / StepFlow / CompareCard（生长机制见 13 号 §8.5）
+// - 内容四件套：CouponCard / StatCounter+StatCard / StepFlow / CompareCard
+//   （生长机制见 workflow/craft.md；组件与产品 UI 对齐状态见 docs/internal/R4-applet前端UI储备.md §8）
+// - 2026-08-29 按 applet 真值校准：CouponCard 金额右置 + 删假条码；PhoneMockup 新增 nav 顶栏
 import React from 'react';
 import { interpolate, interpolateColors, spring, useCurrentFrame } from 'remotion';
-import { ACCENT_GREEN, ACCENT_RED, FONT_BODY, FONT_TITLE, FPS, INK, PAPER } from '../palette';
+import { ACCENT_GREEN, ACCENT_RED, FONT_BODY, FONT_TITLE, FPS, INK, NAV_RED, PAPER } from '../palette';
 import { EASE_OUT, EASE_IN, SPRING_CONFIG } from './animations';
 import { Ico } from './icons';
 import type { IconKey } from './icons';
@@ -74,38 +75,80 @@ export const IconBadge: React.FC<{
   </div>
 );
 
-/** 手机样机：内嵌产品真实 UI 用（bezel + 灵动岛 + 玻璃高光），场景内 children 自由设计 */
+/** 手机样机：内嵌产品真实 UI 用（bezel + 灵动岛 + 玻璃高光），场景内 children 自由设计。
+ *  传 `nav` 才在壳内顶部补产品顶栏（演示"真界面"时应传）：
+ *  - `brand`：顶栏红底白字 = applet `pages.json` globalStyle 全站默认
+ *  - `light`：浅底黑字 = 10 个页面显式覆盖的 `#f6f6f6`（我的卡包 / 券包 / 次卡系列 / 券详情 / 我的商家）
+ *  胶囊为自绘（返回 + 分隔线 + 首页），规格对齐 applet `m-navigation-bar.vue`；顶栏一律手写复刻，不贴真实截图。 */
 export const PhoneMockup: React.FC<{
   children: React.ReactNode; width?: number; height?: number;
-}> = ({ children, width = 560, height = 1140 }) => (
-  <div style={{
-    width, height, borderRadius: 64, padding: 14, backgroundColor: '#101216',
-    boxShadow: `${elevation(3, true)}, inset 0 1px 0 rgba(255,255,255,0.18)`,
-    position: 'relative',
-  }}>
+  nav?: { title?: string; variant?: 'brand' | 'light' };
+}> = ({ children, width = 560, height = 1140, nav }) => {
+  const rpx = (width - 28) / 750;
+  const NAV_H = 88 * rpx;
+  const chromeH = Math.round(176 * rpx);
+  const light = nav?.variant === 'light';
+  const barBg = light ? '#f6f6f6' : NAV_RED;
+  const fg = light ? '#333' : '#fff';
+  return (
     <div style={{
-      width: '100%', height: '100%', borderRadius: 50, overflow: 'hidden',
-      position: 'relative', backgroundColor: '#fff',
+      width, height, borderRadius: 64, padding: 14, backgroundColor: '#101216',
+      boxShadow: `${elevation(3, true)}, inset 0 1px 0 rgba(255,255,255,0.18)`,
+      position: 'relative',
     }}>
       <div style={{
-        position: 'absolute', top: 18, left: '50%', transform: 'translateX(-50%)',
-        width: 120, height: 32, borderRadius: 16, backgroundColor: '#101216', zIndex: 10,
-      }} />
-      {children}
+        width: '100%', height: '100%', borderRadius: 50, overflow: 'hidden',
+        position: 'relative', backgroundColor: '#fff',
+      }}>
+        {nav && (
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: chromeH, backgroundColor: barBg }}>
+            <div style={{
+              position: 'absolute', left: 0, right: 0, bottom: 0, height: NAV_H,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{
+                fontFamily: FONT_BODY, fontSize: 34 * rpx, fontWeight: 600, color: fg, letterSpacing: '0.01em',
+              }}>{nav.title || '券到卡包'}</span>
+            </div>
+            <div style={{
+              position: 'absolute', right: 20 * rpx, bottom: 12 * rpx, width: 174 * rpx, height: 64 * rpx,
+              borderRadius: 32 * rpx, backgroundColor: light ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.24)',
+              border: `0.5px solid ${light ? 'rgba(0,0,0,0.08)' : 'rgba(255,255,255,0.28)'}`,
+              display: 'flex', alignItems: 'center', boxSizing: 'border-box',
+            }}>
+              <svg width={40 * rpx} height={40 * rpx} viewBox="0 0 24 24" fill="none" style={{ flex: 1 }}>
+                <path d="M15 5l-7 7 7 7" stroke={fg} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <div style={{ width: 1, height: 18 * rpx, backgroundColor: fg, opacity: 0.3 }} />
+              <svg width={34 * rpx} height={34 * rpx} viewBox="0 0 24 24" fill="none" style={{ flex: 1 }}>
+                <path d="M4 10.5L12 4l8 6.5V20H4v-9.5z" stroke={fg} strokeWidth="2" strokeLinejoin="round" />
+              </svg>
+            </div>
+          </div>
+        )}
+        <div style={{
+          position: 'absolute', top: 18, left: '50%', transform: 'translateX(-50%)',
+          width: 120, height: 32, borderRadius: 16, backgroundColor: '#101216', zIndex: 10,
+        }} />
+        <div style={{ position: 'absolute', top: nav ? chromeH : 0, left: 0, right: 0, bottom: 0, overflow: 'hidden' }}>
+          {children}
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 
-/** 券面卡片：票券标准件（大字金额 + 虚线分隔 + 条码感装饰）。
- *  holeColor 必须传「卡片底下的场景背景色」才能在卡边打出缺口，不传则无缺口；条码为纯装饰非真实数据 */
+/** 券面卡片：票券标准件（内容在左 + 大字金额在右 + 虚线分隔 + 两侧缺口）。
+ *  布局对齐真产品：`m-coupon-tpl` / 首页券票 / 券详情三段式均为金额右置（`max-width:230rpx; text-align:right`）。
+ *  holeColor 必须传「卡片底下的场景背景色」才能在卡边打出缺口，不传则无缺口。
+ *  不放条码：真产品全 App 无条形码，核销码是后端返回的二维码图片 + 数字卡号。 */
 export const CouponCard: React.FC<{
   title: string; amount?: string; validity?: string; note?: string;
   accent: string; width?: number; delay?: number; dark?: boolean; holeColor?: string; motion?: MotionKey;
 }> = ({ title, amount, validity, note, accent, width = 560, delay = 0, dark = false, holeColor, motion = 'snappy' }) => {
   const f = useCurrentFrame();
   const spr = spring({ frame: f - delay, fps: FPS, config: SPRING_CONFIG[motion] });
-  const BARS = [4, 2, 6, 3, 2, 5, 2, 4, 3, 6, 2, 3, 5, 2, 4, 3];
   const PAD = 32;
   return (
     <div style={{
@@ -116,16 +159,17 @@ export const CouponCard: React.FC<{
       opacity: interpolate(spr, [0, 0.4], [0, 1], { extrapolateRight: 'clamp' }),
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
-        {amount && (
-          <div style={{
-            fontFamily: FONT_TITLE, fontSize: 84, fontWeight: 900, color: accent,
-            lineHeight: 1, letterSpacing: '-0.02em', flexShrink: 0,
-          }}>{amount}</div>
-        )}
         <div style={{ flex: 1, textAlign: amount ? 'left' : 'center' }}>
           <div style={{ fontFamily: FONT_BODY, fontSize: 32, fontWeight: 700, color: dark ? '#fff' : INK, lineHeight: 1.3 }}>{title}</div>
           {note && <div style={{ fontFamily: FONT_BODY, fontSize: 24, color: dark ? 'rgba(255,255,255,0.55)' : '#777', marginTop: 8 }}>{note}</div>}
         </div>
+        {amount && (
+          <div style={{
+            flexShrink: 0, maxWidth: 330, textAlign: 'right',
+            fontFamily: FONT_TITLE, fontSize: 84, fontWeight: 900, color: accent,
+            lineHeight: 1, letterSpacing: '-0.02em',
+          }}>{amount}</div>
+        )}
       </div>
       <div style={{ position: 'relative', margin: '28px 0 20px' }}>
         <div style={{ borderTop: `2px dashed ${dark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.14)'}` }} />
@@ -134,14 +178,9 @@ export const CouponCard: React.FC<{
           <div style={{ position: 'absolute', right: -(PAD + 10), top: -10, width: 20, height: 20, borderRadius: '50%', backgroundColor: holeColor }} />
         </>}
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        {validity && <div style={{ fontFamily: FONT_BODY, fontSize: 24, color: dark ? 'rgba(255,255,255,0.55)' : '#888' }}>{validity}</div>}
-        <div style={{ display: 'flex', gap: 4, alignItems: 'flex-end', height: 30, opacity: 0.75, marginLeft: 'auto' }}>
-          {BARS.map((w, i) => (
-            <div key={i} style={{ width: w, height: i % 3 === 2 ? 18 : 30, backgroundColor: dark ? 'rgba(255,255,255,0.7)' : INK }} />
-          ))}
-        </div>
-      </div>
+      {validity && (
+        <div style={{ fontFamily: FONT_BODY, fontSize: 24, color: dark ? 'rgba(255,255,255,0.55)' : '#888' }}>{validity}</div>
+      )}
     </div>
   );
 };

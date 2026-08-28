@@ -1,6 +1,15 @@
 // 数据驱动核心：Scene 内容类型 + StyleConfig 风格配置（2026-08-18 时间线版）
+import type * as React from 'react';
 import type { PaletteKey } from './palette';
 import type { IconKey } from './components/icons';
+
+/** 场景渲染器统一入参（共享 scenes/ 与本片专属 videos/gXX/ 都用它） */
+export interface SceneRenderProps {
+  scene: Scene;
+  style: StyleConfig;
+  index: number;
+  total: number;
+}
 
 export type SceneType =
   | 'hook' | 'pain' | 'solution' | 'flow' | 'grid' | 'panel' | 'cta'
@@ -81,6 +90,16 @@ export interface SubtitleLine {
 
 export interface Scene {
   type: SceneType;
+  /**
+   * 本片专属渲染器名（pipeline §2.1.0「一条视频一套 UI 语言」）。
+   * 传了 → 用 `scenes/index.tsx` 里 `VIDEO_RENDERERS[视频id][ui]` 注册的组件渲染；不传 → 回退共享 `scenes/` 里该 type 的默认组件。
+   * **组件不写在数据文件里**（数据要能序列化，函数会丢），只在分发器按视频 id 注册一次。
+   * type 描述**叙事槽位**（痛点/步骤/字段…），ui 描述**画面结构**——两者分开，才能既复用叙事骨架又不复用画面。
+   * 整屏结构指纹 = type + ui（+ layout/cardVariant），机检见 `scripts/check-similarity.mjs`。
+   */
+  ui?: string;
+  /** 本片专属渲染器（scene.ui）的数据载荷；结构由 `video/src/videos/gXX/types.ts` 定义，组件内用 pick<T>() 取型。共享 scenes/ 不读这个字段 */
+  payload?: Record<string, unknown>;
   dur: number;
   /** 语音起点偏移（秒）：画面先出现，延迟 X 秒后开口说话。默认 0。 */
   voiceOffset?: number;

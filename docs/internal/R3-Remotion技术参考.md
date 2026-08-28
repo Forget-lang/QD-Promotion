@@ -1,6 +1,6 @@
 # R3 · Remotion 技术参考（原理层）
 
-> 最后校验：2026-08-27（审计修正：§5.6 呈现手法「7 选 1」清单口径对齐手法规格表——卡片不算手法；文档重构阶段 3：R1/R5/M2 残留引用改指 `spec/facts.json`、`spec/redlines.json`、`workflow/pipeline.md`）（文档重构阶段 2：吸收 M2 §三 技术硬规则为 §七「制作硬规则（操作版）」；「与 M2 的关系」改指 `workflow/pipeline.md`）（08-25 新增 §5.4 CardFaceScene 规格、§5.5 产品 UI 参考+统计核对、§5.6 呈现手法库、atempo 语速；08-26 atempo 口径对齐——G04 定稿 1.2 后续沿用；08-26 组件状态纠错：§5.4 改为规格示例（CardFaceScene 已实现）、§5.6 手法状态对齐代码 + 真源指向资产盘点脚本）（从原 13 号文档拆分，本文件=原理与 API 参考；08-24 修订语速参数口径）
+> 最后校验：2026-08-29（§3.2 组件表按 applet 真值校准两处：`CouponCard` 金额右置 + 删假条码；`PhoneMockup` 新增 `nav` 顶栏 prop，取色与胶囊规格对齐 applet `pages.json` globalStyle 与 `m-navigation-bar.vue`）（此前 2026-08-28：§5.6 呈现手法库改为「只登记代码已落地的 14 种手法」并逐行写明数据文件写法与首用屏——原清单把 3 种未落地写法也计入，9 屏视频按规则选不到足够手法；新增「判定看视觉语法不看标签」防卡片流；计数真源变更已同步 pipeline §2.1.3 / craft §5 / AGENTS §二·5 / `ref-registry.json` counts.stale）（此前 2026-08-27：审计修正：§5.6 呈现手法清单口径对齐手法规格表——卡片不算手法（旧计数值见 registry stale）；文档重构阶段 3：R1/R5/M2 残留引用改指 `spec/facts.json`、`spec/redlines.json`、`workflow/pipeline.md`）（文档重构阶段 2：吸收 M2 §三 技术硬规则为 §七「制作硬规则（操作版）」；「与 M2 的关系」改指 `workflow/pipeline.md`）（08-25 新增 §5.4 CardFaceScene 规格、§5.5 产品 UI 参考+统计核对、§5.6 呈现手法库、atempo 语速；08-26 atempo 口径对齐——G04 定稿 1.2 后续沿用；08-26 组件状态纠错：§5.4 改为规格示例（CardFaceScene 已实现）、§5.6 手法状态对齐代码 + 真源指向资产盘点脚本）（从原 13 号文档拆分，本文件=原理与 API 参考；08-24 修订语速参数口径）
 > 这份文档是**参考层**：解释"为什么"和"组件怎么用"。正常做视频**不需要**读它，按 `workflow/pipeline.md` §2（视频）操作即可；遇到渲染异常、需要新建积木/组件/图标、或想理解声画同步原理时，再查本文件。
 > 操作流程（怎么做出片）在 `workflow/pipeline.md`，制作硬规则（动画/转场/布局/代码结构操作版）在本文件 §七，本文件不重复流程环节。
 
@@ -154,9 +154,9 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 | `CharReveal` | text/delay/stagger/duration/style | 逐字 mask 入场，大标题"贵感"来源 |
 | `AccentWord` | text/color/delay/peak | 重音词大字：字号+颜色同时弹入，对齐口播重音帧 |
 | `IconBadge` | icon/color/size/pad/radius | 图标容器：squircle 底 + 主色 tint + 内高光，图标不裸放 |
-| `PhoneMockup` | children/width/height | 手机样机：bezel+灵动岛+玻璃高光，不使用真实小程序截图 |
+| `PhoneMockup` | children/width/height/nav | 手机样机：bezel+灵动岛+玻璃高光，不使用真实小程序截图；`nav:{title,variant:'brand'\|'light'}` 才在壳内补产品顶栏（`brand` = `#e2453d` 红底白字，取自 applet `pages.json` globalStyle；`light` = `#f6f6f6` 浅底黑字，10 个页面显式覆盖；胶囊自绘对齐 `m-navigation-bar.vue`），不传即与旧行为一致 |
 | `elevation(level, dark)` | — | 三级投影常量（浅底/深底两套），卡片统一取用，全片光影方向一致 |
-| `CouponCard` | — | 券面票券标准件：大字金额+虚线分隔+条码感装饰+可选撕边缺口；文案必须查 `spec/facts.json`，禁止虚构券规则 |
+| `CouponCard` | — | 券面票券标准件：内容在左 + 大字金额在右（对齐 applet 真券的金额右置）+ 虚线分隔 + 可选撕边缺口；**不放条码**（真产品全 App 无条形码，画了会暗示不存在的能力）；文案必须查 `spec/facts.json`，禁止虚构券规则 |
 | `StatCounter` | value/suffix/delay/duration/color/size | 数字滚动 0→value；只用于真实可述口径，禁止虚构营销数据 |
 | `StatCard` | label/value/suffix/caption/icon/accent | 数据卡：图标+标签+滚动数字+说明，grid/panel 数据屏通用 |
 | `StepFlow` | steps[{icon,title,note}]/accent/stagger | 步骤条：连接线擦入+步骤逐个弹入，flow 屏通用 |
@@ -228,13 +228,16 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 
 ### 5.1 什么时候新建场景积木
 
+> **2026-08-28 前置铁律（优先于下表）**：一条视频一套专属 UI 语言（`workflow/pipeline.md` §2.1.0 / §2.2）。**与任何已产出视频同结构的屏一律新建**，判据是 `node scripts/check-similarity.mjs` 的输出（不是"看起来还行"）。下表只在"本片还没有同类结构"时用。
+
 | 情况 | 处理方式 |
 |---|---|
-| 内容结构与现有积木一致，只是文案/图标/颜色不同 | 直接用现有积木 |
-| 结构一致但布局想换一种排列 | 用版式变体（`scene.layout` 字段），不新建类型 |
-| 现有积木的视觉结构无法表达叙事意图 | 新建积木（设计稿中写 `new:xxx`，人审确认后实现） |
+| 本片要的叙事槽位，已产出视频里有屏用过同一结构 | **新建本片专属组件**（`videos/gXX/` + 屏上 `ui:'名字'`）；确需沿用 → 走 `pipeline.md` §2.1.0 复用例外提案，用户批准并在 `ref-registry.json` `similarityExemptions` 登记 |
+| 全库都没有这个结构，且新结构与既有积木无重叠 | 新建通用积木：`scenes/` + `SceneType` 新类型名 + `scenes/index.tsx` 注册（跨片可复用的叙事原语才走这条） |
+| 结构一致但本片想换一种排列 | 仍按上一条判：排列不同 = 视觉结构不同 = 新建；同一组件加 `layout` 变体只用于**该组件在本片第一次出现**时 |
+| 只有文案/图标/颜色不同（骨架与已产出某屏一致） | ❌ 这就是"换皮"，不是"用现有积木"——按第一行处理 |
 
-**判断核心**：区分「内容不同」（换文案/图标/颜色→用现有）和「结构不同」（信息组织方式根本不同→新建）。
+**判断核心**：先问「这条结构在已产出的任何一条里出现过吗」，出现过就要新结构；再问「信息组织方式是否根本不同」。配色/字体/图标不同不构成差异。
 
 ### 5.2 新建积木完整步骤
 
@@ -331,30 +334,38 @@ fields?: { icon: IconKey; label: string; value: string }[];  // 附加字段网�
 - 界面字段必须 `spec/facts.json` 可查（不虚构 UI）；统计屏不填真实商户数据
 - 不出现企微/微信系界面（`spec/redlines.json` rules.platform_diversion）、商户认证/审核类界面（`spec/facts.json`：不提审核）
 
-### 5.6 呈现手法库（2026-08-25 定，防审美疲劳）
+### 5.6 呈现手法库（2026-08-25 定；2026-08-28 改为「只登记已落地手法」）
 
 > 目的：信息呈现原语多样化。**卡片是容器，手法是信息组织方式**——G03/G04 连续两期"卡片流"（白卡+图标+文字贯穿全片）导致审美疲劳，根因是组件库只有"卡片容器"一种实现原语。设计稿按屏型选择手法、行业之间轮换。
+> **本表只登记「代码已落地」的手法**：每一行都有现成的场景组件或 `layout`/可选字段可写进数据文件。原表把「撕纸笔记 / 大边框分区 / 药丸徽章」三项未落地的写法也计入清单，导致 9 屏视频按规则选不到足够的合规手法——教训见 2026-08-28 工作流验证。
 
 **使用规则**：
-1. 设计稿每屏标注「呈现手法」字段（7 选 1：编号列表 / 手写高亮 / 多层分区 / 撕纸笔记 / 括号分组 / 大边框分区 / 药丸徽章；卡片容器不算手法——它是默认承载形式，全片只用卡片=「卡片流」，正是本节要防的）
-2. 相邻屏手法不同；内容屏（solution/flow/grid/panel）至少 2 屏手法与上一条视频不同（配合 `workflow/pipeline.md` §2.2 相似度检查）
-3. 手法组件是**变体优先**（同 type 用 scene.layout 切换，组件清单跑 `list-assets.mjs` 核对），结构差异大的才新建场景组件
+1. 设计稿每屏标注「呈现手法」字段，取本表「手法」列**原名**（14 选 1，禁止自造名）；相邻屏手法不同；内容屏（solution/flow/grid/panel/cardface）至少 2 屏手法与上一条视频不同（配合 `workflow/pipeline.md` §2.2 相似度检查）
+2. **判定看视觉语法，不看标签**：每屏都标了手法名 ≠ 达标。若一条视频多数内容屏仍是"白卡 + 图标 + 标题 + 说明"的同一语法，即便标签各不相同，仍按「卡片流」判不合格、回炉
+3. 手法组件是**变体优先**（同 `type` 用 `scene.layout` / `scene.cardVariant` / 可选字段切换，组件清单跑 `node scripts/list-assets.mjs` 核对），结构差异大的才新建场景组件
 
-**手法规格表**：
+**手法规格表**（计数真源 = 本表 `| **` 行；改行数须同步 `scripts/ref-registry.json` counts 与 `workflow/pipeline.md` §2.1.3 的「N 选 1」）：
 
-| 手法 | 视觉特征 | 参考图 | 落地方式 | 状态 |
+| 手法 | 视觉特征 | 参考图 | 落地方式（数据文件怎么写） | 首用 |
 |---|---|---|---|---|
-| **编号列表** | 编号（主题色/红）+ 标题下划线 + 正文多行；网格纸背景感（与 BG-ABS-003 网格呼应） | ref-01 重启人生计划 | PainScene/SolutionScene layout 变体 `numbered-list` | ✅（G04 S2 首用） |
-| **手写高亮** | 大字 + 半透明高亮条（微倾斜 2-3°）+ 波浪下划线 | ref-02 暑期实习 | 文字装饰组件 `HighLightText`（highlight: 色条 / wavy: 波浪线参数） | ✅（G04 S1 首用） |
-| **多层分区** | 虚线圆角分区 + 丝带横幅标题 + 区块块（icon+数字锚点） | ref-03 CKT 价格表 | GridScene layout 变体 `multi-section` | ✅（G04 S5 首用） |
-| **撕纸笔记** | 白纸质感容器（撕边/阴影）+ 丝带标题 + 手绘装饰（回形针/铅笔） | ref-04 超级学霸 | 容器组件 `PaperSheet` | ⏳ 按需 |
-| **括号分组** | 左侧竖排分类标签 + 大括号聚合 + 右侧编号要点 + 重点高亮 | ref-05 保险投保思路 | 场景组件 `BracketGroupScene` | ✅（G04 S4 首用） |
-| **大边框分区** | 主题色外框包裹 + 标题区深色底白字 + 内容区浅底深字 | ref-06 准初一衔接 | 容器组件 `FrameSection` | ⏳ 按需 |
-| **药丸徽章** | 彩色胶囊标签云（统一色系内变化）+ 投影 | ref-08 券型都支持 | 徽章组件 `PillBadge` | ⏳ 按需 |
+| **编号列表** | 编号（主题色大字）+ 标题红色下划线 + 后果小字，白纸容器承载 | ref-01 重启人生计划 | `type:'pain'` + `layout:'numbered-list'`，配 `leftItems[]` / `leftItemsSub[]`（后果副行）/ `rightSub`（底部红结论条，**必须显式传**） | G04 S2 |
+| **手写高亮** | 大字 + 半透明高亮条（微倾斜）+ 波浪下划线 | ref-02 暑期实习 | `type:'hook'` + `hookStyle:'contrast'`（`HighLightText` 只在 `ContrastHook` 内被调用；别的屏要用需改组件） | G04 S1 |
+| **多层分区** | 虚线圆角分区 + 丝带横幅标题 + icon/数字锚点区块 | ref-03 CKT 价格表 | `type:'grid'` + `layout:'multi-section'` + `cards[]` | G04 S5 |
+| **括号分组** | 左竖排分类标签 + 大括号聚合 + 右明细 + 重点行金底 | ref-05 保险投保思路 | `type:'bracket-group'` + `bracketGroups[]`（`detail` 用 `\|` 分行；`highlight:true` 出金底） | G04 S4 |
+| **药丸徽章** | 彩色胶囊承载场景锚点/徽章信息，不占主体 | ref-08 券型都支持 | `type:'hook'` + `hookStyle:'story'`（场景胶囊）或 `'challenge'`（徽章胶囊）+ `hookTag` | G05 S1 |
+| **卡面焦点型** | 深色磁条卡面为主体：卡名 → 焦点大字 → 字段行 → 类型徽章 + 有效期 | ref-04（仅借卡片多层分区，不取撕纸） | `type:'cardface'` + `cardName`/`cardType`/`merchantName`/`validLabel`/`cardTheme`（**必须传 hex**）/`cardFields[]` + 卡下 `useTips[]`；焦点块用 `faceFocus:{value,unit,note}`（券包/优惠券）或 `times`+`total`（次卡） | G04 S3 |
+| **时间轴曲线型** | 横轴时段曲线 + 关键点亮点 + 券落点抬升 | —（自有组件） | `type:'timeline'` + `timelinePoints[]`/`timelineCoupons[]`/`timelineMode`/`timelineHighlight` | G03 S2 |
+| **递进链路型** | A→B 箭头链路 + ①② 编号要点逐条 | —（自有组件） | `type:'transfer'` + `transferFrom`/`transferTo`/`points[]` | G04 S6 |
+| **对比双卡型** | 同尺寸两张全宽卡，左边色条分优劣（灰=老做法 / 主题色=本方案） | ref-17 双卡对称语法型 | `type:'solution'` + `items[]`×2，`color` 传对比色（缺省 `border-left` 变体）。**组件无逐卡透明度槽位**，弱化只能靠色彩与图标色 | G05 S3 |
+| **节点连线型** | 横向序号圆 + 图标 + 标题 + 小字，节点间连接线逐段 draw-on | ref-11 纵向编号步骤条型（横排实现） | `type:'flow'` + `layout:'horizontal'` + `nodes[]`（`sub` = 节点小字）+ `footnote`；不传 `layout` 即纵向大步骤卡 | G05 S4 |
+| **分组清单型** | 图标 + 文字条（无卡片边框）+ 行左上角分组角标 | ref-10 多栏分类清单型 | `type:'usetips'` + `useTips[]`，行内传 `group:'组名'` 即出角标（≤2 组） | G05 S5 |
+| **图标锚点逐条型** | 全宽白卡 + 左边色条 + 超大图标底板为锚点 + 机制说明逐条 | ref-03 | `type:'panel'` 默认变体 + `metrics[]`（**不填 `value` 即不出现数字**；`dir:'↓'` 不渲染上升箭头） | G05 S8 |
+| **排行条型** | 排名块 1/2/3 + 指标名 + 说明 + 右侧弱图标 | —（自有组件，参照产品统计页排行榜） | `type:'panel'` + `layout:'ranking'` + `metrics[]` | G04 S7 |
+| **品牌收尾型** | 品牌名超大居中 + 一句主张 + 上下装饰线 draw-on + 光晕 | ref-06（仅借居中层级，不取边框） | `type:'cta'` + `title`=品牌名 / `sub`=主张 | G02v3 S8 |
 
-**G04 已落地 4 个手法**：S1 手写高亮（装饰）/ S2 编号列表 / S4 括号分组 / S5 多层分区；其余 3 个（撕纸笔记/大边框分区/药丸徽章）按需实现。
+**未落地、标进设计稿 = 渲染不出**（要做先建组件，再往本表加行）：撕纸笔记（需容器组件 `PaperSheet`，ref-04 语法）、大边框分区（需 `FrameSection`，ref-06 语法）、独立药丸徽章组件 `PillBadge`（现由 HookScene 内置胶囊承载同一语法）。
 
-> **组件状态真源**：`node scripts/list-assets.mjs`（项目根运行，从代码实时生成）；本表状态为 2026-08-26 快照，与脚本输出不一致时以脚本为准。
+> **组件状态真源**：`node scripts/list-assets.mjs`（项目根运行，从代码实时生成）；本表「落地方式」为 2026-08-28 按组件源码逐条核对后的快照，与脚本输出或源码不一致时以代码为准。
 
 ---
 
@@ -400,6 +411,8 @@ fields?: { icon: IconKey; label: string; value: string }[];  // 附加字段网�
 | 字幕安全区 | 底部距底 60px，白字黑描边 34px，位于 y:1760-1920，不侵入内容区 |
 | 活动区硬底线 | y:120-1760，出界 = 不合格 |
 | **核心内容集中** | 核心内容（标题+卡片/图标/流程）集中在 **y:200-1100**；标题距顶 ≥200px；标题与内容间距 40-60px；多卡片间距 ≥ 卡片高度 20%；卡片内 padding ≥43px。只约束垂直分布，不限制风格 |
+| **绝对定位 vs 动画包装（2026-08-28 硬规则）** | 带 `transform` 的动画组件（`FadeInUp`/`ScaleIn`/`WipeIn`/`Pulse`…）会**成为后代的包含块**。写 `<FadeInUp><div style="position:absolute; left:80; right:80; bottom:280">` 时，`left+right` 相对一个零尺寸盒解析 → 元素塌缩不可见。**正确写法：外层普通 div 负责 `position:absolute` + 锚点，内层再套动画组件**。教训：`PainScene` 编号列表变体的红色结论条自 G04 起从未渲出来（G04 交付帧已取证），设计稿只写"必须显式传 rightSub"根本抓不到这个缺陷 |
+| 浅底字幕可读性（已知短板，待决） | `Subtitle` 无条件白字黑描边（`SceneRenderer` 不传 `darkText`）→ 浅底背景上全靠描边撑可读，观感偏弱。改它影响全片所有已渲视频的字幕层，须走组件提案 |
 
 ### 7.4 代码结构规则
 

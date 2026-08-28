@@ -233,21 +233,22 @@ const NumberedListPain: React.FC<{
         ))}
       </div>
 
-      {/* 底部红色结论条 */}
-      <FadeInUp delay={56} motion={style.motion}>
-        <div style={{
-          position: 'absolute', left: 80, right: 80, bottom: 280,
-          background: `linear-gradient(135deg, ${ACCENT_RED} 0%, ${ACCENT_RED}cc 100%)`,
-          borderRadius: 24, padding: '32px 48px', boxShadow: elevation(2),
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20,
-        }}>
-          <div style={{ width: 48, height: 48 }}>{Ico.bolt('#fff')}</div>
-          <span style={{
-            fontFamily: typo.family, fontSize: 52, fontWeight: typo.titleWeight,
-            color: '#fff', lineHeight: 1.2, textShadow: '0 2px 8px rgba(0,0,0,0.2)',
-          }}>{scene.rightSub ?? '钱花了，人没来'}</span>
-        </div>
-      </FadeInUp>
+      {/* 底部红色结论条（外层负责绝对定位；FadeInUp 带 transform 会成为绝对定位的包含块，不能反过来套） */}
+      <div style={{ position: 'absolute', left: 80, right: 80, bottom: 280 }}>
+        <FadeInUp delay={56} motion={style.motion}>
+          <div style={{
+            background: `linear-gradient(135deg, ${ACCENT_RED} 0%, ${ACCENT_RED}cc 100%)`,
+            borderRadius: 24, padding: '32px 48px', boxShadow: elevation(2),
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 20,
+          }}>
+            <div style={{ width: 48, height: 48 }}>{Ico.bolt('#fff')}</div>
+            <span style={{
+              fontFamily: typo.family, fontSize: 52, fontWeight: typo.titleWeight,
+              color: '#fff', lineHeight: 1.2, textShadow: '0 2px 8px rgba(0,0,0,0.2)',
+            }}>{scene.rightSub ?? '钱花了，人没来'}</span>
+          </div>
+        </FadeInUp>
+      </div>
     </AbsoluteFill>
   );
 };

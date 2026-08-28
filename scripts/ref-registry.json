@@ -23,63 +23,239 @@
   "counts": [
     {
       "name": "玩法库条目",
-      "source": { "file": "workflow/策划弹药库.md", "from": "### 1.1", "to": "### 1.2", "regex": "^\\| P-\\d+ \\|" },
+      "source": {
+        "file": "workflow/策划弹药库.md",
+        "from": "### 1.1",
+        "to": "### 1.2",
+        "regex": "^\\| P-\\d+ \\|"
+      },
       "claims": [
-        { "label": "玩法编号段", "regex": "P-01~P-(\\d+)" }
+        {
+          "label": "玩法编号段",
+          "regex": "P-01~P-(\\d+)"
+        }
       ],
-      "stale": ["P-01~P-07", "P-01~07", "7 套通用玩法", "7套通用玩法", "七大玩法", "§1.9 矩阵", "1.9 矩阵"]
+      "stale": [
+        "P-01~P-07",
+        "P-01~07",
+        "7 套通用玩法",
+        "7套通用玩法",
+        "七大玩法",
+        "§1.9 矩阵",
+        "1.9 矩阵"
+      ]
     },
     {
       "name": "特色卖点条目",
-      "source": { "file": "workflow/策划弹药库.md", "regex": "^#### 卖点 \\d+" },
+      "source": {
+        "file": "workflow/策划弹药库.md",
+        "regex": "^#### 卖点 \\d+"
+      },
       "claims": [
-        { "label": "卖点计数", "regex": "(\\d+)\\s*大(?:特色)?卖点" }
+        {
+          "label": "卖点计数",
+          "regex": "(\\d+)\\s*大(?:特色)?卖点"
+        }
       ],
-      "stale": ["十大卖点", "10 大卖点", "10大卖点", "10 大特色卖点"]
+      "stale": [
+        "十大卖点",
+        "10 大卖点",
+        "10大卖点",
+        "10 大特色卖点"
+      ]
     },
     {
       "name": "布局模式条目",
-      "source": { "file": "workflow/craft.md", "from": "## 8.", "to": "## 9.", "regex": "^\\| L-\\d{2} \\|" },
+      "source": {
+        "file": "workflow/craft.md",
+        "from": "## 8.",
+        "to": "## 9.",
+        "regex": "^\\| L-\\d{2} \\|"
+      },
       "claims": [
-        { "label": "布局模式段", "regex": "L-01~L-(\\d+)" },
-        { "label": "布局模式种数", "regex": "布局模式库 (\\d+) 种" }
+        {
+          "label": "布局模式段",
+          "regex": "L-01~L-(\\d+)"
+        },
+        {
+          "label": "布局模式种数",
+          "regex": "布局模式库 (\\d+) 种"
+        }
       ],
-      "stale": []
+      "stale": [
+        "L-01~L-12",
+        "L-01~L-13",
+        "布局模式库 12 种",
+        "布局模式库 13 种",
+        "从 12 种中选",
+        "从 13 种中选"
+      ]
     },
     {
       "name": "呈现手法条目",
-      "source": { "file": "docs/internal/R3-Remotion技术参考.md", "from": "### 5.6", "to": "## 六", "regex": "^\\| \\*\\*" },
+      "source": {
+        "file": "docs/internal/R3-Remotion技术参考.md",
+        "from": "### 5.6",
+        "to": "## 六",
+        "regex": "^\\| \\*\\*"
+      },
       "claims": [
-        { "label": "手法选 1 计数", "regex": "(\\d+) 选 1" },
-        { "label": "手法个数", "regex": "（(\\d+) 手法" }
+        {
+          "label": "手法选 1 计数",
+          "regex": "(\\d+) 选 1"
+        },
+        {
+          "label": "手法个数",
+          "regex": "（(\\d+) 手法"
+        }
       ],
-      "stale": []
+      "stale": [
+        "7 选 1",
+        "（7 手法",
+        "7 种手法"
+      ]
     },
     {
       "name": "钩子样式分支",
-      "source": { "file": "video/src/scenes/HookScene.tsx", "regex": "hookStyle === '" },
+      "source": {
+        "file": "video/src/scenes/HookScene.tsx",
+        "regex": "hookStyle === '"
+      },
       "claims": [
-        { "label": "钩子样式种数", "regex": "已实现 (\\d+) 种选 1" }
+        {
+          "label": "钩子样式种数",
+          "regex": "已实现 (\\d+) 种选 1"
+        }
       ],
-      "stale": ["已实现 4 种选 1"]
+      "stale": [
+        "已实现 4 种选 1"
+      ]
     }
   ],
   "factChecks": [
-    { "desc": "G02 V3 背景图（data 引用）", "path": "video/public/backgrounds/g02v3/bg.jpg" },
-    { "desc": "BG-ABS-001 暖奶油卡片底（素材登记）", "path": "背景素材/抽象模板/暖色系/BG-ABS-001-暖奶油卡片底.png" },
-    { "desc": "BG-ABS-002 冰蓝柔光底（素材登记）", "path": "背景素材/抽象模板/冷色系/BG-ABS-002-冰蓝柔光底.png" },
-    { "desc": "IL-COMMON-001 优惠券票券插画（素材登记）", "path": "插图库/物体插画/通用/IL-COMMON-001-优惠券票券.png" },
-    { "desc": "得意黑字体（bundle）", "path": "video/public/fonts/得意黑.ttf" },
-    { "desc": "普惠体 Regular（bundle）", "path": "video/public/fonts/AlibabaPuHuiTi-3-55-Regular.ttf" },
-    { "desc": "图标组件库", "path": "video/src/components/icons.tsx" },
-    { "desc": "动画组件库", "path": "video/src/components/animations.tsx" },
-    { "desc": "G02 数据文件", "path": "video/src/data/g02v3.ts" },
-    { "desc": "G03 数据文件", "path": "video/src/data/g03.ts" },
-    { "desc": "G04 数据文件", "path": "video/src/data/g04.ts" },
-    { "desc": "编排引擎 VTemplate", "path": "video/src/VTemplate.tsx" },
-    { "desc": "产品事实真源", "path": "spec/facts.json" },
-    { "desc": "内容红线真源（机检层 + 规则全量）", "path": "spec/redlines.json" },
-    { "desc": "素材登记真源", "path": "spec/assets.json" },
-    { "desc": "changelog 变更日志", "path": "outputs/archive/changelog.md" }
+    {
+      "desc": "G02 V3 背景图（data 引用）",
+      "path": "video/public/backgrounds/g02v3/bg.jpg"
+    },
+    {
+      "desc": "BG-ABS-001 暖奶油卡片底（素材登记）",
+      "path": "背景素材/抽象模板/暖色系/BG-ABS-001-暖奶油卡片底.png"
+    },
+    {
+      "desc": "BG-ABS-002 冰蓝柔光底（素材登记）",
+      "path": "背景素材/抽象模板/冷色系/BG-ABS-002-冰蓝柔光底.png"
+    },
+    {
+      "desc": "IL-COMMON-001 优惠券票券插画（素材登记）",
+      "path": "插图库/物体插画/通用/IL-COMMON-001-优惠券票券.png"
+    },
+    {
+      "desc": "得意黑字体（bundle）",
+      "path": "video/public/fonts/得意黑.ttf"
+    },
+    {
+      "desc": "普惠体 Regular（bundle）",
+      "path": "video/public/fonts/AlibabaPuHuiTi-3-55-Regular.ttf"
+    },
+    {
+      "desc": "图标组件库",
+      "path": "video/src/components/icons.tsx"
+    },
+    {
+      "desc": "动画组件库",
+      "path": "video/src/components/animations.tsx"
+    },
+    {
+      "desc": "G02 数据文件",
+      "path": "video/src/data/g02v3.ts"
+    },
+    {
+      "desc": "G03 数据文件",
+      "path": "video/src/data/g03.ts"
+    },
+    {
+      "desc": "G04 数据文件",
+      "path": "video/src/data/g04.ts"
+    },
+    {
+      "desc": "编排引擎 VTemplate",
+      "path": "video/src/VTemplate.tsx"
+    },
+    {
+      "desc": "产品事实真源",
+      "path": "spec/facts.json"
+    },
+    {
+      "desc": "内容红线真源（机检层 + 规则全量）",
+      "path": "spec/redlines.json"
+    },
+    {
+      "desc": "素材登记真源",
+      "path": "spec/assets.json"
+    },
+    {
+      "desc": "changelog 变更日志",
+      "path": "outputs/archive/changelog.md"
+    },
+    {
+      "desc": "applet 主题变量页（R4 §1）",
+      "path": "../applet/App.vue"
+    },
+    {
+      "desc": "applet 公共样式表（R4 §3 结构件）",
+      "path": "../applet/static/css/app.css"
+    },
+    {
+      "desc": "applet 主题映射（R4 九套主题）",
+      "path": "../applet/utils/theme.js"
+    },
+    {
+      "desc": "applet 页面配置（R4 §8 顶栏 globalStyle 依据）",
+      "path": "../applet/pages.json"
+    },
+    {
+      "desc": "applet 券面模板组件（R4 §4.2 金额右置）",
+      "path": "../applet/components/m/m-coupon-tpl/m-coupon-tpl.vue"
+    },
+    {
+      "desc": "applet 顶栏组件（PhoneMockup nav 自绘胶囊依据）",
+      "path": "../applet/components/m/m-navigation-bar/m-navigation-bar.vue"
+    },
+    {
+      "desc": "applet 磁条卡卡面（R4 §4.1 五层层序）",
+      "path": "../applet/components/m/m-card-magnetic-face/m-card-magnetic-face.vue"
+    },
+    {
+      "desc": "applet C 端券详情（R2 §1.5 核销码区 / R4 §5.4）",
+      "path": "../applet/pages_user/coupon/detail.vue"
+    },
+    {
+      "desc": "applet C 端券列表（R4 §5.2）",
+      "path": "../applet/pages_user/coupon/index.vue"
+    },
+    {
+      "desc": "applet B 端券详情（R4 §4.3 三段式红头）",
+      "path": "../applet/pages_coupon/coupon/detail.vue"
+    },
+    {
+      "desc": "applet 卡包首页（R4 §4.2 首页券票）",
+      "path": "../applet/pages/index/index.vue"
+    },
+    {
+      "desc": "applet 商户中心首页（R4 §5.1 负 80rpx 叠压）",
+      "path": "../applet/pages/merchant/index.vue"
+    },
+    {
+      "desc": "applet 底部组件（R4 §3.8）",
+      "path": "../applet/components/m/m-footer/m-footer.vue"
+    }
+  ],
+  "similarityExemptions": [
+    {
+      "video": "G05-KidsArt-SelfPick",
+      "fingerprint": "cta",
+      "reason": "品牌收尾屏职能固定（品牌名+一句主张+不诱导关注）；用户拍板 CTA 屏允许例外。本片差异由 S1-S8 全新画室作品墙语言、deep-blue/纸米白配色与主张句式承载",
+      "approvedBy": "用户（2026-08-28 闸门1 v2 拍板：CTA 屏允许例外）"
+    }
   ]
 }

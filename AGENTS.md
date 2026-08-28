@@ -1,6 +1,6 @@
 # 券到卡包 · 内容运营项目（AI 入口）
 
-> 最后校验：2026-08-27（闸门升级：doc 引用闸门新增③计数/旧号扫描层——ref-registry `counts` 登记玩法 13/卖点 11/布局模式 12/呈现手法 7，自动核对「声称数 vs 真源数」并扫描已淘汰旧值，改编号/计数不再靠人工记忆；此前同日三轮架构审计：§六 doc 引用闸门扫描范围描述补列 `docs/AI使用手册.md`，与 ref-registry 实际一致；再前旧文档清理：删除 `docs/archive-legacy/` 全部旧手册 + `outputs/archive/` 5 份过时过程文件 + 渲染副产品，原文保留在 git 历史；审计修订二轮——目录树与磁盘对齐、AI使用手册/启动提示词按新结构重写、引用闸门扩扫；更早文档架构重构：入口切换到 spec/ 三真源 + workflow/ 四散文 + R2/R3，旧文档先存档后清理）
+> 最后校验：2026-08-28（工作流验证 G05 · 文档层修订七处：① R3 §5.6 呈现手法库**只登记代码已落地的 14 种**并逐行写明"数据文件怎么写"，未落地项移到表外（旧计数值见 `ref-registry.json` counts.stale），同时补「判定看视觉语法不看标签」；② craft §8 布局模式库补 **L-13 括号分组型**（`BracketGroupScene` 已承载两期却无档位，设计稿被迫自造名）；③ pipeline §2.2 布局模式比对**口径唯一化**为"与上一条同模式的屏数 ≤ 屏数−4"（旧文按三种读法会得三个结果）；④ pipeline 步骤 3 新增**口播字数计数口径**（剔空白与标点 + `ceil01(字数÷6)`，禁手估）；⑤ pipeline §2.5 阶段一新增**绝对帧换算**（`TransitionSeries` 每屏重叠 12 帧，起始帧/总帧必须扣减）；⑥ pipeline 附录补 still/render 必带 `--browser-executable`；⑦ craft §3 补「字号阶梯=应然档 vs 组件实然档」对指规则（填屏以组件实测为准，改档走组件提案）。ref-registry `counts` 当前登记：玩法 13 / 卖点 11 / 布局模式 21 / 呈现手法 14 / 钩子样式 6（改编号或计数必须同步该表，闸门③层自动核对「声称数 vs 真源数」并全库扫描已淘汰旧值）（此前 08-27：闸门升级——doc 引用闸门新增③计数/旧号扫描层；同日三轮架构审计 + 旧文档清理 + 文档架构重构：入口切换到 spec/ 三真源 + workflow/ 四散文 + R2/R3）
 > 任何 AI 助手在本仓库开工前，先读本文件（约 3 分钟）。读完按「§二 开工三动作」执行：跑盘点脚本 → 读 changelog 近况 → 按「任务 → 手册映射」读对应手册，**不需要**读全部文档。
 > 本项目面向实体店电子券工具（做券→发券→领券→扫码核销→统计），当前做宣传推广线冷启动：抖音短视频 + 小红书图文 + 搜狐长文。
 > 产品源码位于 `../applet/`（本文件所在 `promotion/` 的上级目录），功能有疑问时直接查阅代码验证。
@@ -15,7 +15,7 @@
 
 ## 二、开工三动作（每次新会话必执行）
 
-**动作 1 跑盘点**——`node scripts/list-assets.mjs`（项目根目录）：组件 / 模板 / 样本 / 素材的实时清单。状态类问题（有哪些组件/模板/背景图、什么状态）一律以脚本输出为准，不凭对文档静态表的记忆作答。
+**动作 1 跑闸门 + 盘点**——先 `node scripts/gate-all.mjs`（红线 / 文档引用 / 事实 / 相似度 四闸门一次跑完），再 `node scripts/list-assets.mjs` 拿组件 / 模板 / 样本 / 素材的实时清单。状态类问题（有哪些组件/模板/背景图、什么状态）一律以脚本输出为准，不凭对文档静态表的记忆作答。**红灯就不许开工、不许交付**；带着红灯继续产出 = 视同没读规则。
 
 **动作 2 读近况**——`outputs/archive/changelog.md` 顶部最近 ~10 条：近期决策、纠错、踩坑。避免重复踩同一个坑，或推翻刚拍板的口径。
 
@@ -60,7 +60,7 @@
 
 - **验证/生产与正式产出同标准**；发现问题当场修复、解决后再进下一环节（§四 协作规则）
 - **文案**：顾客反应不得绝对化；字数/时长=内容深度的结果不硬凑；开头句式禁止与上一条同构（pipeline §1 步骤 2/3）
-- **画面**：呈现手法轮换（7 手法，R3 §5.6），禁"卡片流"；左右安全区 ≥80px（R3 §7.3）；视觉观感比对防换皮同款（pipeline §2.2）；视觉预演闸门+可截图抄作业（pipeline §2.4）
+- **画面（第一铁律）**：**一条视频 = 一套专属 UI 语言**——整屏结构指纹（`type`+`ui`+`layout`+`cardVariant`+`hookStyle`）与任何已产出视频**重复屏数必须为 0**；缺积木就新建本片专属场景组件（`video/src/videos/gXX/`，屏上填 `ui:'名字'`；规范见 pipeline §2.1.0 + R3 §5.2），**以 `node scripts/check-similarity.mjs` 输出为准，不接受设计稿自评**（旧"≥2 屏手法不同/序列 ≥3 不同"等下限式指标已作废，教训：G05 首版 6/9 屏复刻却在旧指标下全绿）。呈现手法名取 R3 §5.6 已落地清单原名；禁"卡片流"（判定看视觉语法不看标签）；左右安全区 ≥80px（R3 §7.3。⚠️ **达标与否只能量渲染像素，不能靠读 CSS 推断**——Remotion 注入全局 `box-sizing:border-box`，组件里的 `width` 已是含 padding 的总宽）；视觉预演闸门+可截图抄作业（pipeline §2.4）
 - **数据屏**：先核对 `spec/facts.json` deep 层统计维度，禁编造指标（R3 §5.5）
 - **产出前强制自检**：踩坑预检 + 用户视角三问 + 产品事实核对（pipeline §1.6 / §2.7）
 - **TTS 语速**：seed-tts-2.0 的 speed_ratio 实测无效 → 用 ffmpeg atempo 1.2（pipeline §2.5 阶段二）
@@ -116,14 +116,16 @@
 
 ## 六、闸门（改前同步 + 改完必跑）
 
-> **改规则前（防漏改，2026-08-26 定）**：改任何规则/口径/参数前，先 `grep -rn "旧关键词" AGENTS.md spec/ workflow/ docs/internal/` 列出全库命中清单，逐处同步后再动手——三闸门只防"引用断链"，防不住"语义矛盾"。
+> **改规则前（防漏改，2026-08-26 定）**：改任何规则/口径/参数前，先 `grep -rn "旧关键词" AGENTS.md spec/ workflow/ docs/internal/` 列出全库命中清单，逐处同步后再动手——四闸门只防"引用断链/数值越界"，防不住"语义矛盾"。
 >
-> 改任何权威文档后，三条闸门全跑一遍，全过才算对齐完成：
-> `node scripts/check-redlines.mjs` && `node scripts/check-doc-references.mjs` && `node scripts/check-facts.mjs`
+> 改任何权威文档后，四条闸门全跑一遍，全过才算对齐完成：**`node scripts/gate-all.mjs`**（加 `--tsc` 连带类型检查）
+> 单独定位某一条：`node scripts/check-redlines.mjs` / `check-doc-references.mjs` / `check-facts.mjs` / `check-similarity.mjs`
+> **闸门只能机检的部分就不要留给自觉**：凡"能被机器判负"的规则一律挂进 gate-all（相似度、计数漂移、禁词、资产在位都是这么收口的），否则就会退化成 AI 自评打勾。
 
 - **红线闸门** `check-redlines.mjs`（读 `spec/redlines.json`）：①画面层/②口播文案层=硬禁（`video/src` 零命中）；④文档层命中=描述红线规则属正常提示
 - **文档引用检查** `check-doc-references.mjs`：扫描 AGENTS + 战略简报 + AI使用手册 + workflow/ + docs/internal/ 的「文件名/章节名」引用，失效即报错（防引用断链/残留旧编号；旧文档「编号-名称」形态无 .md 后缀也报断链）；**另做 ③计数/旧号扫描**——`ref-registry.json` `counts` 登记关键计数（玩法/卖点/布局模式/呈现手法）与其已淘汰旧值清单（stale），自动核对「真源实际条数 vs 各文档声称数」并全库扫描旧值命中，专防纯文字计数漂移与"锚点仍在、语义已变"；**计数/编号变化时必须同步更新 counts 登记**（本文档及任何权威文档不得直书旧值字面量，否则会被本层命中——举例请指向 registry）
 - **事实检查** `check-facts.mjs`：验证文档依赖的关键资产路径在磁盘存在（注册表 `scripts/ref-registry.json` 维护）
+- **相似度闸门** `check-similarity.mjs`：抽 `video/src/data/*.ts` 的整屏结构指纹，把最新一条与全部已产出视频两两比对，**同结构屏数 > 0 即红**；确需复用必须在 `ref-registry.json` `similarityExemptions` 逐条登记理由与批准人（对应 pipeline §2.1.0 复用例外提案）。解析不到任何屏时脚本直接报错，不会静默放行
 - **变更记录**：每次改动权威文档，在 `outputs/archive/changelog.md` 顶部追加一条（最新在前）
 
 ## 七、目录规范
@@ -150,8 +152,8 @@ promotion/
 │   ├── gXX-行业/             行业单元最终交付（四件套/攻略/设计稿/视频/封面）
 │   ├── 样本库/               模板样本帧 + 排版参照图（模板定义在 video/src/templates/）
 │   └── archive/             README.md（阅读纪律）+ changelog.md + 过程文件（日期前缀）
-├── scripts/                 闸门与工具（check-* 三闸门 + list-assets 盘点）
-├── video/                   Remotion 工程（内容在 src/data/，组件在 src/components/ + src/scenes/，模板在 src/templates/，封面合成在 src/covers/）
+├── scripts/                 闸门与工具（check-* 四闸门 + list-assets 盘点）
+├── video/                   Remotion 工程（内容在 src/data/；共享场景在 src/scenes/、原子件在 src/components/、封面在 src/covers/、模板在 src/templates/；**每条视频自己的屏组件在 src/videos/gXX/**，见 pipeline §2.1.0）
 └── .workbuddy/              AI 工作区（MEMORY.md / skills）
 ```
 

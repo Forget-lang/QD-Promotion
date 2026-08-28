@@ -8,6 +8,7 @@ export const ACCENT_GREEN = '#43A047';
 export const ACCENT_ORANGE = '#FF7043';
 export const ACCENT_CYAN = '#26C6DA';
 export const GREEN = '#07C160'; // 解法绿 / S7 CTA 背景（G02 设计稿显式锁定，非品牌色假定）
+export const NAV_RED = '#e2453d'; // 产品顶栏红：复刻 applet 顶栏专用，与痛点红 ACCENT_RED 不同源勿混用
 
 export const INK = '#1a1a1a';
 export const PAPER = '#ffffff';

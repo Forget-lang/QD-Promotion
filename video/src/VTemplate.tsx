@@ -164,6 +164,7 @@ export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
                   style={video.style}
                   index={i}
                   total={video.scenes.length}
+                  videoId={video.id}
                 />
                 {video.hasAudio && (
                   <FadingAudio

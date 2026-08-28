@@ -3,6 +3,8 @@
 // 2026-08-21：删除 g02（V2）版本，仅保留 g02v3（V3，ink-green 风格）
 // 2026-08-22：新增 g03（火锅店，warm-orange，闲时填空档）
 // 2026-08-25：新增 g04（美容院，berry-purple，送卡锁客+闺蜜转赠）
+// 2026-08-28：新增 g05（社区少儿美术班，deep-blue，券包自选+老学员唤醒）
 export { g02v3 } from './g02v3';
 export { g03 } from './g03';
 export { g04 } from './g04';
+export { g05 } from './g05';
