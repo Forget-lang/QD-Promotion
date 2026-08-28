@@ -13,8 +13,8 @@
  *   3. 风格维度（色板键 / 图标键）
  *   4. 已产出视频数据（场景序列 + 风格五维，相似度比对基线从这里取）
  *   5. 封面组件与排版参照图
- *   6. 模板库（video/src/templates/，设计稿环节"选模板 + 填内容"的选型清单）
- *   7. 样本库（outputs/样本库/，认可帧 = 模板设计的审美锚点，含孤儿文件检查）
+ *   6. 每条视频的专属屏（video/src/videos/gXX/，一条视频一套 UI 语言的落点）
+ *   7. 排版参照图（outputs/样本库/，分镜设计借排版用）
  */
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
@@ -134,55 +134,31 @@ if (existsSync(refDir)) {
   out(`- **排版参照图**（outputs/archive/排版参考/，${refs.length} 张）：${refs.join('、')}`);
 }
 
-// ── 6. 模板库 ──
+// ── 6. 每条视频的专属屏（一条视频一套 UI 语言）──
 out();
-out('## 6. 模板库（templates/，设计稿环节 = 选模板 + 填内容）');
+out('## 6. 每条视频的专属屏（videos/gXX/）');
 out();
-const tplDir = join(videoSrc, 'templates');
-if (existsSync(tplDir)) {
-  const tplFiles = readdirSync(tplDir).filter((f) => /^T\d+.*\.ts$/.test(f)).sort();
-  if (!tplFiles.length) {
-    out('（空）');
-  } else {
-    out('| 模板 | 名称 | 提炼来源 | 风格预设（motion/typography/transition/hook） | 屏序列 |');
-    out('|---|---|---|---|---|');
-    for (const f of tplFiles) {
-      const src = read(join(tplDir, f));
-      const pick = (re) => (src.match(re) || [])[1] || '?';
-      const id = pick(/id:\s*'([^']+)'/);
-      const name = pick(/name:\s*'([^']+)'/);
-      const source = pick(/source:\s*'([^']+)'/);
-      const preset = ['motion', 'typography', 'transition', 'hookStyle']
-        .map((k) => pick(new RegExp(`${k}:\\s*'([^']+)'`))).join(' / ');
-      const slots = [...src.matchAll(/\{\s*role:\s*'([^']+)',\s*type:\s*'([^']+)'/g)]
-        .map(([, role, type]) => `${role}:${type}`);
-      out(`| ${id} | ${name} | ${source} | ${preset} | ${slots.join(' → ')} |`);
-    }
-    out();
-    out('> 用法：设计稿按玩法选模板 → 逐屏填 `fill` 槽（内容来自 pipeline.md 步骤 3.5 干货提取）→ palette 按背景图色调选定（预设不含 palette）；模板覆盖不了的屏按 R3-Remotion技术参考 §五 扩展流程标 new:xxx。');
+const videosDir = join(videoSrc, 'videos');
+if (existsSync(videosDir)) {
+  for (const d of readdirSync(videosDir).sort()) {
+    const dir = join(videosDir, d);
+    const files = readdirSync(dir).filter((f) => f.endsWith('.tsx') || f.endsWith('.ts')).sort();
+    out(`- **${d}**（${files.length} 个文件）：${files.join('、')}`);
   }
 } else {
-  out('（templates/ 目录未建）');
+  out('（videos/ 目录未建）');
 }
 
-// ── 7. 样本库 ──
+// ── 7. 排版参照图 ──
 out();
-out('## 7. 样本库（outputs/样本库/，认可帧 = 模板设计的审美锚点）');
+out('## 7. 排版参照图（outputs/样本库/，只借排版不取内容）');
 out();
 const sampleDir = join(root, 'outputs', '样本库');
-const sampleIndexFile = join(sampleDir, 'index.json');
-if (existsSync(sampleIndexFile)) {
-  const samples = JSON.parse(read(sampleIndexFile));
-  out('| 文件 | 模板 | 屏 | 角色 | 说明 |');
-  out('|---|---|---|---|---|');
-  for (const s of samples) {
-    out(`| ${s.file} | ${s.template} | ${s.screen} | ${s.role} | ${s.note} |`);
-  }
-  const indexed = new Set(samples.map((s) => s.file));
-  const orphans = readdirSync(sampleDir).filter((f) => /\.(png|jpe?g)$/i.test(f) && !indexed.has(f));
-  for (const f of orphans) out(`> ⚠️ 孤儿文件（在库但未登记 index.json）：${f}`);
+if (existsSync(sampleDir)) {
+  const refs = readdirSync(sampleDir).filter((f) => /\.(png|jpe?g|webp)$/i.test(f)).sort();
+  out(`${refs.length} 张：${refs.join('、')}`);
 } else {
-  out('（样本库未建）');
+  out('（outputs/样本库/ 未建）');
 }
 
 // ── 8. 素材登记视图（真源 = spec/assets.json）──

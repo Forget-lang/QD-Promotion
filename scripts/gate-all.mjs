@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * scripts/gate-all.mjs · 四闸门一次跑完
+ * scripts/gate-all.mjs · 五闸门一次跑完
  *
- * 为什么要它：闸门分散成四条命令时，新会话常常只跑其中一条（或干脆不跑），
+ * 为什么要它：闸门分散成五条命令时，新会话常常只跑其中一条（或干脆不跑），
  * 结果就是"规则在文档里、问题在成片里"。开工第 1 步跑这一个命令，**一开工就见红**。
  *
- * 用法：node scripts/gate-all.mjs          # 四闸门
+ * 用法：node scripts/gate-all.mjs          # 五闸门（红线/文档引用/事实/相似度/效果尺子）
  *      node scripts/gate-all.mjs --tsc   # 额外跑 video/ 的 tsc --noEmit
  */
 import { spawnSync } from 'node:child_process';
@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const GATES = [
   { key: 'redlines', label: '红线闸门（画面/口播硬禁）', args: ['scripts/check-redlines.mjs'] },
-  { key: 'refs', label: '文档引用闸门（引用 + 计数/旧值）', args: ['scripts/check-doc-references.mjs'] },
+  { key: 'refs', label: '文档引用闸门（引用断链）', args: ['scripts/check-doc-references.mjs'] },
   { key: 'facts', label: '事实闸门（资产路径与素材对账）', args: ['scripts/check-facts.mjs'] },
   { key: 'similarity', label: '相似度闸门（整屏结构不得复用）', args: ['scripts/check-similarity.mjs'] },
 ];
@@ -65,7 +65,7 @@ if (vid) {
   rows.push({ ok: true, label: '效果尺子', msg: '跳过（outputs 下暂无成片 mp4；出片后必跑）' });
 }
 
-console.log('\n══════════════ 四闸门总览（gate-all）══════════════');
+console.log('\n══════════════ 五闸门总览（gate-all）══════════════');
 for (const r of rows) console.log(`${r.ok ? '✅' : '❌'} ${r.label.padEnd(26)} ${r.msg}`);
 const failed = rows.filter((r) => !r.ok);
 console.log('\n──────────────────────────────────────────────────');

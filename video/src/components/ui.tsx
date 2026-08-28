@@ -1,7 +1,7 @@
 // 通用 UI 组件（仅提效，非模板）· 2026-08-17 专业级优化 · 2026-08-20 质感升级 + 内容四件套
 // - 质感积木：CharReveal / AccentWord / IconBadge / PhoneMockup / elevation
 // - 内容四件套：CouponCard / StatCounter+StatCard / StepFlow / CompareCard
-//   （生长机制见 workflow/craft.md；组件与产品 UI 对齐状态见 docs/internal/R4-applet前端UI储备.md §8）
+//   （生长机制见 SKILL 第 2 步；组件与产品 UI 对齐状态见 docs/internal/R6-applet前端UI储备.md §8）
 // - 2026-08-29 按 applet 真值校准：CouponCard 金额右置 + 删假条码；PhoneMockup 新增 nav 顶栏
 import React from 'react';
 import { interpolate, interpolateColors, spring, useCurrentFrame } from 'remotion';

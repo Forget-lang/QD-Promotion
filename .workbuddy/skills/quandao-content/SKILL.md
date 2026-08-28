@@ -1,12 +1,12 @@
 ---
 name: quandao-content
 description: 券到卡包宣传视频怎么做——唯一作业文档。行业选型→视觉母题→口播去冗→分镜真图→声画节拍→量化验收→发布。红线与事实见 spec/。
-version: 6.0.0-beta
+version: 6.1.0
 ---
 
 # 券到卡包 · 宣传视频怎么做
 
-> 版本：2026-08-28 重写（beta，试点中）。本文是**做一条视频的完整方法**，取代 pipeline / craft / 两份弹药库的规范地位；试点通过后旧文档归档。
+> 版本：2026-08-29（文档收敛完成：旧文档体系已归档，本文是唯一作业文档）。本文是**做一条视频的完整方法**。
 > 硬事实与红线不在本文复述：产品能力与数字 → `spec/facts.json`；平台红线 → `spec/redlines.json`；素材登记 → `spec/assets.json`。
 > **本文只写"能被机器判负"或"你亲眼看图判定"的标准。只能靠自觉打勾的条款一律不写——文档一多，AI 就会为了符合文档而产出，而不是为了好看而产出。**
 
@@ -55,7 +55,7 @@ version: 6.0.0-beta
 | 零售门店 | 价签 / 收银小票 / 货架 | 价签翻转；条码扫过做强调 |
 
 - **禁止 AI 自绘具象插画**（简笔人物、场景涂鸦必然廉价，直接拉低整片质感）。图形只做抽象装饰：色块、线条、几何、图标。
-- 要"真实感"只有两条正路：**产品真实页面**（`docs/internal/R4-applet真实UI参考` → H5 构建在浏览器里以网页外观录屏，或截图后裁掉违规区域，套自绘手机壳与状态栏）；**行业实拍素材**（需商用授权，库里没有就让人提供，不许拿代码画冒充）。
+- 要"真实感"只有两条正路：**产品真实页面**（`docs/internal/R6-applet前端UI储备.md` → H5 构建在浏览器里以网页外观录屏，或截图后裁掉违规区域，套自绘手机壳与状态栏）；**行业实拍素材**（需商用授权，库里没有就让人提供，不许拿代码画冒充）。
 - 产出**母题一页**：栅格与内容区坐标 / 标题承载方式 / 容器语言 / 装饰母题 / 色彩与质感配方 / 动效语法，逐行写明"上一条片是什么、本片为何不同"。
 
 ### 第 3 步 · 口播稿（**去废话是这一步的核心**）
@@ -96,16 +96,16 @@ version: 6.0.0-beta
 ### 第 6 步 · 渲染与量化验收
 
 ```bash
-node scripts/check-motion.mjs <媒体文件>     # 静止占比 / 平均帧间差 / 最长静止段 / 画面占用率
+node scripts/check-motion.mjs <媒体文件>     # 静止占比 / 中位帧间差 / 画面占用率
 node scripts/check-similarity.mjs            # 整屏结构与任何已产出片重复数必须 = 0
 node scripts/check-redlines.mjs              # 硬禁层 0 命中
 ```
 
-| 指标 | 合格线 | 实测参照 |
+| 指标 | 合格线 | 实测参照（2026-08-29，RGB 口径） |
 |---|---|---|
-| 画面静止占比（帧间差 ≤0.3） | ≤45% | G04 = 67%（不合格）；参考片 = 28% |
-| 中位帧间差（持续微动强度） | ≥0.35 | G04 = 0.13；参考片 = 0.46 |
-| 画面占用率 | ≥70% | G04 成片 29%；参考片 90%；G05 v2 九屏 43~52% |
+| 画面静止占比（帧间差 ≤0.3） | ≤45% | G04 = 67%（不合格）；参考片 = 20% |
+| 中位帧间差（持续微动强度） | ≥0.35 | G04 = 0.12；参考片 = 0.81 |
+| 画面占用率 | ≥70% | G04 成片 63%；参考片 95%；G05 v2 九屏 63~68% |
 | 每屏可读信息条数 | ≥3（含钩子屏） | v1 钩子屏 = 0 |
 | 口播冗余句占比 | ≤8% | 现稿 ≈25% |
 | 跨片结构重复数 | 0（例外须批准并登记） | G05 v1 = 6/9 |
@@ -128,7 +128,7 @@ node scripts/check-redlines.mjs              # 硬禁层 0 命中
 
 ## 三、工程约定
 
-- **一行业一套专属屏**：`video/src/videos/gXX/`（屏组件 + 本片零件 + payload 类型 + 数据）。屏组件**不得跨行业 import**；共享的只有原子件（`Ico`、动画函数、`elevation`、`CharReveal`、palette、字体）与 `VTemplate`（转场/氛围/字幕/音频）。
+- **一行业一套专属屏**：`video/src/videos/gXX/`（屏组件 + 本片零件 + payload 类型）。屏组件**不得跨行业 import**；共享的只有原子件（`Ico`、动画函数、`elevation`、`CharReveal`、palette、字体）与 `VTemplate`（转场/氛围/字幕/音频）。（目标态：数据文件也下沉到 `videos/gXX/`；现状仍在 `src/data/`，未迁移）
 - 数据文件每屏写 `ui: 'gXX-名字'`，在 `scenes/index.tsx` 的 `VIDEO_RENDERERS[视频id]` 注册；`ui` 名拼错运行即抛错，不会静默回退旧组件。
 - 结构指纹 = `type + ui + layout + cardVariant + hookStyle`，由 `check-similarity` 比对；确需复用旧结构 → 在 `ref-registry.json` 的 `similarityExemptions` 登记理由与批准人。
 - `dur = ceil01(口播字数÷6) + extraHold`（信息屏 0 / 数据屏 0.8 / CTA 1.5）；**绝对起始帧 = Σ前各屏帧数 − 12×前屏数**（`TransitionSeries` 每屏重叠 12 帧），峰值帧 = 起始帧 + floor(本屏帧数×0.3)。
@@ -138,6 +138,9 @@ node scripts/check-redlines.mjs              # 硬禁层 0 命中
 
 ---
 
-## 四、待办（本文试点通过后执行）
+## 四、文档收敛记录（2026-08-29 已执行）
 
-归档 `workflow/pipeline.md`、`workflow/craft.md`、`workflow/策划弹药库.md`、`workflow/发布弹药库.md`、`video/src/templates/`、`outputs/样本库/T03-*.png`；`AGENTS.md` 压到约 40 行只留入口；废除 `check-doc-references` 的计数/旧值扫描层；`docs/internal/R2/R3/R4` 降为按需参考。
+- **已归档**（`outputs/archive/20260829-文档收敛归档/`，原文在 git 历史可查）：`workflow/` 四份（pipeline / craft / 策划弹药库 / 发布弹药库）、`video/src/templates/`（死代码）、`outputs/样本库/T03-*.png` 认可帧。
+- **已完成**：`AGENTS.md` 压成入口；`check-doc-references` 废除计数/旧值扫描层；`R4-applet前端UI储备` 改名 `R6`（避让退役编号）。
+- **仍按需参考**：`docs/internal/` R2（业务流程）/ R3（Remotion 技术）/ R6（applet UI 真值）——不是开工必读。
+- **遗留目标态（未做）**：数据文件下沉 `videos/gXX/`、中心注册表 `VIDEO_RENDERERS` 抽离、历史片（G02~G04）与新机制的关系冻结说明——等样板片验证通过后顺手做，不单独立项。

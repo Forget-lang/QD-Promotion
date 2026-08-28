@@ -1,8 +1,8 @@
 # R3 · Remotion 技术参考（原理层）
 
-> 最后校验：2026-08-29（§3.2 组件表按 applet 真值校准两处：`CouponCard` 金额右置 + 删假条码；`PhoneMockup` 新增 `nav` 顶栏 prop，取色与胶囊规格对齐 applet `pages.json` globalStyle 与 `m-navigation-bar.vue`）（此前 2026-08-28：§5.6 呈现手法库改为「只登记代码已落地的 14 种手法」并逐行写明数据文件写法与首用屏——原清单把 3 种未落地写法也计入，9 屏视频按规则选不到足够手法；新增「判定看视觉语法不看标签」防卡片流；计数真源变更已同步 pipeline §2.1.3 / craft §5 / AGENTS §二·5 / `ref-registry.json` counts.stale）（此前 2026-08-27：审计修正：§5.6 呈现手法清单口径对齐手法规格表——卡片不算手法（旧计数值见 registry stale）；文档重构阶段 3：R1/R5/M2 残留引用改指 `spec/facts.json`、`spec/redlines.json`、`workflow/pipeline.md`）（文档重构阶段 2：吸收 M2 §三 技术硬规则为 §七「制作硬规则（操作版）」；「与 M2 的关系」改指 `workflow/pipeline.md`）（08-25 新增 §5.4 CardFaceScene 规格、§5.5 产品 UI 参考+统计核对、§5.6 呈现手法库、atempo 语速；08-26 atempo 口径对齐——G04 定稿 1.2 后续沿用；08-26 组件状态纠错：§5.4 改为规格示例（CardFaceScene 已实现）、§5.6 手法状态对齐代码 + 真源指向资产盘点脚本）（从原 13 号文档拆分，本文件=原理与 API 参考；08-24 修订语速参数口径）
-> 这份文档是**参考层**：解释"为什么"和"组件怎么用"。正常做视频**不需要**读它，按 `workflow/pipeline.md` §2（视频）操作即可；遇到渲染异常、需要新建积木/组件/图标、或想理解声画同步原理时，再查本文件。
-> 操作流程（怎么做出片）在 `workflow/pipeline.md`，制作硬规则（动画/转场/布局/代码结构操作版）在本文件 §七，本文件不重复流程环节。
+> 最后校验：2026-08-29（文档收敛：原指向已归档 `workflow/pipeline.md` / `craft.md` 的 6 处引用全部改指 `.workbuddy/skills/quandao-content/SKILL.md` 或机检脚本，删除计数同步要求）（此前同日 §3.2 组件表按 applet 真值校准两处：`CouponCard` 金额右置 + 删假条码；`PhoneMockup` 新增 `nav` 顶栏 prop，取色与胶囊规格对齐 applet `pages.json` globalStyle 与 `m-navigation-bar.vue`）（此前 2026-08-28：§5.6 呈现手法库改为「只登记代码已落地的 14 种手法」并逐行写明数据文件写法与首用屏——原清单把 3 种未落地写法也计入，9 屏视频按规则选不到足够手法；新增「判定看视觉语法不看标签」防卡片流；计数真源变更已同步 pipeline §2.1.3 / craft §5 / AGENTS §二·5 / `ref-registry.json` counts.stale）（此前 2026-08-27：审计修正：§5.6 呈现手法清单口径对齐手法规格表——卡片不算手法（旧计数值见 registry stale）；文档重构阶段 3：R1/R5/M2 残留引用改指 `spec/facts.json`、`spec/redlines.json`、`workflow/pipeline.md`）（文档重构阶段 2：吸收 M2 §三 技术硬规则为 §七「制作硬规则（操作版）」；「与 M2 的关系」改指 `workflow/pipeline.md`）（08-25 新增 §5.4 CardFaceScene 规格、§5.5 产品 UI 参考+统计核对、§5.6 呈现手法库、atempo 语速；08-26 atempo 口径对齐——G04 定稿 1.2 后续沿用；08-26 组件状态纠错：§5.4 改为规格示例（CardFaceScene 已实现）、§5.6 手法状态对齐代码 + 真源指向资产盘点脚本）（从原 13 号文档拆分，本文件=原理与 API 参考；08-24 修订语速参数口径）
+> 这份文档是**参考层**：解释"为什么"和"组件怎么用"。正常做视频**不需要**读它，按 `.workbuddy/skills/quandao-content/SKILL.md` 的七步法操作即可；遇到渲染异常、需要新建积木/组件/图标、或想理解声画同步原理时，再查本文件。
+> 操作流程（怎么做出片）在 `.workbuddy/skills/quandao-content/SKILL.md`（七步法），制作硬规则（动画/转场/布局/代码结构操作版）在本文件 §七，本文件不重复流程环节。
 
 ---
 
@@ -48,7 +48,7 @@ const frames = Math.round(duration * 30);
 **预览 vs 渲染差异**：Remotion Studio 预览时音频和画面可能因性能有轻微延迟，**最终 `npx remotion render` 渲染结果一定同步——以渲染结果为准，不以预览为准**。
 
 **音频预处理（零裁剪、零淡入，只做响度归一化）**：
-- TTS 语速控制：**seed-tts-2.0 的 speed_ratio 参数实测无效**（G04 2026-08-25 实测 0.5~2.0 时长不变），语速一律用 **ffmpeg atempo** 达成 5.5-6 字/秒（**G04 定稿 1.2，后续视频沿用**；如需其他值在 1.15~1.2 内选定并回写；纯变速不变调）；详见 `workflow/pipeline.md` §2.5 阶段二
+- TTS 语速控制：**seed-tts-2.0 的 speed_ratio 参数实测无效**（G04 2026-08-25 实测 0.5~2.0 时长不变），语速一律用 **ffmpeg atempo** 达成 5.5-6 字/秒（**G04 定稿 1.2，后续视频沿用**；如需其他值在 1.15~1.2 内选定并回写；纯变速不变调）；详见 SKILL 第 6 步（渲染与量化验收）
 - 仅用 ffmpeg `loudnorm=I=-16:TP=-1.5:LRA=11` 做响度归一化（`scripts/process-audio.sh`）
 - 不裁剪首尾静音，不做文件级淡入淡出（淡入淡出在代码层用 `<Audio volume={f}>` 帧级控制）
 
@@ -228,11 +228,11 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 
 ### 5.1 什么时候新建场景积木
 
-> **2026-08-28 前置铁律（优先于下表）**：一条视频一套专属 UI 语言（`workflow/pipeline.md` §2.1.0 / §2.2）。**与任何已产出视频同结构的屏一律新建**，判据是 `node scripts/check-similarity.mjs` 的输出（不是"看起来还行"）。下表只在"本片还没有同类结构"时用。
+> **2026-08-28 前置铁律（优先于下表）**：一条视频一套专属 UI 语言（SKILL 第 2 步·行业视觉母题）。**与任何已产出视频同结构的屏一律新建**，判据是 `node scripts/check-similarity.mjs` 的输出（不是"看起来还行"）。下表只在"本片还没有同类结构"时用。
 
 | 情况 | 处理方式 |
 |---|---|
-| 本片要的叙事槽位，已产出视频里有屏用过同一结构 | **新建本片专属组件**（`videos/gXX/` + 屏上 `ui:'名字'`）；确需沿用 → 走 `pipeline.md` §2.1.0 复用例外提案，用户批准并在 `ref-registry.json` `similarityExemptions` 登记 |
+| 本片要的叙事槽位，已产出视频里有屏用过同一结构 | **新建本片专属组件**（`videos/gXX/` + 屏上 `ui:'名字'`）；确需沿用 → 提出复用例外提案，用户批准并在 `ref-registry.json` `similarityExemptions` 登记 |
 | 全库都没有这个结构，且新结构与既有积木无重叠 | 新建通用积木：`scenes/` + `SceneType` 新类型名 + `scenes/index.tsx` 注册（跨片可复用的叙事原语才走这条） |
 | 结构一致但本片想换一种排列 | 仍按上一条判：排列不同 = 视觉结构不同 = 新建；同一组件加 `layout` 变体只用于**该组件在本片第一次出现**时 |
 | 只有文案/图标/颜色不同（骨架与已产出某屏一致） | ❌ 这就是"换皮"，不是"用现有积木"——按第一行处理 |
@@ -340,11 +340,11 @@ fields?: { icon: IconKey; label: string; value: string }[];  // 附加字段网�
 > **本表只登记「代码已落地」的手法**：每一行都有现成的场景组件或 `layout`/可选字段可写进数据文件。原表把「撕纸笔记 / 大边框分区 / 药丸徽章」三项未落地的写法也计入清单，导致 9 屏视频按规则选不到足够的合规手法——教训见 2026-08-28 工作流验证。
 
 **使用规则**：
-1. 设计稿每屏标注「呈现手法」字段，取本表「手法」列**原名**（14 选 1，禁止自造名）；相邻屏手法不同；内容屏（solution/flow/grid/panel/cardface）至少 2 屏手法与上一条视频不同（配合 `workflow/pipeline.md` §2.2 相似度检查）
+1. 设计稿每屏标注「呈现手法」字段，取本表「手法」列**原名**（14 选 1，禁止自造名）；相邻屏手法不同；内容屏（solution/flow/grid/panel/cardface）至少 2 屏手法与上一条视频不同（配合 `scripts/check-similarity.mjs` 相似度机检）
 2. **判定看视觉语法，不看标签**：每屏都标了手法名 ≠ 达标。若一条视频多数内容屏仍是"白卡 + 图标 + 标题 + 说明"的同一语法，即便标签各不相同，仍按「卡片流」判不合格、回炉
 3. 手法组件是**变体优先**（同 `type` 用 `scene.layout` / `scene.cardVariant` / 可选字段切换，组件清单跑 `node scripts/list-assets.mjs` 核对），结构差异大的才新建场景组件
 
-**手法规格表**（计数真源 = 本表 `| **` 行；改行数须同步 `scripts/ref-registry.json` counts 与 `workflow/pipeline.md` §2.1.3 的「N 选 1」）：
+**手法规格表**（计数真源 = 本表 `| **` 行）：
 
 | 手法 | 视觉特征 | 参考图 | 落地方式（数据文件怎么写） | 首用 |
 |---|---|---|---|---|
@@ -371,10 +371,10 @@ fields?: { icon: IconKey; label: string; value: string }[];  // 附加字段网�
 
 ## 六、与生产流程的关系
 
-- **操作流程**（设计稿模板/两阶段生产流程/检查清单/命令）→ `workflow/pipeline.md` §2（视频）
+- **操作流程**（行业母题/分镜稿/三层运动/渲染验收/发布）→ `.workbuddy/skills/quandao-content/SKILL.md`（七步法）
 - **制作硬规则**（动画/转场/布局/代码结构操作版）→ 本文件 §七（2026-08-27 由 M2 §三 迁入）
 - **本文件**提供：为什么这么做的原理（「一、声画同步原理」/「二、动画原理」）、组件怎么用的 API（「三、组件 API 规格」）、怎么扩展（「四、组件生长机制」/「五、扩展指南」）
-- 遇到渲染异常、组件用法疑问、需要新建组件时查本文件；正常生产流程只读 `workflow/pipeline.md`
+- 遇到渲染异常、组件用法疑问、需要新建组件时查本文件；正常生产流程只读 `.workbuddy/skills/quandao-content/SKILL.md`
 
 ---
 

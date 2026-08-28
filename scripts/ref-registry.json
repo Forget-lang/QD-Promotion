@@ -1,137 +1,18 @@
 {
-  "description": "权威文档注册表：check-doc-references / check-facts 读取本文件。维护规则：新增权威文档时在此登记；文档清单变化时更新 aliases；关键计数（玩法/卖点/布局/手法等）变化时同步更新 counts。",
+  "description": "权威文档注册表：check-doc-references / check-facts 读取本文件。维护规则：新增权威文档时在此登记；文档清单变化时更新 aliases。（2026-08-29 文档收敛：废除 counts 计数治理层；归档文档从 extraDocs/aliases 移除。）",
   "docsDir": "docs/internal",
   "extraDocs": [
     "AGENTS.md",
     "docs/战略简报.md",
-    "docs/AI使用手册.md",
-    "workflow/pipeline.md",
-    "workflow/craft.md",
-    "workflow/策划弹药库.md",
-    "workflow/发布弹药库.md"
+    "docs/AI使用手册.md"
   ],
   "excludeDirs": [],
   "aliases": {
     "AGENTS": "AGENTS.md",
     "R2": "R2-业务流程.md",
     "R3": "R3-Remotion技术参考.md",
-    "pipeline": "workflow/pipeline.md",
-    "craft": "workflow/craft.md",
-    "策划弹药库": "workflow/策划弹药库.md",
-    "发布弹药库": "workflow/发布弹药库.md"
+    "R6": "R6-applet前端UI储备.md"
   },
-  "counts": [
-    {
-      "name": "玩法库条目",
-      "source": {
-        "file": "workflow/策划弹药库.md",
-        "from": "### 1.1",
-        "to": "### 1.2",
-        "regex": "^\\| P-\\d+ \\|"
-      },
-      "claims": [
-        {
-          "label": "玩法编号段",
-          "regex": "P-01~P-(\\d+)"
-        }
-      ],
-      "stale": [
-        "P-01~P-07",
-        "P-01~07",
-        "7 套通用玩法",
-        "7套通用玩法",
-        "七大玩法",
-        "§1.9 矩阵",
-        "1.9 矩阵"
-      ]
-    },
-    {
-      "name": "特色卖点条目",
-      "source": {
-        "file": "workflow/策划弹药库.md",
-        "regex": "^#### 卖点 \\d+"
-      },
-      "claims": [
-        {
-          "label": "卖点计数",
-          "regex": "(\\d+)\\s*大(?:特色)?卖点"
-        }
-      ],
-      "stale": [
-        "十大卖点",
-        "10 大卖点",
-        "10大卖点",
-        "10 大特色卖点"
-      ]
-    },
-    {
-      "name": "布局模式条目",
-      "source": {
-        "file": "workflow/craft.md",
-        "from": "## 8.",
-        "to": "## 9.",
-        "regex": "^\\| L-\\d{2} \\|"
-      },
-      "claims": [
-        {
-          "label": "布局模式段",
-          "regex": "L-01~L-(\\d+)"
-        },
-        {
-          "label": "布局模式种数",
-          "regex": "布局模式库 (\\d+) 种"
-        }
-      ],
-      "stale": [
-        "L-01~L-12",
-        "L-01~L-13",
-        "布局模式库 12 种",
-        "布局模式库 13 种",
-        "从 12 种中选",
-        "从 13 种中选"
-      ]
-    },
-    {
-      "name": "呈现手法条目",
-      "source": {
-        "file": "docs/internal/R3-Remotion技术参考.md",
-        "from": "### 5.6",
-        "to": "## 六",
-        "regex": "^\\| \\*\\*"
-      },
-      "claims": [
-        {
-          "label": "手法选 1 计数",
-          "regex": "(\\d+) 选 1"
-        },
-        {
-          "label": "手法个数",
-          "regex": "（(\\d+) 手法"
-        }
-      ],
-      "stale": [
-        "7 选 1",
-        "（7 手法",
-        "7 种手法"
-      ]
-    },
-    {
-      "name": "钩子样式分支",
-      "source": {
-        "file": "video/src/scenes/HookScene.tsx",
-        "regex": "hookStyle === '"
-      },
-      "claims": [
-        {
-          "label": "钩子样式种数",
-          "regex": "已实现 (\\d+) 种选 1"
-        }
-      ],
-      "stale": [
-        "已实现 4 种选 1"
-      ]
-    }
-  ],
   "factChecks": [
     {
       "desc": "G02 V3 背景图（data 引用）",
@@ -198,23 +79,23 @@
       "path": "outputs/archive/changelog.md"
     },
     {
-      "desc": "applet 主题变量页（R4 §1）",
+      "desc": "applet 主题变量页（R6 §1）",
       "path": "../applet/App.vue"
     },
     {
-      "desc": "applet 公共样式表（R4 §3 结构件）",
+      "desc": "applet 公共样式表（R6 §3 结构件）",
       "path": "../applet/static/css/app.css"
     },
     {
-      "desc": "applet 主题映射（R4 九套主题）",
+      "desc": "applet 主题映射（R6 九套主题）",
       "path": "../applet/utils/theme.js"
     },
     {
-      "desc": "applet 页面配置（R4 §8 顶栏 globalStyle 依据）",
+      "desc": "applet 页面配置（R6 §8 顶栏 globalStyle 依据）",
       "path": "../applet/pages.json"
     },
     {
-      "desc": "applet 券面模板组件（R4 §4.2 金额右置）",
+      "desc": "applet 券面模板组件（R6 §4.2 金额右置）",
       "path": "../applet/components/m/m-coupon-tpl/m-coupon-tpl.vue"
     },
     {
@@ -222,31 +103,31 @@
       "path": "../applet/components/m/m-navigation-bar/m-navigation-bar.vue"
     },
     {
-      "desc": "applet 磁条卡卡面（R4 §4.1 五层层序）",
+      "desc": "applet 磁条卡卡面（R6 §4.1 五层层序）",
       "path": "../applet/components/m/m-card-magnetic-face/m-card-magnetic-face.vue"
     },
     {
-      "desc": "applet C 端券详情（R2 §1.5 核销码区 / R4 §5.4）",
+      "desc": "applet C 端券详情（R2 §1.5 核销码区 / R6 §5.4）",
       "path": "../applet/pages_user/coupon/detail.vue"
     },
     {
-      "desc": "applet C 端券列表（R4 §5.2）",
+      "desc": "applet C 端券列表（R6 §5.2）",
       "path": "../applet/pages_user/coupon/index.vue"
     },
     {
-      "desc": "applet B 端券详情（R4 §4.3 三段式红头）",
+      "desc": "applet B 端券详情（R6 §4.3 三段式红头）",
       "path": "../applet/pages_coupon/coupon/detail.vue"
     },
     {
-      "desc": "applet 卡包首页（R4 §4.2 首页券票）",
+      "desc": "applet 卡包首页（R6 §4.2 首页券票）",
       "path": "../applet/pages/index/index.vue"
     },
     {
-      "desc": "applet 商户中心首页（R4 §5.1 负 80rpx 叠压）",
+      "desc": "applet 商户中心首页（R6 §5.1 负 80rpx 叠压）",
       "path": "../applet/pages/merchant/index.vue"
     },
     {
-      "desc": "applet 底部组件（R4 §3.8）",
+      "desc": "applet 底部组件（R6 §3.8）",
       "path": "../applet/components/m/m-footer/m-footer.vue"
     }
   ],
