@@ -30,6 +30,13 @@ export const CardFaceScene: React.FC<{ scene: Scene; style: StyleConfig; index: 
   const tips = scene.useTips ?? [];
   const dark = scene.darkText ?? false;
 
+  // 卡面焦点块（C2）：faceFocus 优先（券包/优惠券等无「次」概念的载体）→ 回退次卡 times/total → 两者都无则整块不渲染
+  const focus = scene.faceFocus;
+  const hasFocus = focus != null || scene.times != null;
+  const focusValue = focus ? focus.value : scene.times;
+  const focusUnit = focus ? focus.unit ?? '' : '次';
+  const focusNote = focus ? focus.note : `/ 共 ${scene.total} 次`;
+
   return (
     <AbsoluteFill style={{ background: 'transparent' }}>
       {/* 标题区 y:180-340 */}
@@ -95,21 +102,27 @@ export const CardFaceScene: React.FC<{ scene: Scene; style: StyleConfig; index: 
                 }}>{scene.cardName}</div>
               </FadeInUp>
 
-              {/* 次数焦点大字 */}
-              <FadeInUp delay={30} motion={style.motion} dist={28}>
-                <div style={{ display: 'flex', alignItems: 'baseline', marginTop: 18 }}>
-                  <span style={{
-                    fontFamily: typo.family, fontSize: 84, fontWeight: 700, color: '#fff',
-                    lineHeight: 1, letterSpacing: '-0.02em',
-                  }}>{scene.times}</span>
-                  <span style={{
-                    fontFamily: typo.family, fontSize: 44, fontWeight: 700, color: 'rgba(255,255,255,0.88)', marginLeft: 8,
-                  }}>次</span>
-                  <span style={{
-                    fontFamily: FONT_BODY, fontSize: 26, color: 'rgba(255,255,255,0.72)', marginLeft: 10,
-                  }}>/ 共 {scene.total} 次</span>
-                </div>
-              </FadeInUp>
+              {/* 卡面焦点大字（faceFocus 优先，无 times 的载体不渲染，避免空「次 / 共 次」） */}
+              {hasFocus && (
+                <FadeInUp delay={30} motion={style.motion} dist={28}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', marginTop: 18 }}>
+                    <span style={{
+                      fontFamily: typo.family, fontSize: 84, fontWeight: 700, color: '#fff',
+                      lineHeight: 1, letterSpacing: '-0.02em',
+                    }}>{focusValue}</span>
+                    {focusUnit && (
+                      <span style={{
+                        fontFamily: typo.family, fontSize: 44, fontWeight: 700, color: 'rgba(255,255,255,0.88)', marginLeft: 8,
+                      }}>{focusUnit}</span>
+                    )}
+                    {focusNote && (
+                      <span style={{
+                        fontFamily: FONT_BODY, fontSize: 26, color: 'rgba(255,255,255,0.72)', marginLeft: 10,
+                      }}>{focusNote}</span>
+                    )}
+                  </div>
+                </FadeInUp>
+              )}
 
               {/* 附加字段区（核销间隔 / 发放方式，小字） */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 26 }}>

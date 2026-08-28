@@ -20,6 +20,8 @@ export const HookScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
       {style.hookStyle === 'contrast' && <ContrastHook scene={scene} style={style} typo={typo} p={p} />}
       {style.hookStyle === 'question' && <QuestionHook scene={scene} style={style} typo={typo} p={p} />}
       {style.hookStyle === 'clock' && <ClockHook scene={scene} style={style} typo={typo} p={p} />}
+      {style.hookStyle === 'story' && <StoryHook scene={scene} style={style} typo={typo} p={p} />}
+      {style.hookStyle === 'challenge' && <ChallengeHook scene={scene} style={style} typo={typo} p={p} />}
     </AbsoluteFill>
   );
 };
@@ -220,6 +222,129 @@ const QuestionHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family:
           marginTop: 32, fontFamily: FONT_BODY, fontSize: 38,
           color: scene.darkText ? 'rgba(26,26,26,0.8)' : 'rgba(255,255,255,0.8)', textAlign: 'center', lineHeight: 1.5,
           textShadow: scene.darkText ? 'none' : '0 2px 12px rgba(0,0,0,0.4)',
+        }}>
+          {scene.sub}
+        </div>
+      </FadeInUp>
+    </>
+  );
+};
+
+// ── story 故事型钩子（2026-08-27）：像同行讲亲身经历——引号锚 + 场景锚点胶囊 + 叙事大字 ──
+const StoryHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family: string; titleWeight: number; bodyWeight: number }; p: typeof PALETTES['mint-cool'] }> = ({ scene, style, typo, p }) => {
+  const dark = scene.darkText ?? false;
+  const ink = dark ? p.ink : '#fff';
+  const titleShadow = dark ? '0 2px 10px rgba(255,255,255,0.4)' : '0 4px 30px rgba(0,0,0,0.5)';
+  return (
+    <>
+      <ScaleIn delay={2} motion={style.motion} startScale={0.3}>
+        <Pulse delay={20} intensity={0.06} duration={24}>
+          <div style={{
+            fontFamily: typo.family, fontSize: 170, fontWeight: typo.titleWeight,
+            color: p.accent, lineHeight: 1, marginBottom: 6,
+            textShadow: `0 0 50px ${p.accent}60, 0 6px 30px rgba(0,0,0,0.35)`,
+          }}>
+            “
+          </div>
+        </Pulse>
+      </ScaleIn>
+      {scene.hookTag && (
+        <FadeInUp delay={10} motion={style.motion}>
+          <div style={{
+            display: 'inline-block', marginBottom: 30, padding: '10px 36px', borderRadius: 999,
+            border: `2px solid ${p.accent}`,
+            background: dark ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.12)',
+            fontFamily: FONT_BODY, fontSize: 34, color: ink, letterSpacing: '0.06em',
+            textShadow: dark ? 'none' : '0 2px 10px rgba(0,0,0,0.35)',
+          }}>
+            {scene.hookTag}
+          </div>
+        </FadeInUp>
+      )}
+      <WipeIn delay={14} duration={18}>
+        <div style={{
+          fontFamily: typo.family, fontSize: 80, fontWeight: typo.titleWeight,
+          color: ink, textAlign: 'center', lineHeight: 1.3, textShadow: titleShadow,
+        }}>
+          <CharReveal text={scene.title ?? ''} delay={14} />
+        </div>
+      </WipeIn>
+      <FadeInUp delay={32} motion={style.motion}>
+        <div style={{
+          marginTop: 36, fontFamily: FONT_BODY, fontSize: 38,
+          color: dark ? 'rgba(26,26,26,0.8)' : 'rgba(255,255,255,0.85)', textAlign: 'center', lineHeight: 1.5,
+          textShadow: dark ? 'none' : '0 2px 12px rgba(0,0,0,0.4)',
+        }}>
+          {scene.sub}
+        </div>
+      </FadeInUp>
+    </>
+  );
+};
+
+// ── challenge 挑战型钩子（2026-08-27）：打赌/宣言式——徽章胶囊 + 描边宣言框（可选数字焦点） ──
+const ChallengeHook: React.FC<{ scene: Scene; style: StyleConfig; typo: { family: string; titleWeight: number; bodyWeight: number }; p: typeof PALETTES['mint-cool'] }> = ({ scene, style, typo, p }) => {
+  const dark = scene.darkText ?? false;
+  const ink = dark ? p.ink : '#fff';
+  const titleShadow = dark ? '0 2px 10px rgba(255,255,255,0.4)' : '0 4px 30px rgba(0,0,0,0.5)';
+  const hasNumber = scene.hookNumber && scene.hookNumber.length > 0;
+  return (
+    <>
+      <ScaleIn delay={2} motion={style.motion} startScale={0.3}>
+        <Pulse delay={18} intensity={0.08} duration={20}>
+          <div style={{
+            display: 'inline-block', marginBottom: 34, padding: '12px 42px', borderRadius: 999,
+            background: p.accent, color: '#fff',
+            fontFamily: typo.family, fontSize: 40, fontWeight: typo.titleWeight, letterSpacing: '0.12em',
+            textShadow: '0 2px 10px rgba(0,0,0,0.25)',
+          }}>
+            {scene.hookTag ?? '敢不敢'}
+          </div>
+        </Pulse>
+      </ScaleIn>
+      <WipeIn delay={10} duration={18}>
+        <div style={{
+          width: 860, padding: hasNumber ? '52px 36px 44px' : '64px 36px', borderRadius: 28,
+          border: `5px solid ${p.accent}`,
+          background: dark ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.1)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+        }}>
+          {hasNumber ? (
+            <>
+              <div style={{
+                fontFamily: typo.family, fontSize: 58, fontWeight: typo.titleWeight,
+                color: ink, textAlign: 'center', lineHeight: 1.35, textShadow: titleShadow,
+              }}>
+                {scene.title}
+              </div>
+              <ScaleIn delay={22} motion={style.motion} startScale={0.3}>
+                <Pulse delay={34} intensity={0.08} duration={24}>
+                  <div style={{
+                    fontFamily: typo.family, fontSize: 185, fontWeight: typo.titleWeight,
+                    color: p.accent, lineHeight: 1.15, margin: '14px 0 0',
+                    textShadow: `0 0 50px ${p.accent}60, 0 6px 30px rgba(0,0,0,0.35)`,
+                  }}>
+                    {scene.hookNumber}
+                    {scene.hookUnit && <span style={{ fontSize: 82 }}>{scene.hookUnit}</span>}
+                  </div>
+                </Pulse>
+              </ScaleIn>
+            </>
+          ) : (
+            <div style={{
+              fontFamily: typo.family, fontSize: 82, fontWeight: typo.titleWeight,
+              color: ink, textAlign: 'center', lineHeight: 1.3, textShadow: titleShadow,
+            }}>
+              <CharReveal text={scene.title ?? ''} delay={16} />
+            </div>
+          )}
+        </div>
+      </WipeIn>
+      <FadeInUp delay={34} motion={style.motion}>
+        <div style={{
+          marginTop: 40, fontFamily: FONT_BODY, fontSize: 38,
+          color: dark ? 'rgba(26,26,26,0.8)' : 'rgba(255,255,255,0.85)', textAlign: 'center', lineHeight: 1.5,
+          textShadow: dark ? 'none' : '0 2px 12px rgba(0,0,0,0.4)',
         }}>
           {scene.sub}
         </div>

@@ -92,12 +92,15 @@ export interface Scene {
   hookNumber?: string;
   /** number 型钩子：单位部分（如 "次"） */
   hookUnit?: string;
+  /** story 型钩子：场景锚点胶囊文字（如 "上周三 · 下午四点"）；challenge 型钩子：徽章文字（如 "敢不敢"，缺省 "敢不敢"） */
+  hookTag?: string;
   title?: string;
   sub?: string;
   /** 浅色背景适配：true = 背景较浅，标题用深色 ink（默认 false = 深底白字）。背景图为浅色系时必须设 true */
   darkText?: boolean;
   /** 卡片样式变体（防连续屏卡片千篇一律，R4 E-011）：border-left=左边框卡（默认）/ center-icon=无边框大图标卡 / numbered=编号圆卡 / number-focus=数字焦点卡（grid 专用，title=数字大字主色） */
   cardVariant?: 'border-left' | 'center-icon' | 'numbered' | 'number-focus';
+  /** 结构变体：pain 用 numbered-list；solution 用 numbered；grid 用 multi-section；panel 用 ranking；flow 用 horizontal（横向节点串联 + 连接线，缺省为纵向大步骤卡）。其余值忽略 */
   layout?: 'vertical' | 'horizontal' | 'numbered-list' | 'multi-section' | 'ranking';
   // pain
   leftTitle?: string;
@@ -138,10 +141,12 @@ export interface Scene {
   validLabel?: string;
   /** 卡面主题底色（9 色深色系，如御紫 #3E2060，applet utils/theme.js） */
   cardTheme?: string;
+  /** 卡面焦点块（可选，泛化自次卡的「次数」）：券包/优惠券等无「次」概念的卡面用它，如 value=3 unit=种 note='/ 各 1 张'。不传则回退 times/total 次卡写法 */
+  faceFocus?: { value: string | number; unit?: string; note?: string };
   /** 附加字段（≤4 项；次数/有效期已在卡面主体，不重复） */
   cardFields?: CardField[];
-  /** 卡面下使用说明（按使用场景，R1 真实功能；如「到店出示：顾客出示卡，店员扫码核销」） */
-  useTips?: { icon: IconKey; text: string }[];
+  /** 卡面下使用说明（按使用场景，R1 真实功能；如「到店出示：顾客出示卡，店员扫码核销」）；group 可选，传了在该行左上角显示分组角标 */
+  useTips?: { icon: IconKey; text: string; group?: string }[];
   // bracket-group（括号分组，R3 §5.6）
   bracketGroups?: BracketGroup[];
   // transfer/通用：操作要点列表（编号 ①②③ + 文字，填满画面/信息密度用）

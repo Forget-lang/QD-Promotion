@@ -1,6 +1,7 @@
 // S4 使用说明屏（usetips，2026-08-25 · 从卡面屏拆出）
 // - 按使用场景展示次卡使用说明（R1 真实功能：核销/间隔/转赠/到期提醒）
 // - 图标 + 文字条（无卡片边框，区别于卡片流；背景 003 网格呼应）
+// - 分组角标（2026-08-28 提案 C3）：useTips[].group 有值时在该行左上边缘渲染 28px 角标，用于语义分组
 import React from 'react';
 import { AbsoluteFill } from 'remotion';
 import { FONT_BODY, PALETTES, TYPOGRAPHY } from '../palette';
@@ -49,12 +50,21 @@ export const UseTipsScene: React.FC<{ scene: Scene; style: StyleConfig; index: n
         {tips.map((t, i) => (
           <FadeInUp key={i} delay={24 + i * 12} motion={style.motion} dist={36}>
             <div style={{
+              position: 'relative',
               display: 'flex', alignItems: 'center', gap: 24,
               background: dark ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.12)',
               backdropFilter: 'blur(8px)', borderRadius: 22,
               padding: '26px 34px',
               border: dark ? '1px solid rgba(0,0,0,0.05)' : '1px solid rgba(255,255,255,0.2)',
             }}>
+              {t.group && (
+                <div style={{
+                  position: 'absolute', top: -20, left: 34,
+                  fontFamily: FONT_BODY, fontSize: 28, fontWeight: 600,
+                  color: p.accentDark, background: `${p.accentDark}14`,
+                  padding: '4px 16px', borderRadius: 10, lineHeight: 1.3,
+                }}>{t.group}</div>
+              )}
               <div style={{
                 width: 64, height: 64, borderRadius: 18, flexShrink: 0,
                 background: `linear-gradient(135deg, ${p.accent}30, ${p.accent}10)`,

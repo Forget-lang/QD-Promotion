@@ -54,6 +54,14 @@
         { "label": "手法个数", "regex": "（(\\d+) 手法" }
       ],
       "stale": []
+    },
+    {
+      "name": "钩子样式分支",
+      "source": { "file": "video/src/scenes/HookScene.tsx", "regex": "hookStyle === '" },
+      "claims": [
+        { "label": "钩子样式种数", "regex": "已实现 (\\d+) 种选 1" }
+      ],
+      "stale": ["已实现 4 种选 1"]
     }
   ],
   "factChecks": [

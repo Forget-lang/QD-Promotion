@@ -79,13 +79,32 @@ function stripComments(text) {
   }).join('\n');
 }
 
-function scan(files, tokens) {
+// markdown：跳过「自查」小节内的行（自查清单必然复述违禁词，只扫正文创作区）
+function filterChecklistSections(text) {
+  let skipped = false;
+  const out = text
+    .split('\n')
+    .map((line) => {
+      const heading =
+        line.match(/^#{1,6}\s+(.+?)\s*$/) ||
+        line.match(/^\s*【([^】]+)】/) ||
+        line.match(/^\*\*([^*]+)\*\*[：:]/);
+      if (heading) skipped = /自查/.test(heading[1]);
+      return skipped ? '' : line;
+    })
+    .join('\n');
+  // 截图处理指令（redlines video_visual 规定的图注用语）= 操作提示非正文，仅豁免「裁剪…微信元素」括号
+  return out.replace(/（[^（）]*裁剪[^（）]*微信元素[^（）]*）/g, '');
+}
+
+function scan(files, tokens, skipChecklists = false) {
   const hits = [];
   for (const f of files) {
     let content;
     try { content = readFileSync(f, 'utf8'); } catch { continue; }
     const isCode = f.endsWith('.tsx') || f.endsWith('.ts');
-    const text = isCode ? stripComments(content) : content;
+    let text = isCode ? stripComments(content) : content;
+    if (skipChecklists && !isCode && f.endsWith('.md')) text = filterChecklistSections(text);
     const rel = f.replace(ROOT + '/', '');
     for (const tok of tokens) {
       if (text.includes(tok)) {
@@ -105,7 +124,11 @@ const report = [];
 for (const [key, cfg] of Object.entries(CONFIG)) {
   if (!cfg.scope) continue;
   const files = expand(cfg.scope, cfg.exclude || []);
-  const hits = scan(files, cfg.tokens);
+  // ② 口播/文案层：合并画面层硬禁词（画面禁词同样不得出现在文案里），并跳过「自查」小节
+  const merged = key === 'voiceBanned' && CONFIG.codeBanned
+    ? [...new Set([...CONFIG.codeBanned.tokens, ...cfg.tokens])]
+    : cfg.tokens;
+  const hits = scan(files, merged, key === 'voiceBanned');
   report.push({ key, note: cfg.note, hits });
   if (cfg.exitOnHit && hits.length > 0) hardFail = true;
 }

@@ -1,14 +1,14 @@
-// S4 流程·大步骤卡 · 2026-08-21 v4 视觉红线版
-// - 纵向大步骤卡，步骤号超大做视觉锤
-// - 每步全宽 960px，高 320px，填满上 2/3
+// S4 流程屏（flow）· 两种呈现：纵向大步骤卡（默认）/ 横向节点串联（layout: 'horizontal'）
+// - 纵向：每步全宽 920px 白卡高 320px，步骤号超大做视觉锤
+// - 横向：序号圆 + 图标 + 标题 + 补充小字，节点间连接线逐段 draw-on（craft §8 L-06 流程线性型）
 // - 透明背景，白色玻璃卡浮在背景图上
 import React from 'react';
-import { AbsoluteFill, spring, useCurrentFrame } from 'remotion';
+import { AbsoluteFill, interpolate, spring, useCurrentFrame } from 'remotion';
 import { FONT_BODY, PALETTES, TYPOGRAPHY } from '../palette';
 import { FPS } from '../palette';
-import type { MotionKey, Scene, StyleConfig } from '../types';
+import type { MotionKey, Scene, SceneNode, StyleConfig } from '../types';
 import { Ico } from '../components/icons';
-import { FadeInUp, ScaleIn, SPRING_CONFIG } from '../components/animations';
+import { EASE_OUT, FadeInUp, ScaleIn, SPRING_CONFIG } from '../components/animations';
 import { CharReveal, elevation } from '../components/ui';
 
 export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: number; total: number }> = ({
@@ -17,6 +17,7 @@ export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
   const p = PALETTES[style.palette];
   const typo = TYPOGRAPHY[style.typography];
   const nodes = scene.nodes ?? [];
+  const isHorizontal = scene.layout === 'horizontal';
 
   return (
     <AbsoluteFill style={{ background: 'transparent' }}>
@@ -44,7 +45,13 @@ export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
         )}
       </div>
 
-      {/* 步骤卡片区：从 y:280 开始，纵向排列 */}
+      {isHorizontal ? (
+        <HorizontalNodes
+          nodes={nodes} accent={p.accent} accentDark={p.accentDark}
+          dark={scene.darkText ?? false} motion={style.motion} typo={typo}
+        />
+      ) : (
+      /* 步骤卡片区：从 y:280 开始，纵向排列 */
       <div style={{
         position: 'absolute', top: 280, left: 80, right: 80,
         display: 'flex', flexDirection: 'column', gap: 28, alignItems: 'center',
@@ -88,6 +95,7 @@ export const FlowScene: React.FC<{ scene: Scene; style: StyleConfig; index: numb
           );
         })}
       </div>
+      )}
 
       {/* 底部脚注 */}
       {scene.footnote && (
@@ -145,5 +153,75 @@ const StepSubtitle: React.FC<{ sub?: string }> = ({ sub }) => {
     }}>
       {sub}
     </div>
+  );
+};
+
+// ── C1 变体：横向节点串联（craft §8 L-06）──
+const NODE_COL_W = 260;
+const NODE_ROW_W = 920;
+const NODE_STEP = 36;
+
+const HorizontalNodes: React.FC<{
+  nodes: SceneNode[]; accent: string; accentDark: string; dark: boolean; motion: MotionKey;
+  typo: { family: string; titleWeight: number };
+}> = ({ nodes, accent, accentDark, dark, motion, typo }) => {
+  const n = nodes.length;
+  const gap = n > 1 ? (NODE_ROW_W - n * NODE_COL_W) / (n - 1) : 0;
+  const centerOf = (i: number) => i * (NODE_COL_W + gap) + NODE_COL_W / 2;
+  return (
+    <div style={{ position: 'absolute', top: 700, left: 80, right: 80, height: 450 }}>
+      {/* 连接线层（先绘制 → 落在序号圆之后）：圆心中线 y=60 */}
+      {nodes.slice(0, -1).map((_, i) => (
+        <Connector
+          key={i} color={accentDark}
+          left={centerOf(i) + 60} width={gap + NODE_COL_W - 120}
+          delay={32 + i * NODE_STEP}
+        />
+      ))}
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        {nodes.map((nd, i) => {
+          const delay = 12 + i * NODE_STEP;
+          const c = nd.color || accent;
+          return (
+            <div key={i} style={{ width: NODE_COL_W, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <StepNumber num={i + 1} color={c} delay={delay} motion={motion} typo={typo} />
+              <FadeInUp delay={delay + 6} motion={motion} dist={26}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <div style={{ width: 48, height: 48, marginTop: 14 }}>{Ico[nd.icon](c)}</div>
+                  <div style={{
+                    marginTop: 12, fontFamily: typo.family, fontSize: 40, fontWeight: typo.titleWeight,
+                    color: dark ? '#1a1a1a' : '#fff', lineHeight: 1.25, textAlign: 'center',
+                  }}>{nd.title}</div>
+                  {nd.sub && (
+                    <div style={{
+                      marginTop: 8, fontFamily: FONT_BODY, fontSize: 26, lineHeight: 1.5,
+                      color: dark ? '#888' : 'rgba(255,255,255,0.8)', textAlign: 'center',
+                    }}>{nd.sub}</div>
+                  )}
+                </div>
+              </FadeInUp>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+/** 节点间连接线：4px 主题深色，scaleX 左→右逐段 draw-on */
+const Connector: React.FC<{ color: string; left: number; width: number; delay: number }> = ({
+  color, left, width, delay,
+}) => {
+  const f = useCurrentFrame();
+  const grow = interpolate(f - delay, [0, 12], [0, 1], {
+    extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT,
+  });
+  return (
+    <div style={{
+      position: 'absolute', top: 58, left, width, height: 4, borderRadius: 2,
+      background: `linear-gradient(90deg, ${color}, ${color}bb)`,
+      transformOrigin: 'left center', transform: `scaleX(${grow})`,
+      opacity: grow > 0 ? 1 : 0,
+    }} />
   );
 };
