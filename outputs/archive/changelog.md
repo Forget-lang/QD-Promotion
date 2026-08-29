@@ -6,6 +6,23 @@
 
 ---
 
+## 2026-08-29 · SKILL.md 迁出 .workbuddy 至仓库根 + 启动提示词按新架构重写
+
+**背景**：用户指出 SKILL 是唯一作业文档，不该藏在工具专属目录 `.workbuddy/skills/` 下；文档架构核对后确认删除动作仅两项（改写启动模板 + 清空目录壳），archive 内历史记录全部保留不删。
+
+### 变更
+| 文件 | 变更 |
+|---|---|
+| `SKILL.md` | `git mv` `.workbuddy/skills/quandao-content/SKILL.md` → 仓库根 `SKILL.md`（与 AGENTS 并列）；R3/AGENTS/archive README/workbuddy MEMORY 共 11 处路径同步；`spec/redlines.json` docsInfo scope 与 `ref-registry.json`（extraDocs + 别名 SKILL）同步——SKILL 本身纳入引用闸门扫描 |
+| `outputs/archive/AI启动提示词.md` | **整篇重写**（359→约 110 行）：旧版按 pipeline/craft/弹药库/三闸门体系写的场景 A~E 全部失效；新版四场景（A 文档审计 / B 正式产出 / C 设计稿→编码 / D 背景图入库），只指路不复述规则；场景 C 补记本机渲染坑：系统 Chrome 151 headless 在 macOS 14 因 CVDisplayLink -6670 挂死，须用 Chrome Headless Shell（`npx remotion browser ensure`）；工具选型与 TraeWork 教训保留 |
+| 清理 | `.workbuddy/skills/` 空目录壳与 `.DS_Store` 删除；`.workbuddy/` 只剩 memory/MEMORY.md |
+
+### 验证
+- `node scripts/gate-all.mjs --tsc`：红线 ✅ 引用 ✅ 事实 ✅ 相似度 ✅ tsc ✅｜效果尺子 ❌（G04 历史成片，属上条记录已知真实状态）
+- 全库 grep `workbuddy/skills`：活文档零残留（archive 历史记录按纪律不回溯修改）
+
+---
+
 ## 2026-08-29 · 文档收敛重构落地：旧文档体系整体归档，作业文档收敛为 SKILL 唯一
 
 **背景**：用户拍板（2026-08-28「我想先改文档」+ 弹药库「归档只留方法」+「两步走」）；本轮用户授权「全权负责、按建议执行到改造完成、不需要合成语音」。第一步（SKILL v6 + check-motion）已于 08-28 完成，本轮执行第二步：归档旧文档 + 全库对齐。
