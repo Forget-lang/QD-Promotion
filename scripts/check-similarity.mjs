@@ -58,7 +58,13 @@ function loadVideos() {
 }
 
 const videos = loadVideos();
-if (!videos.length) { console.error('❌ data/index.ts 未导出任何视频'); process.exit(1); }
+if (!videos.length) {
+  // 防伪：只有 data/ 确实没有视频文件才算"基线为空"；有文件却解析出 0 屏 = 解析 bug，必须报错
+  const dataFiles = readdirSync(DATA_DIR).filter((f) => f.endsWith('.ts') && f !== 'index.ts');
+  if (dataFiles.length) { console.error(`❌ data/ 有 ${dataFiles.length} 个文件却一屏都没解析出来（格式变了？），拒绝静默放行`); process.exit(1); }
+  console.log('✅ 暂无已产出视频（2026-08-29 清零重启），结构重复基线为空——新视频之间自当比对');
+  process.exit(0);
+}
 
 if (SHOW_ALL) {
   console.log('=== 全部已产出视频的整屏结构指纹 ===');

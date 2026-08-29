@@ -9,13 +9,13 @@
   "A": {
     "abstract": [
       { "id": "BG-ABS-001", "name": "暖奶油卡片底", "colorScheme": "暖色系", "desc": "奶油色/暖棕抽象底，柔和光斑，适合暖色 palette（warm-orange/caramel）", "industries": "茶饮咖啡/餐饮等暖调行业", "path": "背景素材/抽象模板/暖色系/BG-ABS-001-暖奶油卡片底.png", "status": "已用" },
-      { "id": "BG-ABS-002", "name": "冰蓝柔光底", "colorScheme": "冷色系", "desc": "冰蓝/薄荷/奶油黄多色柔光圆斑 + 下部白光，颗粒质感，适合冷色 palette（ink-green/deep-blue/mint-cool）", "industries": "茶饮咖啡（ink-green）/美业等冷调行业", "path": "背景素材/抽象模板/冷色系/BG-ABS-002-冰蓝柔光底.png", "status": "已用（G02 V3）" },
+      { "id": "BG-ABS-002", "name": "冰蓝柔光底", "colorScheme": "冷色系", "desc": "冰蓝/薄荷/奶油黄多色柔光圆斑 + 下部白光，颗粒质感，适合冷色 palette（ink-green/deep-blue/mint-cool）", "industries": "茶饮咖啡（ink-green）/美业等冷调行业", "path": "背景素材/抽象模板/冷色系/BG-ABS-002-冰蓝柔光底.png", "status": "可用" },
       { "id": "BG-ABS-003", "name": "粉雾网格渐变底", "colorScheme": "暖色系（粉）", "desc": "粉→浅桃渐变 + 白色细网格 + 两角半透明圆形光斑，柔和梦幻；浅底，适合粉紫调（美业/美容养生）", "industries": "美业/美容养生", "darkText": true, "path": "背景素材/抽象模板/暖色系/BG-ABS-003-粉雾网格渐变底.png", "status": "已入库（前景验证通过）" },
       { "id": "BG-ABS-004", "name": "蓝绿光斑底", "colorScheme": "冷色系", "desc": "天蓝→薄荷绿渐变 + 白色/淡黄散焦光斑，下半光斑密集，清新通透；浅底；AI 生成（无版权问题，已裁去水印）", "industries": "洗车养车等冷调行业", "darkText": true, "path": "背景素材/抽象模板/冷色系/BG-ABS-004-蓝绿光斑底.png", "status": "已入库（前景验证通过）" },
       { "id": "BG-ABS-006", "name": "粉晕光弧底", "colorScheme": "暖色系（粉）", "desc": "柔粉底 + 左上白色光晕 + 底部大弧形光弧 + 零星小圆，梦幻干净；浅底；用户自搜（商用授权待确认）", "industries": "美业/美容养生（粉调）", "darkText": true, "path": "背景素材/抽象模板/暖色系/BG-ABS-006-粉晕光弧底.png", "status": "已入库（前景验证通过）" }
     ],
     "abstractDeleted": [
-      { "id": "BG-ABS-005", "name": "雾霾紫柔光底", "deletedAt": "2026-08-25", "reason": "用户判定偏艳抢前景（底部中紫饱和+光斑密集），文件已移回收站", "ban": "禁止再引用/选用", "replacement": "BG-ABS-003（G04 已改用）" }
+      { "id": "BG-ABS-005", "name": "雾霾紫柔光底", "deletedAt": "2026-08-25", "reason": "用户判定偏艳抢前景（底部中紫饱和+光斑密集），文件已移回收站", "ban": "禁止再引用/选用", "replacement": "BG-ABS-003（G04 测试片已删，2026-08-29 清零）" }
     ],
     "xhs": [
       { "id": "BG-XHS-01", "name": "横线笔记本纸", "desc": "白底 + 浅灰横线 + 左侧红边距线，空白笔记纸", "path": "背景素材/小红书风格/1.jpg" },

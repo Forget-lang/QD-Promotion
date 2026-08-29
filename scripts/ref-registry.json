@@ -17,10 +17,6 @@
   },
   "factChecks": [
     {
-      "desc": "G02 V3 背景图（data 引用）",
-      "path": "video/public/backgrounds/g02v3/bg.jpg"
-    },
-    {
       "desc": "BG-ABS-001 暖奶油卡片底（素材登记）",
       "path": "背景素材/抽象模板/暖色系/BG-ABS-001-暖奶油卡片底.png"
     },
@@ -47,18 +43,6 @@
     {
       "desc": "动画组件库",
       "path": "video/src/components/animations.tsx"
-    },
-    {
-      "desc": "G02 数据文件",
-      "path": "video/src/data/g02v3.ts"
-    },
-    {
-      "desc": "G03 数据文件",
-      "path": "video/src/data/g03.ts"
-    },
-    {
-      "desc": "G04 数据文件",
-      "path": "video/src/data/g04.ts"
     },
     {
       "desc": "编排引擎 VTemplate",
@@ -133,12 +117,5 @@
       "path": "../applet/components/m/m-footer/m-footer.vue"
     }
   ],
-  "similarityExemptions": [
-    {
-      "video": "G05-KidsArt-SelfPick",
-      "fingerprint": "cta",
-      "reason": "品牌收尾屏职能固定（品牌名+一句主张+不诱导关注）；用户拍板 CTA 屏允许例外。本片差异由 S1-S8 全新画室作品墙语言、deep-blue/纸米白配色与主张句式承载",
-      "approvedBy": "用户（2026-08-28 闸门1 v2 拍板：CTA 屏允许例外）"
-    }
-  ]
+  "similarityExemptions": []
 }

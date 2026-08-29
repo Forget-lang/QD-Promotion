@@ -2,8 +2,6 @@ import { Composition, registerRoot, staticFile } from 'remotion';
 import { VTemplate, computeTotalFrames } from './VTemplate';
 import { FPS } from './palette';
 import * as videoModules from './data';
-import { G03CoverA, G03CoverB, G03CoverSohu } from './covers/g03cover';
-import { G04CoverA, G04CoverSohu } from './covers/g04cover';
 import type { VideoData } from './types';
 
 // ── 注入项目商用字体（@font-face，Remotion 渲染前自动等待 document.fonts.ready）──
@@ -54,12 +52,7 @@ const RemotionRoot: React.FC = () => {
     <>
       {/* 全局字体声明 */}
       <style dangerouslySetInnerHTML={{ __html: FONT_CSS }} />
-      {/* G03 发布封面（竖版 A/B + 搜狐横版头图） */}
-      <Composition id="G03-Cover-A" component={G03CoverA} fps={FPS} width={1080} height={1920} durationInFrames={1} />
-      <Composition id="G03-Cover-B" component={G03CoverB} fps={FPS} width={1080} height={1920} durationInFrames={1} />
-      <Composition id="G03-Cover-Sohu" component={G03CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
-      <Composition id="G04-Cover-A" component={G04CoverA} fps={FPS} width={1080} height={1920} durationInFrames={1} />
-      <Composition id="G04-Cover-Sohu" component={G04CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
+      {/* 一条视频一条 Composition；封面在 src/covers/ 建好后在此注册 */}
       {videos.map((video) => (
         <Composition
           key={video.id}
