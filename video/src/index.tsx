@@ -2,6 +2,7 @@ import { Composition, registerRoot, staticFile } from 'remotion';
 import { VTemplate, computeTotalFrames } from './VTemplate';
 import { FPS } from './palette';
 import * as videoModules from './data';
+import { BundleOpenBench } from './bench/BundleOpenBench';
 import type { VideoData } from './types';
 
 // ── 注入项目商用字体（@font-face，Remotion 渲染前自动等待 document.fonts.ready）──
@@ -53,6 +54,8 @@ const RemotionRoot: React.FC = () => {
       {/* 全局字体声明 */}
       <style dangerouslySetInnerHTML={{ __html: FONT_CSS }} />
       {/* 一条视频一条 Composition；封面在 src/covers/ 建好后在此注册 */}
+      {/* 一屏标杆（质感验证用，非交付片） */}
+      <Composition id="BENCH-bundle-open" component={BundleOpenBench} fps={FPS} width={1080} height={1920} durationInFrames={150} />
       {videos.map((video) => (
         <Composition
           key={video.id}
