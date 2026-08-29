@@ -49,7 +49,7 @@ const frames = Math.round(duration * 30);
 **预览 vs 渲染差异**：Remotion Studio 预览时音频和画面可能因性能有轻微延迟，**最终 `npx remotion render` 渲染结果一定同步——以渲染结果为准，不以预览为准**。
 
 **音频预处理（零裁剪、零淡入，只做响度归一化）**：
-- TTS 语速控制：**seed-tts-2.0 的 speed_ratio 参数实测无效**（G04 2026-08-25 实测 0.5~2.0 时长不变），语速一律用 **ffmpeg atempo** 达成 5.5-6 字/秒（**G04 定稿 1.2，后续视频沿用**；改值须重测并回写 SKILL；纯变速不变调）；详见 SKILL 第 6 步（渲染与量化验收）
+- TTS 语速控制：**seed-tts-2.0 的 speed_ratio 参数实测无效**（G04 2026-08-25 实测 0.5~2.0 时长不变），语速一律用 **ffmpeg atempo** 达成 5.5-6 字/秒（上限 6 字/秒，与 SKILL dur 公式 ÷6 的保守口径同源）（**G04 定稿 1.2，后续视频沿用**；改值须重测并回写 SKILL；纯变速不变调）；详见 SKILL 第 6 步（渲染与量化验收）
 - 仅用 ffmpeg `loudnorm=I=-16:TP=-1.5:LRA=11` 做响度归一化（`scripts/process-audio.sh`）
 - 不裁剪首尾静音，不做文件级淡入淡出（淡入淡出在代码层用 `<Audio volume={f}>` 帧级控制）
 
@@ -338,7 +338,7 @@ interface CardfacePayload {
 > **本表只登记「代码已落地」的手法**：每一行都有现成的场景组件或 `layout`/可选字段可写进数据文件。原表把「撕纸笔记 / 大边框分区 / 药丸徽章」三项未落地的写法也计入清单，导致 9 屏视频按规则选不到足够的合规手法——教训见 2026-08-28 工作流验证。
 
 **使用规则**：
-1. 设计稿每屏标注「呈现手法」字段，取本表「手法」列**原名**（14 选 1，禁止自造名）；相邻屏手法不同；内容屏（solution/flow/grid/panel/cardface）至少 2 屏手法与上一条视频不同（配合 `scripts/check-similarity.mjs` 相似度机检）
+1. 设计稿每屏可标注「呈现手法」作**沟通参照**（取本表「手法」列原名，用于说明视觉语法；数据写法以 SKILL「布局来源」+ payload 为准，2026-08-30 起不再是强制分类）；相邻屏手法不同；内容屏至少 2 屏手法与上一条视频不同（配合 `scripts/check-similarity.mjs` 相似度机检）
 2. **判定看视觉语法，不看标签**：每屏都标了手法名 ≠ 达标。若一条视频多数内容屏仍是"白卡 + 图标 + 标题 + 说明"的同一语法，即便标签各不相同，仍按「卡片流」判不合格、回炉
 3. 手法落到代码：2026-08-29 起**每片专属组件手写实现**（旧"同 type 用 layout/cardVariant 切共享组件变体"机制随共享场景一并删除）；跑 `node scripts/list-assets.mjs` 核对现有原子件
 
@@ -346,7 +346,7 @@ interface CardfacePayload {
 
 | 手法 | 视觉特征 | 参考图 | 落地方式（数据文件怎么写） | 首用 |
 |---|---|---|---|---|
-| **编号列表** | 编号（主题色大字）+ 标题红色下划线 + 后果小字，白纸容器承载 | ref-01 重启人生计划 | `type:'pain'` + `layout:'numbered-list'`，配 `leftItems[]` / `leftItemsSub[]`（后果副行）/ `rightSub`（底部红结论条，**必须显式传**） | G04 S2 |
+| **编号列表** | 编号（主题色大字）+ 标题红色下划线 + 后果小字，白纸容器承载 | ref-01 重启人生计划 | `type:'pain'` + `layout:'numbered-list'`，配 `leftItems[]` / `leftItemsSub[]`（后果副行）/ 底部红结论条为语法项（旧共享组件"必须显式传 rightSub"规则已随组件废止） | G04 S2 |
 | **手写高亮** | 大字 + 半透明高亮条（微倾斜）+ 波浪下划线 | ref-02 暑期实习 | 每片手写（原 `HighLightText` 共享件已删）；现成参照 = `outputs/bench/bench-r02.png` 与锚稿 pain 的涂药块语法 | G04 S1 |
 | **多层分区** | 虚线圆角分区 + 丝带横幅标题 + icon/数字锚点区块 | ref-03 CKT 价格表 | `type:'grid'` + `layout:'multi-section'` + `cards[]` | G04 S5 |
 | **括号分组** | 左竖排分类标签 + 大括号聚合 + 右明细 + 重点行金底 | ref-05 保险投保思路 | `type:'bracket-group'` + `bracketGroups[]`（`detail` 用 `\|` 分行；`highlight:true` 出金底） | G04 S4 |

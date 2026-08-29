@@ -83,7 +83,7 @@ version: 7.0.0-重置
 
 - **审批必须给真图**：设计稿阶段就把每屏渲成静态图，文字规格只做注脚。给你文字让你想象画面 = 没交付。
 - 每屏要经得起暂停截图：单独看是一张完整干货卡。
-- **新屏型先找排版底稿**：四张质感锚覆盖不了的屏型（四象限、步骤条、价格表等），从 `outputs/样本库/ref-01~19`（17 屏型底稿已全部拆成样张，见 `outputs/bench/bench-rNN.png`）挑最接近的一张，拆它的栅格/字号对比/用色做新组件（只借骨架不抄内容，配色换产品主题色），照旧先过一屏标杆。新参考图按 `ref-NN-屏型名-来源.扩展名` 命名入库即可走同一流程。
+- **新屏型先找排版底稿**：四张质感锚覆盖不了的屏型（四象限、步骤条、价格表等），从 `outputs/样本库/ref-01~19`（编号 01~19，缺 07、15 已转第四锚，故样张 17 张，见 `outputs/bench/bench-rNN.png`）挑最接近的一张，拆它的栅格/字号对比/用色做新组件（只借骨架不抄内容，配色换产品主题色），照旧先过一屏标杆。新参考图按 `ref-NN-屏型名-来源.扩展名` 命名入库即可走同一流程。
 - **底部结论条限制（2026-08-29 用户指出样张 17 屏同一条的雷同问题）**：样张里统一的 ConcBar/Foot 是样张约定不是成片条款——正式片每片结论条最多用 2 次（一般给机制屏/收尾屏），且每次换配色与形状贴合本片主题；样张脚注（"屏型排版样张…"）一律不进成片。锚与底稿锁的是视觉语言，列数/行数/高亮位/主题色/字段语义都是分镜阶段定的参数。
 
 ### 第 5 步 · 三层运动（**流畅感的真正来源：声画同步**）
@@ -136,7 +136,7 @@ node scripts/check-redlines.mjs              # 硬禁层 0 命中
 - **一行业一套专属屏**：`video/src/videos/gXX/`（屏组件 + 本片零件 + payload 类型）。屏组件**不得跨行业 import**；共享层已冻结——只含原子件（`Ico`、动画函数、`elevation`、`CharReveal`、`AccentWord`、`Subtitle`、氛围件 `KenBurnsBg/Grain/Vignette/AccentOverlay/DotGrid/GlowOrb`、palette、字体）与 `VTemplate`。两轮拆除（2026-08-29）：12 个共享场景 + "不写 ui 按 type 回退"旁路 → **ui 必填，缺了直接抛错**；9 个"统一外观"业务组件（CouponCard/PhoneMockup/StepFlow/CompareCard/StatCounter / StatCard/IconBadge/SectionTitle/HighLightText）→ 禁止预建/复用外观件，每片照锚稿手写。（目标态：数据文件也下沉到 `videos/gXX/`；现状仍在 `src/data/`，未迁移）
 - 数据文件每屏写 `ui: 'gXX-名字'`，业务数据进 `payload`（形状由本片 `videos/gXX/types.ts` 定义，通用 `Scene` 只留分发/时长/字幕/钩子形态字段）；在 `scenes/index.tsx` 的 `VIDEO_RENDERERS[视频id]` 注册；`ui` 名拼错运行即抛错，不会静默回退旧组件；数据文件的**导出名必须与视频 id 一致**（check-similarity 防伪按该名找 `videos/<key>/index.tsx`）。
 - 结构指纹 = `type + ui`（+ payload 内声明的 `layout/cardVariant/hookStyle` 类键，机器按文本抓），由 `check-similarity` 比对；确需复用旧结构 → 在 `ref-registry.json` 的 `similarityExemptions` 登记理由与批准人。
-- `dur = ceil01(口播字数÷6) + extraHold`（信息屏 0 / 数据屏 0.8 / CTA 1.5）；**绝对起始帧 = Σ前各屏帧数 − 12×前屏数**（`TransitionSeries` 每屏重叠 12 帧），峰值帧 = 起始帧 + floor(本屏帧数×0.3)。
+- `dur = ceil01(口播字数÷6) + extraHold`（÷6 = 语速上限的保守估算，实测落 5.5-6 字/秒；信息屏 0 / 数据屏 0.8 / CTA 1.5）；**绝对起始帧 = Σ前各屏帧数 − 12×前屏数**（`TransitionSeries` 每屏重叠 12 帧），峰值帧 = 起始帧 + floor(本屏帧数×0.3)。
 - 字数口径：剔除空白与标点后逐屏机器计数（别手估，同一稿会数出两个结果）。
 - 卡片宽度按 `border-box` 理解（Remotion 注入全局 CSS）；安全区达标与否**量渲染像素**，不靠读 CSS 推断。
 - 交付落 `outputs/gXX-行业/`：内容输入包、分镜稿、逐屏关键帧、成片、封面、三份发布稿；过程文件进 `outputs/archive/`。

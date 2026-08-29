@@ -151,8 +151,7 @@
     "scope": [
       "docs/internal/**/*.md",
       "SKILL.md",
-      "spec/**/*.json",
-      "workflow/**/*.md"
+      "spec/**/*.json"
     ],
     "note": "规则/红线文档层，命中多为规则描述，仅作信息提示（不失败）。",
     "exitOnHit": false,

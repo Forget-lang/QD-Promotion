@@ -4,7 +4,7 @@
     "lastVerified": "2026-08-27",
     "source": "R1 最后校验 2026-08-25；R0 最后校验 2026-08-26（applet 源码深读定稿）",
     "usage": "任何宣传文案/教程/视频脚本的功能描述必须能在本文件找到依据；标注 unverified 的条目需人工核实后方可对外；数字从 constraints 取。与代码冲突时以 applet 代码为准并修正本文件。",
-    "migrationNote": "R0 §九 视频干货速查按迁移地图归入 workflow/策划弹药库（阶段 2），不在本文件。"
+    "migrationNote": "R0 §九 视频干货速查历史上属 workflow 体系（已物理删除，git 历史可查），不在本文件。"
   },
   "positioning": {
     "slogan": "免费实体店电子券制作工具，快速创建优惠券、券包、次卡，支持企业微信自动发券。",
