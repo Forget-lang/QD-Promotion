@@ -13,7 +13,7 @@
 
 | 你要什么 | 读 |
 |---|---|
-| 怎么做一条宣传视频（**唯一作业文档**，七步法） | `.workbuddy/skills/quandao-content/SKILL.md` |
+| 怎么做一条宣传视频（**唯一作业文档**，七步法） | `SKILL.md` |
 | 产品事实 / 平台红线 / 素材登记 | `spec/facts.json` / `spec/redlines.json` / `spec/assets.json` |
 | 业务流程操作 / Remotion 技术原理 / applet UI 真值 | `docs/internal/` R2 / R3 / R6（按需，不是开工必读） |
 | 近期决策与踩坑 | `outputs/archive/changelog.md` 顶部 10 条 |
@@ -44,7 +44,7 @@
 ```
 promotion/
 ├── AGENTS.md                      入口（本文件）
-├── .workbuddy/skills/quandao-content/SKILL.md  唯一作业文档
+├── SKILL.md  唯一作业文档
 ├── spec/                          机器可读真源（事实 / 红线 / 素材登记）
 ├── docs/internal/                 参考层：R2 业务流程 / R3 Remotion 技术 / R6 applet UI 储备
 ├── scripts/                       闸门（check-* / gate-all）+ 盘点（list-assets）+ TTS 工具

@@ -4,14 +4,16 @@
   "extraDocs": [
     "AGENTS.md",
     "docs/战略简报.md",
-    "docs/AI使用手册.md"
+    "docs/AI使用手册.md",
+    "SKILL.md"
   ],
   "excludeDirs": [],
   "aliases": {
     "AGENTS": "AGENTS.md",
     "R2": "R2-业务流程.md",
     "R3": "R3-Remotion技术参考.md",
-    "R6": "R6-applet前端UI储备.md"
+    "R6": "R6-applet前端UI储备.md",
+    "SKILL": "SKILL.md"
   },
   "factChecks": [
     {

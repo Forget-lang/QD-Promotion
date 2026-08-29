@@ -146,7 +146,7 @@
   "docsInfo": {
     "scope": [
       "docs/internal/**/*.md",
-      ".workbuddy/skills/quandao-content/**/*.md",
+      "SKILL.md",
       "spec/**/*.json",
       "workflow/**/*.md"
     ],

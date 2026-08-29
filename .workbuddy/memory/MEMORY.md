@@ -10,14 +10,14 @@
 - 决策/变更历史 → `outputs/archive/changelog.md`（最新在前）
 - 红线 → `spec/redlines.json`；速记在 `AGENTS.md` §四 三铁律
 - 产品事实/业务深度 → `spec/facts.json`
-- 内容模式/质量标准 → `.workbuddy/skills/quandao-content/SKILL.md`（唯一作业文档，七步法）
+- 内容模式/质量标准 → `SKILL.md`（唯一作业文档，七步法）
 - 项目规则/协作 → `AGENTS.md`（入口）
 - 旧生产文档（pipeline/craft/两份弹药库/模板库）→ 已归档 `outputs/archive/20260829-文档收敛归档/`，不再作为执行依据
 
 ## 开工必读索引
 
 1. `AGENTS.md` —— 入口卡片（项目/真源表/开工三动作/三铁律/协作要点）
-2. `.workbuddy/skills/quandao-content/SKILL.md` —— 唯一作业文档：一条视频的七步法 + 量化验收线
+2. `SKILL.md` —— 唯一作业文档：一条视频的七步法 + 量化验收线
 3. `spec/facts.json` / `spec/redlines.json` / `spec/assets.json` —— 事实/红线/素材登记三真源
 4. `docs/internal/R2-业务流程.md`、`docs/internal/R3-Remotion技术参考.md`、`docs/internal/R6-applet前端UI储备.md` —— 保留参考，按需查
 5. `outputs/archive/changelog.md` —— 文档变更日志
