@@ -118,7 +118,7 @@ node scripts/check-redlines.mjs              # 硬禁层 0 命中
 
 - 无声版阶段渲**逐屏峰值帧单张**交你看（不拼九宫格、不渲无声版）；你说"画面 OK"才进阶段二。
 - 阶段二：逐屏 TTS → loudnorm → ffprobe 实测 → **atempo 1.2**（seed-tts 的 `speed_ratio` 实测无效，此值已定稿）→ dur 与字幕按实测回填 → 渲染 → **盲听全片**（首字完整、尾音不爆、节奏自然）。以渲染结果为准，不信预览器。
-- 渲染必带：`NODE_OPTIONS=""` + `--browser-executable="video/node_modules/.remotion/chrome-headless-shell/mac-x64/chrome-headless-shell-mac-x64/chrome-headless-shell"`。⚠️ 不许指向系统 Chrome——Chrome 151 + macOS 14 下 headless 因 CVDisplayLink 挂死（2026-08-29 实测）；缺 shell 先跑 `npx remotion browser ensure`。渲染走管道时 `| tail` 会吞失败退出码，以产物文件存在为准。
+- 渲染必带：`NODE_OPTIONS=""` + `--browser-executable` 指向 `video/node_modules/.remotion/chrome-headless-shell/<架构>/…/chrome-headless-shell`——**架构随芯片**：Intel Mac = `mac-x64`，Apple 芯片（M 系）= `mac-arm64`；跑前 `npx remotion browser ensure`，再 `ls video/node_modules/.remotion/chrome-headless-shell/` 确认实际目录，勿照抄另一台机器的路径。⚠️ 不许指向系统 Chrome——Chrome 151 + macOS 14 下 headless 因 CVDisplayLink 挂死（2026-08-29 实测）。渲染走管道时 `| tail` 会吞失败退出码，以产物文件存在为准。
 
 ### 第 7 步 · 发布（三平台）
 
