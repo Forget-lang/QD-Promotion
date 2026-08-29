@@ -133,7 +133,7 @@ node scripts/check-redlines.mjs              # 硬禁层 0 命中
 
 ## 三、工程约定
 
-- **一行业一套专属屏**：`video/src/videos/gXX/`（屏组件 + 本片零件 + payload 类型）。屏组件**不得跨行业 import**；共享的只有原子件（`Ico`、动画函数、`elevation`、`CharReveal`、palette、字体）与 `VTemplate`（转场/氛围/字幕/音频）。（目标态：数据文件也下沉到 `videos/gXX/`；现状仍在 `src/data/`，未迁移）
+- **一行业一套专属屏**：`video/src/videos/gXX/`（屏组件 + 本片零件 + payload 类型）。屏组件**不得跨行业 import**；共享的只有原子件（`Ico`、动画函数、`elevation`、`CharReveal`、palette、字体）与 `VTemplate`（转场/氛围/字幕/音频）。12 个旧共享场景与"不写 ui 回退共享组件"旁路已于 2026-08-29 删除——**ui 必填，缺了直接抛错**。（目标态：数据文件也下沉到 `videos/gXX/`；现状仍在 `src/data/`，未迁移）
 - 数据文件每屏写 `ui: 'gXX-名字'`，在 `scenes/index.tsx` 的 `VIDEO_RENDERERS[视频id]` 注册；`ui` 名拼错运行即抛错，不会静默回退旧组件。
 - 结构指纹 = `type + ui + layout + cardVariant + hookStyle`，由 `check-similarity` 比对；确需复用旧结构 → 在 `ref-registry.json` 的 `similarityExemptions` 登记理由与批准人。
 - `dur = ceil01(口播字数÷6) + extraHold`（信息屏 0 / 数据屏 0.8 / CTA 1.5）；**绝对起始帧 = Σ前各屏帧数 − 12×前屏数**（`TransitionSeries` 每屏重叠 12 帧），峰值帧 = 起始帧 + floor(本屏帧数×0.3)。

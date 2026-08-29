@@ -364,9 +364,9 @@ fields?: { icon: IconKey; label: string; value: string }[];  // 附加字段网�
 | **排行条型** | 排名块 1/2/3 + 指标名 + 说明 + 右侧弱图标 | —（自有组件，参照产品统计页排行榜） | `type:'panel'` + `layout:'ranking'` + `metrics[]` | G04 S7 |
 | **品牌收尾型** | 品牌名超大居中 + 一句主张 + 上下装饰线 draw-on + 光晕 | ref-06（仅借居中层级，不取边框） | `type:'cta'` + `title`=品牌名 / `sub`=主张 | G02v3 S8 |
 
-**未落地、标进设计稿 = 渲染不出**（要做先建组件，再往本表加行）：撕纸笔记（需容器组件 `PaperSheet`，ref-04 语法）、大边框分区（需 `FrameSection`，ref-06 语法）、独立药丸徽章组件 `PillBadge`（现由 HookScene 内置胶囊承载同一语法）。
+**未落地、标进设计稿 = 渲染不出**（要做先建组件，再往本表加行）：撕纸笔记（需容器组件 `PaperSheet`，ref-04 语法）、大边框分区（需 `FrameSection`，ref-06 语法）、独立药丸徽章组件 `PillBadge`（ref-08 药丸语法已在 `video/src/bench/BenchRefsA.tsx` R08 样张实现，可拆用）。
 
-> **组件状态真源**：`node scripts/list-assets.mjs`（项目根运行，从代码实时生成）；本表「落地方式」为 2026-08-28 按组件源码逐条核对后的快照，与脚本输出或源码不一致时以代码为准。
+> **组件状态真源**：`node scripts/list-assets.mjs`（项目根运行，从代码实时生成）；本表「落地方式」为 2026-08-28 按组件源码逐条核对后的快照，与脚本输出或源码不一致时以代码为准。⚠️ 2026-08-29 共享场景组件已整体删除（ui 回退旁路一并拆除），本表「落地方式」列的 `type:'xxx'+props` 写法**不再可直接使用**——布局模式种类仍作目录，现行实现参照 = 四张锚 + `outputs/bench/bench-rNN.png` 17 屏型样张（代码 `video/src/bench/`）。
 
 ---
 
@@ -412,7 +412,7 @@ fields?: { icon: IconKey; label: string; value: string }[];  // 附加字段网�
 | 字幕安全区 | 底部距底 60px，白字黑描边 34px，位于 y:1760-1920，不侵入内容区 |
 | 活动区硬底线 | y:120-1760，出界 = 不合格 |
 | **核心内容集中** | 核心内容（标题+卡片/图标/流程）集中在 **y:200-1100**；标题距顶 ≥200px；标题与内容间距 40-60px；多卡片间距 ≥ 卡片高度 20%；卡片内 padding ≥43px。只约束垂直分布，不限制风格 |
-| **绝对定位 vs 动画包装（2026-08-28 硬规则）** | 带 `transform` 的动画组件（`FadeInUp`/`ScaleIn`/`WipeIn`/`Pulse`…）会**成为后代的包含块**。写 `<FadeInUp><div style="position:absolute; left:80; right:80; bottom:280">` 时，`left+right` 相对一个零尺寸盒解析 → 元素塌缩不可见。**正确写法：外层普通 div 负责 `position:absolute` + 锚点，内层再套动画组件**。教训：`PainScene` 编号列表变体的红色结论条自 G04 起从未渲出来（G04 交付帧已取证），设计稿只写"必须显式传 rightSub"根本抓不到这个缺陷 |
+| **绝对定位 vs 动画包装（2026-08-28 硬规则）** | 带 `transform` 的动画组件（`FadeInUp`/`ScaleIn`/`WipeIn`/`Pulse`…）会**成为后代的包含块**。写 `<FadeInUp><div style="position:absolute; left:80; right:80; bottom:280">` 时，`left+right` 相对一个零尺寸盒解析 → 元素塌缩不可见。**正确写法：外层普通 div 负责 `position:absolute` + 锚点，内层再套动画组件**。教训：`PainScene`（旧共享场景，2026-08-29 已删除）编号列表变体的红色结论条自 G04 起从未渲出来（G04 交付帧已取证），设计稿只写"必须显式传 rightSub"根本抓不到这个缺陷 |
 | 浅底字幕可读性（已知短板，待决） | `Subtitle` 无条件白字黑描边（`SceneRenderer` 不传 `darkText`）→ 浅底背景上全靠描边撑可读，观感偏弱。改它影响全片所有已渲视频的字幕层，须走组件提案 |
 
 ### 7.4 代码结构规则
