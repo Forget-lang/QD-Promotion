@@ -49,7 +49,7 @@ const frames = Math.round(duration * 30);
 **预览 vs 渲染差异**：Remotion Studio 预览时音频和画面可能因性能有轻微延迟，**最终 `npx remotion render` 渲染结果一定同步——以渲染结果为准，不以预览为准**。
 
 **音频预处理（零裁剪、零淡入，只做响度归一化）**：
-- TTS 语速控制：**seed-tts-2.0 的 speed_ratio 参数实测无效**（G04 2026-08-25 实测 0.5~2.0 时长不变），语速一律用 **ffmpeg atempo** 达成 5.5-6 字/秒（**G04 定稿 1.2，后续视频沿用**；如需其他值在 1.15~1.2 内选定并回写；纯变速不变调）；详见 SKILL 第 6 步（渲染与量化验收）
+- TTS 语速控制：**seed-tts-2.0 的 speed_ratio 参数实测无效**（G04 2026-08-25 实测 0.5~2.0 时长不变），语速一律用 **ffmpeg atempo** 达成 5.5-6 字/秒（**G04 定稿 1.2，后续视频沿用**；改值须重测并回写 SKILL；纯变速不变调）；详见 SKILL 第 6 步（渲染与量化验收）
 - 仅用 ffmpeg `loudnorm=I=-16:TP=-1.5:LRA=11` 做响度归一化（`scripts/process-audio.sh`）
 - 不裁剪首尾静音，不做文件级淡入淡出（淡入淡出在代码层用 `<Audio volume={f}>` 帧级控制）
 
@@ -131,7 +131,7 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 
 ## 三、组件 API 规格（video/src/components/）
 
-> 分发器在 `video/src/scenes/index.tsx`（ui 必填、无回退），本片专属屏组件在 `video/src/videos/gXX/`，原子组件库在 `video/src/components/`。组件是**原子积木，非成品模板**——每条视频独立设计、组合方式不同。组件靠纪律生长（见四）。
+> 分发器在 `video/src/scenes/index.tsx`（ui 必填、无回退），本片专属屏组件在 `video/src/videos/gXX/`（首条正式片开工时建立，现空目录），原子组件库在 `video/src/components/`。组件是**原子积木，非成品模板**——每条视频独立设计、组合方式不同。组件靠纪律生长（见四）。
 
 ### 3.1 动画组件（components/animations.tsx）
 
@@ -159,7 +159,7 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 
 ### 3.3 图标库（components/icons.tsx）
 
-内联 SVG 图标，通过 `<Ico name={color} />` 调用。当前覆盖：cup, x, check, gift, clock, users, cash, bolt, search, arrow 等。新增图标保持单色描边风格统一。
+内联 SVG 图标，通过 `Ico[name](color)` 调用（映射表，非组件）。当前覆盖：cup, x, check, gift, clock, users, cash, bolt, search, arrow 等。新增图标保持单色描边风格统一。
 
 **新增图标流程（Icon MCP Server 已接入，.mcp.json 配置）**：
 1. 先查 `icons.tsx` 是否够用
@@ -189,7 +189,7 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 | 动画性格 | `style.motion` | bouncy / snappy / buttery / heavy（4 种） | SPRING_CONFIG，全部动画组件透传 |
 | 转场 | `style.transition` | slide / wipe / dissolve / zoom / pop（5 种） | 自定义呈现组件在 VTemplate.tsx，五种观感真实可见 |
 | 字体性格 | `style.typography` | impact / clean / friendly（3 种） | impact=得意黑900/普惠体500，clean=普惠体800/500，friendly=方圆体400（单一字重靠字号分层） |
-| 钩子型 | `style.hookStyle` | contrast / number / question / clock（4/6 已实现） | story/challenge 待按需补 |
+| 钩子型 | `style.hookStyle` | 六值均为待本片实现的分派键（旧共享钩子已删，0/6 实现） | 本片实现时照锚稿手写钩子屏 |
 
 ---
 
@@ -416,6 +416,6 @@ interface CardfacePayload {
 
 - 场景内容全部从 scene 数据读取（禁止硬编码文案/颜色/图标名，语义色 ACCENT_RED/GREEN 除外）
 - 风格值全部从 style/palette 读取（禁止硬编码色值）
-- 图标用内联 SVG 组件 `<Ico name={color} />`（禁止外部图标文件/CDN）
+- 图标用内联 SVG 映射 `Ico[name](color)`（禁止外部图标文件/CDN）
 - 图片用 `<Img src={staticFile(...)} />`（禁止 `<img>`）
 - 字幕用 `<Subtitle>` 组件，接收 `lines: {text, startFrame, endFrame}[]`（数据在 data/gXX.ts 的 subtitles 字段）

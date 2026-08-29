@@ -59,7 +59,7 @@ export interface Scene {
   voiceDur?: number;
   /** 字幕多行数组（口播全文，按语义断行；无声版均匀分布占位，有声版按 TTS 实测精修） */
   subtitles?: SubtitleLine[];
-  /** 浅色背景适配：true = 背景较浅，字幕/深色控件按浅底校准。背景为浅色系时必须设 */
+  /** 浅色背景适配标记。⚠️ 已知短板（R3 §7.3）：Subtitle 尚未消费此字段（恒白字黑描边），接线须走组件提案；在那之前它只是数据标注 */
   darkText?: boolean;
   // ── 钩子屏通用便捷字段（专属组件可选读取；其余内容一律进 payload）──
   title?: string;

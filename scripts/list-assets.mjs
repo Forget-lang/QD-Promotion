@@ -63,7 +63,7 @@ const unionOf = (name) => {
   return m ? [...m[1].matchAll(/'([^']+)'/g)].map(([, v]) => v) : [];
 };
 out();
-out(`types.ts 变体上限：layout ∈ { ${unionOf('layout').join(' / ')} }；cardVariant ∈ { ${unionOf('cardVariant').join(' / ')} }`);
+// 2026-08-30 删：旧共享场景的 layout/cardVariant 变体盘点（Scene 瘦身后两键已无类型定义，输出空集是噪音）
 
 // ── 2. 原子组件 ──
 const exportsOf = (file) => {

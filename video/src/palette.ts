@@ -3,12 +3,8 @@
 export const FPS = 30;
 
 // 语义色（跨行业通用：红=痛点 绿=解法 橙=强调 青=科技）
-export const ACCENT_RED = '#EF5350';
-export const ACCENT_GREEN = '#43A047';
-export const ACCENT_ORANGE = '#FF7043';
-export const ACCENT_CYAN = '#26C6DA';
-export const GREEN = '#07C160'; // 解法绿 / S7 CTA 背景（G02 设计稿显式锁定，非品牌色假定）
-export const NAV_RED = '#e2453d'; // 产品顶栏红：复刻 applet 顶栏专用，与痛点红 ACCENT_RED 不同源勿混用
+// 2026-08-30 删 6 个零引用语义色常量（ACCENT_* / GREEN / NAV_RED）：注释焊着单片决策（S7/G02），违反共享层中立；
+// 顶栏红等真值在 docs/internal/R6 §8，本片需要时从 palette 主题或 R6 真值取色。
 
 export const INK = '#1a1a1a';
 export const PAPER = '#ffffff';

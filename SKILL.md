@@ -24,7 +24,7 @@ version: 7.0.0-重置
 
 ## 一、开工三步
 
-1. `node scripts/gate-all.mjs` — 一次跑完红线 / 事实 / 相似度 / 效果尺子。**红灯不产出、不交付。**
+1. `node scripts/gate-all.mjs` — 一次跑完五闸门（红线 / 文档引用 / 事实 / 相似度 / 效果尺子）。**红灯不产出、不交付。**
 2. `node scripts/list-assets.mjs` — 组件、素材、已产出片的实时清单。状态一律以脚本输出为准，不凭记忆。
 3. 读 `outputs/archive/changelog.md` 顶部 10 条 — 近期决策与踩坑，避免推翻刚拍板的口径。
 
@@ -52,11 +52,11 @@ version: 7.0.0-重置
 | 火锅 | 桌号牌 / 时段客流 / 锅底 | 时段曲线随口播爬升；气泡做数据点 |
 | 美容养生 | 护理本 / 次卡存折 / 镜面 | 翻页式次卡；镜面擦除转场 |
 | 少儿教培 | 报名表 / 课程表 / 印章 / 作业本 | 表格逐格填写；盖章做结论强调 |
-| 零售门店 | 价签 / 收银小票 / 货架 | 价签翻转；条码扫过做强调 |
+| 零售门店 | 价签 / 收银小票 / 货架 | 价签翻转；小票逐行打印做强调 |
 
 - **禁止 AI 自绘具象插画**（简笔人物、场景涂鸦必然廉价，直接拉低整片质感）。图形只做抽象装饰：色块、线条、几何、图标。
 - **质感锚（2026-08-29 用户逐张认可，做屏前先看这四张图）**：`outputs/bench/anchor-bundle-open.png`（产品特写）· `anchor-pain.png`（痛点·实物传单）· `anchor-mech.png`（机制对比）· `anchor-table.png`（多列对照表，ref-15 拆底稿实证）；实现代码在 `video/src/bench/`——新屏从锚稿抄结构，禁止脱离自由发挥；对不上锚稿 = 回炉。锚未覆盖的新屏型走「ref 拆底稿 → 一屏标杆」路径，17 屏型底稿样张在同目录 `outputs/bench/bench-rNN.png`（待审）。一条片内每屏按叙事功能挑**不同**的锚/底稿——片内布局多样、跨片骨架稳定。
-- **复用边界（三条实物体感标杆后明确）**：可跨行业复用的只有【做法】——真物或重排版、密度=字段、四层画面结构（背景/主张/实物/字幕道）；【载体】必须每行业重找（美术班=传单、火锅=排队号票、宠物店=疫苗提醒卡……载体不对味即返工）；【外观】每行业新配（9 套真实主题色轮换、券种组合、字段内容）。一屏标杆审的是"像不像上一条"，似曾相识=不过。
+- **复用边界（三条实物体感标杆后明确；锚现四张，第四条对照表非实物）**：可跨行业复用的只有【做法】——真物或重排版、密度=字段、四层画面结构（背景/主张/实物/字幕道）；【载体】必须每行业重找（美术班=传单、火锅=排队号票、宠物店=疫苗提醒卡……载体不对味即返工）；【外观】每行业新配（9 套真实主题色轮换、券种组合、字段内容）。一屏标杆审的是"像不像上一条"，似曾相识=不过。
 - 要"真实感"只有两条正路：**产品真实页面的高保真复刻**（按 `docs/internal/R6-applet前端UI储备.md` 像素真值用 Remotion 手工做，构图取"实物特写"不复刻整页；⚠️ H5 构建/浏览器录屏路线已永久关闭——applet 只兼容微信小程序端，拿不到他端形态）；**行业实拍素材**（需商用授权，库里没有就让人提供，不许拿代码画冒充）。
 - 产出**母题一页**：栅格与内容区坐标 / 标题承载方式 / 容器语言 / 装饰母题 / 色彩与质感配方 / 动效语法，逐行写明"上一条片是什么、本片为何不同"。
 
@@ -112,9 +112,9 @@ node scripts/check-redlines.mjs              # 硬禁层 0 命中
 | 中位帧间差（持续微动强度） | ≥0.35 | G04 = 0.12；参考片 = 0.81 |
 | 画面占用率 | ≥70% | G04 成片 63%；参考片 95%；G05 v2 九屏 63~68% |
 | 每屏可读信息条数 | ≥3（含钩子屏） | v1 钩子屏 = 0 |
-| 口播冗余句占比 | ≤8% | 现稿 ≈25% |
+| 口播冗余句占比 | ≤8% | 现稿 ≈25%（G05 已删，此数为历史记录） |
 | 跨片结构重复数 | 0（例外须批准并登记） | G05 v1 = 6/9 |
-> 阈值按"一条已知差的 + 一条已知好的"实测定标（绝对阈值随采样分辨率漂移，同一参考片曾算出 30% 与 77% 两个结果）；换机器或改采样后重新定标，不许凭感觉调。
+> 阈值按"一条已知差的 + 一条已知好的"实测定标（绝对阈值随采样分辨率漂移，同一参考片曾算出 30% 与 77% 两个结果）；换机器或改采样后重新定标，不许凭感觉调。两个定标样本（G04 差片+同事好片）已随清零删除，45%/0.35/70% 为 08-29 实测**封版基线**；今后重新定标须先各存一份好/坏样本到 `outputs/archive/calibration/` 再跑。
 
 - 无声版阶段渲**逐屏峰值帧单张**交你看（不拼九宫格、不渲无声版）；你说"画面 OK"才进阶段二。
 - 阶段二：逐屏 TTS → loudnorm → ffprobe 实测 → **atempo 1.2**（seed-tts 的 `speed_ratio` 实测无效，此值已定稿）→ dur 与字幕按实测回填 → 渲染 → **盲听全片**（首字完整、尾音不爆、节奏自然）。以渲染结果为准，不信预览器。
@@ -133,8 +133,8 @@ node scripts/check-redlines.mjs              # 硬禁层 0 命中
 
 ## 三、工程约定
 
-- **一行业一套专属屏**：`video/src/videos/gXX/`（屏组件 + 本片零件 + payload 类型）。屏组件**不得跨行业 import**；共享层已冻结——只含原子件（`Ico`、动画函数、`elevation`、`CharReveal`、`AccentWord`、`Subtitle`、氛围件 `KenBurnsBg/Grain/Vignette/AccentOverlay/DotGrid/GlowOrb`、palette、字体）与 `VTemplate`。两轮拆除（2026-08-29）：12 个共享场景 + "不写 ui 按 type 回退"旁路 → **ui 必填，缺了直接抛错**；9 个"统一外观"业务组件（CouponCard/PhoneMockup/StepFlow/CompareCard/StatCard·Counter/IconBadge/SectionTitle/HighLightText）→ 禁止预建/复用外观件，每片照锚稿手写。（目标态：数据文件也下沉到 `videos/gXX/`；现状仍在 `src/data/`，未迁移）
-- 数据文件每屏写 `ui: 'gXX-名字'`，业务数据进 `payload`（形状由本片 `videos/gXX/types.ts` 定义，通用 `Scene` 只留分发/时长/字幕/钩子形态字段）；在 `scenes/index.tsx` 的 `VIDEO_RENDERERS[视频id]` 注册；`ui` 名拼错运行即抛错，不会静默回退旧组件。
+- **一行业一套专属屏**：`video/src/videos/gXX/`（屏组件 + 本片零件 + payload 类型）。屏组件**不得跨行业 import**；共享层已冻结——只含原子件（`Ico`、动画函数、`elevation`、`CharReveal`、`AccentWord`、`Subtitle`、氛围件 `KenBurnsBg/Grain/Vignette/AccentOverlay/DotGrid/GlowOrb`、palette、字体）与 `VTemplate`。两轮拆除（2026-08-29）：12 个共享场景 + "不写 ui 按 type 回退"旁路 → **ui 必填，缺了直接抛错**；9 个"统一外观"业务组件（CouponCard/PhoneMockup/StepFlow/CompareCard/StatCounter / StatCard/IconBadge/SectionTitle/HighLightText）→ 禁止预建/复用外观件，每片照锚稿手写。（目标态：数据文件也下沉到 `videos/gXX/`；现状仍在 `src/data/`，未迁移）
+- 数据文件每屏写 `ui: 'gXX-名字'`，业务数据进 `payload`（形状由本片 `videos/gXX/types.ts` 定义，通用 `Scene` 只留分发/时长/字幕/钩子形态字段）；在 `scenes/index.tsx` 的 `VIDEO_RENDERERS[视频id]` 注册；`ui` 名拼错运行即抛错，不会静默回退旧组件；数据文件的**导出名必须与视频 id 一致**（check-similarity 防伪按该名找 `videos/<key>/index.tsx`）。
 - 结构指纹 = `type + ui`（+ payload 内声明的 `layout/cardVariant/hookStyle` 类键，机器按文本抓），由 `check-similarity` 比对；确需复用旧结构 → 在 `ref-registry.json` 的 `similarityExemptions` 登记理由与批准人。
 - `dur = ceil01(口播字数÷6) + extraHold`（信息屏 0 / 数据屏 0.8 / CTA 1.5）；**绝对起始帧 = Σ前各屏帧数 − 12×前屏数**（`TransitionSeries` 每屏重叠 12 帧），峰值帧 = 起始帧 + floor(本屏帧数×0.3)。
 - 字数口径：剔除空白与标点后逐屏机器计数（别手估，同一稿会数出两个结果）。
@@ -155,4 +155,4 @@ G02 茶饮、G03 火锅、G04 美容、G05 美术班全部是**梳理流程用�
 
 **新增硬闸门——一屏标杆：** 任何一条视频，先只做 1 屏、渲真图、**交用户认可"就是这个质感"，才许铺其余屏**。一屏不过，整片不开工（G05 九屏一起交导致整体否决的直接教训）。
 
-**保留的工具（清零不清能力）：** `check-motion` 效果尺子、`band-occupancy` 分带诊断（教训：占用真空常在顶/底带，别对着已 70~90% 的中段硬填）、节拍层思路（`useBeatIndex`/`regionState` 模式，参考 git 历史 `videos/g05/beats.ts`）、Chrome Headless Shell 渲染路径。相似度基线随历史片删除归零，脚本保留——以后防的是我们前后两条片自己重复。
+**保留的工具（清零不清能力）：** `check-motion` 效果尺子、`band-occupancy` 分带诊断（教训：占用真空常在顶/底带，别对着已 70~90% 的中段硬填）、节拍层思路（`useBeatIndex`/`useRegion` 模式，参考 git 历史 `videos/g05/beats.ts`）、Chrome Headless Shell 渲染路径。相似度基线随历史片删除归零，脚本保留——以后防的是我们前后两条片自己重复。

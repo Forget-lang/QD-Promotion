@@ -105,7 +105,7 @@ function checkBespoke(video) {
 const dups = newest.screens.map((s, i) => ({ ...s, n: i + 1 })).filter((s) => seen.has(s.fp));
 const unexempted = dups.filter((d) => !exemptions.has(d.fp));
 
-console.log(`\n══════════════ 整屏结构相似度机检（pipeline §2.2）══════════════`);
+console.log(`\n══════════════ 整屏结构相似度机检（SKILL 第 2 步）══════════════`);
 console.log(`待检: ${newest.id}（${newest.screens.length} 屏）｜基线: ${others.map((v) => v.id).join(' / ') || '无'}`);
 console.log(`结构指纹: ${newest.screens.map((s, i) => `S${i + 1} ${s.fp}`).join('  ')}`);
 console.log(`\n同结构屏（与任一已产出视频）: ${dups.length} / ${newest.screens.length}`);
@@ -121,13 +121,14 @@ if (newest.screens.some((s) => s.ui)) {
   else if (bespoke.missing.length) console.log(`❌ 防伪：ui 名在 video/src/videos/${newest.key}/index.tsx 中找不到 → ${bespoke.missing.join(', ')}`);
   else console.log(`✅ 防伪：${newest.screens.filter((s) => s.ui).length} 个 ui 渲染器均有实组件（videos/${newest.key}/）`);
 } else {
-  console.log(`ℹ️ 本片未使用 ui（全部走共享 scenes/）——按 pipeline §2.1.0，与已产出视频同结构的屏须新建本片专属组件`);
+  console.log(`❌ 本片有数据但一屏都没写 ui——ui 必填（2026-08-29 起共享场景已删、无回退）；每屏写 ui:'gXX-名字' 并在 scenes/index.tsx 的 VIDEO_RENDERERS 注册`);
 }
+const noUiFail = newest.screens.length > 0 && !newest.screens.some((s) => s.ui);
 const bespokeFail = bespoke.noDir || bespoke.missing.length > 0;
-if (unexempted.length || bespokeFail) {
+if (unexempted.length || bespokeFail || noUiFail) {
   if (unexempted.length) {
     console.log(`❌ 不通过：${unexempted.length} 屏复用了已有视频的结构。`);
-    console.log('   处理：回 pipeline §2.1.0 定本片视觉基线 → 新建本片专属场景组件（videos/gXX/ + 屏上 ui）重做这些屏；');
+    console.log('   处理：回 SKILL 第 2 步定本片视觉基线 → 新建本片专属场景组件（videos/gXX/ + 屏上 ui）重做这些屏；');
   }
   if (bespokeFail) console.log('❌ 不通过：声明了 ui 却没有对应实组件（见上）。');
   console.log('   确实不可替代的，在 scripts/ref-registry.json similarityExemptions 逐条登记理由并经用户批准。');

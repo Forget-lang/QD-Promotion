@@ -5,7 +5,8 @@
     "AGENTS.md",
     "docs/战略简报.md",
     "docs/AI使用手册.md",
-    "SKILL.md"
+    "SKILL.md",
+    "outputs/archive/AI启动提示词.md"
   ],
   "excludeDirs": [],
   "aliases": {
@@ -85,7 +86,7 @@
       "path": "../applet/components/m/m-coupon-tpl/m-coupon-tpl.vue"
     },
     {
-      "desc": "applet 顶栏组件（PhoneMockup nav 自绘胶囊依据）",
+      "desc": "applet 顶栏组件（顶栏/胶囊视觉真值；PhoneMockup 组件 2026-08-29 已删，真值转 R6 §8）",
       "path": "../applet/components/m/m-navigation-bar/m-navigation-bar.vue"
     },
     {

@@ -62,14 +62,15 @@ if (vid) {
   rows.push({ ok: code === 0, label: '效果尺子（最新成片）',
     msg: `${code === 0 ? '达标' : '未达标'}｜${vid.split('/').slice(-2).join('/')}｜静止 ${m?.[1]}% 中位帧差 ${d?.[1]} 占用率 ${o?.[1]}%` });
 } else {
-  rows.push({ ok: true, label: '效果尺子', msg: '跳过（outputs 下暂无成片 mp4；出片后必跑）' });
+  rows.push({ ok: true, skipped: true, label: '效果尺子', msg: '跳过（outputs 下暂无成片 mp4；出片后必跑）' });
 }
 
 console.log('\n══════════════ 五闸门总览（gate-all）══════════════');
-for (const r of rows) console.log(`${r.ok ? '✅' : '❌'} ${r.label.padEnd(26)} ${r.msg}`);
+for (const r of rows) console.log(`${r.ok ? (r.skipped ? '⏭️' : '✅') : '❌'} ${r.label.padEnd(26)} ${r.msg}`);
 const failed = rows.filter((r) => !r.ok);
-console.log('\n──────────────────────────────────────────────────');
+const skipped = rows.filter((r) => r.skipped).length;
+console.log('\n──────────────────────────────────────────────');
 console.log(failed.length
   ? `❌ ${failed.length}/${rows.length} 个闸门未通过 —— 修完再开工/再交付；禁止带着红灯产出或改文档。`
-  : `✅ ${rows.length}/${rows.length} 全通过，可以开工。`);
+  : `✅ ${rows.length - skipped}/${rows.length} 通过、${skipped} 项跳过（无成片，出片后必跑）——可以开工。`);
 process.exit(failed.length ? 1 : 0);

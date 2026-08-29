@@ -100,6 +100,7 @@ for (const v of videos) {
   });
 }
 
+let imageFails = 0;
 if (images.length) {
   const occ = images.map((p) => {
     const r = spawnSync(FFMPEG, ['-hide_banner', '-loglevel', 'error', '-i', p,
@@ -112,12 +113,14 @@ if (images.length) {
     console.log('\n══════════════ 画面占用率（静态图）══════════════');
     for (const o of occ) console.log(`${o.occupancy >= LIMITS.occupancy ? '✅' : '❌'} ${String(o.occupancy).padStart(3)}%  ${o.file}`);
     const bad = occ.filter((o) => o.occupancy < LIMITS.occupancy);
+    imageFails = bad.length;
     console.log(bad.length ? `\n❌ ${bad.length}/${occ.length} 屏画面占用率低于 ${LIMITS.occupancy}%（不许拿空白当呼吸感）`
       : `\n✅ ${occ.length}/${occ.length} 屏画面占用率达标`);
   }
 }
 
-if (!videos.length) process.exit(images.some((_, i) => true) ? 0 : 2);
+// 2026-08-30 修：图片模式占用率不达标必须反映到退出码（旧版写死 exit 0，红字绿码）
+if (!videos.length) process.exit(imageFails ? 1 : 0);
 
 if (asJson) { console.log(JSON.stringify(results, null, 1)); }
 else {

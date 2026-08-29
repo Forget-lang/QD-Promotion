@@ -128,7 +128,8 @@ for (const [file, path] of allDocs) {
     // 归档注记模式：「原 13 §x」「原 07-渠道与执行 §3」——跳过；「最后校验」头部溯源行——跳过
     const isArchivalNote = /(?:原\s*[^，。；：]*|(?:0\d|1[0-4])-[^，。；：]*)\s*§/.test(line) || /最后校验/.test(line);
     // 反例/规则说明行（举例"错"或"禁止/不使用"）——跳过章节引用检查
-    const isCounterExample = /(❌|错：|禁止|不使用|不重复|不用「)/.test(line);
+    // 2026-08-30 修：移除"不重复"——它把 R6 头部导航行整行豁免，藏住了 craft §8 死指路
+    const isCounterExample = /(❌|错：|禁止|不使用|不用「)/.test(line);
 
     if (!isArchivalNote && !isCounterExample) {
       // 章节引用
@@ -172,16 +173,19 @@ for (const [file, path] of allDocs) {
   lines.forEach((line, i) => {
     if (/^\s*```/.test(line)) { inCodeBlock = !inCodeBlock; return; }
     if (inCodeBlock) return;
-    if (/git 历史|已删除|物理删除/.test(line)) return; // 历史溯源行不算现行指路
+    // 2026-08-30 修：删除"整行含'已删除/git 历史'即跳过"的豁免——负向测试证实该洞可让真断链隐身。
+    // 历史溯源行靠占位符规则与 RES_ROOTS 前缀白名单天然豁免，无需整行豁免。
     let bm;
     const btRe = /`([^`\s]+)`/g;
     while ((bm = btRe.exec(line)) !== null) {
-      const tok = bm[1].replace(/[，。、）)"'：;]+$/, '');
+      const raw = bm[1].replace(/[，。、）)"'：;]+$/, '');
+      // 2026-08-30 修：带 promotion/ 前缀的写法也要查（旧版前缀不在白名单 = 永不查）
+      const tok = raw.startsWith('promotion/') ? raw.slice('promotion/'.length) : raw;
       if (!RES_ROOTS.some((r) => tok.startsWith(r))) continue;
       if (placeholderRe.test(tok)) continue;
       const p = join(ROOT, tok);
       if (!existsSync(p)) {
-        hardFails.push({ file: rel, line: i + 1, ref: tok, why: '文档指路的资源路径在磁盘上不存在（挪动/改名后未同步）' });
+        hardFails.push({ file: rel, line: i + 1, ref: raw, why: '文档指路的资源路径在磁盘上不存在（挪动/改名后未同步）' });
       }
     }
   });
