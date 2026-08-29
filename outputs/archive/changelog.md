@@ -6,6 +6,10 @@
 
 ---
 
+## 2026-08-29 · video 架构收口第二轮：删 9 个"统一外观"业务组件，Scene 瘦身成入口卡，R3 §四/§五改写为"共享层冻结"
+
+全量审计 `video/` 发现共享场景之外的同类暗门：`ui.tsx` 里 9 个业务外观组件（CouponCard/PhoneMockup/StatCounter/StatCard/StepFlow/CompareCard/IconBadge/SectionTitle/HighLightText）零引用但可被 import 回来"跨片同皮"；`types.ts` 的 Scene 还挂着 12 类旧场景专属字段（leftItems/metrics/cardFields…）= 误导性的"点菜单"；R3 §四生长机制还在教"跨行业结构提成通用组件"（正是同质化的制度来源）。改动：① ui.tsx 只留原子件（elevation/CharReveal/AccentWord/Subtitle），真值口径（金额右置/无条码/图标不裸放/顶栏规格）以纪律文字留在 R3 §3.2 警示与 R6 §8 底账；② Scene 瘦身为入口卡（type/ui/payload/dur/字幕/语音/钩子形态字段），`SceneType` 改为 SKILL 九叙事槽（hook/pain/idea/steps/fields/cardface/advance/mechanism/cta），业务字段一律进本片 payload；③ R3 §四重写三机制（提炼纪律只许动画工具原子件/回顾收编不收场景 JSX/外观件禁预建）、§5.1-5.6 扩展步骤与手法表改指 `videos/gXX/`+手写、§5.6 落地方式列加"仅作语法说明"警示；④ SKILL §三 白名单写实 + 指纹改 `type+ui(+payload 内键)`；⑤ R6 §8 头注明"组件已删、校准结论为永久真值底账"。清 3 个 .DS_Store。tsc 零错误、gate-all --tsc 全绿、BENCH 样张抽渲验证。
+
 ## 2026-08-29 · 拆除共享场景回退旁路：12 个旧场景组件删除，`ui` 转必填；R3 布局模式表标注"落地方式不可直接使用"
 
 启动提示词复审时发现退化暗门：`video/src/scenes/` 仍留 12 个共享场景组件 + "数据不写 ui 就按 type 回退共享组件"的旁路——正是"一条视频一套专属 UI"的绕行通道（用户拍板删除）。改动：分发器重写为 **ui 必填**（缺失或未注册直接抛错）、`Scene.ui` 类型转必填、删 12 组件；同步四处文字——SKILL §三工程约定、types.ts 注释、check-similarity 口径注释、R3（PillBadge/PainScene 两行 + 布局模式表加⚠️警示：表的"落地方式"列属已删实现，模式目录仍有效，现行参照=四锚+17 屏型样张）。tsc 零错误 + gate-all 5/5（真实退出码）。
