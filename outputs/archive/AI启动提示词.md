@@ -39,7 +39,7 @@
   node scripts/gate-all.mjs   →   node scripts/list-assets.mjs   →   读 outputs/archive/changelog.md 顶部 10 条
 红灯不产出、不交付。
 第二步：严格照 SKILL.md 七步法执行，一次一条视频。要点重申（详见 SKILL 对应步骤）：
-- 做屏之前先逐张看四张锚图（outputs/bench/anchor-*.png）+ SKILL §四否决清单，弄清"过关质感"和"被否决过的做法"各长什么样，再动手
+- 做屏之前先逐张看 outputs/bench/ 的 21 张基准图——4 张锚（anchor-*.png，质感必须过的基准线）+ 17 张屏型样张（bench-rNN.png，已获认可的排版参照库），再看 SKILL §四否决清单，弄清"过关质感""可用排版""被否决过的做法"各长什么样，再动手
 - 一条视频 = 一套专属视觉语言，骨架新做，整屏结构以 check-similarity 为准（重复即红）
 - 每屏样式先定「布局来源」：四锚之一（outputs/bench/anchor-*.png）/ ref-XX 拆底稿 / 全新做
 - **一屏标杆硬闸门**：先只做 1 屏渲真图，用户认可质感后才许铺其余屏
