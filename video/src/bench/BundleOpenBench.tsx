@@ -1,4 +1,6 @@
-// 一屏标杆 · 「券包打开页」高保真复刻（非交付片，验证质感用）
+// 一屏标杆 · 「券包打开页」复刻（非交付片，验证质感用）
+// 形态决策（2026-08-29 用户口径）：产品展示屏默认【全屏铺】——只放重要内容，
+//   状态栏/返回键等 App chrome 属杂件不放；手机壳版留给需要旁注的讲解屏（PhoneMockup 另用）。
 // 真值来源：applet/pages_user/bundle/private_receive.vue（结构/CSS 逐条对照）+ utils/theme.js（深海蓝 #123448）
 //   + static/css/app.css（.button-gold #ffeeb2/#8d5f37）+ R6 换算 1rpx = 1080/750 = 1.44px
 // 红线：不出现微信胶囊/字样等小程序标识；数据为脱敏示例并角标「示例」
@@ -56,25 +58,23 @@ export const BundleOpenBench: React.FC = () => {
     <AbsoluteFill style={{ background: '#F6F6F6', fontFamily: FONT_BODY }}>
       {/* ── 封面区（真值 swiperHeight≈864px，展示滚动后构图：压到 620px）── */}
       <div style={{
-        position: 'absolute', left: 0, top: 0, right: 0, height: 588,
+        position: 'absolute', left: 0, top: 0, right: 0, height: 452,
         background: `linear-gradient(168deg, ${THEME_DARK} 0%, ${THEME} 52%, #1B4A63 100%)`, overflow: 'hidden',
       }}>
         {/* 光晕两块：呼吸微动 */}
-        <div style={{ position: 'absolute', left: -140, top: -180, width: 560, height: 560, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 70%)', opacity: 0.6 + glow * 0.4 }} />
+        <div style={{ position: 'absolute', left: -120, top: -220, width: 520, height: 520, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.10) 0%, transparent 70%)', opacity: 0.6 + glow * 0.4 }} />
         <div style={{ position: 'absolute', right: -180, top: 60, width: 620, height: 620, borderRadius: '50%', background: 'radial-gradient(circle, rgba(244,196,48,0.14) 0%, transparent 70%)', opacity: 0.5 + glow * 0.3 }} />
         {/* 海报标题区 */}
-        <div style={{ position: 'absolute', left: 64, top: 216, color: '#fff' }}>
+        <div style={{ position: 'absolute', left: 64, top: 72, color: '#fff' }}>
           <div style={{ display: 'inline-block', fontSize: 26, letterSpacing: 6, border: '2px solid rgba(255,255,255,0.55)', borderRadius: 999, padding: '8px 26px', opacity: 0.9 }}>开学季 · 老学员回归季</div>
-          <div style={{ marginTop: 26, fontFamily: FONT_TITLE, fontSize: 76, fontWeight: 900, letterSpacing: 2 }}>秋季新生美术礼包</div>
+          <div style={{ marginTop: 26, fontFamily: FONT_TITLE, fontSize: 84, fontWeight: 900, letterSpacing: 2 }}>秋季新生美术礼包</div>
           <div style={{ marginTop: 14, fontSize: 30, color: 'rgba(255,255,255,0.82)' }}>三选一领取 · 老师一对一发给你</div>
         </div>
-        <StatusBar />
-        <NavBar />
       </div>
 
       {/* ── 商户面板（真值 margin-top:-60rpx 上叠 + 白卡 24rpx 圆角）── */}
       <div style={{
-        position: 'absolute', left: 32 * PX, right: 32 * PX, top: 512,
+        position: 'absolute', left: 32 * PX, right: 32 * PX, top: 380,
         transform: `translateY(${(1 - panel) * 40}px)`, opacity: panel,
         background: '#fff', borderRadius: 35, boxShadow: '0 12px 35px rgba(20,40,70,0.10)',
         padding: '30px 34px', display: 'flex', alignItems: 'center', gap: 22,
@@ -89,7 +89,7 @@ export const BundleOpenBench: React.FC = () => {
 
       {/* ── 券包主卡（真值 .bundle：主题底 32rpx 内距 24rpx 圆角，白字标题）── */}
       <div style={{
-        position: 'absolute', left: 32 * PX, right: 32 * PX, top: 648,
+        position: 'absolute', left: 32 * PX, right: 32 * PX, top: 552,
         background: THEME, borderRadius: 35, padding: '28px 30px 14px',
         boxShadow: '0 18px 44px rgba(18,52,72,0.28)',
       }}>
@@ -100,7 +100,7 @@ export const BundleOpenBench: React.FC = () => {
           const p = [card1, card2, card3][i];
           return (
             <div key={c.name} style={{
-              position: 'relative', marginTop: 15, background: '#fff', borderRadius: 35, padding: '16px 28px',
+              position: 'relative', marginTop: 18, background: '#fff', borderRadius: 35, padding: '22px 28px',
               display: 'flex', alignItems: 'center', gap: 26,
               opacity: p, transform: `translateY(${(1 - p) * 34}px)`,
             }}>
@@ -108,7 +108,7 @@ export const BundleOpenBench: React.FC = () => {
               <div style={{ position: 'absolute', left: -17, top: '50%', marginTop: -17, width: 34, height: 34, borderRadius: '50%', background: THEME }} />
               <div style={{ position: 'absolute', right: -17, top: '50%', marginTop: -17, width: 34, height: 34, borderRadius: '50%', background: THEME }} />
               {/* 缩略块（无封面图时 = couponTypeLabel 占位真值 120rpx 圆角12） */}
-              <div style={{ width: 88, height: 88, borderRadius: 14, background: '#F5F7F9', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 96, height: 96, borderRadius: 15, background: '#F5F7F9', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <span style={{ fontSize: 26, color: THEME, fontWeight: 600 }}>{c.thumb}</span>
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -124,8 +124,8 @@ export const BundleOpenBench: React.FC = () => {
                   )}
                   <span style={{ fontSize: 27, color: '#B6B6B6' }}>{c.threshold}</span>
                 </div>
-                <div style={{ marginTop: 7, fontSize: 26, color: '#B6B6B6' }}>{c.valid}</div>
-                <div style={{ marginTop: 3, fontSize: 24, color: '#9AA6B2' }}>{c.hours}</div>
+                <div style={{ marginTop: 9, fontSize: 27, color: '#B6B6B6' }}>{c.valid}</div>
+                <div style={{ marginTop: 5, fontSize: 25, color: '#9AA6B2' }}>{c.hours}</div>
               </div>
               {/* button-gold 真值：#ffeeb2 底 #8d5f37 字 24rpx 600 */}
               <div style={{ flexShrink: 0, background: GOLD_BG, color: GOLD_TX, fontSize: 26, fontWeight: 600, borderRadius: 10, padding: '12px 20px' }}>{c.count}</div>
@@ -134,14 +134,14 @@ export const BundleOpenBench: React.FC = () => {
         })}
 
         {/* 使用须知：结构化 4 条，每条有 facts.json 能力依据 */}
-        <div style={{ marginTop: 22, paddingBottom: 8, borderTop: '1.5px dashed rgba(255,255,255,0.22)', paddingTop: 14 }}>
+        <div style={{ marginTop: 26, paddingBottom: 10, borderTop: '1.5px dashed rgba(255,255,255,0.22)', paddingTop: 18 }}>
           <div style={{ fontSize: 29, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>使用须知</div>
           {[
             ['领取', '每人限领 1 个券包 · 三张券任选其一'],
             ['怎么用', '领取后进「我的卡包」，到店出示核销码，老师扫码核销'],
             ['到期', '到期前 3 天服务通知提醒 · 过期作废'],
           ].map(([k, v]) => (
-            <div key={k} style={{ display: 'flex', gap: 14, marginTop: 5, fontSize: 24, lineHeight: 1.45 }}>
+            <div key={k} style={{ display: 'flex', gap: 14, marginTop: 8, fontSize: 25, lineHeight: 1.5 }}>
               <span style={{ color: 'rgba(255,255,255,0.5)', width: 72, flexShrink: 0, whiteSpace: 'nowrap' }}>{k}</span>
               <span style={{ color: 'rgba(255,255,255,0.85)' }}>{v}</span>
             </div>
