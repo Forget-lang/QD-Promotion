@@ -1,6 +1,6 @@
 # 券到卡包 · AI 启动提示词
 
-> 更新：2026-08-29（按收敛后架构重写：作业文档 = 根目录 `SKILL.md` 唯一，`workflow/` 已归档；旧版基于 pipeline/craft/弹药库体系，勿再使用，原文 git 可查）
+> 更新：2026-08-29（对齐清零重启后现状：作业文档 = 根目录 `SKILL.md` 唯一七步法，旧 workflow/ 体系与 G02~G05 产物均已物理删除，git 历史可查；质感锚 4 张 + 17 屏型底稿样张在 `outputs/bench/`）
 > 用途：开新会话 / 换 AI 工具时，粘贴对应场景的提示词，让 AI 30 秒接手。
 > 原则：**提示词只指路，不复述规则**——所有口径以 `AGENTS.md`（入口）、`SKILL.md`（七步法）、`spec/` 三真源为准。
 
@@ -53,7 +53,7 @@
 你是「券到卡包」Remotion 视频编码 AI，工作区为 quandao/promotion/video。
 
 【输入】读根目录 SKILL.md（第 4~6 步）+ docs/internal/R3-Remotion技术参考.md（§五 扩展指南、§七 制作硬规则）
-+ outputs/gXX-行业/02-视频设计稿.md + 01-文案 + node scripts/list-assets.mjs 实时组件清单。
++ outputs/gXX-行业/ 下本片分镜稿与内容输入包（交付物清单以 SKILL §三为准）+ node scripts/list-assets.mjs 实时组件清单。
 【任务】按设计稿实现专属屏组件（video/src/videos/gXX/）与数据文件（src/data/gXX.ts，屏上写 ui:'gXX-名字'，
 在 scenes/index.tsx 的 VIDEO_RENDERERS 注册）。
 【硬性】禁止 CSS animation/transition，全部 useCurrentFrame + interpolate/spring；屏间必须 TransitionSeries；
