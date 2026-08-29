@@ -6,6 +6,10 @@
 
 ---
 
+## 2026-08-29 · 文档引用闸门补第 4 层：反引号资源路径存在性机检（锚图散位/H5 旧路线两次人检教训的机检化）
+
+用户问"文档更新机制没问题吧"，抽查发现文档引用闸门只查文档名与章节锚，**不查图片/目录等资源路径**——今天两处路径漂移全靠人眼。`check-doc-references.mjs` 新增资源层：扫描权威文档内反引号中 `outputs/ spec/ docs/ scripts/ video/ 素材库` 开头的路径，磁盘不存在 = 硬失败；占位符（XX/NN/*/~/|）与 "git 历史/已删除" 溯源行豁免。负向测试验证：植入假路径即红、移除即绿。gate-all 无改动自动接入（该脚本本就是第二闸门）。
+
 ## 2026-08-29 · 样张资源整合：四张锚 PNG 收进 `outputs/bench/`（更名 anchor-*.png），与 17 张屏型样张同目录
 
 用户指出对照表转正后锚图仍散在 outputs 根。`git mv` 归位：`outputs/bench/anchor-bundle-open|pain|mech|table.png`；SKILL 第 2 步质感锚路径与 check-motion 注释示例同步。outputs 根只留 archive / bench / 样本库 三目录。

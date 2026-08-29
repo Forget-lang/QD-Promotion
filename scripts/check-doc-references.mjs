@@ -10,6 +10,7 @@
  *   1. 文档间文件名引用（如 `R2-业务流程.md`、`SKILL.md`）→ 被引文件必须是注册文档（docs/internal/ + AGENTS.md + 战略简报 + AI使用手册）
  *   2. 章节引用（如 §2.9、§布局模式库、§5.9.7）→ 解析到被引文档（§ 前最近出现的文档名；无则视为本文档自引用）并验证锚点存在
  *   3. 归档注记（如「原 13 §5.9」）与反例代码块 → 跳过，不误报
+ *   4. 资源路径存在性：反引号内以 outputs/ spec/ docs/ scripts/ video/ 或素材库目录开头的路径，磁盘上必须真实存在（占位符 XX/NN/*/~/| 与 git 历史溯源行豁免）——2026-08-29 锚图散位、H5 旧路线两次"文档指路失效"的机检化
  *
  * 规则：失效引用 = 硬失败（exit 1）。无法判定归属的章节引用记入「需人工确认」，不算硬失败。
  */
@@ -161,11 +162,36 @@ for (const [file, path] of allDocs) {
   });
 }
 
+// ── 3.5 资源路径存在性（反引号内指向仓库真实文件/目录的路径，防挪动/改名后文档指路失效——2026-08-29 锚图散位教训的机检化）──
+const RES_ROOTS = ['outputs/', 'spec/', 'docs/', 'scripts/', 'video/', '背景素材/', '插图库/', '图标素材/', '截图素材/', '商用字体/'];
+const placeholderRe = /(XX|NN|\*|\||~|…|\.\.|node_modules)/;
+for (const [file, path] of allDocs) {
+  const rel = relative(ROOT, path);
+  const lines = readFileSync(path, 'utf8').split('\n');
+  let inCodeBlock = false;
+  lines.forEach((line, i) => {
+    if (/^\s*```/.test(line)) { inCodeBlock = !inCodeBlock; return; }
+    if (inCodeBlock) return;
+    if (/git 历史|已删除|物理删除/.test(line)) return; // 历史溯源行不算现行指路
+    let bm;
+    const btRe = /`([^`\s]+)`/g;
+    while ((bm = btRe.exec(line)) !== null) {
+      const tok = bm[1].replace(/[，。、）)"'：;]+$/, '');
+      if (!RES_ROOTS.some((r) => tok.startsWith(r))) continue;
+      if (placeholderRe.test(tok)) continue;
+      const p = join(ROOT, tok);
+      if (!existsSync(p)) {
+        hardFails.push({ file: rel, line: i + 1, ref: tok, why: '文档指路的资源路径在磁盘上不存在（挪动/改名后未同步）' });
+      }
+    }
+  });
+}
+
 // ── 4. 输出 ──
 const distinctHard = [...new Map(hardFails.map((h) => [`${h.file}:${h.line}:${h.ref}`, h])).values()];
 const distinctRev = [...new Map(reviews.map((h) => [`${h.file}:${h.line}:${h.ref}`, h])).values()];
 console.log('\n══════════════ 文档引用守门扫描结果 ════════════\n');
-console.log(`① 文件/章节引用失效  ${distinctHard.length === 0 ? '✅ 通过' : '❌ 硬失败'} —— ${distinctHard.length} 处`);
+console.log(`① 文件/章节引用失效或资源路径断链  ${distinctHard.length === 0 ? '✅ 通过' : '❌ 硬失败'} —— ${distinctHard.length} 处`);
 for (const h of distinctHard) console.log(`   ${h.file}:${h.line}  «${h.ref}» — ${h.why}`);
 console.log(`② 无法判定（需人工确认）  ${distinctRev.length === 0 ? '✅ 无' : '⚠️ ' + distinctRev.length + ' 处'}`);
 for (const h of distinctRev) console.log(`   ${h.file}:${h.line}  «${h.ref}» — ${h.why}`);
