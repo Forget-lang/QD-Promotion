@@ -6,6 +6,10 @@
 
 ---
 
+## 2026-08-29 · 样张资源整合：四张锚 PNG 收进 `outputs/bench/`（更名 anchor-*.png），与 17 张屏型样张同目录
+
+用户指出对照表转正后锚图仍散在 outputs 根。`git mv` 归位：`outputs/bench/anchor-bundle-open|pain|mech|table.png`；SKILL 第 2 步质感锚路径与 check-motion 注释示例同步。outputs 根只留 archive / bench / 样本库 三目录。
+
 ## 2026-08-29 · 17 屏型底稿批量解锁成样张 + 结论条成片限制 + 文档对账修三处过时
 
 **背景**：第四锚确立后用户令「把参考图的样式都实现一下」。样本库剩余 17 张 ref（01~19 减 07/15）全部拆成 BENCH 样张（`video/src/bench/BenchKit.tsx` 公共骨架件 + `BenchRefsA/B.tsx`），装券域干货、9 套主题色轮换，逐帧渲染目检修复后提交（`78a12f3`），样张在 `outputs/bench/bench-rNN.png` 待用户审。目检修掉两类病：标题 JSX 拼接 bug（文字重复）与下半屏留白（补密度/铺满）；红线机检抓出 R04「最大」广告法禁词当场改。
