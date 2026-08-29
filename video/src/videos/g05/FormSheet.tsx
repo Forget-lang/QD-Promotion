@@ -8,29 +8,21 @@ import { FONT_BODY } from '../../palette';
 import type { SceneRenderProps } from '../../types';
 import { EASE_OUT } from '../../components/animations';
 import { ActDots, CrayonLine, DropIn, ExhibitTag, PAPER, PAPER_EDGE, PAPER_SHADOW, PENCIL } from './parts';
-import { regionState, useBeatIndex } from './beats';
+import { regionState, useBeatIndex, useMicroMotion } from './beats';
+import { Stage } from './Stage';
 import { pick, type FormSheetPayload } from './types';
 
 /** 每句字幕指向哪一行（-1 = 不指向；行数 = 字幕句数） */
 const BEAT_MAP = [-1, 0, 2, 1, 1, 3, 3, 4, -1, -1];
-
-/** 底层持续微动：整屏缓推 + 纸面呼吸 */
-const useMicroMotion = () => {
-  const f = useCurrentFrame();
-  return {
-    zoom: 1 + interpolate(f, [0, 440], [0, 0.022], { extrapolateRight: 'clamp' }),
-    breathe: Math.sin(f / 26) * 0.28,
-    drift: Math.sin(f / 34) * 6,
-  };
-};
 
 export const FormSheet: React.FC<SceneRenderProps> = ({ scene, style }) => {
   const p = pick<FormSheetPayload>(scene, 'S5');
   const m = style.motion;
   const f = useCurrentFrame();
   const beat = useBeatIndex(scene);
-  const mm = useMicroMotion();
+  const mm = useMicroMotion(440);
   return (
+    <Stage>
     <AbsoluteFill>
       <ExhibitTag no={5} total={9} title="几个细节别漏" motion={m} delay={0} accent="#1565C0" size={54} />
       <div style={{ position: 'absolute', left: 80, top: 316, fontFamily: FONT_BODY, fontSize: 31, color: 'rgba(26,26,26,0.78)' }}>
@@ -40,7 +32,7 @@ export const FormSheet: React.FC<SceneRenderProps> = ({ scene, style }) => {
       {/* 表单纸：占满 y:380-1520，宽度到安全区边缘 */}
       <div style={{
         position: 'absolute', left: 80, top: 388, width: 920,
-        transform: `scale(${mm.zoom}) rotate(${mm.breathe * 0.18}deg)`, transformOrigin: '50% 40%',
+        transform: `scale(${mm.zoom}) rotate(${mm.breathe * 0.05}deg)`, transformOrigin: '50% 40%',
       }}>
         <DropIn motion={m} delay={10} from={-70} rotate={1.2}>
           <div style={{
@@ -56,7 +48,7 @@ export const FormSheet: React.FC<SceneRenderProps> = ({ scene, style }) => {
             ))}
             <div style={{
               position: 'absolute', left: 34, top: 210, width: 2, height: 680,
-              background: 'rgba(107,107,107,0.25)', transform: `translateX(${mm.drift * 0.2}px)`,
+              background: 'rgba(107,107,107,0.25)', transform: `translateX(${mm.drift * 1.2}px)`,
             }} />
 
             {p.rows.map((r, i) => {
@@ -131,5 +123,6 @@ export const FormSheet: React.FC<SceneRenderProps> = ({ scene, style }) => {
       </div>
       <ActDots active={4} />
     </AbsoluteFill>
+      </Stage>
   );
 };
