@@ -51,7 +51,7 @@ export const CapTip: React.FC<{ top: number; icon?: string; children: React.Reac
   </div>
 );
 
-/** 底部结论条 */
+/** 底部结论条（样张统一件；正式片每片 ≤2 次且必须换配色与形状，见 SKILL 第 4 步） */
 export const ConcBar: React.FC<{ icon?: string; children: React.ReactNode; bg?: string; fg?: string; bottom?: number }> = ({ icon = '🎯', children, bg = '#fff', fg = INK, bottom = 90 }) => (
   <div style={{
     position: 'absolute', left: 62, right: 62, bottom, background: bg, borderRadius: 24,
