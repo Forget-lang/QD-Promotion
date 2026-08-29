@@ -37,9 +37,41 @@ export const BundleOpenBench: React.FC = () => {
       {/* 轻压一层白雾保证暗色小字可读（呼吸微动） */}
       <AbsoluteFill style={{ background: 'rgba(250,252,255,0.22)', opacity: 0.9 + glow * 0.1 }} />
 
+      {/* ── 顶部路径条：券怎么到顾客手上（真实能力「加好友自动发券」泛称口径）── */}
+      {(() => {
+        const enter = spring({ frame: f - 20, fps: FPS, config: { damping: 22, stiffness: 180 } });
+        const steps = ['加老师好友', '券包自动到账', '三选一领取'];
+        return (
+          <div style={{
+            position: 'absolute', left: 0, right: 0, top: 190 + (1 - enter) * 30,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18,
+            opacity: enter,
+          }}>
+            {steps.map((t, i) => (
+              <React.Fragment key={t}>
+                {i > 0 && (
+                  <svg width="30" height="20" viewBox="0 0 30 20"><path d="M2 10 H24 M18 3 L26 10 L18 17" stroke="rgba(18,52,72,0.5)" strokeWidth="3" fill="none" strokeLinecap="round" /></svg>
+                )}
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(255,255,255,0.78)',
+                  border: '1.5px solid rgba(18,52,72,0.14)', borderRadius: 999, padding: '12px 28px',
+                  boxShadow: '0 8px 20px rgba(18,52,72,0.10)',
+                }}>
+                  <span style={{
+                    width: 34, height: 34, borderRadius: '50%', background: THEME, color: '#fff',
+                    fontSize: 21, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  }}>{i + 1}</span>
+                  <span style={{ fontSize: 27, fontWeight: 600, color: '#16323F' }}>{t}</span>
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
+        );
+      })()}
+
       {/* ── 券包主体：一个物体，整体入场 + 落影浮起 ── */}
       <div style={{
-        position: 'absolute', left: 104, right: 104, top: 372,
+        position: 'absolute', left: 104, right: 104, top: 340,
         transform: `translateY(${(1 - lift) * 90}px)`, opacity: lift,
         filter: 'drop-shadow(0 34px 60px rgba(18,52,72,0.30))',
       }}>
