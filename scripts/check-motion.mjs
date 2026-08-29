@@ -6,8 +6,8 @@
  * 能算的指标就不要留给自觉。
  *
  * 用法：
- *   node scripts/check-motion.mjs outputs/g04-美容院/g04-成片-v2.mp4      # 整片运动指标
- *   node scripts/check-motion.mjs outputs/g05-兴趣班/g05-s1.png ...       # 静态图只算画面占用率
+ *   node scripts/check-motion.mjs outputs/gXX-行业/gXX-成片.mp4           # 整片运动指标
+ *   node scripts/check-motion.mjs outputs/bench-*.png ...            # 静态图只算画面占用率
  *   node scripts/check-motion.mjs <mp4> --json                            # 机器可读输出
  *
  * 指标与合格线（SKILL 第 6 步，RGB 口径）：静止占比 ≤45%｜中位帧间差 ≥0.35｜画面占用率 ≥70%

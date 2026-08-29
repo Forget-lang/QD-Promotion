@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * scripts/check-similarity.mjs · 整屏结构相似度机检（pipeline §2.2 主判据）
+ * scripts/check-similarity.mjs · 整屏结构相似度机检（SKILL 第 2 步主判据：一条视频一套专属 UI 语言）
  *
  * 为什么要有这个脚本：G05 首版设计稿 9 屏里 4 屏复刻上一条 G04 的组件+变体，
  * 而当时 §2.2 的四类指标全是"下限式"（≥3 处不同 / ≤ 屏数−4 / ≥2 屏不同 / "多数屏"才判雷同），
@@ -15,7 +15,7 @@
  *
  * 放行条件：最新一条与任何已产出视频的「同结构屏数」= 0。
  * 例外：在 scripts/ref-registry.json 的 similarityExemptions 里逐条登记
- *      { video, fingerprint, reason, approvedBy }（对应 pipeline §2.1.0 复用例外提案，须用户批准）。
+ *      { video, fingerprint, reason, approvedBy }（复用例外提案，须用户批准并登记）。
  */
 import { readFileSync } from 'node:fs';
 import { readdirSync } from 'node:fs';
@@ -48,7 +48,7 @@ function loadVideos() {
       const cardVariant = cardVariantRaw === 'border-left' ? undefined : cardVariantRaw;
       const ui = (b.match(/\bui:\s*'([\w-]+)'/) || [])[1];
       const t = mk.type === 'hook' && hookStyle ? `hook:${hookStyle}` : mk.type;
-      // ui = 本片专属渲染器名（pipeline §2.1.0）：有 ui 时画面结构由它决定，type 只是叙事槽位 → 参与指纹
+      // ui = 本片专属渲染器名（SKILL §三工程约定）：有 ui 时画面结构由它决定，type 只是叙事槽位 → 参与指纹
       const fp = [t, ui ? `#${ui}` : null, layout, cardVariant].filter(Boolean).join('/');
       return { fp, type: mk.type, ui };
     });

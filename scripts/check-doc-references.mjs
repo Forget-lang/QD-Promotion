@@ -78,7 +78,7 @@ const legacyRefRe = /`?((?:[A-Z]\d|\d{2})-[^`\s，。；：、()（）"']+\.md|�
 const legacyNameRe = /\b(?:M[123]|R[0145])-(?:内容策划手册|视频制作手册|平台发布手册|业务深度图谱|产品事实表|最佳实践库|内容红线)/g;
 // 迁移溯源注记行（迁入/迁移合并/原文存档/存档可查）与「最后校验」头部：属历史说明，不算引用
 const provenanceRe = /迁入|迁移合并|原文存档|存档可查|最后校验/;
-// 别名引用（AGENTS/R2/R3/pipeline/craft 等，不带 .md）
+// 别名引用（AGENTS/R2/R3/R6/SKILL 等，不带 .md）
 const aliasKeys = Object.keys(REGISTRY.aliases || {}).sort((a, b) => b.length - a.length);
 const aliasRe = aliasKeys.length
   ? new RegExp('(?:^|[^A-Za-z0-9])(' + aliasKeys.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')(?:[^A-Za-z0-9]|$)', 'g')
