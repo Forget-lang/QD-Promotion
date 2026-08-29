@@ -6,6 +6,10 @@
 
 ---
 
+## 2026-08-29 · 启动提示词场景 A 升为八维全量审计（补拍板对账/代码卫生/闸门体检）
+
+用户问"场景 A 审计是全面的吗"——对照当天两轮实际审计，旧五条漏掉今天抓出最大问题的三个维度：语义过时对账（"三张锚"/H5 旧路线那类，断链机检查不出）、代码死路与退化旁路（12 共享场景+9 外观件即此路查出）、闸门自身可信度（脚本崩过一次且管道会吞退出码）。已补第 6/7/8 维，各条写明取证方式；7 维把"两轮拆除后"定为基线。
+
 ## 2026-08-29 · video 架构收口第二轮：删 9 个"统一外观"业务组件，Scene 瘦身成入口卡，R3 §四/§五改写为"共享层冻结"
 
 全量审计 `video/` 发现共享场景之外的同类暗门：`ui.tsx` 里 9 个业务外观组件（CouponCard/PhoneMockup/StatCounter/StatCard/StepFlow/CompareCard/IconBadge/SectionTitle/HighLightText）零引用但可被 import 回来"跨片同皮"；`types.ts` 的 Scene 还挂着 12 类旧场景专属字段（leftItems/metrics/cardFields…）= 误导性的"点菜单"；R3 §四生长机制还在教"跨行业结构提成通用组件"（正是同质化的制度来源）。改动：① ui.tsx 只留原子件（elevation/CharReveal/AccentWord/Subtitle），真值口径（金额右置/无条码/图标不裸放/顶栏规格）以纪律文字留在 R3 §3.2 警示与 R6 §8 底账；② Scene 瘦身为入口卡（type/ui/payload/dur/字幕/语音/钩子形态字段），`SceneType` 改为 SKILL 九叙事槽（hook/pain/idea/steps/fields/cardface/advance/mechanism/cta），业务字段一律进本片 payload；③ R3 §四重写三机制（提炼纪律只许动画工具原子件/回顾收编不收场景 JSX/外观件禁预建）、§5.1-5.6 扩展步骤与手法表改指 `videos/gXX/`+手写、§5.6 落地方式列加"仅作语法说明"警示；④ SKILL §三 白名单写实 + 指纹改 `type+ui(+payload 内键)`；⑤ R6 §8 头注明"组件已删、校准结论为永久真值底账"。清 3 个 .DS_Store。tsc 零错误、gate-all --tsc 全绿、BENCH 样张抽渲验证。
