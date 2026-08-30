@@ -4,13 +4,16 @@ import React from 'react';
 import { AbsoluteFill } from 'remotion';
 import type { SceneRenderProps } from '../types';
 import { Subtitle } from '../components/ui';
+import { G06_RENDERERS } from '../videos/g06';
 
 /**
  * 本片专属渲染器注册表：按视频 id 索引。
  * 组件**不能**写在 data 文件里（VideoData 会进 Composition defaultProps 的序列化链路，函数会丢），
  * 所以数据文件只写 `ui: '名字'`，实组件在这里注册。新增一条视频 = 加一行 import + 加一个键。
  */
-const VIDEO_RENDERERS: Record<string, Record<string, React.ComponentType<SceneRenderProps>>> = {};
+const VIDEO_RENDERERS: Record<string, Record<string, React.ComponentType<SceneRenderProps>>> = {
+  g06: G06_RENDERERS,
+};
 
 export const SceneRenderer: React.FC<SceneRenderProps & { videoId: string }> = ({
   scene, style, index, total, videoId,

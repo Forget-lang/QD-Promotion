@@ -47,7 +47,9 @@ export interface Scene {
    * 本片专属渲染器名（「一条视频一套 UI 语言」）。**必填**：
    * 用 `scenes/index.tsx` 里 `VIDEO_RENDERERS[视频id][ui]` 注册的组件渲染；缺失或没注册直接抛错（2026-08-29 共享场景回退已删除，无旁路）。
    * **组件不写在数据文件里**（数据要能序列化，函数会丢），只在分发器按视频 id 注册一次。
-   * 整屏结构指纹 = type + ui（+ payload 内的 layout/cardVariant 类键），机检见 `scripts/check-similarity.mjs`。
+   * 整屏结构指纹 = `type + ui`（机检见 `scripts/check-similarity.mjs`）。
+   * ⚠️ 别再往 payload 里加 `layout`/`cardVariant` 想"改指纹"：那两个键随 2026-08-29 共享场景一起删了，
+   * 现在脚本只认 type + ui，且 ui 带 `gXX-` 前缀 → 换前缀重做同款骨架永不碰撞。结构雷同靠一屏标杆人判。
    */
   ui: string;
   /** 本片本屏的业务数据载荷；形状由 `video/src/videos/gXX/types.ts` 定义，专属组件内取型。分发器不读 */
