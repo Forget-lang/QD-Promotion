@@ -131,7 +131,7 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 
 ## 三、组件 API 规格（video/src/components/）
 
-> 分发器在 `video/src/scenes/index.tsx`（ui 必填、无回退），本片专属屏组件在 `video/src/videos/gXX/`（首条正式片开工时建立，现空目录），原子组件库在 `video/src/components/`。组件是**原子积木，非成品模板**——每条视频独立设计、组合方式不同。组件靠纪律生长（见四）。
+> 分发器在 `video/src/scenes/index.tsx`（ui 必填、无回退），本片专属屏组件在 `video/src/videos/gXX/`（g06 首条正式片已建：`index.tsx` 全部屏组件内联 + `types.ts` payload 形状；新片另起一个目录），原子组件库在 `video/src/components/`。组件是**原子积木，非成品模板**——每条视频独立设计、组合方式不同。组件靠纪律生长（见四）。
 
 ### 3.1 动画组件（components/animations.tsx）
 
@@ -224,7 +224,7 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 
 ### 5.1 什么时候新建场景积木
 
-> **2026-08-28 前置铁律（优先于下表）**：一条视频一套专属 UI 语言（SKILL 第 2 步·行业视觉母题）。**与任何已产出视频同结构的屏一律新建**，判据是 `node scripts/check-similarity.mjs` 的输出（不是"看起来还行"）。下表只在"本片还没有同类结构"时用。
+> **2026-08-28 前置铁律（优先于下表，2026-08-30 判据更正）**：一条视频一套专属 UI 语言（SKILL 第 2 步·行业视觉母题）。**与任何已产出视频同结构的屏一律新建**——判据是**一屏标杆：用户逐张看真图**（`node scripts/check-similarity.mjs` 只防"照抄上一片的 ui 名"，换前缀重做同款骨架它永不碰撞，别拿它的绿当"结构没重复"，能力边界见 SKILL §三）。下表只在"本片还没有同类结构"时用。
 
 | 情况 | 处理方式 |
 |---|---|

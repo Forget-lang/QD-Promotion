@@ -107,7 +107,7 @@ version: 7.0.0-重置
 | 层 | 做什么 | 目的 |
 |---|---|---|
 | 底层持续微动 | 背景缓推、光晕漂移、纸面呼吸、高光扫过 | 帧间差永不归零，消灭死寂，不抢注意力 |
-| 中层口播指向 | 每句口播到点，对应区域入场/放大/描边/划线强调；讲过的降到 55% 透明 | 讲到哪、跳到哪、亮到哪——灵动感 |
+| 中层口播指向 | 每句口播到点，对应区域入场/放大/描边/划线强调；讲过的降到 72% 透明（0.55 实测太暗被否，浅底上要能读清，见 g06 `region()`） | 讲到哪、跳到哪、亮到哪——灵动感 |
 | 顶层信息全景 | 未被念到的参数保持可见安静 | 信息密度与可截图性，不占口播时长 |
 
 - **节拍 = 口播句，不是画面元素。** 一屏 8 句最多 8 次指向；给每个元素各排一次入场是轰炸，不是同步。
@@ -149,7 +149,7 @@ node scripts/check-redlines.mjs              # 硬禁层 0 命中
 
 ## 三、工程约定
 
-- **一行业一套专属屏**：`video/src/videos/gXX/`（屏组件 + 本片零件 + payload 类型）。屏组件**不得跨行业 import**；共享层已冻结——只含原子件与 `VTemplate`。两轮拆除（2026-08-29）：12 个共享场景 + "不写 ui 按 type 回退"旁路 → **ui 必填，缺了直接抛错**；9 个"统一外观"业务组件（CouponCard/PhoneMockup/StepFlow/CompareCard/StatCounter / StatCard/IconBadge/SectionTitle/HighLightText）→ 禁止预建/复用外观件，每片照锚稿手写。**共享件现行消费者情况**（2026-08-30 实测；**零引用 ≠ 已删除**，是"能调用但当前没人用"）：真正在被用的只有 `elevation`、`Subtitle`（分发器调）、`KenBurnsBg/Grain/Vignette/AccentOverlay`（VTemplate 调）、`EASE_OUT`、palette 与字体；`Ico`+`IconKey`、`CharReveal`、`AccentWord`、`DotGrid`、`GlowOrb`、`FadeInUp/SlideInLeft/SlideInRight/ScaleIn/WipeIn/Pulse/SPRING_CONFIG/EASE_IN` 全库零引用。**这批里面没有任何现成的券面/手机壳/步骤条外观**——要上屏就得自己写，别以为 import 一下就有。（目标态：数据文件也下沉到 `videos/gXX/`；现状仍在 `src/data/`，未迁移）
+- **一行业一套专属屏**：`video/src/videos/gXX/`（屏组件 + 本片零件 + payload 类型）。屏组件**不得跨行业 import**；共享层已冻结——只含原子件与 `VTemplate`。两轮拆除（2026-08-29）：12 个共享场景 + "不写 ui 按 type 回退"旁路 → **ui 必填，缺了直接抛错**；9 个"统一外观"业务组件（CouponCard/PhoneMockup/StepFlow/CompareCard/StatCounter / StatCard/IconBadge/SectionTitle/HighLightText）→ 禁止预建/复用外观件，每片照锚稿手写。**共享件现行消费者情况**（2026-08-30 实测；**零引用 ≠ 已删除**，是"能调用但当前没人用"）：真正在被用的只有 `elevation`、`Subtitle`（分发器调）、`KenBurnsBg/Grain/Vignette/AccentOverlay`、`SPRING_CONFIG`（VTemplate 调，转场 timing 取它）、`EASE_OUT`、palette 与字体；`Ico`+`IconKey`、`CharReveal`、`AccentWord`、`DotGrid`、`GlowOrb`、`FadeInUp/SlideInLeft/SlideInRight/ScaleIn/WipeIn/Pulse/EASE_IN` 全库零引用。**这批里面没有任何现成的券面/手机壳/步骤条外观**——要上屏就得自己写，别以为 import 一下就有。（目标态：数据文件也下沉到 `videos/gXX/`；现状仍在 `src/data/`，未迁移）
 - 数据文件每屏写 `ui: 'gXX-名字'`，业务数据进 `payload`（形状由本片 `videos/gXX/types.ts` 定义，通用 `Scene` 只留分发/时长/字幕/钩子形态字段）；在 `scenes/index.tsx` 的 `VIDEO_RENDERERS[视频id]` 注册；`ui` 名拼错运行即抛错，不会静默回退旧组件；数据文件的**导出名必须与视频 id 一致**（check-similarity 防伪按该名找 `videos/<key>/index.tsx`）。
 - 结构指纹 = `type + ui`，由 `check-similarity` 比对。**⚠️ 这道机检只防「把上一片的 ui 名照抄」**：ui 按约定必须带 `gXX-` 前缀，所以换掉前缀重做一副一模一样的骨架，指纹永远不碰撞（2026-08-30 负向测试证实）。**结构雷同的真判据是「一屏标杆」——你逐张看真图**，别拿这道绿当"结构没重复"。确需复用旧结构 → 在 `ref-registry.json` 的 `similarityExemptions` 登记理由与批准人。
 - `dur = ceil01(口播字数÷6) + extraHold`（÷6 = 语速上限的保守估算，实测落 5.5-6 字/秒；信息屏 0 / 数据屏 0.8 / CTA 1.5）；**绝对起始帧 = Σ前各屏帧数 − 12×前屏数**（`TransitionSeries` 每屏重叠 12 帧），峰值帧 = 起始帧 + floor(本屏帧数×0.3)。
