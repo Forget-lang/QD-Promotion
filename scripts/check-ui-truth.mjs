@@ -1,0 +1,284 @@
+#!/usr/bin/env node
+/**
+ * scripts/check-ui-truth.mjs · 上屏真实性闸门（字段名回源码取证）
+ *
+ * 为什么要有它：2026-08-30 g06 被否的根因之一，是画面上出现了"看起来像后台"的字段名，
+ * 商家照着找不到对应格子，整片的教学价值归零。这条口径以前只写在 SKILL 里靠 AI 自觉，
+ * 换会话就会重犯——所以升成机检：上屏的字段名必须逐字存在于 ../applet/ 源码。
+ *
+ * 约定（关键）：数据文件里 **`k:` 属性 = 产品真实字段名**，必须能在 applet 源码逐字命中（硬失败）。
+ *   其它键（act/desc/res/mark/title/sub…）是本片文案，不参与硬检。
+ *   文案里用「」引起来、声称是产品界面说法的词，列入"需人工确认"层（不计失败，但必须看过）。
+ *
+ * 四层：
+ *   ① 字段名逐字取证 —— `k:` 必须在 applet 源码出现（硬失败）
+ *   ② 「」声称是界面说法但源码查不到（⚠️ 人工确认）
+ *   ③ 分组归属 —— 组标题若照抄页面原生组名，其下每一行必须真在那一组里（硬失败）。
+ *      为什么单独立一层：2026-08-30 S5 把「到期提醒」挂进「领券顾客信息」组，
+ *      字段名 ① 全过、归属是错的，商家翻后台会卡在"这一组里没这行"——① 拦不住这类错。
+ *      我方自述的分步标题（「① 券面」「③ 期限」）不是原生组名，不参与本层判定。
+ *   ④ 表外字段 —— 源码里有、`spec/coupon-fields.json` 没登记（⚠️ 提醒回写，不计失败）
+ *   ⑤ 真值表自证 —— 表里每个行名/组名，必须逐字命中它自己 `src` 所指的源码行段（±10 行），查无 = 硬失败。
+ *      为什么单独立一层：SKILL 第 4 步要求「字段名逐字取自 spec/coupon-fields.json」，**表本身错了就会污染后续每一片**，
+ *      而 ①③④ 都只拿表当尺子量画面、不量表自己。2026-08-30 审计即在表里抓出 8 处产品查无此名的行名
+ *      （周期内可领张数 / 自定义领取名额 / 套餐明细 / 需提前预约 / 错挂到别组的封面图片…）。
+ *      豁免：`onScreen: false` 的条目（按定义不上屏，是我方描述名）。
+ *
+ * 用法：node scripts/check-ui-truth.mjs
+ * 退出码：0 = 通过；1 = 有硬失败（① 未取证的字段名，③ 分组归属错误，或 ⑤ 真值表行名在源码查无）。
+ */
+import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
+import { dirname, join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const APPLET = join(ROOT, '..', 'applet');
+const DATA_DIR = join(ROOT, 'video', 'src', 'data');
+
+/** 递归收集 applet 里可能承载 UI 文案的文件（跳过第三方模块） */
+function collectSources(dir, out = []) {
+  for (const name of readdirSync(dir)) {
+    if (name === 'uni_modules' || name === 'node_modules' || name === 'unpackage' || name.startsWith('.')) continue;
+    const p = join(dir, name);
+    const st = statSync(p);
+    if (st.isDirectory()) collectSources(p, out);
+    else if (/\.(vue|js|json)$/.test(name)) out.push(p);
+  }
+  return out;
+}
+
+/** 读取并去掉换行，让"跨行写的 label"也能被逐字命中 */
+function loadAppletCorpus() {
+  return collectSources(APPLET).map((p) => ({
+    p,
+    // 归一化：全角/半角引号统一，压掉空白，避免源码里换行缩进导致假失配
+    text: readFileSync(p, 'utf8').replace(/\s+/g, '').replace(/[""]/g, '"').replace(/['']/g, "'"),
+  }));
+}
+const norm = (s) => s.replace(/\s+/g, '').replace(/[""]/g, '"').replace(/['']/g, "'");
+
+/** 提取形如 k: '优惠券名称' 的字段名（键名单词边界，防 mark: 被当成 k:） */
+function extractKeys(fileText) {
+  const hits = [];
+  const re = /(?:^|[{,\s])k:\s*'([^']+)'/g;
+  let m;
+  while ((m = re.exec(fileText))) hits.push(m[1]);
+  return hits;
+}
+
+/** 按出现顺序把数据文件切成「组标题 → 该组字段行」，用于分组归属检查 */
+function extractGroups(fileText) {
+  const re = /(?:^|[{,\s])(head|k):\s*'([^']+)'/g;
+  const groups = [];
+  let m;
+  while ((m = re.exec(fileText))) {
+    if (m[1] === 'head') groups.push({ head: m[2], rows: [] });
+    else if (groups.length) groups[groups.length - 1].rows.push(m[2]);
+  }
+  return groups;
+}
+
+/** 提取文案里「」包起来的说法（声称是产品界面原话的那一类，交人工确认） */
+function extractQuoted(fileText) {
+  const hits = new Set();
+  const re = /「([^」]{2,14})」/g;
+  let m;
+  while ((m = re.exec(fileText))) hits.add(m[1]);
+  return [...hits];
+}
+
+if (!existsSync(APPLET)) {
+  console.error(`❌ 找不到产品源码目录：${APPLET}`);
+  process.exit(1);
+}
+if (!existsSync(DATA_DIR)) {
+  console.error(`❌ 找不到数据目录：${DATA_DIR}`);
+  process.exit(1);
+}
+
+const corpus = loadAppletCorpus();
+const dataFiles = readdirSync(DATA_DIR).filter((f) => f.endsWith('.ts'));
+
+/** 分组归属真值 + ⑤ 层自证真值：spec/coupon-fields.json */
+const TRUTH = join(ROOT, 'spec', 'coupon-fields.json');
+const TABLE = existsSync(TRUTH) ? JSON.parse(readFileSync(TRUTH, 'utf8')) : {};
+const nativeGroups = new Map();
+const allRows = new Set();
+/** 行名 → 它在表里真正所属的组（③ 层报错时指出该挪去哪儿，而不是重复报已知的组名） */
+const rowHome = new Map();
+for (const g of TABLE.createGroups || []) {
+  for (const r of g.rows || []) {
+    allRows.add(r);
+    if (!rowHome.has(r)) rowHome.set(r, g.title || `无标题组 ${g.range}`);
+  }
+  if (g.title) nativeGroups.set(g.title, g.rows || []);
+}
+/** 剥掉「① 」「⑤ 」这类步进前缀，得到实际组名（覆盖 ①-⑳，不手写子集） */
+const stripStep = (s) => s.replace(/^[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳]\s*/, '').trim();
+const inList = (row, list) => list.some((a) => a === row || a.startsWith(row) || row.startsWith(a) || a.includes(row));
+
+const missing = [];
+const unverified = [];
+const misfiled = [];
+const unknownRow = [];
+let fieldTotal = 0;
+
+for (const f of dataFiles) {
+  const full = join(DATA_DIR, f);
+  const text = readFileSync(full, 'utf8');
+  const fields = extractKeys(text);
+  fieldTotal += fields.length;
+  for (const label of fields) {
+    const n = norm(label);
+    const where = corpus.find((c) => c.text.includes(n));
+    if (!where) missing.push({ file: f, label });
+  }
+  for (const q of extractQuoted(text)) {
+    const n = norm(q);
+    // 只报"疑似界面说法"：含动作/字段/页面特征词的，其余是场景文案
+    if (!/(券|码|号|知|量|取|发放|页|栏|提醒|模板|领取|核销|时长|有效期|门槛|名称)/.test(q)) continue;
+    if (corpus.some((c) => c.text.includes(n))) continue;
+    unverified.push({ file: f, term: q });
+  }
+  // ③ 分组归属：组标题若声称是页面原生那一组，行就必须真在那一组里
+  if (nativeGroups.size) {
+    for (const g of extractGroups(text)) {
+      if (!g.rows.length) continue;
+      const name = stripStep(g.head);
+      const nativeKey = [...nativeGroups.keys()].find((t) => name === t || name.includes(t));
+      for (const row of g.rows) {
+        if (nativeKey) {
+          if (!inList(row, nativeGroups.get(nativeKey))) misfiled.push({ file: f, head: g.head, row, nativeKey, home: rowHome.get(row) || '（表里没登记这一行）' });
+        } else if (!inList(row, [...allRows])) {
+          unknownRow.push({ file: f, head: g.head, row });
+        }
+      }
+    }
+  }
+}
+
+/* ── ⑤ 真值表自证：表里每个要上屏的名字，必须逐字命中它自己 src 所指的源码行段 ── */
+/** 裸文件名 → applet 真实路径（applet 里 create.vue 有两份，制券页在 pages_coupon 下） */
+const byBase = new Map();
+for (const c of corpus) {
+  const b = c.p.split('/').pop();
+  if (!byBase.has(b)) byBase.set(b, []);
+  byBase.get(b).push(c.p);
+}
+const resolveSrc = (base) => {
+  const list = byBase.get(base) || [];
+  return list.find((p) => p.includes('pages_coupon')) || list[0] || null;
+};
+const lineCache = new Map();
+/** 取某文件某行段的归一化文本（前后各留 PAD 行容差） */
+const PAD = 10;
+function srcWindow(base, a, b) {
+  const p = resolveSrc(base);
+  if (!p) return null;
+  if (!lineCache.has(p)) lineCache.set(p, readFileSync(p, 'utf8').split('\n'));
+  const lines = lineCache.get(p);
+  return norm(lines.slice(Math.max(0, a - 1 - PAD), Math.min(lines.length, b + PAD)).join(''));
+}
+/** 「A / B」「A + B」这类复合名拆开各自取证；纯说明句（含标点或纯数字）另计 */
+const nameParts = (label) => String(label).split(/\s*[/＋+]\s*/)
+  .map((s) => s.trim()).filter((s) => s.length >= 2 && !/[，。；>≤≥]/.test(s) && !/^\d+$/.test(s));
+
+const tableBad = [];
+const tableUnresolved = [];
+let tableTotal = 0;
+{
+  const items = [];
+  for (const f of TABLE.fields || []) {
+    if (f.onScreen === false) continue;
+    items.push({ where: 'fields', name: f.label, src: f.src });
+  }
+  for (const g of TABLE.createGroups || []) {
+    for (const r of g.rows || []) items.push({ where: `createGroups「${g.title || '无标题'}」`, name: r, src: g.range });
+  }
+  for (const it of items) {
+    const m = String(it.src || '').match(/^([\w./-]+?):(\d+)(?:-(\d+))?/);
+    const win = m ? srcWindow(m[1], +m[2], m[3] ? +m[3] : +m[2]) : null;
+    if (!win) { tableUnresolved.push({ ...it, why: 'src 定位不到源码文件' }); continue; }
+    const parts = nameParts(it.name);
+    if (!parts.length) { tableUnresolved.push({ ...it, why: '不是可取证的界面文案（疑似说明句）' }); continue; }
+    tableTotal++;
+    const miss = parts.filter((p) => !win.includes(norm(p)));
+    if (miss.length) tableBad.push({ ...it, miss, src: it.src });
+  }
+}
+
+const rel = (p) => relative(ROOT, p);
+console.log('\n══════════════ 上屏真实性闸门（check-ui-truth）══════════════\n');
+console.log(`取证范围：${corpus.length} 个 applet 源文件（已排除 uni_modules / node_modules / unpackage）`);
+console.log(`数据文件：${dataFiles.map((f) => rel(join(DATA_DIR, f))).join(', ') || '（暂无，首片开工时建立）'}\n`);
+
+if (missing.length) {
+  console.log(`① 字段名逐字取证  ❌ 硬失败 —— ${missing.length} 个上屏字段名在 applet 源码中找不到：`);
+  for (const x of missing) console.log(`   ${x.file}  k:'${x.label}'`);
+  console.log('   修法：回 ../applet/ 读该页 label / title / placeholder 原文改成真名，或这本来就不是字段名（换掉 k: 键）。');
+} else {
+  console.log(`① 字段名逐字取证  ✅ 通过 —— 命中 ${fieldTotal} 个字段名，全部逐字存在于 applet 源码`);
+}
+
+console.log('');
+if (unverified.length) {
+  console.log(`② 文案里「」声称是界面说法、但源码查不到  ⚠️ 需人工确认 —— ${unverified.length} 处（不计失败）`);
+  for (const x of unverified.slice(0, 20)) console.log(`   ${x.file}  «${x.term}»`);
+  if (unverified.length > 20) console.log(`   ……另有 ${unverified.length - 20} 处`);
+  console.log('   逐个回源码看一眼：是产品原话就留着，是场景说法就换掉引号。');
+} else {
+  console.log('② 文案里「」声称是界面说法、但源码查不到  ✅ 无');
+}
+
+console.log('');
+if (!nativeGroups.size) {
+  console.log('③ 分组归属（行挂在哪一组）  ⏭ 跳过 —— 未找到 spec/coupon-fields.json 的 createGroups');
+} else if (misfiled.length) {
+  console.log(`③ 分组归属  ❌ 硬失败 —— ${misfiled.length} 行被挂到了别组的原生组名下（字段名对、归属错，商家照样找不到）：`);
+  for (const x of misfiled) console.log(`   ${x.file}  「${x.head}」组里的 k:'${x.row}' —— 这一行在表里真属于「${x.home}」，别挂在这儿`);
+  console.log(`   修法：照 spec/coupon-fields.json 的 createGroups 改组标题，或把该行移回真组；我方自述的分步标题（① ② ③…）不参与本层判定。`);
+} else {
+  console.log(`③ 分组归属  ✅ 通过 —— 声称是页面原生组（${[...nativeGroups.keys()].join('/')}）的组，行都对得上`);
+}
+if (unknownRow.length) {
+  console.log('');
+  console.log(`④ 字段在源码里有、但制券页真值表没登记  ⚠️ 需回写 —— ${unknownRow.length} 处（不计失败）`);
+  for (const x of unknownRow.slice(0, 20)) console.log(`   ${x.file}  「${x.head}」组 k:'${x.row}'`);
+  if (unknownRow.length > 20) console.log(`   ……另有 ${unknownRow.length - 20} 处`);
+  console.log('   回源码确认它属于哪一页/哪一组，把带 `src` 行号的新行补进 spec/coupon-fields.json，别让它游离在表外。');
+}
+
+console.log('');
+if (!existsSync(TRUTH)) {
+  console.log('⑤ 真值表自证（表里的名字逐字回源码）  ⏭ 跳过 —— 未找到 spec/coupon-fields.json');
+} else if (tableBad.length) {
+  console.log(`⑤ 真值表自证  ❌ 硬失败 —— 表里 ${tableBad.length} 个名字在它自己 src 所指的源码行段里查无此文案：`);
+  for (const x of tableBad) console.log(`   ${x.where}  «${x.name}»  src=${x.src}  — 源码查无：${x.miss.join(' / ')}`);
+  console.log('   这类错比画面错更严重：SKILL 第 4 步要求字段名「逐字取自这张表」，表里的假名字会被后续每一片照抄。');
+  console.log('   修法：回 ../applet/ 取该行真正的 title/label 原话改表；页面确实没有这一行就删掉它，或标 `onScreen: false` 并写明理由。');
+} else {
+  console.log(`⑤ 真值表自证  ✅ 通过 —— 表内 ${(TABLE.fields || []).filter((f) => f.onScreen !== false).length} 个字段名 + ${(TABLE.createGroups || []).reduce((n, g) => n + (g.rows || []).length, 0)} 个分组行名，逐字命中各自 src 所指源码行段`);
+}
+if (tableUnresolved.length) {
+  console.log('');
+  console.log(`⑤b 真值表里 src 无法自动取证的条目  ⚠️ 需人看一眼 —— ${tableUnresolved.length} 处（不计失败）`);
+  for (const x of tableUnresolved.slice(0, 15)) console.log(`   ${x.where}  «${x.name}»  src=${x.src} — ${x.why}`);
+  if (tableUnresolved.length > 15) console.log(`   ……另有 ${tableUnresolved.length - 15} 处`);
+  console.log('   复合名（A / B）会自动拆开取证；仍查不到的多半是我方描述名，建议改成页面原话或标 `onScreen: false`。');
+}
+
+console.log('\n────────────────────────────────────────────');
+if (missing.length) {
+  console.log(`❌ 存在 ${missing.length} 个未取证字段名。商家在后台找不到它，这一屏就等于没教。修完再声明通过。`);
+  process.exit(1);
+}
+if (misfiled.length) {
+  console.log(`❌ 存在 ${misfiled.length} 处分组归属错误。字段名逐字对、组名张冠李戴，商家翻后台会卡在"这一组里没这行"。修完再声明通过。`);
+  process.exit(1);
+}
+if (tableBad.length) {
+  console.log(`❌ 真值表里有 ${tableBad.length} 个名字在产品源码中查无此文案（见 ⑤）。这张表是后续每一片抄字段名的源头，它错一片错一片。修完再声明通过。`);
+  process.exit(1);
+}
+console.log(`✅ 通过：上屏字段名全部回源码取到原话、分组归属对得上制券页、真值表自证 ${tableTotal} 个名字逐字命中。`);
+process.exit(0);

@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * scripts/gate-all.mjs · 五闸门一次跑完
+ * scripts/gate-all.mjs · 六闸门一次跑完
  *
- * 为什么要它：闸门分散成五条命令时，新会话常常只跑其中一条（或干脆不跑），
+ * 为什么要它：闸门分散成多条命令时，新会话常常只跑其中一条（或干脆不跑），
  * 结果就是"规则在文档里、问题在成片里"。开工第 1 步跑这一个命令，**一开工就见红**。
  *
- * 用法：node scripts/gate-all.mjs          # 五闸门（红线/文档引用/事实/相似度/效果尺子）
+ * 用法：node scripts/gate-all.mjs          # 六闸门（红线/文档引用/事实/相似度/上屏真实性/效果尺子）
  *      node scripts/gate-all.mjs --tsc   # 额外跑 video/ 的 tsc --noEmit
  */
 import { spawnSync } from 'node:child_process';
@@ -19,6 +19,7 @@ const GATES = [
   { key: 'refs', label: '文档引用闸门（引用断链）', args: ['scripts/check-doc-references.mjs'] },
   { key: 'facts', label: '事实闸门（资产路径与素材对账）', args: ['scripts/check-facts.mjs'] },
   { key: 'similarity', label: '相似度闸门（整屏结构不得复用）', args: ['scripts/check-similarity.mjs'] },
+  { key: 'uitruth', label: '上屏真实性闸门（字段名回源码）', args: ['scripts/check-ui-truth.mjs'] },
 ];
 const WITH_TSC = process.argv.includes('--tsc');
 /** 效果尺子需要媒体文件：取 outputs 下最新的成片 mp4；没有就标跳过（不能假装通过） */
@@ -56,16 +57,39 @@ if (WITH_TSC) {
 }
 
 const vid = newestVideo();
+/** 遍历 video/src 取最新源码修改时间 */
+function srcNewest() {
+  const { readdirSync, statSync } = require$fs();
+  const walk = (dir) => {
+    let best = 0;
+    for (const name of readdirSync(dir)) {
+      const p = join(dir, name);
+      const st = statSync(p);
+      if (st.isDirectory()) best = Math.max(best, walk(p));
+      else if (/\.(tsx?|json)$/.test(name)) best = Math.max(best, st.mtimeMs);
+    }
+    return best;
+  };
+  return walk(join(ROOT, 'video', 'src'));
+}
 if (vid) {
-  const { code, out } = run('node', ['scripts/check-motion.mjs', vid], ROOT);
-  const m = out.match(/静止占比 (\d+)%/) , d = out.match(/中位帧间差 ([\d.]+)/), o = out.match(/画面占用率 (\d+)%/);
-  rows.push({ ok: code === 0, label: '效果尺子（最新成片）',
-    msg: `${code === 0 ? '达标' : '未达标'}｜${vid.split('/').slice(-2).join('/')}｜静止 ${m?.[1]}% 中位帧差 ${d?.[1]} 占用率 ${o?.[1]}%` });
+  const vidM = require$fs().statSync(vid).mtimeMs;
+  const srcM = srcNewest();
+  if (srcM > vidM) {
+    const mins = Math.round((srcM - vidM) / 60000);
+    rows.push({ ok: false, label: '效果尺子（最新成片）',
+      msg: `过期证据｜${vid.split('/').slice(-2).join('/')} 比 video/src 最新改动旧 ${mins} 分钟：这份数字测的是已作废版本，不算通过（设计阶段可带此红继续，交付前必须重渲重测）` });
+  } else {
+    const { code, out } = run('node', ['scripts/check-motion.mjs', vid], ROOT);
+    const m = out.match(/静止占比 (\d+)%/), d = out.match(/中位帧间差 ([\d.]+)/), o = out.match(/画面占用率 (\d+)%/);
+    rows.push({ ok: code === 0, label: '效果尺子（最新成片）',
+      msg: `${code === 0 ? '达标' : '未达标'}｜${vid.split('/').slice(-2).join('/')}｜静止 ${m?.[1]}% 中位帧差 ${d?.[1]} 占用率 ${o?.[1]}%` });
+  }
 } else {
   rows.push({ ok: true, skipped: true, label: '效果尺子', msg: '跳过（outputs 下暂无成片 mp4；出片后必跑）' });
 }
 
-console.log('\n══════════════ 五闸门总览（gate-all）══════════════');
+console.log('\n══════════════ 六闸门总览（gate-all）══════════════');
 for (const r of rows) console.log(`${r.ok ? (r.skipped ? '⏭️' : '✅') : '❌'} ${r.label.padEnd(26)} ${r.msg}`);
 const failed = rows.filter((r) => !r.ok);
 const skipped = rows.filter((r) => r.skipped).length;

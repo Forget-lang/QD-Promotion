@@ -54,6 +54,10 @@
       "path": "spec/facts.json"
     },
     {
+      "desc": "制券字段真值表（券类型/设置项/显隐联动/发放与核销要点，全部回 applet 源码取证）",
+      "path": "spec/coupon-fields.json"
+    },
+    {
       "desc": "内容红线真源（机检层 + 规则全量）",
       "path": "spec/redlines.json"
     },
@@ -116,6 +120,30 @@
     {
       "desc": "applet 底部组件（R6 §3.8）",
       "path": "../applet/components/m/m-footer/m-footer.vue"
+    },
+    {
+      "desc": "applet 制券页（spec/coupon-fields.json 设置项与联动真源）",
+      "path": "../applet/pages_coupon/coupon/create.vue"
+    },
+    {
+      "desc": "applet 券常量枚举（券类型 / 发放方式 / 有效期类型 / 奖励状态）",
+      "path": "../applet/constants/coupon.js"
+    },
+    {
+      "desc": "applet 券种选择页（六种券类型说明文案真源）",
+      "path": "../applet/pages_coupon/coupon/choose_type.vue"
+    },
+    {
+      "desc": "applet 私密发放面板（发放数量 / 超时时间 / 发放备注）",
+      "path": "../applet/pages_coupon/issue/private.vue"
+    },
+    {
+      "desc": "applet 核销页（转赠标识 / 奖励发放状态 / 转赠中禁核销）",
+      "path": "../applet/pages_coupon/verify/verify.vue"
+    },
+    {
+      "desc": "applet C 端公开领取页（领取与五种失效态）",
+      "path": "../applet/pages_user/coupon/public_receive.vue"
     }
   ],
   "similarityExemptions": []

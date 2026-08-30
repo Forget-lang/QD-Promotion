@@ -191,11 +191,31 @@ for (const [file, path] of allDocs) {
   });
 }
 
+// ── 3.6 计数型复述（2026-08-30 实证教训：闸门增减时文档里的条数复述必然漏改——新增 check-ui-truth 后，AGENTS/SKILL/AI使用手册/启动提示词共 6 处"五闸门 / 5/6 绿"当场过期。人不知道要改哪几份，所以直接禁掉复述）──
+const GATE_LABELS = ['红线', '文档引用', '事实', '相似度', '效果尺子', '上屏真实性'];
+const countRe = /[0-9一二两三四五六七八九十]+\s*(?:大|条|个)?闸门|(?:闸门|检查项)[^。\n]{0,4}[0-9一二三四五六七八九十]+\s*项|\b\d\s*\/\s*\d\s*(?:绿|通过)/;
+for (const [file, path] of allDocs) {
+  const rel = relative(ROOT, path);
+  const lines = readFileSync(path, 'utf8').split('\n');
+  let inCodeBlock = false;
+  lines.forEach((line, i) => {
+    if (/^\s*```/.test(line)) { inCodeBlock = !inCodeBlock; return; }
+    if (inCodeBlock) return;
+    if (countRe.test(line)) {
+      hardFails.push({ file: rel, line: i + 1, ref: line.trim().slice(0, 48), why: '复述了闸门条数：闸门增减时必然漏改，改成"以 gate-all 输出为准"' });
+    }
+    const named = GATE_LABELS.filter((g) => line.includes(g)).length;
+    if (named >= 3 && line.includes('闸门')) {
+      hardFails.push({ file: rel, line: i + 1, ref: line.trim().slice(0, 48), why: '逐项列出了闸门清单：同样会过期，改成指向脚本输出' });
+    }
+  });
+}
+
 // ── 4. 输出 ──
 const distinctHard = [...new Map(hardFails.map((h) => [`${h.file}:${h.line}:${h.ref}`, h])).values()];
 const distinctRev = [...new Map(reviews.map((h) => [`${h.file}:${h.line}:${h.ref}`, h])).values()];
 console.log('\n══════════════ 文档引用守门扫描结果 ════════════\n');
-console.log(`① 文件/章节引用失效或资源路径断链  ${distinctHard.length === 0 ? '✅ 通过' : '❌ 硬失败'} —— ${distinctHard.length} 处`);
+console.log(`① 引用断链 / 资源路径失效 / 计数型复述  ${distinctHard.length === 0 ? '✅ 通过' : '❌ 硬失败'} —— ${distinctHard.length} 处`);
 for (const h of distinctHard) console.log(`   ${h.file}:${h.line}  «${h.ref}» — ${h.why}`);
 console.log(`② 无法判定（需人工确认）  ${distinctRev.length === 0 ? '✅ 无' : '⚠️ ' + distinctRev.length + ' 处'}`);
 for (const h of distinctRev) console.log(`   ${h.file}:${h.line}  «${h.ref}» — ${h.why}`);
@@ -204,6 +224,6 @@ if (distinctHard.length > 0) {
   console.log('❌ 存在失效引用。修复后重跑本脚本，全部通过才能声明「文档对齐」。\n');
   process.exit(1);
 } else {
-  console.log('✅ 文档引用检查通过（失效引用 0 处）。\n');
+  console.log('✅ 文档引用与计数复述检查通过（失效引用 0 处）。\n');
   process.exit(0);
 }
