@@ -48,10 +48,24 @@ const rows = [];
 for (const g of GATES) {
   const { code, out } = run('node', g.args, ROOT);
   const outLines = out.trim().split('\n').filter(Boolean);
-  const last = outLines.pop() || '(无输出)';
-  // 2026-08-31 修：只取末行会把「⚠️ 需人工确认」类提醒吞掉（红线闸门的文案层/文档层提醒曾因此隐身）——收集进总览单列；「✅ 无」类空结果不收
-  const warns = outLines.filter((l) => (/⚠️|需人工确认/.test(l)) && !/✅\s*无/.test(l)).map((l) => l.replace(/^[\s✅❌⚠️]+/, '').trim());
-  rows.push({ ok: code === 0, label: g.label, msg: last.replace(/^[\s✅❌⚠️]+/, '').slice(0, 96), warns });
+  // 2026-08-31 修（补完第十四轮 A1/A2 的另一半）：摘要不取"末行"——末行常是收尾话术（红线闸门的"确认无误即可收口。"），
+  // 改取最后一条 ✅/❌ 结果行；⚠️ 提醒除标题行外连带收其下逐条证据行（含 «token» 或 file:行号），话术行与"✅ 无"空结果不收。
+  const statusLines = outLines.filter((l) => /^\s*[✅❌]/.test(l));
+  const last = (statusLines.length ? statusLines[statusLines.length - 1] : outLines[outLines.length - 1]) || '(无输出)';
+  const clean = (l) => l.replace(/^[\s✅❌⚠️]+/, '').trim();
+  const warns = [];
+  let capturing = false;
+  for (const l of outLines) {
+    if (/⚠️|需人工确认/.test(l) && !/✅\s*无/.test(l)) {
+      warns.push(clean(l));
+      capturing = true;
+    } else if (capturing && /^\s{2,}\S/.test(l) && (/»/.test(l) || /[\w./-]+:\d+/.test(l))) {
+      warns.push(clean(l));
+    } else {
+      capturing = false;
+    }
+  }
+  rows.push({ ok: code === 0, label: g.label, msg: clean(last).slice(0, 96), warns });
 }
 if (WITH_TSC) {
   const { code, out } = run('npx', ['tsc', '--noEmit'], join(ROOT, 'video'));

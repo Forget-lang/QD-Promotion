@@ -3,7 +3,6 @@
 // Scene 因此瘦成「入口卡」：只描述 分发/时长/字幕/钩子形态 等通用字段；
 // 每屏真正的业务数据放 payload，形状由各片 `video/src/videos/gXX/types.ts` 自定义（组件内 pick 取型）。
 // 旧版在这里堆的 leftItems/metrics/cardFields/bracketGroups… 专属字段随其渲染器一并删除（git 历史可查）。
-import type * as React from 'react';
 import type { PaletteKey } from './palette';
 
 /** 场景渲染器统一入参（本片专属组件用，scenes/index.tsx 分发时传入） */

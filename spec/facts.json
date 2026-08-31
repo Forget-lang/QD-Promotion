@@ -1,8 +1,9 @@
 {
   "_meta": {
     "desc": "券到卡包产品事实唯一真源（机器可读）。迁移自 R1-产品事实表（全文）+ R0-业务深度图谱（§一~§八），内容逐条忠实迁移，无增删。",
-    "lastVerified": "2026-08-27",
+    "lastVerified": "2026-08-31",
     "source": "R1 最后校验 2026-08-25；R0 最后校验 2026-08-26（applet 源码深读定稿）",
+    "lastVerifiedNote": "2026-08-31 第十五轮审计复核：正文含 2026-08-30 校正条目（条形码、通知场景送达口径），原 lastVerified 停在 08-27 属日期脱节。本轮把 constraints 各数字与 docs/internal/R2、spec/redlines.json、spec/coupon-fields.json 交叉核对，无冲突（字段名逐字取证以 `node scripts/check-ui-truth.mjs` 输出为准，本文件不复述条数）。遗留：`unverified` 数组内条目仍未核实——对外措辞已按各条 detail 收敛（尤其「审核/认证」类一律不提），核实进度不改变这一禁令。",
     "usage": "任何宣传文案/教程/视频脚本的功能描述必须能在本文件找到依据；标注 unverified 的条目需人工核实后方可对外；数字从 constraints 取。与代码冲突时以 applet 代码为准并修正本文件。",
     "migrationNote": "R0 §九 视频干货速查历史上属 workflow 体系（已物理删除，git 历史可查），不在本文件。"
   },

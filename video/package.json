@@ -2,11 +2,10 @@
   "name": "quandao-video",
   "version": "1.0.0",
   "private": true,
-  "description": "券到卡包宣传视频 Remotion 合成工程（S7）",
+  "description": "券到卡包宣传视频 Remotion 工程（每条视频专属屏在 src/videos/gXX/）",
   "scripts": {
     "dev": "remotion studio",
-    "render": "remotion render src/index.tsx",
-    "render:g02": "remotion render src/index.tsx G02-TeaCoffee-V3 ../outputs/g02-茶饮咖啡/g02-final.mp4 --crf 18 --jpeg-quality 90"
+    "render": "remotion render src/index.tsx"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.515",

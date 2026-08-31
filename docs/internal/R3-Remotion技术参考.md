@@ -85,7 +85,7 @@ const opacity = interpolate(frame, [0, 2 * fps], [0, 1], {
 spring({ frame: frame - delay, fps, config: { stiffness, damping, mass } });
 ```
 
-**参数安全带**：`stiffness 80-200`、`damping 20-60`。**damping 过小会导致无限震荡**（如 bouncy 应控制 damping ≥ 12）。本项目 `SPRING_CONFIG` 已有四套预设（bouncy/snappy/buttery/heavy），全部动画组件透传 `style.motion`，一般不需要自调参数。
+**参数安全带**：`stiffness 80-200`、`damping 20-60`。**damping 过小会导致无限震荡**（如 bouncy 应控制 damping ≥ 12）。本项目 `SPRING_CONFIG` 已有四套预设（bouncy/snappy/buttery/heavy），全部动画组件透传 `style.motion`，一般不需要自调参数。**现状如实**（见 §3.5）：那批透传组件当前零外部消费者，专属屏内 `spring()` 各自定 damping（g06 实测 18 处）——本段是**目标写法**，不是已生效机制。
 
 **使用建议**：
 - 用 `measureSpring()` 精确计算弹簧动画持续帧数，不要手估
@@ -144,7 +144,7 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 | `WipeIn` | delay, duration, direction | clip-path 擦入（标题 reveal） |
 | `Pulse` | delay, intensity, duration | 单次脉冲强调（数字/箭头） |
 
-所有组件透传 motion，spring config 从 `SPRING_CONFIG` 读取；`EASE_OUT` 为标准缓动常量。
+这批组件全部透传 motion、spring config 从 `SPRING_CONFIG` 读取（⚠️ 指 `animations.tsx` 的入场原子件，当前**零外部消费者**，见 §3.5）；`EASE_OUT` 为标准缓动常量。
 
 ### 3.2 UI 组件（components/ui.tsx）
 
@@ -153,7 +153,7 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 | `Subtitle` | lines[{text,startFrame,endFrame}] | 底部多行字幕（帧级精确同步）：白字黑描边，距底 60px，最多同时显示 2 行；分发器统一挂载 |
 | `CharReveal` | text/delay/stagger/duration/style | 逐字 mask 入场，大标题"贵感"来源 |
 | `AccentWord` | text/color/delay/peak | 重音词大字：字号+颜色同时弹入，对齐口播重音帧 |
-| `elevation(level, dark)` | — | 三级投影常量（浅底/深底两套），卡片统一取用，全片光影方向一致 |
+| `elevation(level, dark)` | — | 三级投影常量（浅底/深底两套）——**当前全库零消费者**：g06 的 7 处 `boxShadow` 用片内自定常量与字面量。保留作统一光影的候选件，用不用每片自定 |
 
 > ⚠️ **2026-08-29 删除的 9 个"统一外观"业务组件**：`SectionTitle`、`IconBadge`、`PhoneMockup`、`CouponCard`、`StatCounter`、`StatCard`、`StepFlow`、`CompareCard`、`HighLightText`——它们把券面/手机壳/步骤条外观焊死，违反「外观每片必新」，禁止以任何形式原样恢复；新屏外观一律照质感锚（`outputs/bench/anchor-*.png`）与 ref 底稿样张逐片手写。**沉淀为纪律的口径仍有效**：券面金额右置、全 App 无条形码不画条码、图标不裸放（须有容器）、滚动数字只用于真实可述口径、顶栏/胶囊规格按 R6 §8 真值复刻。
 
@@ -185,8 +185,8 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 
 | 维度 | 字段 | 可选值 | 说明 |
 |---|---|---|---|
-| 配色 | `style.palette` | mint-cool / warm-orange / berry-purple / deep-blue / caramel / ink-green / neon（7 套） | `palette.ts` PALETTES，场景全部读 `p.accent` 等 |
-| 动画性格 | `style.motion` | bouncy / snappy / buttery / heavy（4 种） | SPRING_CONFIG，全部动画组件透传 |
+| 配色 | `style.palette` | mint-cool / warm-orange / berry-purple / deep-blue / caramel / ink-green / neon（7 套） | `palette.ts` PALETTES。**现状如实**：主题变量只覆盖部分元素，专属屏内仍有硬编码色值（`videos/g06/index.tsx` 实测 38 处 hex）——要不要收口到 `p.accent` 等属设计决策，未拍板 |
+| 动画性格 | `style.motion` | bouncy / snappy / buttery / heavy（4 种） | `SPRING_CONFIG` 由 `animations.tsx` 的 4 个动画组件透传，**但那 4 个组件当前零外部消费者**（见 SKILL §三）；实际生效的唯一消费者 = VTemplate 转场 timing（`VTemplate.tsx:180`）。屏内 spring 各自定 damping（g06 实测 18 处），未按 motion 分派 |
 | 转场 | `style.transition` | slide / wipe / dissolve / zoom / pop（5 种） | 自定义呈现组件在 VTemplate.tsx，五种观感真实可见 |
 | 钩子型 | `style.hookStyle` | 六值均为待本片实现的分派键（旧共享钩子已删，0/6 实现） | 本片实现时照锚稿手写钩子屏 |
 

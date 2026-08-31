@@ -2,12 +2,10 @@ import React from 'react';
 import {
   AbsoluteFill,
   Audio,
-  Img,
   Sequence,
   interpolate,
   staticFile,
   useCurrentFrame,
-  useVideoConfig,
 } from 'remotion';
 import { TransitionSeries, springTiming } from '@remotion/transitions';
 import type { TransitionPresentation, TransitionPresentationComponentProps } from '@remotion/transitions';

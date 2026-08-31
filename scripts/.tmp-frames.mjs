@@ -1,4 +1,5 @@
-// 临时：十屏帧表 + 每屏"内容全在"的静帧取样帧（末句口播入场后再走骨架各自的尾巴）
+// 临时：g06 帧表（屏数从 `video/src/data/g06.ts` 现读，当前 12 屏）+ 每屏"内容全在"的静帧取样帧（末句口播入场后再走骨架各自的尾巴）
+// 注意：`outputs/g06-教培托管/07-片1-分镜稿.md` §一 与 `00-交付说明.md` 把本脚本当作帧号复算真源引用，删它前先改那两处指路。
 import { readFileSync } from 'node:fs';
 const src = readFileSync(new URL('../video/src/data/g06.ts', import.meta.url), 'utf8');
 const blocks = [...src.matchAll(/ui:\s*'([\w-]+)'([\s\S]*?)(?=ui:\s*'[\w-]+'|$)/g)];

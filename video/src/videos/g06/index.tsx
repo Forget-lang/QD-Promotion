@@ -12,7 +12,6 @@ import {
 } from 'remotion';
 import { FPS, FONT_BODY, FONT_ROUND, PALETTES } from '../../palette';
 import { EASE_OUT } from '../../components/animations';
-import { elevation } from '../../components/ui';
 import type { SceneRenderProps, SubtitleLine } from '../../types';
 import type {
   HookPayload, PainPayload, IdeaPayload, MakePayload, FormRow, StepsPayload,
