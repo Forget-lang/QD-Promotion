@@ -67,21 +67,6 @@ export interface StepsPayload {
   rows: StepRow[];
 }
 
-export interface VsSide {
-  head: string;
-  tone: 'dim' | 'win';
-  items: string[];
-}
-
-export interface ComparePayload {
-  tag: string;
-  title1: string;
-  title2: string;
-  left: VsSide;
-  right: VsSide;
-  bar: string;
-}
-
 export interface ChainNode { head: string; desc: string; note?: string; reward?: boolean }
 
 export interface ChainPayload {

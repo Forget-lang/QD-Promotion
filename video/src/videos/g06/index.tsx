@@ -5,7 +5,7 @@
 //   S6 ref-16 / S8 ref-11 / S9·S11 ref-10 / S12 全新
 // 本片骨架（Slip / HandIn / FormCard / FormLine / GroupHead / Stamp / Tag / HiLight …）全部内联在本文件，
 //   仓库没有 src/skeletons 目录；跨屏复用的只有 ../../components/{animations,ui} 与 ../../palette。
-//   组件函数名保留首版屏号前缀，与现行屏号不一一对应（现行绑定见文件末 G06_RENDERERS；g06-compare 当前无屏绑定）。
+//   组件函数名保留首版屏号前缀，与现行屏号不一一对应（现行绑定见文件末 G06_RENDERERS；2026-08-31 删无屏绑定的 g06-compare）。
 import React from 'react';
 import {
   AbsoluteFill, interpolate, spring, useCurrentFrame,
@@ -16,7 +16,7 @@ import { elevation } from '../../components/ui';
 import type { SceneRenderProps, SubtitleLine } from '../../types';
 import type {
   HookPayload, PainPayload, IdeaPayload, MakePayload, FormRow, StepsPayload,
-  ComparePayload, ChainPayload, LedgerPayload, CtaPayload,
+  ChainPayload, LedgerPayload, CtaPayload,
 } from './types';
 
 // ── 本片色板（暖奶油底 + 焦糖棕 + 印章红 + 荧光黄）──
@@ -660,82 +660,6 @@ const S6Steps: React.FC<SceneRenderProps> = ({ scene }) => {
   );
 };
 
-// ── S7 机制 · 拆 ref-17（双卡对称对照）──────────────
-const S7Compare: React.FC<SceneRenderProps> = ({ scene }) => {
-  const p = scene.payload as unknown as ComparePayload;
-  const beat = useBeat(scene.subtitles);
-  const f = useCurrentFrame();
-  const tt = spring({ frame: f - 6, fps: FPS, config: { damping: 22, stiffness: 150 } });
-  const side = (sd: ComparePayload['left'], dir: -1 | 1, delay: number) => {
-    const s = spring({ frame: f - delay, fps: FPS, config: { damping: 22, stiffness: 150 } });
-    const win = sd.tone === 'win';
-    const activeR = region(beat, win ? 1 : 0, win ? 3 : 0);
-    return (
-      <div style={{
-        flex: 1, opacity: Math.min(activeR.opacity + 0.12, 1) * interpolate(s, [0, 0.3], [0, 1], { extrapolateRight: 'clamp' }),
-        transform: `translateX(${(1 - s) * 120 * dir}px)`,
-      }}>
-        <div style={{
-          background: win ? PAPER : '#F1EAE0', borderRadius: 26, height: 760, padding: '36px 34px',
-          border: win ? `3px solid ${ACCENT}` : `2px solid rgba(141,110,99,0.28)`,
-          boxShadow: win ? `0 18px 44px ${SHADOW}` : `0 10px 24px rgba(122,74,38,0.10)`,
-        }}>
-          <div style={{
-            borderRadius: 14, padding: '16px 0', textAlign: 'center', letterSpacing: 3, fontSize: 33, fontWeight: 700,
-            background: win ? ACCENT : '#C9B8A6', color: '#fff',
-          }}>{sd.head}</div>
-          {sd.items.map((it, i) => (
-            <RowWipe key={it} delay={delay + 16 + i * 12}>
-              <div style={{ display: 'flex', gap: 14, marginTop: 30, alignItems: 'flex-start' }}>
-                {win
-                  ? <CheckGlyph size={30} color={ACCENT_DARK} />
-                  : <svg width="30" height="30" viewBox="0 0 32 32"><path d="M8 8l16 16M24 8L8 24" stroke="#b09b86" strokeWidth="4" strokeLinecap="round" /></svg>}
-                <span style={{ flex: 1, fontSize: 29, lineHeight: 1.5, color: win ? '#2f241c' : '#7d6a58', fontWeight: win ? 600 : 400 }}>{it}</span>
-              </div>
-            </RowWipe>
-          ))}
-        </div>
-      </div>
-    );
-  };
-  return (
-    <AbsoluteFill style={{ fontFamily: FONT_BODY }}>
-      <Ambient />
-      <Tag text={p.tag} />
-      <div style={{ position: 'absolute', left: 72, top: 236, right: 72, opacity: tt, transform: `translateY(${(1 - tt) * 26}px)` }}>
-        <div style={{ fontFamily: FONT_ROUND, fontSize: 76, color: BROWN, lineHeight: 1.24 }}>
-          {p.title1}<HiLight delay={18}>{p.title2}</HiLight>
-        </div>
-      </div>
-
-      <div style={{ position: 'absolute', left: 72, right: 72, top: 480, display: 'flex', gap: 44 }}>
-        {side(p.left, -1, 20)}
-        {side(p.right, 1, 30)}
-      </div>
-      <div style={{ position: 'absolute', left: 0, right: 0, top: 806, display: 'flex', justifyContent: 'center' }}>
-        <Stamp delay={46} rot={-6}>
-          <div style={{
-            width: 96, height: 96, borderRadius: '50%', background: STAMP_RED, color: '#fff',
-            fontFamily: FONT_ROUND, fontSize: 38, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 10px 26px rgba(232,80,58,0.4)',
-          }}>VS</div>
-        </Stamp>
-      </div>
-
-      {/* 结论条（全片 2 次之一 · 焦糖棕圆角） */}
-      <div style={{ position: 'absolute', left: 72, right: 72, top: 1330, opacity: region(beat, 3, 3).opacity }}>
-        <Stamp delay={372} rot={-1}>
-          <div style={{
-            background: `linear-gradient(120deg, #7d5a44, ${CARAMEL})`, borderRadius: 22, padding: '32px 44px',
-            fontFamily: FONT_ROUND, fontSize: 40, color: '#fff', textAlign: 'center', letterSpacing: 3,
-            boxShadow: '0 16px 36px rgba(122,74,38,0.3)',
-          }}>{p.bar}</div>
-        </Stamp>
-      </div>
-    </AbsoluteFill>
-  );
-};
-
 // ── S8 进阶 · 拆 ref-11（纵向编号步骤条）────────────
 const S8Chain: React.FC<SceneRenderProps> = ({ scene }) => {
   const p = scene.payload as unknown as ChainPayload;
@@ -902,7 +826,6 @@ export const G06_RENDERERS: Record<string, React.ComponentType<SceneRenderProps>
   'g06-make-basic': S4MakeBasic,
   'g06-make-rules': S5MakeRules,
   'g06-steps': S6Steps,
-  'g06-compare': S7Compare,
   'g06-chain': S8Chain,
   'g06-ledger': S9Ledger,
   'g06-cta': S10Cta,

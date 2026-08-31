@@ -8,10 +8,10 @@
  *   node scripts/list-assets.mjs
  *
  * 输出（stdout，Markdown）：
- *   1. 场景组件（已注册 type + 各文件实现的 layout/cardVariant 变体）
+ *   1. 场景组件（共享场景层 08-29 起冻结删除，此节常态为空；每片屏组件在 videos/gXX/）
  *   2. 原子组件（动画 / UI / 氛围）
  *   3. 风格维度（色板键 / 图标键）
- *   4. 已产出视频数据（场景序列 + 风格五维，相似度比对基线从这里取）
+ *   4. 已产出视频数据（场景序列 + 风格键值，相似度比对基线从这里取）
  *   5. 封面组件与排版参照图
  *   6. 每条视频的专属屏（video/src/videos/gXX/，一条视频一套 UI 语言的落点）
  *   7. 排版参照图（outputs/样本库/，分镜设计借排版用）
@@ -28,19 +28,10 @@ const read = (p) => readFileSync(p, 'utf8');
 const lines = [];
 const out = (s = '') => lines.push(s);
 
-// ── 1. 场景组件（注册表 + 变体）──
+// ── 1. 场景组件（注册表）──
 const indexSrc = read(join(videoSrc, 'scenes', 'index.tsx'));
 const registered = [...indexSrc.matchAll(/case\s+'([^']+)':\s*content\s*=\s*<(\w+)/g)]
   .map(([, type, comp]) => ({ type, comp }));
-
-const variantsIn = (file) => {
-  const p = join(videoSrc, 'scenes', `${file}.tsx`);
-  if (!existsSync(p)) return { layouts: [], variants: [] };
-  const src = read(p);
-  const layouts = [...new Set([...src.matchAll(/\blayout\s*(?:===|!==)\s*'([^']+)'/g)].map(([, v]) => v))];
-  const variants = [...new Set([...src.matchAll(/\bcardVariant\s*(?:===|!==)\s*'([^']+)'/g)].map(([, v]) => v))];
-  return { layouts, variants };
-};
 
 out('# 视频视觉资产盘点（真源 = 代码）');
 out();
@@ -49,21 +40,18 @@ out('> 设计稿「组件核对」以本清单为准；文档静态状态列仅�
 out();
 out('## 1. 场景组件（SceneRenderer 已注册）');
 out();
-out('| type | 组件 | layout 变体 | cardVariant 变体 |');
-out('|---|---|---|---|');
-for (const { type, comp } of registered) {
-  const { layouts, variants } = variantsIn(comp);
-  out(`| \`${type}\` | ${comp} | ${layouts.map((v) => `\`${v}\``).join(' ') || '—'} | ${variants.map((v) => `\`${v}\``).join(' ') || '—'} |`);
+// 2026-08-31 修：共享场景层已随 08-29 清零删除（ui 必填、无按 type 回退），此表常态为空；
+// 空表不再打已废止的 layout/cardVariant 变体列头，改输出冻结说明，避免误读"还有共享场景件"
+if (!registered.length) {
+  out('（无）——共享场景层已冻结删除（2026-08-29 清零：ui 必填、缺了直接抛错，无按 type 回退）。');
+  out('每条视频的屏组件在 `video/src/videos/gXX/`（见下方 §6），不在共享层注册。');
+} else {
+  out('| type | 组件 |');
+  out('|---|---|');
+  for (const { type, comp } of registered) out(`| \`${type}\` | ${comp} |`);
 }
 
-// types.ts 的联合类型是变体字段的类型上限
-const typesSrc = read(join(videoSrc, 'types.ts'));
-const unionOf = (name) => {
-  const m = typesSrc.match(new RegExp(`\\b${name}\\??:\\s*([^;]+);`));
-  return m ? [...m[1].matchAll(/'([^']+)'/g)].map(([, v]) => v) : [];
-};
 out();
-// 2026-08-30 删：旧共享场景的 layout/cardVariant 变体盘点（Scene 瘦身后两键已无类型定义，输出空集是噪音）
 
 // ── 2. 原子组件 ──
 const exportsOf = (file) => {
@@ -110,7 +98,7 @@ for (const f of dataFiles) {
   const pick = (re) => (src.match(re) || [])[1] || '?';
   const id = pick(/id:\s*'([^']+)'/);
   const sceneTypes = [...src.matchAll(/type:\s*'([^']+)'/g)].map(([, t]) => t);
-  const style = ['palette', 'motion', 'typography', 'transition', 'hookStyle']
+  const style = ['palette', 'motion', 'transition', 'hookStyle']
     .map((k) => `${k}=${pick(new RegExp(`${k}:\\s*'([^']+)'`))}`)
     .join('，');
   out(`- **${id}**（\`data/${f}\`）：${style}`);

@@ -26,9 +26,8 @@ export type SceneType =
   | 'mechanism'   // 机制
   | 'cta';        // 收尾
 
-// 风格配置五维（style 五维：配色/动画性格/字体/转场/钩子）
+// 风格配置四维（style：配色/动画性格/转场/钩子；2026-08-31 删 typography 维度——声明了从未有渲染器消费）
 export type MotionKey = 'bouncy' | 'snappy' | 'buttery' | 'heavy';
-export type TypographyKey = 'impact' | 'clean' | 'friendly';
 export type TransitionKey = 'slide' | 'zoom' | 'wipe' | 'dissolve' | 'pop';
 export type HookStyleKey = 'contrast' | 'number' | 'question' | 'story' | 'challenge' | 'clock';
 
@@ -80,7 +79,6 @@ export interface Scene {
 export interface StyleConfig {
   palette: PaletteKey;
   motion: MotionKey;
-  typography: TypographyKey;
   transition: TransitionKey;
   hookStyle: HookStyleKey;
   /** 行业专属背景图路径（public 下相对路径，如 'backgrounds/g06/bg.jpg'） */

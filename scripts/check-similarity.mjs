@@ -142,4 +142,6 @@ if (unexempted.length || bespokeFail || noUiFail) {
 }
 console.log(dups.length
   ? `✅ 通过（${dups.length} 处重复均已登记例外批准）`
-  : '✅ 通过：与全部已产出视频零同结构屏');
+  : others.length
+    ? '✅ 通过：与全部已产出视频零同结构屏'
+    : '✅ 通过（注意：基线只有本片一支，无对照物，此绿不证明跨片不雷同——结构像不像按一屏标杆逐张看真图判，见 SKILL §三）');

@@ -17,6 +17,7 @@
 | 产品事实 / 平台红线 / 素材登记 | `spec/facts.json` / `spec/redlines.json` / `spec/assets.json` |
 | **制券页字段、分组归属、上限与联动**（动笔写"怎么设"前先查） | `spec/coupon-fields.json`——表里没有的字段/组名回 `../applet/` 源码取证并回写该行（带 `src` 行号），不得凭印象编 |
 | 业务流程操作 / Remotion 技术原理 / applet UI 真值 | `docs/internal/` R2 / R3 / R6（按需，不是开工必读） |
+| 项目总览 / 人机协作方法（面向用户；同受文档引用闸门扫描，改后照跑 `gate-all`） | `docs/战略简报.md` / `docs/AI使用手册.md` |
 | 近期决策与踩坑 | `outputs/archive/changelog.md` 顶部 10 条 |
 | 组件 / 素材 / 已产出片的实时清单 | `node scripts/list-assets.mjs` |
 | G02~G05 历史测试产物（成片/设计稿/专属屏代码/旧文档） | **已删除**（2026-08-29 清零重启），git 历史可查但不得回流为参照；教训沉淀在 `SKILL.md` §四 |

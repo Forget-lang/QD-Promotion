@@ -18,7 +18,6 @@ export const g06: VideoData = {
   style: {
     palette: 'warm-orange',
     motion: 'snappy',
-    typography: 'friendly',
     transition: 'wipe',
     hookStyle: 'story',
     bgImage: 'backgrounds/g06/bg.png',

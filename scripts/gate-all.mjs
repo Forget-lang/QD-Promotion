@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * scripts/gate-all.mjs · 六闸门一次跑完
+ * scripts/gate-all.mjs · 全部闸门一次跑完（清单以下方 GATES 数组为准，不在注释里复述条数）
  *
  * 为什么要它：闸门分散成多条命令时，新会话常常只跑其中一条（或干脆不跑），
  * 结果就是"规则在文档里、问题在成片里"。开工第 1 步跑这一个命令，**一开工就见红**。
  *
- * 用法：node scripts/gate-all.mjs          # 六闸门（红线/文档引用/事实/相似度/上屏真实性/效果尺子）
+ * 用法：node scripts/gate-all.mjs          # 全部门禁闸门 + 效果尺子
  *      node scripts/gate-all.mjs --tsc   # 额外跑 video/ 的 tsc --noEmit
  */
 import { spawnSync } from 'node:child_process';
@@ -47,8 +47,11 @@ const run = (cmd, args, cwd) => {
 const rows = [];
 for (const g of GATES) {
   const { code, out } = run('node', g.args, ROOT);
-  const last = out.trim().split('\n').filter(Boolean).pop() || '(无输出)';
-  rows.push({ ok: code === 0, label: g.label, msg: last.replace(/^[\s✅❌⚠️]+/, '').slice(0, 96) });
+  const outLines = out.trim().split('\n').filter(Boolean);
+  const last = outLines.pop() || '(无输出)';
+  // 2026-08-31 修：只取末行会把「⚠️ 需人工确认」类提醒吞掉（红线闸门的文案层/文档层提醒曾因此隐身）——收集进总览单列；「✅ 无」类空结果不收
+  const warns = outLines.filter((l) => (/⚠️|需人工确认/.test(l)) && !/✅\s*无/.test(l)).map((l) => l.replace(/^[\s✅❌⚠️]+/, '').trim());
+  rows.push({ ok: code === 0, label: g.label, msg: last.replace(/^[\s✅❌⚠️]+/, '').slice(0, 96), warns });
 }
 if (WITH_TSC) {
   const { code, out } = run('npx', ['tsc', '--noEmit'], join(ROOT, 'video'));
@@ -76,9 +79,16 @@ if (vid) {
   const vidM = require$fs().statSync(vid).mtimeMs;
   const srcM = srcNewest();
   if (srcM > vidM) {
-    const mins = Math.round((srcM - vidM) / 60000);
+    const diffMs = srcM - vidM;
+    // 2026-08-31 修：不足 1 分钟（含 14ms 这种"同批写出/批量重置 mtime"）不能打「旧 0 分钟」——说明可疑并保守判过期
+    const age = diffMs < 1000
+      ? `仅旧 ${Math.round(diffMs)} 毫秒`
+      : diffMs < 60000
+        ? `仅旧 ${Math.round(diffMs / 1000)} 秒`
+        : `旧 ${Math.round(diffMs / 60000)} 分钟`;
+    const note = diffMs < 60000 ? '（疑似与源码同批写出或 mtime 被批量重置，无法证明是最新渲染）' : '';
     rows.push({ ok: false, label: '效果尺子（最新成片）',
-      msg: `过期证据｜${vid.split('/').slice(-2).join('/')} 比 video/src 最新改动旧 ${mins} 分钟：这份数字测的是已作废版本，不算通过（设计阶段可带此红继续，交付前必须重渲重测）` });
+      msg: `过期证据｜${vid.split('/').slice(-2).join('/')} 比 video/src 最新改动${age}${note}：这份数字测的可能是已作废版本，不算通过（设计阶段可带此红继续，交付前必须重渲重测）` });
   } else {
     const { code, out } = run('node', ['scripts/check-motion.mjs', vid], ROOT);
     const m = out.match(/静止占比 (\d+)%/), d = out.match(/中位帧间差 ([\d.]+)/), o = out.match(/画面占用率 (\d+)%/);
@@ -89,8 +99,13 @@ if (vid) {
   rows.push({ ok: true, skipped: true, label: '效果尺子', msg: '跳过（outputs 下暂无成片 mp4；出片后必跑）' });
 }
 
-console.log('\n══════════════ 六闸门总览（gate-all）══════════════');
+console.log('\n══════════════ 闸门总览（gate-all）══════════════');
 for (const r of rows) console.log(`${r.ok ? (r.skipped ? '⏭️' : '✅') : '❌'} ${r.label.padEnd(26)} ${r.msg}`);
+const warnRows = rows.filter((r) => r.warns?.length);
+if (warnRows.length) {
+  console.log('\n⚠️ 需人工确认（不计闸门红绿，但必须逐条看过，不许直接跳过）：');
+  for (const r of warnRows) for (const w of r.warns) console.log(`   [${r.label}] ${w}`);
+}
 const failed = rows.filter((r) => !r.ok);
 const skipped = rows.filter((r) => r.skipped).length;
 console.log('\n──────────────────────────────────────────────');

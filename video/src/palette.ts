@@ -16,23 +16,9 @@ export const FONT_TITLE = "'DeyiHei', sans-serif";
 export const FONT_BODY = "'Alibaba PuHuiTi 3', sans-serif";
 export const FONT_ROUND = "'Alimama FangYuan', sans-serif";
 
-// 字体性格映射（typography 维度落地，2026-08-17）
-// impact=得意黑超粗冲击 / clean=普惠体清爽现代 / friendly=方圆体亲和圆润
-import type { TypographyKey } from './types';
-
-export interface TypographyConfig {
-  family: string;       // 标题字体
-  titleWeight: number;
-  bodyFamily: string;   // 正文字体（impact 时正文仍用普惠体保可读性）
-  bodyWeight: number;
-}
-
-export const TYPOGRAPHY: Record<TypographyKey, TypographyConfig> = {
-  impact:   { family: FONT_TITLE, titleWeight: 900, bodyFamily: FONT_BODY,  bodyWeight: 500 },
-  clean:    { family: FONT_BODY,  titleWeight: 800, bodyFamily: FONT_BODY,  bodyWeight: 500 },
-  // 方圆体仅 400 单一字重，friendly 性格靠圆润字形而非字重区分，层级靠字号
-  friendly: { family: FONT_ROUND, titleWeight: 400, bodyFamily: FONT_ROUND, bodyWeight: 400 },
-};
+// 2026-08-31 删 typography「字体性格」维度（TypographyKey/TYPOGRAPHY 表）：注释曾声称"维度落地"，实际全库零消费者——
+// VTemplate 与各渲染器从不读 style.typography，g06 数据里的 'friendly' 声明同删。字体直接用下方 FONT_* 常量；
+// 真要做"性格"维度时按一屏标杆重新设计，别照旧表复活。
 
 // 行业风格配色（风格轮换方案 P1-P7 落地；G02 用 mint-cool，值与原 VTemplate 一致）
 export type PaletteKey =

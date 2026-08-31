@@ -181,15 +181,16 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 > ⚠️ 氛围层三件套（Grain/Vignette/AccentOverlay）是**全片必挂**（VTemplate 统一挂载，场景与设计稿无需处理），是画面"质感"的关键来源。缺失时画面偏平偏黑。
 > 注意挂载条件：Grain/Vignette 无条件挂全片；AccentOverlay 仅在 `video.style.bgImage` 存在（有背景图）时挂载（代码条件渲染，无背景图时不挂）。
 
-### 3.5 风格五维（video/src/palette.ts + data/gXX.ts style）
+### 3.5 风格维度（video/src/palette.ts + data/gXX.ts style）
 
 | 维度 | 字段 | 可选值 | 说明 |
 |---|---|---|---|
 | 配色 | `style.palette` | mint-cool / warm-orange / berry-purple / deep-blue / caramel / ink-green / neon（7 套） | `palette.ts` PALETTES，场景全部读 `p.accent` 等 |
 | 动画性格 | `style.motion` | bouncy / snappy / buttery / heavy（4 种） | SPRING_CONFIG，全部动画组件透传 |
 | 转场 | `style.transition` | slide / wipe / dissolve / zoom / pop（5 种） | 自定义呈现组件在 VTemplate.tsx，五种观感真实可见 |
-| 字体性格 | `style.typography` | impact / clean / friendly（3 种） | impact=得意黑900/普惠体500，clean=普惠体800/500，friendly=方圆体400（单一字重靠字号分层） |
 | 钩子型 | `style.hookStyle` | 六值均为待本片实现的分派键（旧共享钩子已删，0/6 实现） | 本片实现时照锚稿手写钩子屏 |
+
+> 2026-08-31 删「字体性格」维度：`style.typography` 声明了从未有渲染器消费，TypographyKey/TYPOGRAPHY 表与 g06 的 'friendly' 声明一并删除；字体直接用 `palette.ts` 的 FONT_* 常量。
 
 ---
 
@@ -212,7 +213,7 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 | 纯运动/工具包装（不含外观） | ✅ 提成原子件跨片复用 | `FadeInUp`、`elevation`、`Subtitle` |
 | 带外观的成品结构（券面/步骤条/手机壳） | ❌ 不提成共享组件；本片内手写，下片照锚稿重新手写 | 原 CouponCard/StepFlow 等 9 件已删 |
 | 只此一家的场景结构 | ✅ 留在本片场景文件内 | 曲线抬升、撕纸缺口逻辑 |
-| 海报风装饰件（窗口容器/吊牌/波浪线） | ⚠️ 默认不建代码；设计稿确需时按需实现，**每条视频装饰件 ≤1-2 处** | 浏览器顶栏容器、吊牌标签 |
+| 海报风装饰件（窗口容器/吊牌/波浪线） | ⚠️ 默认不建代码；设计稿确需时按需实现（判据是上文「少而精」原则 + 看真图，不设数量配额——2026-08-30 拍板，配额会绑架设计） | 浏览器顶栏容器、吊牌标签 |
 
 ✅ 正确：三个行业各照锚稿手写券面，入场都复用 `FadeInUp`
 ❌ 错误①：把上一片的券面 JSX 原样 import 过来（= 换皮复用，`check-similarity` + 一屏标杆双拦）
@@ -414,7 +415,7 @@ interface CardfacePayload {
 
 ### 7.4 代码结构规则
 
-- 场景内容全部从 scene 数据读取（禁止硬编码文案/颜色/图标名，语义色 ACCENT_RED/GREEN 除外）
+- 场景内容全部从 scene 数据读取（禁止硬编码文案/颜色/图标名；语义色取色走 palette 主题或 `R6` §8 真值，不私设常量——原 `ACCENT_*` 常量 2026-08-30 已删）
 - 风格值全部从 style/palette 读取（禁止硬编码色值）
 - 图标用内联 SVG 映射 `Ico[name](color)`（禁止外部图标文件/CDN）
 - 图片用 `<Img src={staticFile(...)} />`（禁止 `<img>`）
