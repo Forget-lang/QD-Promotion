@@ -1,7 +1,7 @@
 # 券到卡包 · 内容运营项目（AI 入口）
 
-> 最后校验：2026-08-31（知识生命周期重构）。本文是 AI 的短入口，不是项目百科。
-> 新会话先恢复当前认知和知识状态，再进入具体生产任务；不要通过历史日志自行猜当前规则。
+> 最后校验：2026-08-31（知识生命周期与文档架构重构）。本文是 AI 的短入口，不是项目百科。
+> 新会话先恢复当前认知与知识架构，再进入具体生产任务；不要通过历史日志自行猜当前规则。
 
 ## 一、项目是什么
 
@@ -12,13 +12,12 @@
 
 ## 二、AI 新会话恢复顺序
 
-1. `docs/PROJECT-UNDERSTANDING.md` —— 当前项目认知、人机分工、演进背景。
-2. `docs/KNOWLEDGE-STATUS.md` —— 当前哪些能力稳定、哪些实验中、哪些已废弃。
-3. `docs/KNOWLEDGE-LIFECYCLE.md` + `docs/EXPERIMENT-PROTOCOL.md` —— 反馈如何分流、方法如何晋级。
-4. `SKILL.md` —— 当前实际生产方法。
-5. `spec/` —— 需要产品事实时读取。
-6. `docs/internal/`、样本、代码 —— 按任务需要深入。
-7. `changelog.md` / Git 历史 —— 只有需要恢复“为什么过去这么改”时读取；不能作为当前规则入口。
+1. `docs/PROJECT-UNDERSTANDING.md` —— 当前项目目标、人机分工、演进背景。
+2. `docs/KNOWLEDGE-ARCHITECTURE.md` —— 当前知识角色、成熟度、反馈分流、项目源/派生物关系。
+3. `SKILL.md` —— 当前稳定生产方法。
+4. `spec/` —— 需要产品事实时读取。
+5. `docs/internal/`、当前项目源、样本、代码 —— 按任务需要深入。
+6. `outputs/archive/changelog.md` / Git 历史 —— 只有需要恢复“为什么过去这么改”时读取；不能作为当前规则入口。
 
 ## 三、开工动作
 
@@ -85,6 +84,7 @@ AI 负责：研究、策划、技术/内容方案、实验、执行、验证、�
 - 不因为“让 AI 记住”就把局部意见写成全局规则。
 - 新方法先实验，稳定后再进入生产层。
 - 已废弃的方法可以保留历史，但必须与当前默认方法明确区分。
+- **不要为每一种小问题新增一个 Markdown；先判断现有层级是否足够。**
 
 ## 九、目录与核心角色
 
@@ -95,11 +95,9 @@ promotion/
 ├── spec/                             # 产品事实与机器约束
 ├── docs/
 │   ├── PROJECT-UNDERSTANDING.md     # 当前认知基线
-│   ├── KNOWLEDGE-STATUS.md          # 稳定/实验/废弃状态
-│   ├── KNOWLEDGE-LIFECYCLE.md       # 反馈分流与知识生命周期
-│   ├── EXPERIMENT-PROTOCOL.md       # 实验与晋级规则
-│   └── internal/                     # 业务/技术/UI 参考
+│   ├── KNOWLEDGE-ARCHITECTURE.md    # 知识角色/成熟度/反馈分流/架构契约
+│   └── internal/                    # 业务/技术/UI 参考
 ├── scripts/                          # 闸门、检查、盘点、TTS
 ├── video/                            # Remotion 生产引擎
-└── outputs/                          # 当前交付、视觉样本、历史
+└── outputs/                          # 当前项目、视觉样本、历史
 ```
