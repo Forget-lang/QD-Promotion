@@ -5,6 +5,7 @@ import { AbsoluteFill } from 'remotion';
 import type { SceneRenderProps } from '../types';
 import { Subtitle } from '../components/ui';
 import { G06_RENDERERS } from '../videos/g06';
+import { G07_RENDERERS } from '../videos/g07';
 
 /**
  * 本片专属渲染器注册表：按视频 id 索引。
@@ -13,6 +14,7 @@ import { G06_RENDERERS } from '../videos/g06';
  */
 const VIDEO_RENDERERS: Record<string, Record<string, React.ComponentType<SceneRenderProps>>> = {
   g06: G06_RENDERERS,
+  g07: G07_RENDERERS,
 };
 
 export const SceneRenderer: React.FC<SceneRenderProps & { videoId: string }> = ({

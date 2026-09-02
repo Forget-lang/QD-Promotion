@@ -5,6 +5,7 @@ import * as videoModules from './data';
 import { BundleOpenBench } from './bench/BundleOpenBench';
 import { BenchPain, BenchMech } from './bench/BenchScreens';
 import { BenchTable } from './bench/BenchTable';
+import { G07Bench } from './bench/G07Bench';
 import { R01, R02, R03, R04, R05, R06, R08, R09, R10 } from './bench/BenchRefsA';
 import { R11, R12, R13, R14, R16, R17, R18, R19 } from './bench/BenchRefsB';
 import { G06CoverDy, G06CoverXhs, G06CoverSohu } from './covers/G06Cover';
@@ -68,6 +69,8 @@ const RemotionRoot: React.FC = () => {
       <Composition id="BENCH-pain" component={BenchPain} fps={FPS} width={1080} height={1920} durationInFrames={150} />
       <Composition id="BENCH-mech" component={BenchMech} fps={FPS} width={1080} height={1920} durationInFrames={150} />
       <Composition id="BENCH-table" component={BenchTable} fps={FPS} width={1080} height={1920} durationInFrames={150} />
+      {/* g07 咖啡茶饮 · 一屏标杆（质感验证，非交付片） */}
+      <Composition id="BENCH-g07-coffee" component={G07Bench} fps={FPS} width={1080} height={1920} durationInFrames={210} />
       {([["BENCH-r01", R01], ["BENCH-r02", R02], ["BENCH-r03", R03], ["BENCH-r04", R04], ["BENCH-r05", R05], ["BENCH-r06", R06], ["BENCH-r08", R08], ["BENCH-r09", R09], ["BENCH-r10", R10], ["BENCH-r11", R11], ["BENCH-r12", R12], ["BENCH-r13", R13], ["BENCH-r14", R14], ["BENCH-r16", R16], ["BENCH-r17", R17], ["BENCH-r18", R18], ["BENCH-r19", R19]] as const).map(([id, C]) => (
         <Composition key={id} id={id} component={C} fps={FPS} width={1080} height={1920} durationInFrames={90} />
       ))}
