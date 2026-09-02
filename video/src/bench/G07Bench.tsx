@@ -1,221 +1,140 @@
-// g07 咖啡茶饮 · 一屏标杆（质感验证用，非交付片）
-// 母题「一张刚打印出来的点单小票」：热敏小票上下撕齿 / 咖啡渍水印 / 拿铁纸感 / 打印出票入场
-// 色板 caramel（陶土咖啡红 #B5502A + 浓缩咖墨 + 纯白小票）——整套与教培那条（暖橙 + 回执左打孔 + 盖章对勾）不同。
-// 屏内容：制作满减券（券面 4 行 + 期限 2 行两组）+ 门槛分水岭提示卡；消费门槛=本片核心决策，唯一强调整行
-// 字段名逐字回 spec/coupon-fields.json；数值为示例（合规标注走顶部面包屑行尾，C-11）。
-// 骨架全部内联本文件；跨屏只复用 ../../components/{animations,ui} 与 ../../palette。
+// g07 咖啡茶饮 · 一屏标杆 v2 ·「咖啡馆菜单板」语言（推翻 v1 的"点单小票"——那版骨架太像教培 g06）
+// 结构全反 g06：深色浓缩咖啡底（非浅底）/ 菜单"名称……价格"点线引导行（非左标签右数值+虚线下划线）/
+//   得意黑招牌标题 + 金色分隔线（非方圆体 + 胶囊角标）/ 平铺分栏无漂浮白卡（非白色圆角卡+投影）/ 暖金强调（非红）
+// 屏内容：制作满减券（① 券面 4 行 + ② 期限 2 行）+ 老板注意卡；消费门槛=分水岭，唯一强调
+// 字段名逐字回 spec/coupon-fields.json；数值为示例（顶部标注）。骨架全内联本文件。
 import React from 'react';
 import {
   AbsoluteFill, interpolate, spring, useCurrentFrame,
 } from 'remotion';
-import { FPS, FONT_BODY, FONT_ROUND, PALETTES } from '../palette';
+import { FPS, FONT_BODY, FONT_TITLE, PALETTES } from '../palette';
 import { EASE_OUT } from '../components/animations';
 import { Ico } from '../components/icons';
 
-// ── 本片色板（caramel 主题派生）──
-const COFFEE_RED = '#B5502A';                     // 陶土咖啡红（本片主 accent，区别暖橙 #FF7043）
-const ESPRESSO = '#2B1C12';                       // 浓缩深咖（标题墨色）
-const BROWN = '#5A3E2B';                          // 暖棕（正文）
-const MUTED = '#8A6F5A';                          // 灰咖（次要）
-const FAINT = '#B49A80';                          // 浅咖（提示）
-const PAPER = '#FFFFFF';                          // 纯白小票（与奶油底拉开对比，撕齿才看得见）
-const CREAM = '#F1E4CE';                          // 奶油卡底
-const LINE = 'rgba(90,62,43,0.18)';               // 咖啡细线
-const SHADOW = 'rgba(90,62,43,0.15)';             // 暖投影
+// ── 菜单板色板（深浓缩咖啡底 + 奶油字 + 暖金）──
+const BG = '#241812';            // 浓缩深咖底
+const BG2 = '#2f2016';           // 稍亮中心
+const CREAM = '#F3E9D8';         // 奶油主字
+const GOLD = '#D9A441';          // 暖金（主强调，区别 g06 红）
+const GOLD_SOFT = 'rgba(217,164,65,0.5)';
+const MUTED = '#B79A78';         // 次要
+const LEADER = 'rgba(243,233,216,0.22)'; // 点线
+const RULE = 'rgba(217,164,65,0.4)';
 
-// ── 底层持续微动：暖光斑漂移 + 咖啡渍水印圈呼吸（招牌记号，只此一个、克制）──
+// ── 底层：深色 + 中心暖光呼吸 + 极淡蒸汽线（持续微动）──
 const Ambient: React.FC = () => {
   const f = useCurrentFrame();
-  const x1 = Math.sin(f / 62) * 26;
-  const y1 = Math.cos(f / 80) * 20;
-  const x2 = Math.cos(f / 70) * 30;
-  const ringO = 0.05 + (Math.sin(f / 50) * 0.5 + 0.5) * 0.025;
+  const o = 0.06 + (Math.sin(f / 70) * 0.5 + 0.5) * 0.05;
+  const sx = Math.sin(f / 90) * 10;
   return (
     <>
-      <div style={{
-        position: 'absolute', left: -160 + x1, top: 200 + y1, width: 560, height: 560, borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(181,80,42,0.10) 0%, transparent 68%)', pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'absolute', right: -200 + x2, bottom: 360 - y1, width: 640, height: 640, borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(141,110,99,0.12) 0%, transparent 66%)', pointerEvents: 'none',
-      }} />
-      {/* 咖啡渍水印圈：非正圆的手绘感环 + 内圈，落在右上，低透明 */}
-      <div style={{
-        position: 'absolute', right: 70, top: 250, width: 260, height: 250,
-        border: `14px solid ${COFFEE_RED}`, borderRadius: '50% 46% 52% 48% / 48% 52% 46% 54%',
-        opacity: ringO, transform: 'rotate(-14deg)', pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'absolute', right: 150, top: 330, width: 90, height: 86,
-        border: `8px solid ${COFFEE_RED}`, borderRadius: '50% 48% 52% 46%', opacity: ringO * 0.8,
-        transform: 'rotate(10deg)', pointerEvents: 'none',
-      }} />
+      <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 90% 60% at 50% 30%, ${BG2} 0%, ${BG} 70%)` }} />
+      <div style={{ position: 'absolute', left: 120 + sx, top: 120, width: 840, height: 520, borderRadius: '50%', background: `radial-gradient(circle, rgba(217,164,65,${o}) 0%, transparent 68%)`, pointerEvents: 'none' }} />
+      {/* 极淡蒸汽线 */}
+      <svg width="1080" height="1920" style={{ position: 'absolute', inset: 0, opacity: 0.06, pointerEvents: 'none' }}>
+        {[0, 1, 2].map((i) => (
+          <path key={i} d={`M ${470 + i * 70} 1750 q 26 -60 0 -120 q -26 -60 0 -120`} stroke={GOLD} strokeWidth="3" fill="none" strokeLinecap="round" />
+        ))}
+      </svg>
     </>
   );
 };
 
-// ── 打印出票入场：行自上而下落 + 擦入（区别教培的右入递交）──
-const PrintLine: React.FC<{ delay?: number; children: React.ReactNode; style?: React.CSSProperties }> = ({ delay = 0, children, style }) => {
+// ── 菜单行入场：整行淡起 + 点线从左往右"写"出来 ──
+const MenuRow: React.FC<{ delay?: number; children: React.ReactNode }> = ({ delay = 0, children }) => {
+  const f = useCurrentFrame();
+  const p = interpolate(f - delay, [0, 16], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
+  return <div style={{ opacity: p, transform: `translateY(${(1 - p) * 14}px)` }}>{children}</div>;
+};
+
+// ── 一行菜单：名称 …… 价格（点线引导），hero=分水岭行 ──
+const Row: React.FC<{ name: string; price: string; delay: number; hero?: boolean; tag?: string; sub?: string }> = ({ name, price, delay, hero, tag, sub }) => {
+  const f = useCurrentFrame();
+  const lead = interpolate(f - delay - 6, [0, 14], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
+  if (f < delay) return null;
+  return (
+    <MenuRow delay={delay}>
+      <div style={{
+        display: 'flex', alignItems: 'baseline', gap: 18, padding: hero ? '20px 22px' : '16px 4px',
+        background: hero ? 'rgba(217,164,65,0.10)' : 'transparent', borderRadius: 12,
+        borderLeft: hero ? `5px solid ${GOLD}` : '5px solid transparent',
+      }}>
+        <span style={{ fontSize: hero ? 34 : 31, color: hero ? GOLD : CREAM, fontWeight: hero ? 700 : 500, letterSpacing: 1, flexShrink: 0 }}>{name}</span>
+        {tag && <span style={{ fontSize: 21, color: BG, background: GOLD, borderRadius: 6, padding: '3px 12px', letterSpacing: 1, fontWeight: 700, flexShrink: 0 }}>{tag}</span>}
+        <span style={{ flex: 1, minWidth: 30, borderBottom: `2px dotted ${LEADER}`, transform: `scaleX(${lead})`, transformOrigin: 'left', height: 2, marginBottom: 8 }} />
+        <span style={{ fontSize: hero ? 40 : 34, color: hero ? GOLD : CREAM, fontWeight: 700, flexShrink: 0, letterSpacing: 1 }}>{price}</span>
+      </div>
+      {sub && <div style={{ fontSize: 23, color: MUTED, textAlign: 'right', padding: '2px 8px 0 0', letterSpacing: 1 }}>{sub}</div>}
+    </MenuRow>
+  );
+};
+
+// ── 分栏抬头（菜单小标题 + 金线）──
+const Section: React.FC<{ no: string; name: string; delay: number }> = ({ no, name, delay }) => {
   const f = useCurrentFrame();
   const p = interpolate(f - delay, [0, 16], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
   return (
-    <div style={{
-      clipPath: `inset(0 ${(1 - p) * 100}% 0 0)`,
-      opacity: Math.min(1, p * 1.8),
-      transform: `translateY(${(1 - p) * -10}px)`,
-      ...style,
-    }}>
-      {children}
+    <MenuRow delay={delay}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 40 }}>
+        <span style={{ fontSize: 26, color: GOLD, fontFamily: FONT_TITLE }}>{no}</span>
+        <span style={{ fontSize: 34, color: CREAM, fontWeight: 700, letterSpacing: 3 }}>{name}</span>
+        <span style={{ flex: 1, height: 1.5, background: RULE, transform: `scaleX(${p})`, transformOrigin: 'left' }} />
+      </div>
+    </MenuRow>
+  );
+};
+
+// ── 招牌标题（得意黑 + 眉标题 + 金分隔线）──
+const Header: React.FC = () => {
+  const f = useCurrentFrame();
+  const p = interpolate(f - 4, [0, 18], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
+  return (
+    <div style={{ position: 'absolute', left: 84, right: 84, top: 150, opacity: p }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <span style={{ width: 34, height: 34, display: 'inline-block' }}>{Ico.cup(GOLD)}</span>
+        <span style={{ fontSize: 26, color: GOLD, letterSpacing: 6, fontWeight: 700 }}>券到咖啡 · 今日出券</span>
+      </div>
+      <div style={{ marginTop: 14, fontFamily: FONT_TITLE, fontSize: 88, color: CREAM, letterSpacing: 4, lineHeight: 1.1 }}>制作满减券</div>
+      <div style={{ marginTop: 20, height: 3, background: `linear-gradient(90deg, ${GOLD}, transparent)`, borderRadius: 2 }} />
+      <div style={{ marginTop: 16, fontSize: 26, color: MUTED, letterSpacing: 2 }}>券到卡包 · 拉新复购 · 数值为示例</div>
     </div>
   );
 };
 
-// ── 小票卡：纯白底 + 细咖啡描边 + 暖投影 + 上下撕齿（纸白 vs 奶油底，齿看得见）──
-const Ticket: React.FC<{ children: React.ReactNode; style?: React.CSSProperties; rot?: number }> = ({ children, style, rot = 0 }) => (
-  <div style={{ position: 'relative', background: PAPER, border: `1.5px solid ${LINE}`, boxShadow: `0 18px 40px ${SHADOW}`, transform: `rotate(${rot}deg)`, ...style }}>
-    <div style={{
-      position: 'absolute', left: 0, right: 0, top: -11, height: 12,
-      backgroundImage: `linear-gradient(135deg, ${PAPER} 30%, transparent 30%), linear-gradient(-135deg, ${PAPER} 30%, transparent 30%)`,
-      backgroundSize: '22px 22px', filter: `drop-shadow(0 -2px 2px ${SHADOW})`,
-    }} />
-    <div style={{
-      position: 'absolute', left: 0, right: 0, bottom: -11, height: 12,
-      backgroundImage: `linear-gradient(45deg, ${PAPER} 30%, transparent 30%), linear-gradient(-45deg, ${PAPER} 30%, transparent 30%)`,
-      backgroundSize: '22px 22px', filter: `drop-shadow(0 2px 2px ${SHADOW})`,
-    }} />
-    {children}
-  </div>
+// ── 老板注意卡（平铺金框，非漂浮白卡）──
+const Note: React.FC<{ delay: number }> = ({ delay }) => (
+  <MenuRow delay={delay}>
+    <div style={{ marginTop: 48, border: `1.5px solid ${RULE}`, borderRadius: 16, padding: '28px 34px', background: 'rgba(217,164,65,0.06)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+        <span style={{ width: 26, height: 26, display: 'inline-block' }}>{Ico.cup(GOLD)}</span>
+        <span style={{ fontSize: 24, color: GOLD, letterSpacing: 3, fontWeight: 700 }}>老板注意</span>
+      </div>
+      <div style={{ fontSize: 31, color: CREAM, lineHeight: 1.5 }}>门槛填 <span style={{ color: GOLD, fontWeight: 700 }}>0</span> 是白送引流，设成客单价 <span style={{ color: GOLD, fontWeight: 700 }}>满 35</span> 才是来了就得消费一次</div>
+    </div>
+  </MenuRow>
 );
 
-// ── 顶栏（菜单板风）：杯标 + 页面真标题 + 步骤胶囊 + 面包屑（行尾「数值为示例」合规标注，C-11 顶部）──
-const Header: React.FC<{ title: string; step: string; crumb: string }> = ({ title, step, crumb }) => {
-  const f = useCurrentFrame();
-  const p = interpolate(f - 4, [0, 16], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
-  return (
-    <div style={{ position: 'absolute', left: 60, right: 60, top: 116, opacity: p }}>
-      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, height: 66 }}>
-        <span style={{ width: 44, height: 44, display: 'inline-block' }}>{Ico.cup(COFFEE_RED)}</span>
-        <span style={{ fontFamily: FONT_ROUND, fontSize: 52, color: ESPRESSO, letterSpacing: 4 }}>{title}</span>
-        <span style={{
-          position: 'absolute', right: 0, fontSize: 24, color: '#fff', background: COFFEE_RED,
-          borderRadius: 999, padding: '9px 24px', letterSpacing: 2,
-        }}>{step}</span>
-      </div>
-      <div style={{ marginTop: 10, textAlign: 'center', fontSize: 25, color: MUTED, letterSpacing: 1 }}>{crumb}</div>
-    </div>
-  );
-};
-
-// ── 分组小标题 ──
-const GroupHead: React.FC<{ text: string; delay: number }> = ({ text, delay }) => (
-  <PrintLine delay={delay}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 14, paddingBottom: 16, borderBottom: `2px solid ${LINE}` }}>
-      <span style={{ width: 10, height: 32, borderRadius: 5, background: COFFEE_RED }} />
-      <span style={{ fontSize: 31, fontWeight: 700, color: BROWN, letterSpacing: 2 }}>{text}</span>
-    </div>
-  </PrintLine>
-);
-
-// ── 一行制券表单：左=产品字段名，右=咖啡场景示例值；未到本行节拍前不占位 ──
-// hero = 本片核心决策行（消费门槛）：整行咖啡红底带 + 左色条 + 值放大成主色 + 可选小标签；其余行干净无装饰
-const FormLine: React.FC<{
-  k: string; v: string; delay: number; hero?: boolean; tag?: string; hint?: string;
-}> = ({ k, v, delay, hero, tag, hint }) => {
-  const f = useCurrentFrame();
-  if (f < delay) return null;
-  return (
-    <PrintLine delay={delay}>
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 16, padding: hero ? '26px 20px 22px' : '24px 12px 20px',
-        borderBottom: `1.5px dashed ${LINE}`,
-        background: hero ? 'rgba(181,80,42,0.10)' : 'transparent',
-        borderLeft: hero ? `7px solid ${COFFEE_RED}` : '7px solid transparent',
-        borderRadius: 12,
-      }}>
-        <span style={{ width: 188, flexShrink: 0, fontSize: 30, color: hero ? '#7a3a1e' : MUTED, letterSpacing: 1, fontWeight: hero ? 700 : 400 }}>{k}</span>
-        <span style={{ flex: 1, display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 14 }}>
-          {tag && (
-            <span style={{ fontSize: 22, color: '#fff', background: COFFEE_RED, borderRadius: 8, padding: '4px 12px', letterSpacing: 1, transform: 'translateY(-6px)' }}>{tag}</span>
-          )}
-          <span style={{ fontSize: hero ? 42 : 36, fontWeight: 700, color: hero ? COFFEE_RED : ESPRESSO, textAlign: 'right', lineHeight: 1.3 }}>{v}</span>
-        </span>
-      </div>
-      {hint && (
-        <div style={{ fontSize: 24, color: FAINT, textAlign: 'right', padding: hero ? '10px 20px 6px' : '8px 12px 4px', letterSpacing: 1, lineHeight: 1.4 }}>{hint}</div>
-      )}
-    </PrintLine>
-  );
-};
-
-// ── 门槛分水岭提示卡 ──
-const Callout: React.FC<{ delay: number }> = ({ delay }) => {
-  const f = useCurrentFrame();
-  const s = spring({ frame: f - delay, fps: FPS, config: { damping: 20, stiffness: 150 } });
-  return (
-    <PrintLine delay={delay} style={{ marginTop: 40 }}>
-      <div style={{
-        background: CREAM, borderRadius: 18, borderLeft: `9px solid ${COFFEE_RED}`,
-        boxShadow: `0 12px 26px ${SHADOW}`, padding: '30px 40px',
-      }}>
-        <div style={{ fontFamily: FONT_ROUND, fontSize: 35, color: ESPRESSO, letterSpacing: 1 }}>
-          门槛填 <span style={{ color: COFFEE_RED, fontWeight: 700 }}>0</span> = 白送引流，招来只占便宜的
-        </div>
-        <div style={{ fontFamily: FONT_ROUND, fontSize: 35, color: ESPRESSO, marginTop: 12, letterSpacing: 1 }}>
-          门槛设成 <span style={{ color: COFFEE_RED, fontWeight: 700 }}>35 元</span>（≈客单价）= 来了就得消费一次
-        </div>
-        <div style={{ marginTop: 16, fontSize: 25, color: BROWN, letterSpacing: 1 }}>这一栏，就是"拉新还是提客单"的分水岭</div>
-      </div>
-    </PrintLine>
-  );
-};
-
-// ── 页脚品牌记号 ──
-const FootMark: React.FC = () => {
-  const f = useCurrentFrame();
-  const p = interpolate(f - 110, [0, 18], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
-  return (
-    <div style={{
-      position: 'absolute', left: 0, right: 0, bottom: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
-      opacity: p * 0.9, color: FAINT, fontSize: 24, letterSpacing: 3,
-    }}>
-      <span style={{ width: 26, height: 26, display: 'inline-block' }}>{Ico.cup(FAINT)}</span>
-      券到卡包 · 咖啡茶饮
-    </div>
-  );
-};
-
-// ── 一屏标杆主体 ──
 export const G07Bench: React.FC = () => {
-  const f = useCurrentFrame();
-  const lift = spring({ frame: f - 12, fps: FPS, config: { damping: 20, stiffness: 150 } });
   return (
-    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: PALETTES.caramel.bg }}>
+    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: BG }}>
       <Ambient />
-      <Header title="制作满减券" step="示例" crumb="券到卡包 · 拉新复购 · 数值为示例" />
-      <div style={{
-        position: 'absolute', left: 68, right: 68, top: 300,
-        opacity: lift, transform: `translateY(${(1 - lift) * 60}px)`,
-      }}>
-        {/* 第一组 · 券面 */}
-        <Ticket style={{ padding: '36px 44px 24px 52px' }}>
-          <GroupHead text="① 券面" delay={18} />
-          <FormLine k="优惠券名称" v="到店咖啡券" delay={28} hint="最多 18 字 · 场景直接写进名字" />
-          <FormLine k="消费门槛" v="满 35 元可用" delay={46} hero tag="分水岭" hint="0 为无门槛" />
-          <FormLine k="优惠金额" v="8 元" delay={66} hint="满 35 才能用，省 8 元" />
-          <FormLine k="制作数量" v="200 张" delay={84} hint="库存 1~10000" />
-        </Ticket>
-
-        {/* 第二组 · 期限 */}
-        <Ticket rot={0.3} style={{ padding: '36px 44px 24px 52px', marginTop: 56 }}>
-          <GroupHead text="② 期限" delay={102} />
-          <FormLine k="有效期类型" v="自领取日起 N 天内有效" delay={110} />
-          <FormLine k="有效期" v="7 天" delay={126} hint="最少 1 天，最多 365 天" />
-        </Ticket>
-
-        <Callout delay={144} />
+      <Header />
+      <div style={{ position: 'absolute', left: 84, right: 84, top: 470 }}>
+        <Section no="01" name="券面" delay={22} />
+        <div style={{ marginTop: 14 }}>
+          <Row name="优惠券名称" price="到店咖啡券" delay={34} sub="最多 18 字 · 场景写进名字" />
+          <Row name="消费门槛" price="满 35 元可用" delay={52} hero tag="分水岭" sub="0 为无门槛" />
+          <Row name="优惠金额" price="减 8 元" delay={72} sub="满 35 才能用，省 8 元" />
+          <Row name="制作数量" price="200 张" delay={90} sub="库存 1~10000" />
+        </div>
+        <Section no="02" name="期限" delay={110} />
+        <div style={{ marginTop: 14 }}>
+          <Row name="有效期类型" price="领后 N 天内有效" delay={120} />
+          <Row name="有效期" price="7 天" delay={136} sub="最少 1 天，最多 365 天" />
+        </div>
+        <Note delay={156} />
       </div>
-      <FootMark />
+      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 200, textAlign: 'center', fontSize: 24, color: MUTED, letterSpacing: 4 }}>券到卡包 · 咖啡茶饮</div>
     </AbsoluteFill>
   );
 };

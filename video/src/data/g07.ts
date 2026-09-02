@@ -55,6 +55,7 @@ const scenes: Scene[] = [
     payload: {
       tag: '示例',
       navTitle: '制作满减券',
+      couponType: '满减券',
       crumb: '券到卡包 · 拉新复购 · 数值为示例',
       groups: [
         {

@@ -1,33 +1,32 @@
 // g07 咖啡茶饮 · 片1 · 九屏（一屏一组件，禁止跨行业 import）
-// 母题「一张刚打印出来的点单小票」：热敏小票上下撕齿 / 咖啡渍水印 / 拿铁纸感 / 打印出票入场
-// 色板 caramel（陶土咖啡红 #B5502A + 浓缩咖墨 + 纯白小票）——整套与教培那条（暖橙 + 回执左打孔 + 盖章对勾）不同。
-// 屏序与分镜见 outputs/g07-咖啡茶饮/07-片1-分镜稿.md：
-//   S1 钩子 / S2 痛点(拆 anchor-pain) / S3 制券·券面(★一屏标杆) / S4 机制对比(拆 anchor-mech) /
-//   S5 制券·发放与期限 / S6 核销后赠券链(拆 ref-11) / S7 结果·顾客与核销(拆 ref-16) / S8 后台(拆 ref-10) / S9 收尾
+// 母题「咖啡馆菜单板」——2026-09-03 推翻 v1（点单小票太像教培 g06）。五轴全反 g06：
+//   底色 深浓缩咖啡（非浅底漂浮卡）/ 容器 平铺分栏无投影（非白色圆角卡）/ 标题 得意黑招牌+金色眉标题（非方圆体+胶囊）/
+//   表单行 菜单「名称 …… 价格」点线引导（非左标签右数值+虚线下划线）/ 强调 暖金（非红）/ 入场 逐行淡起+点线写出
+// 屏序与分镜见 outputs/g07-咖啡茶饮/07-片1-分镜稿.md。数据/字段/口播不动，本文件只承载呈现骨架。
 // 骨架全部内联本文件；跨屏只复用 ../../components/{animations,ui} 与 ../../palette。
 import React from 'react';
 import {
   AbsoluteFill, interpolate, spring, useCurrentFrame,
 } from 'remotion';
-import { FPS, FONT_BODY, FONT_ROUND, PALETTES } from '../../palette';
+import { FPS, FONT_BODY, FONT_TITLE } from '../../palette';
 import { EASE_OUT } from '../../components/animations';
 import { Ico } from '../../components/icons';
 import type { SceneRenderProps, SubtitleLine } from '../../types';
 import type {
-  HookPayload, PainPayload, MakePayload, FormRow, MechPayload, IssuePayload,
+  HookPayload, PainPayload, MakePayload, MechPayload, IssuePayload,
   ChainPayload, StepsPayload, LedgerPayload, CtaPayload,
 } from './types';
 
-// ── 本片色板 ──
-const COFFEE_RED = '#B5502A';
-const ESPRESSO = '#2B1C12';
-const BROWN = '#5A3E2B';
-const MUTED = '#8A6F5A';
-const FAINT = '#B49A80';
-const PAPER = '#FFFFFF';
-const CREAM = '#F1E4CE';
-const LINE = 'rgba(90,62,43,0.18)';
-const SHADOW = 'rgba(90,62,43,0.15)';
+// ── 菜单板色板 ──
+const BG = '#241812';
+const BG2 = '#2f2016';
+const CREAM = '#F3E9D8';
+const GOLD = '#D9A441';
+const MUTED = '#B79A78';
+const FAINT = '#8a7355';
+const LEADER = 'rgba(243,233,216,0.22)';
+const RULE = 'rgba(217,164,65,0.45)';
+const TINT = 'rgba(217,164,65,0.10)';
 
 // ── 节拍：口播句 → 区域 ──
 const useBeat = (subs?: SubtitleLine[]): number => {
@@ -38,483 +37,387 @@ const useBeat = (subs?: SubtitleLine[]): number => {
   return a;
 };
 const useBeatFrame = (subs?: SubtitleLine[]) => (i: number) => subs?.[i]?.startFrame ?? 8;
-/** 区域三态：没讲到=安静可读 0.9 / 讲到=全亮 / 讲过=降到 0.74（浅底仍读得清） */
 const region = (beat: number, from: number, to: number) => ({
-  opacity: beat < 0 ? 0.94 : beat < from ? 0.9 : beat <= to ? 1 : 0.74,
+  opacity: beat < 0 ? 0.95 : beat < from ? 0.9 : beat <= to ? 1 : 0.72,
   active: beat >= from && beat <= to,
 });
 
 // ── 母题零件 ──
 const Ambient: React.FC = () => {
   const f = useCurrentFrame();
-  const x1 = Math.sin(f / 62) * 26;
-  const y1 = Math.cos(f / 80) * 20;
-  const x2 = Math.cos(f / 70) * 30;
-  const ringO = 0.05 + (Math.sin(f / 50) * 0.5 + 0.5) * 0.025;
+  const o = 0.06 + (Math.sin(f / 70) * 0.5 + 0.5) * 0.05;
+  const sx = Math.sin(f / 90) * 10;
   return (
     <>
-      <div style={{ position: 'absolute', left: -160 + x1, top: 200 + y1, width: 560, height: 560, borderRadius: '50%', background: 'radial-gradient(circle, rgba(181,80,42,0.10) 0%, transparent 68%)', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', right: -200 + x2, bottom: 360 - y1, width: 640, height: 640, borderRadius: '50%', background: 'radial-gradient(circle, rgba(141,110,99,0.12) 0%, transparent 66%)', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', right: 70, top: 240, width: 260, height: 250, border: `14px solid ${COFFEE_RED}`, borderRadius: '50% 46% 52% 48% / 48% 52% 46% 54%', opacity: ringO, transform: 'rotate(-14deg)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', inset: 0, background: `radial-gradient(ellipse 90% 60% at 50% 30%, ${BG2} 0%, ${BG} 70%)` }} />
+      <div style={{ position: 'absolute', left: 120 + sx, top: 120, width: 840, height: 520, borderRadius: '50%', background: `radial-gradient(circle, rgba(217,164,65,${o}) 0%, transparent 68%)`, pointerEvents: 'none' }} />
+      <svg width="1080" height="1920" style={{ position: 'absolute', inset: 0, opacity: 0.06, pointerEvents: 'none' }}>
+        {[0, 1, 2].map((i) => (
+          <path key={i} d={`M ${470 + i * 70} 1760 q 26 -60 0 -120 q -26 -60 0 -120`} stroke={GOLD} strokeWidth="3" fill="none" strokeLinecap="round" />
+        ))}
+      </svg>
     </>
   );
 };
 
-const PrintLine: React.FC<{ delay?: number; children: React.ReactNode; style?: React.CSSProperties }> = ({ delay = 0, children, style }) => {
+/** 逐行淡起 + 上移（菜单行入场，区别 g06 的递交/打印擦入） */
+const MenuRow: React.FC<{ delay?: number; children: React.ReactNode; style?: React.CSSProperties }> = ({ delay = 0, children, style }) => {
   const f = useCurrentFrame();
   const p = interpolate(f - delay, [0, 16], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
-  return <div style={{ clipPath: `inset(0 ${(1 - p) * 100}% 0 0)`, opacity: Math.min(1, p * 1.8), transform: `translateY(${(1 - p) * -10}px)`, ...style }}>{children}</div>;
+  return <div style={{ opacity: p, transform: `translateY(${(1 - p) * 14}px)`, ...style }}>{children}</div>;
 };
 
-const Ticket: React.FC<{ children: React.ReactNode; style?: React.CSSProperties; rot?: number }> = ({ children, style, rot = 0 }) => (
-  <div style={{ position: 'relative', background: PAPER, border: `1.5px solid ${LINE}`, boxShadow: `0 18px 40px ${SHADOW}`, transform: `rotate(${rot}deg)`, ...style }}>
-    <div style={{ position: 'absolute', left: 0, right: 0, top: -11, height: 12, backgroundImage: `linear-gradient(135deg, ${PAPER} 30%, transparent 30%), linear-gradient(-135deg, ${PAPER} 30%, transparent 30%)`, backgroundSize: '22px 22px', filter: `drop-shadow(0 -2px 2px ${SHADOW})` }} />
-    <div style={{ position: 'absolute', left: 0, right: 0, bottom: -11, height: 12, backgroundImage: `linear-gradient(45deg, ${PAPER} 30%, transparent 30%), linear-gradient(-45deg, ${PAPER} 30%, transparent 30%)`, backgroundSize: '22px 22px', filter: `drop-shadow(0 2px 2px ${SHADOW})` }} />
-    {children}
-  </div>
-);
-
-/** 关键词咖啡渍圈（标题里只圈一次，克制） */
-const Ring: React.FC<{ delay?: number; children: React.ReactNode }> = ({ delay = 18, children }) => {
+/** 招牌标题：金色眉标题 + 得意黑主标题（可两行，第二行金下划线）+ 副行 */
+const Sign: React.FC<{ eyebrow: string; l1: string; l2?: string; sub?: string; delay?: number }> = ({ eyebrow, l1, l2, sub, delay = 4 }) => {
   const f = useCurrentFrame();
-  const p = interpolate(f - delay, [0, 16], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
+  const p = interpolate(f - delay, [0, 18], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
+  const ul = interpolate(f - delay - 10, [0, 16], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
   return (
-    <span style={{ position: 'relative', display: 'inline-block', padding: '0 6px' }}>
-      <span style={{ position: 'absolute', left: '-2%', top: '-14%', width: `${p * 104}%`, height: '128%', border: `4px solid ${COFFEE_RED}`, borderRadius: '50% 46% 52% 48% / 48% 52% 46% 54%', opacity: 0.55, transform: 'rotate(-5deg)' }} />
-      <span style={{ position: 'relative' }}>{children}</span>
-    </span>
-  );
-};
-
-/** 内容屏左上角标胶囊 */
-const Tag: React.FC<{ text: string; delay?: number }> = ({ text, delay = 4 }) => {
-  const f = useCurrentFrame();
-  const p = interpolate(f - delay, [0, 14], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
-  return (
-    <div style={{ position: 'absolute', left: 72, top: 128, display: 'inline-flex', alignItems: 'center', gap: 12, opacity: p, transform: `translateY(${(1 - p) * 16}px)`, border: `2px solid rgba(90,62,43,0.35)`, borderRadius: 999, padding: '10px 28px', color: BROWN, fontSize: 26, letterSpacing: 3, background: 'rgba(255,255,255,0.7)' }}>
-      <span style={{ width: 24, height: 24, display: 'inline-block' }}>{Ico.cup(COFFEE_RED)}</span>
-      {text}
-    </div>
-  );
-};
-
-/** 制券屏顶栏（菜单板风 + 右上示例胶囊 + 面包屑行尾合规标注） */
-const MakeNav: React.FC<{ title: string; step: string; crumb: string }> = ({ title, step, crumb }) => {
-  const f = useCurrentFrame();
-  const p = interpolate(f - 4, [0, 16], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
-  return (
-    <div style={{ position: 'absolute', left: 60, right: 60, top: 116, opacity: p }}>
-      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 18, height: 66 }}>
-        <span style={{ width: 44, height: 44, display: 'inline-block' }}>{Ico.cup(COFFEE_RED)}</span>
-        <span style={{ fontFamily: FONT_ROUND, fontSize: 52, color: ESPRESSO, letterSpacing: 4 }}>{title}</span>
-        <span style={{ position: 'absolute', right: 0, fontSize: 24, color: '#fff', background: COFFEE_RED, borderRadius: 999, padding: '9px 24px', letterSpacing: 2 }}>{step}</span>
+    <div style={{ position: 'absolute', left: 84, right: 84, top: 150, opacity: p }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <span style={{ width: 32, height: 32, display: 'inline-block' }}>{Ico.cup(GOLD)}</span>
+        <span style={{ fontSize: 25, color: GOLD, letterSpacing: 6, fontWeight: 700 }}>{eyebrow}</span>
       </div>
-      <div style={{ marginTop: 10, textAlign: 'center', fontSize: 25, color: MUTED, letterSpacing: 1 }}>{crumb}</div>
+      <div style={{ marginTop: 14, fontFamily: FONT_TITLE, fontSize: 82, color: CREAM, letterSpacing: 3, lineHeight: 1.12 }}>
+        {l1}
+        {l2 && (
+          <span style={{ position: 'relative', display: 'inline-block', marginLeft: 4 }}>
+            {l2}
+            <span style={{ position: 'absolute', left: 0, bottom: -8, width: `${ul * 100}%`, height: 5, background: GOLD, borderRadius: 3 }} />
+          </span>
+        )}
+      </div>
+      {sub && <div style={{ marginTop: 22, fontSize: 27, color: MUTED, letterSpacing: 2 }}>{sub}</div>}
     </div>
   );
 };
 
-const GroupHead: React.FC<{ text: string; delay: number }> = ({ text, delay }) => (
-  <PrintLine delay={delay}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 14, paddingBottom: 16, borderBottom: `2px solid ${LINE}` }}>
-      <span style={{ width: 10, height: 32, borderRadius: 5, background: COFFEE_RED }} />
-      <span style={{ fontSize: 31, fontWeight: 700, color: BROWN, letterSpacing: 2 }}>{text}</span>
-    </div>
-  </PrintLine>
-);
-
-const Chevron = () => (
-  <svg width="20" height="28" viewBox="0 0 20 28" style={{ flexShrink: 0 }}>
-    <path d="M5 4l11 10L5 24" stroke={FAINT} strokeWidth="3.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-const Toggle: React.FC<{ prog: number }> = ({ prog }) => (
-  <span style={{ width: 84, height: 44, borderRadius: 999, flexShrink: 0, position: 'relative', background: prog > 0.5 ? COFFEE_RED : '#D9CEC1' }}>
-    <span style={{ position: 'absolute', top: 5, left: 5 + prog * 40, width: 34, height: 34, borderRadius: '50%', background: '#fff', boxShadow: '0 2px 6px rgba(0,0,0,0.18)' }} />
-  </span>
-);
-
-/** 一行制券表单：hero=核心决策行整行点亮；kind=select 带箭头、switch 带开关 */
-const FormLine: React.FC<{ row: FormRow; delay: number; active: boolean }> = ({ row, delay, active }) => {
+/** 分栏抬头：金色编号 + 奶油名 + 金线 */
+const SectionHead: React.FC<{ no: string; name: string; delay: number }> = ({ no, name, delay }) => {
   const f = useCurrentFrame();
-  const knob = row.kind === 'switch' ? spring({ frame: f - delay - 10, fps: FPS, config: { damping: 17, stiffness: 190 } }) : 0;
+  const p = interpolate(f - delay, [0, 16], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
+  return (
+    <MenuRow delay={delay}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 38 }}>
+        <span style={{ fontSize: 26, color: GOLD, fontFamily: FONT_TITLE }}>{no}</span>
+        <span style={{ fontSize: 33, color: CREAM, fontWeight: 700, letterSpacing: 3 }}>{name}</span>
+        <span style={{ flex: 1, height: 1.5, background: RULE, transform: `scaleX(${p})`, transformOrigin: 'left' }} />
+      </div>
+    </MenuRow>
+  );
+};
+
+/** 菜单行：名称 …… 价格（点线引导）；hero=分水岭整行点亮；muted=弱化 */
+const MenuLine: React.FC<{ name: string; value: string; delay: number; active?: boolean; hero?: boolean; muted?: boolean; tag?: string; sub?: string }> = ({ name, value, delay, active, hero, muted, tag, sub }) => {
+  const f = useCurrentFrame();
+  const lead = interpolate(f - delay - 6, [0, 14], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
   if (f < delay) return null;
   return (
-    <PrintLine delay={delay}>
+    <MenuRow delay={delay}>
       <div style={{
-        display: 'flex', alignItems: 'center', gap: 16, padding: row.hero ? '26px 20px 22px' : '24px 12px 20px',
-        borderBottom: `1.5px dashed ${LINE}`,
-        background: row.hero || active ? 'rgba(181,80,42,0.10)' : 'transparent',
-        borderLeft: row.hero ? `7px solid ${COFFEE_RED}` : `7px solid ${active ? 'rgba(181,80,42,0.4)' : 'transparent'}`,
-        borderRadius: 12,
+        display: 'flex', alignItems: 'baseline', gap: 18, padding: hero ? '20px 22px' : '16px 6px',
+        background: hero ? TINT : 'transparent', borderRadius: 12,
+        borderLeft: hero ? `5px solid ${GOLD}` : `5px solid ${active ? 'rgba(217,164,65,0.45)' : 'transparent'}`,
       }}>
-        <span style={{ width: 188, flexShrink: 0, fontSize: 30, color: row.hero || active ? '#7a3a1e' : MUTED, letterSpacing: 1, fontWeight: row.hero ? 700 : 400 }}>{row.k}</span>
-        <span style={{ flex: 1, display: 'flex', alignItems: 'baseline', justifyContent: 'flex-end', gap: 14 }}>
-          {row.tag && <span style={{ fontSize: 22, color: '#fff', background: COFFEE_RED, borderRadius: 8, padding: '4px 12px', letterSpacing: 1, transform: 'translateY(-6px)' }}>{row.tag}</span>}
-          <span style={{ fontSize: row.hero ? 42 : 36, fontWeight: 700, color: row.hero ? COFFEE_RED : ESPRESSO, textAlign: 'right', lineHeight: 1.3 }}>{row.v}</span>
-          {row.kind === 'switch' && <Toggle prog={knob} />}
-          {row.kind === 'select' && <Chevron />}
-        </span>
+        <span style={{ fontSize: hero ? 34 : 31, color: hero ? GOLD : muted ? MUTED : CREAM, fontWeight: hero ? 700 : 500, letterSpacing: 1, flexShrink: 0 }}>{name}</span>
+        {tag && <span style={{ fontSize: 21, color: BG, background: GOLD, borderRadius: 6, padding: '3px 12px', letterSpacing: 1, fontWeight: 700, flexShrink: 0 }}>{tag}</span>}
+        <span style={{ flex: 1, minWidth: 30, borderBottom: `2px dotted ${LEADER}`, transform: `scaleX(${lead})`, transformOrigin: 'left', height: 2, marginBottom: 8 }} />
+        <span style={{ fontSize: hero ? 40 : 34, color: hero ? GOLD : muted ? MUTED : CREAM, fontWeight: 700, flexShrink: 0, letterSpacing: 1 }}>{value}</span>
       </div>
-      {row.hint && <div style={{ fontSize: 24, color: FAINT, textAlign: 'right', padding: row.hero ? '10px 20px 6px' : '8px 12px 4px', letterSpacing: 1, lineHeight: 1.4 }}>{row.hint}</div>}
-    </PrintLine>
+      {sub && <div style={{ fontSize: 23, color: FAINT, textAlign: 'right', padding: '2px 10px 0 0', letterSpacing: 1 }}>{sub}</div>}
+    </MenuRow>
   );
 };
+
+/** 要点行（列表项，圆点 + 文本） */
+const Item: React.FC<{ text: string; delay: number; tone?: 'cream' | 'muted' | 'gold' }> = ({ text, delay, tone = 'cream' }) => {
+  const color = tone === 'muted' ? MUTED : tone === 'gold' ? GOLD : CREAM;
+  return (
+    <MenuRow delay={delay}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 18 }}>
+        <span style={{ width: 12, height: 12, borderRadius: '50%', background: tone === 'muted' ? MUTED : GOLD, flexShrink: 0 }} />
+        <span style={{ fontSize: 30, color, fontWeight: tone === 'muted' ? 400 : 600, lineHeight: 1.4 }}>{text}</span>
+      </div>
+    </MenuRow>
+  );
+};
+
+/** 老板注意卡（平铺金框，非漂浮白卡） */
+const Note: React.FC<{ delay: number; children: React.ReactNode; label?: string }> = ({ delay, children, label = '老板注意' }) => (
+  <MenuRow delay={delay} style={{ marginTop: 44 }}>
+    <div style={{ border: `1.5px solid ${RULE}`, borderRadius: 16, padding: '28px 34px', background: 'rgba(217,164,65,0.06)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+        <span style={{ width: 26, height: 26, display: 'inline-block' }}>{Ico.cup(GOLD)}</span>
+        <span style={{ fontSize: 24, color: GOLD, letterSpacing: 3, fontWeight: 700 }}>{label}</span>
+      </div>
+      <div style={{ fontSize: 31, color: CREAM, lineHeight: 1.5 }}>{children}</div>
+    </div>
+  </MenuRow>
+);
+
+const G = (t: string) => <span style={{ color: GOLD, fontWeight: 700 }}>{t}</span>;
 
 // ── S1 钩子 ──
 const S1Hook: React.FC<SceneRenderProps> = ({ scene }) => {
   const p = scene.payload as unknown as HookPayload;
   const beat = useBeat(scene.subtitles);
-  const f = useCurrentFrame();
-  const t = spring({ frame: f - 8, fps: FPS, config: { damping: 20, stiffness: 130 } });
-  const tick = spring({ frame: f - 60, fps: FPS, config: { damping: 18, stiffness: 150 } });
   return (
-    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: PALETTES.caramel.bg }}>
+    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: BG }}>
       <Ambient />
-      <Tag text={p.tag} />
-      <div style={{ position: 'absolute', left: 72, top: 250, right: 72, opacity: t, transform: `translateY(${(1 - t) * 34}px)` }}>
-        <div style={{ fontFamily: FONT_ROUND, fontSize: 88, lineHeight: 1.24, color: ESPRESSO }}>{p.title1}</div>
-        <div style={{ fontFamily: FONT_ROUND, fontSize: 88, lineHeight: 1.24, color: ESPRESSO }}>
-          <Ring delay={22}>{p.title2}</Ring>
-        </div>
-        <div style={{ marginTop: 28, fontSize: 32, color: MUTED, letterSpacing: 1, opacity: region(beat, 1, 1).opacity }}>{p.sub}</div>
-      </div>
-      <div style={{ position: 'absolute', left: 130, right: 130, top: 660, opacity: interpolate(tick, [0, 0.3], [0, 1], { extrapolateRight: 'clamp' }), transform: `translateY(${(1 - tick) * 60}px)` }}>
-        <Ticket rot={-1.2} style={{ padding: '46px 52px 40px 60px' }}>
+      <Sign eyebrow={p.tag} l1={p.title1} l2={p.title2} sub={p.sub} />
+      <div style={{ position: 'absolute', left: 84, right: 84, top: 560, opacity: region(beat, 0, 1).opacity }}>
+        <div style={{ border: `1.5px solid ${RULE}`, borderRadius: 16, padding: '34px 40px', background: 'rgba(0,0,0,0.18)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 28, color: FAINT, letterSpacing: 2 }}>{p.ticketName}</span>
-            <span style={{ fontSize: 26, color: '#fff', background: COFFEE_RED, borderRadius: 999, padding: '10px 28px', letterSpacing: 2 }}>{p.ticketBadge}</span>
+            <span style={{ fontSize: 26, color: FAINT, letterSpacing: 2 }}>{p.ticketName}</span>
+            <span style={{ fontSize: 24, color: BG, background: MUTED, borderRadius: 999, padding: '8px 24px', letterSpacing: 2 }}>{p.ticketBadge}</span>
           </div>
-          <div style={{ marginTop: 22, fontFamily: FONT_ROUND, fontSize: 52, color: ESPRESSO }}>{p.ticketLine}</div>
-          <div style={{ marginTop: 18, fontSize: 30, color: MUTED }}>客人：白拿一杯，喝完就走</div>
-        </Ticket>
+          <div style={{ marginTop: 20, display: 'flex', alignItems: 'baseline', gap: 18 }}>
+            <span style={{ fontSize: 40, color: MUTED, fontWeight: 700 }}>{p.ticketLine}</span>
+            <span style={{ flex: 1, borderBottom: `2px dotted ${LEADER}`, height: 2, marginBottom: 10 }} />
+            <span style={{ fontSize: 28, color: FAINT }}>白拿一杯 · 喝完就走</span>
+          </div>
+        </div>
       </div>
-      <div style={{ position: 'absolute', left: 130, right: 130, top: 1180, opacity: region(beat, 1, 1).opacity }}>
-        <PrintLine delay={150}>
-          <div style={{ background: CREAM, borderRadius: 18, borderLeft: `9px solid ${COFFEE_RED}`, boxShadow: `0 12px 26px ${SHADOW}`, padding: '30px 40px', fontFamily: FONT_ROUND, fontSize: 36, color: ESPRESSO, letterSpacing: 1, textAlign: 'center' }}>
-            问题不在发不发券，在<span style={{ color: COFFEE_RED }}>门槛那一栏</span>
-          </div>
-        </PrintLine>
+      <div style={{ position: 'absolute', left: 84, right: 84, top: 900 }}>
+        <Note delay={150} label="问题出在哪">不在发不发券，在{G('门槛')}那一栏——先别怪客人</Note>
       </div>
     </AbsoluteFill>
   );
 };
 
-// ── S2 痛点（拆 anchor-pain）──
+// ── S2 痛点 ──
 const S2Pain: React.FC<SceneRenderProps> = ({ scene }) => {
   const p = scene.payload as unknown as PainPayload;
   const beat = useBeat(scene.subtitles);
-  const f = useCurrentFrame();
-  const card = spring({ frame: f - 14, fps: FPS, config: { damping: 20, stiffness: 130 } });
-  const tt = spring({ frame: f - 4, fps: FPS, config: { damping: 22, stiffness: 150 } });
   return (
-    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: PALETTES.caramel.bg }}>
+    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: BG }}>
       <Ambient />
-      <Tag text={p.tag} />
-      <div style={{ position: 'absolute', left: 72, top: 234, right: 72, opacity: tt, transform: `translateY(${(1 - tt) * 26}px)` }}>
-        <div style={{ fontFamily: FONT_ROUND, fontSize: 78, lineHeight: 1.24, color: ESPRESSO }}>{p.title1}</div>
-        <div style={{ fontFamily: FONT_ROUND, fontSize: 78, lineHeight: 1.24, color: ESPRESSO }}>{p.title2}</div>
-        <div style={{ marginTop: 8, fontSize: 40, color: ESPRESSO, fontFamily: FONT_ROUND }}><Ring delay={18}>{p.accent}</Ring></div>
-      </div>
-      <div style={{ position: 'absolute', left: 72, top: 600, width: 560, opacity: card, transform: `translateX(${(1 - card) * 90}px) rotate(${(1 - card) * 3 - 0.6}deg)` }}>
-        <Ticket style={{ padding: '46px 46px 40px 54px' }}>
+      <Sign eyebrow={p.tag} l1={p.title1} l2={p.title2} />
+      <div style={{ position: 'absolute', left: 84, top: 500, width: 500, opacity: region(beat, 0, 1).opacity }}>
+        <div style={{ border: `1.5px solid ${RULE}`, borderRadius: 16, padding: '32px 36px', background: 'rgba(0,0,0,0.18)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 26, color: FAINT, letterSpacing: 2 }}>{p.ticketName}</span>
-            <span style={{ fontSize: 25, color: '#fff', background: COFFEE_RED, borderRadius: 999, padding: '9px 26px', letterSpacing: 2 }}>{p.ticketBadge}</span>
+            <span style={{ fontSize: 24, color: FAINT, letterSpacing: 2 }}>{p.ticketName}</span>
+            <span style={{ fontSize: 23, color: BG, background: MUTED, borderRadius: 999, padding: '7px 22px', letterSpacing: 2 }}>{p.ticketBadge}</span>
           </div>
-          <div style={{ fontFamily: FONT_ROUND, fontSize: 52, lineHeight: 1.3, color: ESPRESSO, marginTop: 16 }}>{p.ticketTitle}</div>
+          <div style={{ marginTop: 16, fontSize: 44, color: MUTED, fontWeight: 700 }}>{p.ticketTitle}</div>
           {p.ticketLines.map((l, i) => (
-            <div key={l} style={{ marginTop: i === 0 ? 26 : 16, fontSize: 31, color: MUTED, borderTop: i === 0 ? `1.5px dashed ${LINE}` : 'none', paddingTop: i === 0 ? 22 : 0 }}>{l}</div>
+            <div key={l} style={{ marginTop: i === 0 ? 22 : 12, fontSize: 28, color: FAINT, borderTop: i === 0 ? `1.5px dashed ${LEADER}` : 'none', paddingTop: i === 0 ? 18 : 0 }}>{l}</div>
           ))}
-        </Ticket>
+        </div>
       </div>
-      <div style={{ position: 'absolute', right: 72, top: 640, width: 340 }}>
-        {p.quotes.map((q, i) => {
-          const r = region(beat, 0, 1);
-          return (
-            <PrintLine key={q.t1} delay={70 + i * 26} style={{ opacity: r.opacity, marginBottom: 90 }}>
-              <div style={{ fontSize: 40, fontWeight: 700, color: ESPRESSO }}>{q.t1}</div>
-              <div style={{ fontSize: 31, color: MUTED, marginTop: 8 }}>{q.t2}</div>
-              <div style={{ width: 64, height: 4, background: COFFEE_RED, marginTop: 14, borderRadius: 2 }} />
-            </PrintLine>
-          );
-        })}
+      <div style={{ position: 'absolute', right: 84, top: 540, width: 380 }}>
+        {p.quotes.map((q, i) => (
+          <MenuRow key={q.t1} delay={60 + i * 26} style={{ marginBottom: 70, opacity: region(beat, 0, 1).opacity }}>
+            <div style={{ fontSize: 38, fontWeight: 700, color: CREAM }}>{q.t1}</div>
+            <div style={{ fontSize: 29, color: MUTED, marginTop: 6 }}>{q.t2}</div>
+            <div style={{ width: 60, height: 4, background: GOLD, marginTop: 12, borderRadius: 2 }} />
+          </MenuRow>
+        ))}
       </div>
-      <div style={{ position: 'absolute', left: 72, right: 72, top: 1300, opacity: region(beat, 1, 1).opacity }}>
-        <PrintLine delay={150}>
-          <div style={{ background: CREAM, borderRadius: 18, borderLeft: `9px solid ${COFFEE_RED}`, boxShadow: `0 12px 26px ${SHADOW}`, padding: '30px 40px', fontFamily: FONT_ROUND, fontSize: 36, color: ESPRESSO, letterSpacing: 1, textAlign: 'center' }}>
-            无门槛是<span style={{ color: COFFEE_RED }}>请客</span>，设了门槛才是<span style={{ color: COFFEE_RED }}>做生意</span>
-          </div>
-        </PrintLine>
+      <div style={{ position: 'absolute', left: 84, right: 84, top: 1180 }}>
+        <Note delay={150} label="一句话">无门槛是{G('请客')}，设了门槛才是{G('做生意')}</Note>
       </div>
     </AbsoluteFill>
   );
 };
 
-// ── S3 制券·券面+期限（★一屏标杆：两组表单 + 门槛分水岭提示）──
+// ── S3 制券·券面+期限（★一屏标杆：菜单点线行 + 老板注意）──
 const S3MakeBasic: React.FC<SceneRenderProps> = ({ scene }) => {
   const p = scene.payload as unknown as MakePayload;
   const beat = useBeat(scene.subtitles);
   const bf = useBeatFrame(scene.subtitles);
-  const f = useCurrentFrame();
-  const lift = spring({ frame: f - 12, fps: FPS, config: { damping: 20, stiffness: 150 } });
   // 行（跨组拉平）→ 口播句：名称1 门槛2 面额3 数量3 有效期类型4 有效期4
   const rowBeat = [1, 2, 3, 3, 4, 4];
   const cardTop = (gi: number) => p.groups.slice(0, gi).reduce((n, g) => n + g.rows.length, 0);
-  const groupDelay = (gi: number) => Math.max(10, bf(rowBeat[cardTop(gi)]) - 10);
+  const clean = (h: string) => h.replace(/^[①②③④⑤⑥⑦⑧⑨⑩]\s*/, '');
   return (
-    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: PALETTES.caramel.bg }}>
+    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: BG }}>
       <Ambient />
-      <MakeNav title={p.navTitle} step={p.tag} crumb={p.crumb} />
-      <div style={{ position: 'absolute', left: 68, right: 68, top: 300, opacity: lift, transform: `translateY(${(1 - lift) * 60}px)` }}>
+      <Sign eyebrow="券到咖啡 · 今日出券" l1={p.navTitle} sub={p.crumb} />
+      <div style={{ position: 'absolute', left: 84, right: 84, top: 470 }}>
         {p.groups.map((g, gi) => (
-          <div key={g.head} style={{ marginTop: gi === 0 ? 0 : 44 }}>
-            <Ticket rot={gi === 0 ? 0 : 0.3} style={{ padding: '34px 44px 22px 52px' }}>
-              <GroupHead text={g.head} delay={groupDelay(gi)} />
+          <div key={g.head}>
+            <SectionHead no={gi === 0 ? '01' : '02'} name={clean(g.head)} delay={bf(rowBeat[cardTop(gi)]) - 6} />
+            <div style={{ marginTop: 12 }}>
               {g.rows.map((row, i) => {
                 const b = rowBeat[cardTop(gi) + i];
-                return <FormLine key={row.k} row={row} delay={bf(b) + 4} active={beat === b} />;
+                return <MenuLine key={row.k} name={row.k} value={row.v} delay={bf(b) + 4} active={beat === b} hero={row.hero} tag={row.tag} sub={row.hint} />;
               })}
-            </Ticket>
+            </div>
           </div>
         ))}
         {p.callout && (
-          <PrintLine delay={bf(2) + 30} style={{ marginTop: 40 }}>
-            <div style={{ background: CREAM, borderRadius: 18, borderLeft: `9px solid ${COFFEE_RED}`, boxShadow: `0 12px 26px ${SHADOW}`, padding: '28px 38px' }}>
-              <div style={{ fontFamily: FONT_ROUND, fontSize: 34, color: ESPRESSO, letterSpacing: 1 }}>{p.callout.l1}</div>
-              <div style={{ fontFamily: FONT_ROUND, fontSize: 34, color: COFFEE_RED, marginTop: 10, letterSpacing: 1 }}>{p.callout.l2}</div>
-              <div style={{ marginTop: 14, fontSize: 25, color: BROWN, letterSpacing: 1 }}>{p.callout.tag}</div>
-            </div>
-          </PrintLine>
+          <Note delay={bf(2) + 30} label="老板注意">门槛填 {G('0')} 是白送引流，设成客单价 {G('满 35')} 才是来了就得消费一次</Note>
         )}
       </div>
-      <div style={{ position: 'absolute', left: 68, right: 68, bottom: 190, textAlign: 'center', fontSize: 24, color: 'rgba(90,62,43,0.6)', letterSpacing: 1, opacity: interpolate(f, [bf(4), bf(4) + 20], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }) }}>{p.foot}</div>
     </AbsoluteFill>
   );
 };
 
-// ── S4 机制·门槛对比（拆 anchor-mech）──
+// ── S4 机制·门槛对比（两栏菜单）──
 const S4Mech: React.FC<SceneRenderProps> = ({ scene }) => {
   const p = scene.payload as unknown as MechPayload;
   const beat = useBeat(scene.subtitles);
-  const f = useCurrentFrame();
-  const tt = spring({ frame: f - 6, fps: FPS, config: { damping: 20, stiffness: 140 } });
   const left = region(beat, 1, 1);
   const right = region(beat, 2, 2);
   return (
-    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: PALETTES.caramel.bg }}>
+    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: BG }}>
       <Ambient />
-      <Tag text={p.tag} />
-      <div style={{ position: 'absolute', left: 72, top: 240, right: 72, opacity: tt, transform: `translateY(${(1 - tt) * 30}px)` }}>
-        <div style={{ fontFamily: FONT_ROUND, fontSize: 82, lineHeight: 1.24, color: ESPRESSO }}>{p.title1}</div>
-        <div style={{ fontFamily: FONT_ROUND, fontSize: 82, lineHeight: 1.24, color: ESPRESSO }}><Ring delay={20}>{p.title2}</Ring></div>
-        <div style={{ marginTop: 20, fontSize: 30, color: MUTED }}>{p.sub}</div>
-      </div>
-      <div style={{ position: 'absolute', left: 72, right: 72, top: 660, display: 'flex', gap: 26, alignItems: 'stretch' }}>
+      <Sign eyebrow={p.tag} l1={p.title1} l2={p.title2} sub={p.sub} />
+      <div style={{ position: 'absolute', left: 84, right: 84, top: 500, display: 'flex', gap: 30 }}>
         <div style={{ flex: 1, opacity: Math.min(left.opacity + 0.05, 1) }}>
-          <div style={{ fontSize: 34, fontWeight: 700, color: MUTED, marginBottom: 18 }}>{p.leftHead}</div>
-          <div style={{ background: '#EFE7DB', borderRadius: 20, padding: '36px 34px', minHeight: 420 }}>
-            {p.leftItems.map((it, i) => <PrintLine key={it} delay={40 + i * 12}><div style={{ fontSize: 32, color: '#8a715c', lineHeight: 1.9 }}>· {it}</div></PrintLine>)}
-          </div>
-          <div style={{ marginTop: 22, background: 'rgba(181,80,42,0.08)', border: `1.5px dashed rgba(181,80,42,0.4)`, borderRadius: 16, padding: '22px 26px', fontSize: 27, color: '#8a4a2e', lineHeight: 1.5 }}>{p.leftNote}</div>
+          <div style={{ fontSize: 34, fontWeight: 700, color: MUTED, borderBottom: `2px solid ${LEADER}`, paddingBottom: 14 }}>{p.leftHead}</div>
+          {p.leftItems.map((it, i) => <Item key={it} text={it} delay={40 + i * 12} tone="muted" />)}
+          <div style={{ marginTop: 24, border: `1.5px dashed rgba(183,154,120,0.5)`, borderRadius: 14, padding: '20px 24px', fontSize: 26, color: MUTED, lineHeight: 1.5 }}>{p.leftNote}</div>
         </div>
-        <div style={{ width: 3, background: LINE, borderRadius: 2, margin: '40px 0' }} />
+        <div style={{ width: 2, background: RULE }} />
         <div style={{ flex: 1, opacity: Math.min(right.opacity + 0.05, 1) }}>
-          <div style={{ fontSize: 34, fontWeight: 700, color: COFFEE_RED, marginBottom: 18 }}>{p.rightHead}</div>
-          <div style={{ background: PAPER, border: `2px solid ${COFFEE_RED}`, borderRadius: 20, padding: '36px 34px', minHeight: 420, boxShadow: `0 14px 30px ${SHADOW}` }}>
-            {p.rightItems.map((it, i) => <PrintLine key={it} delay={70 + i * 12}><div style={{ fontSize: 32, color: ESPRESSO, fontWeight: 600, lineHeight: 1.9 }}>· {it}</div></PrintLine>)}
-          </div>
-          <div style={{ marginTop: 22, background: CREAM, borderLeft: `7px solid ${COFFEE_RED}`, borderRadius: 16, padding: '22px 26px', fontSize: 27, color: BROWN, lineHeight: 1.5 }}>{p.rightNote}</div>
+          <div style={{ fontSize: 34, fontWeight: 700, color: GOLD, borderBottom: `2px solid ${GOLD}`, paddingBottom: 14 }}>{p.rightHead}</div>
+          {p.rightItems.map((it, i) => <Item key={it} text={it} delay={70 + i * 12} tone="cream" />)}
+          <div style={{ marginTop: 24, background: TINT, borderLeft: `5px solid ${GOLD}`, borderRadius: 14, padding: '20px 24px', fontSize: 26, color: CREAM, lineHeight: 1.5 }}>{p.rightNote}</div>
         </div>
       </div>
-      <div style={{ position: 'absolute', left: 72, right: 72, top: 1360, opacity: region(beat, 3, 3).opacity }}>
-        <PrintLine delay={150}>
-          <div style={{ background: COFFEE_RED, borderRadius: 18, padding: '26px 40px', fontFamily: FONT_ROUND, fontSize: 36, color: '#fff', textAlign: 'center', letterSpacing: 2, boxShadow: `0 14px 30px rgba(181,80,42,0.28)` }}>{p.punch}</div>
-        </PrintLine>
+      <div style={{ position: 'absolute', left: 84, right: 84, top: 1340, opacity: region(beat, 3, 3).opacity }}>
+        <MenuRow delay={150}>
+          <div style={{ background: GOLD, borderRadius: 14, padding: '26px 40px', fontFamily: FONT_TITLE, fontSize: 38, color: BG, textAlign: 'center', letterSpacing: 2 }}>{p.punch}</div>
+        </MenuRow>
       </div>
     </AbsoluteFill>
   );
 };
 
-// ── S5 发放方式·选择（公开领取 vs 私密发放，选公开）──
+// ── S5 发放方式·选择 ──
 const S5Issue: React.FC<SceneRenderProps> = ({ scene }) => {
   const p = scene.payload as unknown as IssuePayload;
   const beat = useBeat(scene.subtitles);
-  const f = useCurrentFrame();
-  const tt = spring({ frame: f - 6, fps: FPS, config: { damping: 22, stiffness: 150 } });
-  const pick = spring({ frame: f - 24, fps: FPS, config: { damping: 18, stiffness: 160 } });
-  const other = spring({ frame: f - 48, fps: FPS, config: { damping: 20, stiffness: 150 } });
   return (
-    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: PALETTES.caramel.bg }}>
+    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: BG }}>
       <Ambient />
-      <Tag text={p.tag} />
-      <div style={{ position: 'absolute', left: 72, top: 240, right: 72, opacity: tt, transform: `translateY(${(1 - tt) * 26}px)` }}>
-        <div style={{ fontFamily: FONT_ROUND, fontSize: 78, color: ESPRESSO, lineHeight: 1.24 }}>{p.title}</div>
-        <div style={{ marginTop: 16, fontSize: 29, color: MUTED }}>{p.sub}</div>
-      </div>
-      {/* 选中：公开领取 */}
-      <div style={{ position: 'absolute', left: 72, right: 72, top: 520, opacity: interpolate(pick, [0, 0.3], [0, 1], { extrapolateRight: 'clamp' }), transform: `translateY(${(1 - pick) * 40}px)` }}>
-        <Ticket style={{ padding: '40px 46px 36px 54px', border: `2.5px solid ${COFFEE_RED}`, background: 'rgba(181,80,42,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-            <span style={{ width: 48, height: 48, display: 'inline-block' }}>{Ico.check(COFFEE_RED)}</span>
-            <span style={{ fontFamily: FONT_ROUND, fontSize: 50, color: ESPRESSO }}>{p.pickHead}</span>
-            <span style={{ marginLeft: 'auto', fontSize: 25, color: '#fff', background: COFFEE_RED, borderRadius: 999, padding: '9px 24px', letterSpacing: 2 }}>这张选它</span>
+      <Sign eyebrow={p.tag} l1={p.title} sub={p.sub} />
+      <div style={{ position: 'absolute', left: 84, right: 84, top: 500, opacity: region(beat, 0, 1).opacity }}>
+        <div style={{ border: `2px solid ${GOLD}`, borderRadius: 16, padding: '34px 40px', background: TINT }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <span style={{ width: 44, height: 44, display: 'inline-block' }}>{Ico.check(GOLD)}</span>
+            <span style={{ fontFamily: FONT_TITLE, fontSize: 50, color: GOLD }}>{p.pickHead}</span>
+            <span style={{ marginLeft: 'auto', fontSize: 24, color: BG, background: GOLD, borderRadius: 999, padding: '8px 22px', letterSpacing: 2 }}>这张选它</span>
           </div>
-          <div style={{ marginTop: 16, fontSize: 30, color: BROWN }}>{p.pickDesc}</div>
-          <div style={{ marginTop: 26, display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {p.pickPoints.map((pt, i) => (
-              <PrintLine key={pt} delay={40 + i * 12}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, fontSize: 32, color: ESPRESSO }}>
-                  <span style={{ width: 13, height: 13, borderRadius: '50%', background: COFFEE_RED, flexShrink: 0 }} />{pt}
-                </div>
-              </PrintLine>
-            ))}
-          </div>
-        </Ticket>
-      </div>
-      {/* 未选：私密发放（弱化，一句带过） */}
-      <div style={{ position: 'absolute', left: 72, right: 72, top: 1080, opacity: Math.min(interpolate(other, [0, 0.3], [0, 1], { extrapolateRight: 'clamp' }), region(beat, 0, 1).opacity) * 0.9, transform: `translateY(${(1 - other) * 40}px)` }}>
-        <div style={{ background: '#EFE7DB', borderRadius: 20, padding: '30px 42px', display: 'flex', alignItems: 'center', gap: 18, opacity: 0.85 }}>
-          <span style={{ fontFamily: FONT_ROUND, fontSize: 40, color: MUTED }}>{p.otherHead}</span>
-          <span style={{ fontSize: 27, color: '#8a715c', marginLeft: 'auto' }}>{p.otherDesc}</span>
+          <div style={{ marginTop: 14, fontSize: 29, color: CREAM }}>{p.pickDesc}</div>
+          {p.pickPoints.map((pt, i) => <Item key={pt} text={pt} delay={40 + i * 12} tone="cream" />)}
         </div>
       </div>
-      {/* 结果条 */}
-      <div style={{ position: 'absolute', left: 72, right: 72, top: 1320, opacity: region(beat, 1, 1).opacity }}>
-        <PrintLine delay={120}>
-          <div style={{ background: CREAM, borderRadius: 18, borderLeft: `9px solid ${COFFEE_RED}`, boxShadow: `0 12px 26px ${SHADOW}`, padding: '34px 44px', fontFamily: FONT_ROUND, fontSize: 40, color: ESPRESSO, letterSpacing: 1, lineHeight: 1.4 }}>{p.result}</div>
-        </PrintLine>
+      <div style={{ position: 'absolute', left: 84, right: 84, top: 1000, opacity: region(beat, 0, 1).opacity * 0.85 }}>
+        <div style={{ border: `1.5px solid ${LEADER}`, borderRadius: 14, padding: '26px 36px', display: 'flex', alignItems: 'center', gap: 18, opacity: 0.7 }}>
+          <span style={{ fontFamily: FONT_TITLE, fontSize: 38, color: MUTED }}>{p.otherHead}</span>
+          <span style={{ fontSize: 26, color: FAINT, marginLeft: 'auto' }}>{p.otherDesc}</span>
+        </div>
+      </div>
+      <div style={{ position: 'absolute', left: 84, right: 84, top: 1200 }}>
+        <Note delay={130} label="发出去">公开领取：把券存成海报贴门口，{G('谁看到都能领')}</Note>
       </div>
     </AbsoluteFill>
   );
 };
 
-// ── S6 核销后赠券链（拆 ref-11 纵向步骤条）──
+// ── S6 复购链（纵向编号菜单）──
 const S6Chain: React.FC<SceneRenderProps> = ({ scene }) => {
   const p = scene.payload as unknown as ChainPayload;
   const beat = useBeat(scene.subtitles);
   const f = useCurrentFrame();
-  const tt = spring({ frame: f - 6, fps: FPS, config: { damping: 22, stiffness: 150 } });
-  const nodeBeat: [number, number][] = [[0, 0], [1, 1], [2, 2]];
   const line = interpolate(f, [24, 110], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
   return (
-    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: PALETTES.caramel.bg }}>
+    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: BG }}>
       <Ambient />
-      <Tag text={p.tag} />
-      <div style={{ position: 'absolute', left: 72, top: 238, right: 72, opacity: tt, transform: `translateY(${(1 - tt) * 26}px)` }}>
-        <div style={{ fontFamily: FONT_ROUND, fontSize: 74, color: ESPRESSO, lineHeight: 1.24 }}>{p.title}</div>
-        <div style={{ marginTop: 16, fontSize: 29, color: MUTED }}>{p.sub}</div>
-      </div>
-      <div style={{ position: 'absolute', left: 128, top: 560, width: 5, height: 820 * line, background: `linear-gradient(${COFFEE_RED}, ${BROWN})`, borderRadius: 3 }} />
+      <Sign eyebrow={p.tag} l1={p.title} sub={p.sub} />
+      <div style={{ position: 'absolute', left: 128, top: 520, width: 3, height: 900 * line, background: `linear-gradient(${GOLD}, ${MUTED})`, borderRadius: 2 }} />
       {p.nodes.map((n, i) => {
-        const r = region(beat, nodeBeat[i][0], nodeBeat[i][1]);
+        const r = region(beat, i, i);
         const s = spring({ frame: f - 26 - i * 20, fps: FPS, config: { damping: 19, stiffness: 160 } });
         return (
-          <div key={n.head} style={{ position: 'absolute', left: 72, right: 72, top: 540 + i * 320, opacity: Math.min(r.opacity, interpolate(s, [0, 0.3], [0, 1], { extrapolateRight: 'clamp' })), transform: `translateY(${(1 - s) * 44}px)` }}>
-            <div style={{ display: 'flex', gap: 30, alignItems: 'flex-start' }}>
-              <div style={{ width: 108, height: 108, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: i === 2 ? COFFEE_RED : PAPER, border: i === 2 ? 'none' : `3px solid ${COFFEE_RED}`, boxShadow: `0 10px 24px ${SHADOW}` }}>
-                <span style={{ fontFamily: FONT_ROUND, fontSize: 52, color: i === 2 ? '#fff' : COFFEE_RED }}>{i + 1}</span>
+          <div key={n.head} style={{ position: 'absolute', left: 84, right: 84, top: 500 + i * 320, opacity: Math.min(r.opacity, interpolate(s, [0, 0.3], [0, 1], { extrapolateRight: 'clamp' })), transform: `translateY(${(1 - s) * 40}px)` }}>
+            <div style={{ display: 'flex', gap: 28, alignItems: 'flex-start' }}>
+              <div style={{ width: 96, height: 96, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: i === 2 ? GOLD : 'transparent', border: i === 2 ? 'none' : `2px solid ${GOLD}` }}>
+                <span style={{ fontFamily: FONT_TITLE, fontSize: 44, color: i === 2 ? BG : GOLD }}>{`0${i + 1}`}</span>
               </div>
-              <Ticket rot={(i - 1) * 0.4} style={{ flex: 1, padding: '30px 34px 28px 44px' }}>
+              <div style={{ flex: 1, borderBottom: `1.5px dashed ${LEADER}`, paddingBottom: 22 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                  <span style={{ fontSize: 36, fontWeight: 700, color: ESPRESSO }}>{n.head}</span>
-                  {n.reward && <span style={{ fontSize: 24, color: '#fff', background: COFFEE_RED, borderRadius: 8, padding: '6px 14px', letterSpacing: 2 }}>奖</span>}
+                  <span style={{ fontSize: 38, fontWeight: 700, color: i === 2 ? GOLD : CREAM }}>{n.head}</span>
+                  {n.reward && <span style={{ fontSize: 22, color: BG, background: GOLD, borderRadius: 6, padding: '3px 12px', letterSpacing: 1, fontWeight: 700 }}>奖</span>}
                 </div>
-                <div style={{ fontSize: 28, color: BROWN, marginTop: 10, lineHeight: 1.5 }}>{n.desc}</div>
-                {n.note && <div style={{ fontSize: 24, color: FAINT, marginTop: 10 }}>{n.note}</div>}
-              </Ticket>
+                <div style={{ fontSize: 29, color: MUTED, marginTop: 10, lineHeight: 1.5 }}>{n.desc}</div>
+                {n.note && <div style={{ fontSize: 24, color: FAINT, marginTop: 8 }}>{n.note}</div>}
+              </div>
             </div>
           </div>
         );
       })}
-      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 176, textAlign: 'center', fontSize: 24, color: 'rgba(90,62,43,0.55)', letterSpacing: 2, opacity: region(beat, 2, 2).opacity }}>{p.foot}</div>
+      <div style={{ position: 'absolute', left: 84, right: 84, bottom: 200, textAlign: 'center', fontSize: 24, color: FAINT, letterSpacing: 2, opacity: region(beat, 2, 2).opacity }}>{p.foot}</div>
     </AbsoluteFill>
   );
 };
 
-// ── S7 结果·顾客与核销（拆 ref-16 步骤结果对照）──
+// ── S7 结果·顾客与核销（菜单点线行）──
 const S7Steps: React.FC<SceneRenderProps> = ({ scene }) => {
   const p = scene.payload as unknown as StepsPayload;
   const beat = useBeat(scene.subtitles);
-  const f = useCurrentFrame();
-  const tt = spring({ frame: f - 6, fps: FPS, config: { damping: 22, stiffness: 150 } });
-  const rowBeat: [number, number][] = [[0, 0], [1, 1], [2, 2]];
   return (
-    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: PALETTES.caramel.bg }}>
+    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: BG }}>
       <Ambient />
-      <Tag text={p.tag} />
-      <div style={{ position: 'absolute', left: 72, top: 240, right: 72, opacity: tt, transform: `translateY(${(1 - tt) * 26}px)` }}>
-        <div style={{ fontFamily: FONT_ROUND, fontSize: 76, color: ESPRESSO, lineHeight: 1.24 }}>{p.title}</div>
-        <div style={{ marginTop: 18, fontSize: 29, color: MUTED }}>{p.sub}</div>
-      </div>
-      {p.rows.map((row, i) => {
-        const r = region(beat, rowBeat[i][0], rowBeat[i][1]);
-        const s = spring({ frame: f - 26 - i * 20, fps: FPS, config: { damping: 20, stiffness: 160 } });
-        return (
-          <div key={row.act} style={{ position: 'absolute', left: 72, right: 72, top: 500 + i * 360, opacity: Math.min(r.opacity, interpolate(s, [0, 0.3], [0, 1], { extrapolateRight: 'clamp' })), transform: `translateX(${(1 - s) * 100}px)` }}>
-            <div style={{ display: 'flex', alignItems: 'stretch', gap: 24 }}>
-              <Ticket style={{ flex: 1.15, padding: '30px 30px 30px 46px', display: 'flex', gap: 22, alignItems: 'center' }}>
-                <span style={{ width: 66, height: 66, borderRadius: 16, background: i === 1 ? COFFEE_RED : BROWN, color: '#fff', fontFamily: FONT_ROUND, fontSize: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{i + 1}</span>
-                <div>
-                  <div style={{ fontSize: 36, fontWeight: 700, color: ESPRESSO }}>{row.act}</div>
-                  <div style={{ fontSize: 27, color: MUTED, marginTop: 8, lineHeight: 1.45 }}>{row.desc}</div>
+      <Sign eyebrow={p.tag} l1={p.title} sub={p.sub} />
+      <div style={{ position: 'absolute', left: 84, right: 84, top: 520 }}>
+        {p.rows.map((row, i) => {
+          const r = region(beat, i, i);
+          return (
+            <MenuRow key={row.act} delay={30 + i * 26} style={{ marginBottom: 40, opacity: r.opacity }}>
+              <div style={{ borderBottom: `1.5px dashed ${LEADER}`, paddingBottom: 26 }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
+                  <span style={{ fontFamily: FONT_TITLE, fontSize: 30, color: GOLD }}>{`0${i + 1}`}</span>
+                  <span style={{ fontSize: 36, fontWeight: 700, color: CREAM }}>{row.act}</span>
+                  <span style={{ fontSize: 26, color: MUTED }}>· {row.desc}</span>
+                  <span style={{ marginLeft: 'auto', fontSize: 22, color: BG, background: r.active ? GOLD : MUTED, borderRadius: 6, padding: '3px 14px', letterSpacing: 1, fontWeight: 700 }}>{row.mark}</span>
                 </div>
-              </Ticket>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <span style={{ width: 40, height: 28 }}>{Ico.arrow(COFFEE_RED)}</span>
+                <div style={{ marginTop: 14, fontSize: 31, color: r.active ? GOLD : CREAM, lineHeight: 1.5 }}>{row.res}</div>
               </div>
-              <div style={{ flex: 1, background: CREAM, borderRadius: 20, padding: '28px 26px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 12, border: r.active ? `2.5px solid ${COFFEE_RED}` : '2.5px solid transparent' }}>
-                <span style={{ fontSize: 26, fontWeight: 700, color: COFFEE_RED, letterSpacing: 2 }}>{row.mark}</span>
-                <div style={{ fontSize: 28, color: BROWN, lineHeight: 1.5 }}>{row.res}</div>
-              </div>
-            </div>
-          </div>
-        );
-      })}
+            </MenuRow>
+          );
+        })}
+      </div>
     </AbsoluteFill>
   );
 };
 
-// ── S8 后台（拆 ref-10 多栏清单）──
+// ── S8 后台（两栏菜单清单）──
 const S8Ledger: React.FC<SceneRenderProps> = ({ scene }) => {
   const p = scene.payload as unknown as LedgerPayload;
   const beat = useBeat(scene.subtitles);
-  const f = useCurrentFrame();
-  const tt = spring({ frame: f - 6, fps: FPS, config: { damping: 22, stiffness: 150 } });
   return (
-    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: PALETTES.caramel.bg }}>
+    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: BG }}>
       <Ambient />
-      <Tag text={p.tag} />
-      <div style={{ position: 'absolute', left: 72, top: 238, right: 72, opacity: tt, transform: `translateY(${(1 - tt) * 26}px)` }}>
-        <div style={{ fontFamily: FONT_ROUND, fontSize: 72, color: ESPRESSO, lineHeight: 1.24 }}>{p.title}</div>
-        <div style={{ marginTop: 16, fontSize: 29, color: MUTED }}>{p.sub}</div>
-      </div>
-      <div style={{ position: 'absolute', left: 72, right: 72, top: 540, display: 'flex', gap: 32 }}>
+      <Sign eyebrow={p.tag} l1={p.title} sub={p.sub} />
+      <div style={{ position: 'absolute', left: 84, right: 84, top: 520, display: 'flex', gap: 30 }}>
         {p.cols.map((col, ci) => {
-          const r = region(beat, ci === 0 ? 0 : 1, ci === 0 ? 0 : 1);
-          const s = spring({ frame: f - 22 - ci * 16, fps: FPS, config: { damping: 21, stiffness: 150 } });
-          const headBg = col.tone === 'accent' ? COFFEE_RED : BROWN;
+          const r = region(beat, ci, ci);
           return (
-            <div key={col.head} style={{ flex: 1, opacity: Math.min(r.opacity + 0.08, 1) * interpolate(s, [0, 0.3], [0, 1], { extrapolateRight: 'clamp' }), transform: `translateX(${(1 - s) * 90 * (ci === 0 ? -1 : 1)}px)` }}>
-              <div style={{ background: PAPER, borderRadius: 24, border: `1.5px solid ${LINE}`, boxShadow: `0 16px 38px ${SHADOW}`, padding: '36px 32px', height: 820, outline: r.active ? `3px solid ${headBg}` : '3px solid transparent', outlineOffset: 4 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14, paddingBottom: 26, borderBottom: `2px solid ${LINE}` }}>
-                  <span style={{ width: 14, height: 36, borderRadius: 6, background: headBg }} />
-                  <span style={{ fontFamily: FONT_ROUND, fontSize: 42, color: ESPRESSO }}>{col.head}</span>
-                </div>
-                {col.items.map((it, i) => (
-                  <PrintLine key={it} delay={40 + ci * 16 + i * 12}>
-                    <div style={{ marginTop: 34, background: '#F7F1E7', borderRadius: 16, padding: '32px 28px', fontSize: 31, color: BROWN, lineHeight: 1.5 }}>{it}</div>
-                  </PrintLine>
-                ))}
+            <div key={col.head} style={{ flex: 1, opacity: Math.min(r.opacity + 0.05, 1) }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, borderBottom: `2px solid ${ci === 0 ? GOLD : MUTED}`, paddingBottom: 16 }}>
+                <span style={{ width: 12, height: 30, borderRadius: 4, background: ci === 0 ? GOLD : MUTED }} />
+                <span style={{ fontFamily: FONT_TITLE, fontSize: 40, color: ci === 0 ? GOLD : CREAM }}>{col.head}</span>
               </div>
+              {col.items.map((it, i) => (
+                <MenuRow key={it} delay={40 + ci * 16 + i * 12}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, marginTop: 24 }}>
+                    <span style={{ fontSize: 30, color: CREAM }}>{it}</span>
+                    <span style={{ flex: 1, borderBottom: `2px dotted ${LEADER}`, height: 2, marginBottom: 8 }} />
+                  </div>
+                </MenuRow>
+              ))}
             </div>
           );
         })}
       </div>
-      <div style={{ position: 'absolute', left: 72, right: 72, top: 1440, opacity: region(beat, 1, 1).opacity }}>
-        <PrintLine delay={150}>
-          <div style={{ background: PAPER, borderRadius: 18, border: `1.5px solid ${LINE}`, boxShadow: `0 12px 26px ${SHADOW}`, padding: '26px 40px', fontFamily: FONT_ROUND, fontSize: 34, color: COFFEE_RED, textAlign: 'center', letterSpacing: 2 }}>{p.punch}</div>
-        </PrintLine>
+      <div style={{ position: 'absolute', left: 84, right: 84, top: 1340, opacity: region(beat, 1, 1).opacity }}>
+        <MenuRow delay={150}>
+          <div style={{ background: TINT, border: `1.5px solid ${RULE}`, borderRadius: 14, padding: '26px 40px', fontFamily: FONT_TITLE, fontSize: 34, color: GOLD, textAlign: 'center', letterSpacing: 2 }}>{p.punch}</div>
+        </MenuRow>
       </div>
     </AbsoluteFill>
   );
@@ -524,31 +427,27 @@ const S8Ledger: React.FC<SceneRenderProps> = ({ scene }) => {
 const S9Cta: React.FC<SceneRenderProps> = ({ scene }) => {
   const p = scene.payload as unknown as CtaPayload;
   const beat = useBeat(scene.subtitles);
-  const f = useCurrentFrame();
-  const tt = spring({ frame: f - 6, fps: FPS, config: { damping: 20, stiffness: 130 } });
   return (
-    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: PALETTES.caramel.bg }}>
+    <AbsoluteFill style={{ fontFamily: FONT_BODY, backgroundColor: BG }}>
       <Ambient />
-      <div style={{ position: 'absolute', left: 72, top: 250, right: 72, opacity: tt, transform: `translateY(${(1 - tt) * 30}px)` }}>
-        <div style={{ fontFamily: FONT_ROUND, fontSize: 82, lineHeight: 1.24, color: ESPRESSO }}>{p.title1}</div>
-        <div style={{ fontFamily: FONT_ROUND, fontSize: 82, lineHeight: 1.24, color: ESPRESSO }}><Ring delay={18}>{p.title2}</Ring></div>
+      <Sign eyebrow="券到咖啡 · 攻略收束" l1={p.title1} l2={p.title2} />
+      <div style={{ position: 'absolute', left: 84, right: 84, top: 520, opacity: region(beat, 0, 0).opacity }}>
+        {p.strips.map((st, i) => (
+          <MenuRow key={st.name} delay={30 + i * 16}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, padding: '20px 6px', borderBottom: `1.5px dashed ${LEADER}` }}>
+              <span style={{ width: 34, height: 34, display: 'inline-block', transform: 'translateY(6px)' }}>{Ico.check(GOLD)}</span>
+              <span style={{ fontSize: 36, fontWeight: 700, color: CREAM }}>{st.name}</span>
+              <span style={{ flex: 1, borderBottom: `2px dotted ${LEADER}`, height: 2, marginBottom: 8 }} />
+              <span style={{ fontSize: 30, color: GOLD, fontWeight: 700, letterSpacing: 2 }}>{st.role}</span>
+            </div>
+          </MenuRow>
+        ))}
       </div>
-      {p.strips.map((st, i) => (
-        <div key={st.name} style={{ position: 'absolute', left: 120, right: 120, top: 590 + i * 176, opacity: region(beat, 0, 0).opacity }}>
-          <PrintLine delay={26 + i * 14}>
-            <Ticket rot={(i - 1.5) * 0.5} style={{ display: 'flex', alignItems: 'center', padding: '28px 44px 28px 54px' }}>
-              <span style={{ width: 40, height: 40, display: 'inline-block' }}>{Ico.check(COFFEE_RED)}</span>
-              <span style={{ fontSize: 32, fontWeight: 700, color: ESPRESSO, marginLeft: 22, flex: 1 }}>{st.name}</span>
-              <span style={{ fontSize: 27, color: COFFEE_RED, fontWeight: 700, letterSpacing: 2 }}>{st.role}</span>
-            </Ticket>
-          </PrintLine>
-        </div>
-      ))}
-      <div style={{ position: 'absolute', left: 0, right: 0, top: 1420, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22 }}>
-        <PrintLine delay={90}>
-          <div style={{ border: `5px solid ${COFFEE_RED}`, borderRadius: 24, padding: '20px 52px', fontFamily: FONT_ROUND, fontSize: 62, color: COFFEE_RED, letterSpacing: 8, background: 'rgba(255,255,255,0.85)', boxShadow: `0 14px 34px rgba(181,80,42,0.22)` }}>{p.brand}</div>
-        </PrintLine>
-        <div style={{ fontSize: 28, color: MUTED, letterSpacing: 3, opacity: region(beat, 1, 1).opacity }}>{p.sub}</div>
+      <div style={{ position: 'absolute', left: 0, right: 0, top: 1240, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22 }}>
+        <MenuRow delay={90}>
+          <div style={{ border: `3px solid ${GOLD}`, borderRadius: 16, padding: '22px 56px', fontFamily: FONT_TITLE, fontSize: 60, color: GOLD, letterSpacing: 8 }}>{p.brand}</div>
+        </MenuRow>
+        <div style={{ fontSize: 27, color: MUTED, letterSpacing: 4, opacity: region(beat, 1, 1).opacity }}>{p.sub}</div>
       </div>
     </AbsoluteFill>
   );

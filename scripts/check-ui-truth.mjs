@@ -10,7 +10,7 @@
  *   其它键（act/desc/res/mark/title/sub…）是本片文案，不参与硬检。
  *   文案里用「」引起来、声称是产品界面说法的词，列入"需人工确认"层（不计失败，但必须看过）。
  *
- * 五层：
+ * 六层：
  *   ① 字段名逐字取证 —— `k:` 必须在 applet 源码出现（硬失败）
  *   ② 「」声称是界面说法但源码查不到（⚠️ 人工确认）
  *   ③ 分组归属 —— 组标题若照抄页面原生组名，其下每一行必须真在那一组里（硬失败）。
@@ -23,9 +23,13 @@
  *      而 ①③④ 都只拿表当尺子量画面、不量表自己。2026-08-30 审计即在表里抓出 8 处产品查无此名的行名
  *      （周期内可领张数 / 自定义领取名额 / 套餐明细 / 需提前预约 / 错挂到别组的封面图片…）。
  *      豁免：`onScreen: false` 的条目（按定义不上屏，是我方描述名）。
+ *   ⑥ 券种↔面额字段配对 —— 制券屏须声明 `couponType: '满减券'` 等；本层校验该屏用到的面额字段
+ *      （原价/券面额/优惠金额/折扣/兑换内容/随机最小·最大金额）全属该券种的 `couponTypes[key].faceFields`，
+ *      且该券种要求的面额字段都在（硬失败）。为什么单独立一层：2026-09-03 g07 把满减券的"减 X"挂到代金券名下——
+ *      "券面额"是真名、① 全过，但券种与字段集配错，①③⑤ 都拦不住。未声明 couponType 却用了面额字段的屏 → ⚠️ 提醒补声明。
  *
  * 用法：node scripts/check-ui-truth.mjs
- * 退出码：0 = 通过；1 = 有硬失败（① 未取证的字段名，③ 分组归属错误，或 ⑤ 真值表行名在源码查无）。
+ * 退出码：0 = 通过；1 = 有硬失败（① 未取证的字段名 / ③ 分组归属错误 / ⑤ 真值表行名源码查无 / ⑥ 券种↔字段配对错）。
  */
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
@@ -78,6 +82,21 @@ function extractGroups(fileText) {
   return groups;
 }
 
+/** 按 `ui: 'gXX-名字'` 把数据文件切成一屏一段，用于 ⑥ 券种↔字段配对（把 couponType 限定在它所在屏） */
+function extractScenes(fileText) {
+  const marks = [];
+  const re = /ui:\s*'([^']+)'/g;
+  let m;
+  while ((m = re.exec(fileText))) marks.push({ ui: m[1], start: m.index });
+  const scenes = [];
+  for (let i = 0; i < marks.length; i++) {
+    const block = fileText.slice(marks[i].start, i + 1 < marks.length ? marks[i + 1].start : fileText.length);
+    const ct = (block.match(/couponType:\s*'([^']+)'/) || [])[1] || null;
+    scenes.push({ ui: marks[i].ui, couponType: ct, keys: extractKeys(block) });
+  }
+  return scenes;
+}
+
 /** 提取文案里「」包起来的说法（声称是产品界面原话的那一类，交人工确认） */
 function extractQuoted(fileText) {
   const hits = new Set();
@@ -117,10 +136,20 @@ for (const g of TABLE.createGroups || []) {
 const stripStep = (s) => s.replace(/^[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳]\s*/, '').trim();
 const inList = (row, list) => list.some((a) => a === row || a.startsWith(row) || row.startsWith(a) || a.includes(row));
 
+/** ⑥ 面额字段全集（券种专属，区别于消费门槛这类所有券种都有的基础字段） */
+const FACE_FIELDS = new Set(['原价', '券面额', '优惠金额', '折扣', '兑换内容', '随机最小金额', '随机最大金额']);
+/** 券种 label → 该券种允许/要求的面额字段集（真源 = coupon-fields.json 的 couponTypes.faceFields） */
+const couponTypeMap = new Map();
+for (const t of TABLE.couponTypes || []) couponTypeMap.set(t.label, new Set(t.faceFields || []));
+
 const missing = [];
 const unverified = [];
 const misfiled = [];
 const unknownRow = [];
+const typeMismatch = [];   // ⑥ 用了不属于声明券种的面额字段（硬失败）
+const typeMissing = [];    // ⑥ 声明券种要求的面额字段缺失（硬失败）
+const undeclared = [];     // ⑥ 用了面额字段却没声明 couponType（⚠️ 提醒）
+const unknownType = [];    // ⑥ 声明的 couponType 不在表里（⚠️ 提醒）
 let fieldTotal = 0;
 
 for (const f of dataFiles) {
@@ -154,6 +183,24 @@ for (const f of dataFiles) {
         }
       }
     }
+  }
+}
+
+/* ──  券种↔面额字段配对：每屏声明的 couponType 决定该屏允许/要求哪些面额字段 ── */
+for (const f of dataFiles) {
+  const text = readFileSync(join(DATA_DIR, f), 'utf8');
+  for (const sc of extractScenes(text)) {
+    const faceUsed = sc.keys.filter((k) => FACE_FIELDS.has(k));
+    if (!sc.couponType) {
+      if (faceUsed.length) undeclared.push({ file: f, ui: sc.ui, faceUsed });
+      continue;
+    }
+    const allowed = couponTypeMap.get(sc.couponType);
+    if (!allowed) { unknownType.push({ file: f, ui: sc.ui, couponType: sc.couponType }); continue; }
+    const wrong = faceUsed.filter((k) => !allowed.has(k));
+    if (wrong.length) typeMismatch.push({ file: f, ui: sc.ui, couponType: sc.couponType, wrong });
+    const miss = [...allowed].filter((k) => !faceUsed.includes(k));
+    if (miss.length) typeMissing.push({ file: f, ui: sc.ui, couponType: sc.couponType, miss });
   }
 }
 
@@ -267,6 +314,30 @@ if (tableUnresolved.length) {
   console.log('   复合名（A / B）会自动拆开取证；仍查不到的多半是我方描述名，建议改成页面原话或标 `onScreen: false`。');
 }
 
+console.log('');
+if (!couponTypeMap.size) {
+  console.log('⑥ 券种↔面额字段配对  ⏭ 跳过 —— 未找到 spec/coupon-fields.json 的 couponTypes');
+} else {
+  const typeFails = typeMismatch.length + typeMissing.length;
+  if (typeFails) {
+    console.log(`⑥ 券种↔面额字段配对  ❌ 硬失败 —— ${typeFails} 处：`);
+    for (const x of typeMismatch) console.log(`   ${x.file}  ${x.ui} 声明「${x.couponType}」却用了别券种的面额字段：${x.wrong.join(' / ')}（该券种只允许：${[...couponTypeMap.get(x.couponType)].join(' / ') || '无'}）`);
+    for (const x of typeMissing) console.log(`   ${x.file}  ${x.ui} 声明「${x.couponType}」但缺它要求的面额字段：${x.miss.join(' / ')}`);
+    console.log('   修法：券种决定面额字段集——改对券种，或把字段换成该券种 faceFields 里的真名（见 coupon-fields.json）。');
+  } else {
+    const declared = dataFiles.reduce((n, f) => n + extractScenes(readFileSync(join(DATA_DIR, f), 'utf8')).filter((s) => s.couponType).length, 0);
+    console.log(`⑥ 券种↔面额字段配对  ✅ 通过 —— ${declared} 个声明了券种的制券屏，面额字段都与券种对得上`);
+  }
+  if (unknownType.length) {
+    console.log(`   ⚠️ 声明的 couponType 不在表里 —— ${unknownType.length} 处：`);
+    for (const x of unknownType) console.log(`   ${x.file}  ${x.ui}  «${x.couponType}»`);
+  }
+  if (undeclared.length) {
+    console.log(`   ⚠️ 用了面额字段却没声明 couponType —— ${undeclared.length} 屏（不计失败；补上 couponType 才能被本层校验）：`);
+    for (const x of undeclared) console.log(`   ${x.file}  ${x.ui}  面额字段：${x.faceUsed.join(' / ')}`);
+  }
+}
+
 console.log('\n────────────────────────────────────────────');
 if (missing.length) {
   console.log(`❌ 存在 ${missing.length} 个未取证字段名。商家在后台找不到它，这一屏就等于没教。修完再声明通过。`);
@@ -280,5 +351,9 @@ if (tableBad.length) {
   console.log(`❌ 真值表里有 ${tableBad.length} 个名字在产品源码中查无此文案（见 ⑤）。这张表是后续每一片抄字段名的源头，它错一片错一片。修完再声明通过。`);
   process.exit(1);
 }
-console.log(`✅ 通过：上屏字段名全部回源码取到原话、分组归属对得上制券页、真值表自证 ${tableTotal} 个名字逐字命中。`);
+if (typeMismatch.length || typeMissing.length) {
+  console.log(`❌ 存在 ${typeMismatch.length + typeMissing.length} 处券种↔面额字段配对错误（见 ⑥）。券种选错，商家在后台找不到对应的金额栏，这一屏白教。修完再声明通过。`);
+  process.exit(1);
+}
+console.log(`✅ 通过：上屏字段名全部回源码取到原话、分组归属对得上制券页、真值表自证 ${tableTotal} 个名字逐字命中、券种↔面额字段配对无误。`);
 process.exit(0);
