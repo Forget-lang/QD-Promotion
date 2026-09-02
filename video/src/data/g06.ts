@@ -2,7 +2,7 @@
 // 分镜稿见 outputs/g06-教培托管/07-片1-分镜稿.md；payload 形状见 ../videos/g06/types.ts。
 // 【判定单位 · 2026-08-30 用户拍板】一条视频 = 一个痛点 + 解决它的一套完整攻略，叙述线有头有尾。
 //   本片三招：兑换券做体验引流 → 满减券只发给谈过的几家（走「指定手机号可领取」）→ 兑换券上开转赠奖励。
-// 【样式冻结 · 2026-08-30 用户验收】十副骨架的 UI 与视觉已定版，本片只换内容：屏序 / 屏上信息 / 口播。渲染器与视觉不动，
+// 【样式冻结 · 2026-08-30 用户验收】十副骨架的 UI 与视觉已定版，本片只换内容：屏序 / 屏上信息 / 口播。渲染器与视觉不动（唯一例外 2026-09-01 拍板：S4/S5/S7/S10 顶栏删返回键——与叙事无关的页面 chrome 装饰一律不画，见 SKILL 第 4 步），
 //   因此每屏行数与口播句数严格对齐组件里既有的节拍表（make-basic 5 句、make-rules 取节拍表前 6 行＝3 组 5 句、
 //   steps·chain·ledger 4 句、idea 3 句、cta 4 句）。make-rules 原排 7 行超出 1080×1920 可用高度
 //   （中段两张卡是空框、提交钮最后才出），已按「讲不完就拆」压到 6 行。
@@ -10,7 +10,10 @@
 //   功能上不猜：表里没有的不上屏、不念。订阅消息六类见该表 messageReminders.types（2026-08-30 用户服务端口径）；
 //   同日再确认：送达是支持的，**不再挂"顾客订阅过才收得到"这层保留说法**，六类都可以直接说会提醒 / 会到账通知
 //   （站外生态词仍是硬禁，措辞只说"提醒""通知"，不带平台名）。转赠中可取消一项按该表 offScript 不进内容。
-// 语速 ≤6 字/秒；12 屏 191.6 秒（按三招讲透倒推的实际值，不是配额）。
+// 语速 ≤6 字/秒。**有声版（2026-09-01 阶段二回填）**：12 屏 / 5501 帧 / 183.4 秒——
+//   每屏 dur、48 句字幕帧位、voiceDur/voiceOffset 全为实测：逐屏 TTS（seed-tts；speed_ratio 无效不用）
+//   → loudnorm -16LUFS → atempo 1.2（G04 定稿）→ ffprobe 屏时长；句界 = 实测时长×字数占比（帧号复算真源 scripts/.tmp-frames.mjs）。
+//   实测各屏语速 5.1~5.7 字/秒，零超线；盲听与偏拍复核见 changelog 第十九轮·补2。
 import type { VideoData } from '../types';
 
 export const g06: VideoData = {
@@ -23,18 +26,20 @@ export const g06: VideoData = {
     bgImage: 'backgrounds/g06/bg.png',
     bgBlur: 3,
   },
-  hasAudio: false,
+  hasAudio: true,
   scenes: [
     // ── S1 钩子 · 开学季校门口（样式与内容均沿用已验收版）──
     {
       type: 'hook',
       ui: 'g06-hook',
-      dur: 11,
+      dur: 9.9,
+      voiceOffset: 0.27,
+      voiceDur: 9.17,
       darkText: true,
       subtitles: [
-        { text: '开学那阵，托管班最忙。', startFrame: 8, endFrame: 71 },
-        { text: '校门口发的传单，家长接了就走，一转身就没了下文。', startFrame: 71, endFrame: 203 },
-        { text: '谁领了、来没来、有没有号码，一件都答不上。', startFrame: 203, endFrame: 316 },
+        { text: '开学那阵，托管班最忙。', startFrame: 8, endFrame: 59 },
+        { text: '校门口发的传单，家长接了就走，一转身就没了下文。', startFrame: 61, endFrame: 182 },
+        { text: '谁领了、来没来、有没有号码，一件都答不上。', startFrame: 184, endFrame: 283 },
       ],
       payload: {
         tag: '九月开学 · 小学校门口',
@@ -52,11 +57,13 @@ export const g06: VideoData = {
     {
       type: 'pain',
       ui: 'g06-pain',
-      dur: 9,
+      dur: 7.2,
+      voiceOffset: 0.27,
+      voiceDur: 6.50,
       darkText: true,
       subtitles: [
-        { text: '家长答应来试一次，回家没人提，这事就搁下了。', startFrame: 8, endFrame: 133 },
-        { text: '你想打电话再约，翻遍本子，一个号码都没留。', startFrame: 133, endFrame: 258 },
+        { text: '家长答应来试一次，回家没人提，这事就搁下了。', startFrame: 8, endFrame: 106 },
+        { text: '你想打电话再约，翻遍本子，一个号码都没留。', startFrame: 108, endFrame: 203 },
       ],
       payload: {
         tag: '校门口发完传单之后',
@@ -75,7 +82,7 @@ export const g06: VideoData = {
           { t1: '口头答应来试', t2: '到周末人没来' },
           { t1: '想打个电话回访', t2: '翻遍本子没号码' },
         ],
-        foot: '口头的话落不成一件拿得出的东西 · 传单为示例 · 场景为演绎',
+        foot: '',
       },
     },
     // ── S3 攻略总览 · 三招（复用 g06-steps 骨架，3 行 4 句；替换原「思路」屏）──
@@ -83,13 +90,15 @@ export const g06: VideoData = {
     {
       type: 'steps',
       ui: 'g06-steps',
-      dur: 15.0,
+      dur: 15.8,
+      voiceOffset: 0.27,
+      voiceDur: 14.67,
       darkText: true,
       subtitles: [
-        { text: '这套攻略三招，一招设一张券。', startFrame: 8, endFrame: 78 },
-        { text: '第一招做张兑换券，把「来试一次」写成家长拿得走的东西。', startFrame: 78, endFrame: 203 },
-        { text: '第二招做张满减券，只发给你谈过的几家。', startFrame: 203, endFrame: 298 },
-        { text: '第三招在兑换券上开转赠奖励，带同学的家长也得一张。', startFrame: 298, endFrame: 423 },
+        { text: '这套攻略三招，一招设一张券。', startFrame: 8, endFrame: 76 },
+        { text: '第一招做张兑换券，把「来试一次」写成家长拿得走的东西。', startFrame: 78, endFrame: 211 },
+        { text: '第二招做张满减券，只发给你谈过的几家。', startFrame: 213, endFrame: 311 },
+        { text: '第三招在兑换券上开转赠奖励，带同学的家长也得一张。', startFrame: 313, endFrame: 448 },
       ],
       payload: {
         tag: '这套攻略 · 三招',
@@ -106,19 +115,21 @@ export const g06: VideoData = {
     {
       type: 'fields',
       ui: 'g06-make-basic',
-      dur: 18.5,
+      dur: 18.4,
+      voiceOffset: 0.27,
+      voiceDur: 17.53,
       darkText: true,
       subtitles: [
-        { text: '商户中心点制作优惠券，类型挑兑换券。', startFrame: 8, endFrame: 98 },
+        { text: '商户中心点制作优惠券，类型挑兑换券。', startFrame: 8, endFrame: 96 },
         { text: '优惠券名称把场景写进去，这一栏十八个字。', startFrame: 98, endFrame: 198 },
-        { text: '兑换内容只有十个字，写下午托管一次。', startFrame: 198, endFrame: 288 },
-        { text: '消费门槛填零元，引流就别设槛；数量先做两百张。', startFrame: 288, endFrame: 398 },
-        { text: '一个下午管什么，写到使用须知里，那一栏能写五百个字。', startFrame: 398, endFrame: 523 },
+        { text: '兑换内容只有十个字，写下午托管一次。', startFrame: 200, endFrame: 289 },
+        { text: '消费门槛填零元，引流就别设槛；数量先做两百张。', startFrame: 291, endFrame: 402 },
+        { text: '一个下午管什么，写到使用须知里，那一栏能写五百个字。', startFrame: 404, endFrame: 534 },
       ],
       payload: {
         tag: '第一招 · 券面',
         navTitle: '制作兑换券',
-        crumb: '商户中心 › 制作优惠券 › 类型：兑换券',
+        crumb: '商户中心 › 制作优惠券 › 类型：兑换券 · 数值为示例',
         groups: [
           {
             head: '① 券面',
@@ -136,7 +147,7 @@ export const g06: VideoData = {
             ],
           },
         ],
-        foot: '本页数值为示例配置',
+        foot: '',
       },
     },
     // ── S5 制券② 兑换券 · 期限与发放（三组六行五句；原七行超出本屏高度、中段两卡空框，已拆）──
@@ -144,19 +155,21 @@ export const g06: VideoData = {
     {
       type: 'fields',
       ui: 'g06-make-rules',
-      dur: 24.5,
+      dur: 21.8,
+      voiceOffset: 0.27,
+      voiceDur: 20.90,
       darkText: true,
       subtitles: [
-        { text: '有效期类型选自领取日起几天内有效，天数填十四天。', startFrame: 8, endFrame: 120 },
-        { text: '可用时段打开定制，只勾工作日下午三点半到六点半。', startFrame: 120, endFrame: 249 },
-        { text: '发放方式选公开领取，这行定了改不了；每人限领总量填一张。', startFrame: 249, endFrame: 400 },
-        { text: '到期提醒是开的，提前三天提醒家长一次。', startFrame: 400, endFrame: 534 },
-        { text: '这些设完按「创建优惠券」，这张体验券就能发给家长了。', startFrame: 534, endFrame: 700 },
+        { text: '有效期类型选自领取日起几天内有效，天数填十四天。', startFrame: 8, endFrame: 134 },
+        { text: '可用时段打开定制，只勾工作日下午三点半到六点半。', startFrame: 136, endFrame: 261 },
+        { text: '发放方式选公开领取，这行定了改不了；每人限领总量填一张。', startFrame: 263, endFrame: 407 },
+        { text: '到期提醒是开的，提前三天提醒家长一次。', startFrame: 409, endFrame: 505 },
+        { text: '这些设完按「创建优惠券」，这张体验券就能发给家长了。', startFrame: 507, endFrame: 635 },
       ],
       payload: {
         tag: '第一招 · 期限与发放',
         navTitle: '制作兑换券',
-        crumb: '制作优惠券 › 兑换券（续）',
+        crumb: '制作优惠券 › 兑换券（续） · 数值为示例',
         groups: [
           {
             head: '③ 期限',
@@ -191,12 +204,14 @@ export const g06: VideoData = {
     {
       type: 'idea',
       ui: 'g06-idea',
-      dur: 14.0,
+      dur: 13.7,
+      voiceOffset: 0.27,
+      voiceDur: 12.33,
       darkText: true,
       subtitles: [
-        { text: '券做好，进这张券点发放优惠券，选海报存下来贴门口。', startFrame: 8, endFrame: 128 },
-        { text: '家长扫这个码，券进了他自己的卡包，写着能用到几号。', startFrame: 128, endFrame: 248 },
-        { text: '号码进了客户列表；到期前三天，家长会收到一条提醒。', startFrame: 248, endFrame: 388 },
+        { text: '券做好，进这张券点发放优惠券，选海报存下来贴门口。', startFrame: 8, endFrame: 129 },
+        { text: '家长扫这个码，券进了他自己的卡包，写着能用到几号。', startFrame: 131, endFrame: 253 },
+        { text: '号码进了客户列表；到期前三天，家长会收到一条提醒。', startFrame: 255, endFrame: 378 },
       ],
       payload: {
         eyebrow: '设完之后',
@@ -215,19 +230,21 @@ export const g06: VideoData = {
     {
       type: 'fields',
       ui: 'g06-make-basic',
-      dur: 17.5,
+      dur: 16.9,
+      voiceOffset: 0.27,
+      voiceDur: 16.33,
       darkText: true,
       subtitles: [
-        { text: '第二招回到类型那一页，挑满减券。', startFrame: 8, endFrame: 88 },
-        { text: '优惠券名称写清楚这张抵多少，十八个字以内。', startFrame: 88, endFrame: 193 },
-        { text: '消费门槛按一学期的费用填一千，门槛挨着客单价，券才有分量。', startFrame: 193, endFrame: 333 },
-        { text: '优惠金额填一百，制作数量三十张。', startFrame: 333, endFrame: 413 },
-        { text: '发放方式选私密发放，这行同样改不了。', startFrame: 413, endFrame: 503 },
+        { text: '第二招回到类型那一页，挑满减券。', startFrame: 8, endFrame: 83 },
+        { text: '优惠券名称写清楚这张抵多少，十八个字以内。', startFrame: 85, endFrame: 188 },
+        { text: '消费门槛按一学期的费用填一千，门槛挨着客单价，券才有分量。', startFrame: 190, endFrame: 331 },
+        { text: '优惠金额填一百，制作数量三十张。', startFrame: 333, endFrame: 408 },
+        { text: '发放方式选私密发放，这行同样改不了。', startFrame: 410, endFrame: 498 },
       ],
       payload: {
         tag: '第二招 · 券面',
         navTitle: '制作满减券',
-        crumb: '制作优惠券 › 类型：满减券',
+        crumb: '制作优惠券 › 类型：满减券 · 数值为示例',
         groups: [
           {
             head: '① 券面',
@@ -245,20 +262,22 @@ export const g06: VideoData = {
             ],
           },
         ],
-        foot: '私密发放 · 一对一给指定的那几家',
+        foot: '',
       },
     },
     // ── S8 满减券 · 只给名单里的号（复用 g06-ledger 两栏清单，4 句）──
     {
       type: 'advance',
       ui: 'g06-ledger',
-      dur: 18.5,
+      dur: 17.5,
+      voiceOffset: 0.27,
+      voiceDur: 16.70,
       darkText: true,
       subtitles: [
-        { text: '在领券顾客信息里打开指定手机号可领取。', startFrame: 8, endFrame: 108 },
-        { text: '号码导进去，每行一个，最多五百个，重复的自动跳过。', startFrame: 108, endFrame: 223 },
-        { text: '这颗开关一开，填写手机号会自动打开并且锁死，名单外的家长领不到。', startFrame: 223, endFrame: 378 },
-        { text: '发出去的是一对一领券码，家长领完，这个码就失效。', startFrame: 378, endFrame: 523 },
+        { text: '在领券顾客信息里打开指定手机号可领取。', startFrame: 8, endFrame: 107 },
+        { text: '号码导进去，每行一个，最多五百个，重复的自动跳过。', startFrame: 109, endFrame: 226 },
+        { text: '这颗开关一开，填写手机号会自动打开并且锁死，名单外的家长领不到。', startFrame: 228, endFrame: 389 },
+        { text: '发出去的是一对一领券码，家长领完，这个码就失效。', startFrame: 391, endFrame: 509 },
       ],
       payload: {
         tag: '第二招 · 只给这几家',
@@ -293,16 +312,18 @@ export const g06: VideoData = {
     {
       type: 'advance',
       ui: 'g06-chain',
-      dur: 16.5,
+      dur: 15.7,
+      voiceOffset: 0.27,
+      voiceDur: 14.87,
       darkText: true,
       subtitles: [
-        { text: '点开这张券的发放优惠券，选私密发放里的面对面二维码。', startFrame: 8, endFrame: 138 },
-        { text: '发放数量最多十张，一对一发就填一张。', startFrame: 138, endFrame: 228 },
-        { text: '超时时间选一天，过了点没人领，这码就失效，得重新发。', startFrame: 228, endFrame: 348 },
-        { text: '发放备注写清楚是哪一波谈的，只有你自己看得到。', startFrame: 348, endFrame: 463 },
+        { text: '点开这张券的发放优惠券，选私密发放里的面对面二维码。', startFrame: 8, endFrame: 135 },
+        { text: '发放数量最多十张，一对一发就填一张。', startFrame: 137, endFrame: 221 },
+        { text: '超时时间选一天，过了点没人领，这码就失效，得重新发。', startFrame: 223, endFrame: 339 },
+        { text: '发放备注写清楚是哪一波谈的，只有你自己看得到。', startFrame: 341, endFrame: 454 },
       ],
       payload: {
-        tag: '第二招 · 发出去',
+        tag: '第二招 · 发出去（示例）',
         title: '一对一发给这一家',
         sub: '券详情页点「发放优惠券」→ 私密发放',
         nodes: [
@@ -310,26 +331,28 @@ export const g06: VideoData = {
           { head: '发放数量 · 超时时间', desc: '数量 1~10 张，一对一就填 1 张；超时时间选 1 天', note: '超过有效期后，领取链接失效，需要重新发放' },
           { head: '发放备注', desc: '写「开学第一周谈的三家」', note: '选填，仅商家可见 · 客户领完，这个码就失效' },
         ],
-        foot: '本页数值为示例配置',
+        foot: '',
       },
     },
     // ── S10 制券④ 分享与转赠（复用 g06-make-basic 卡形 3+1 行）──
     {
       type: 'fields',
       ui: 'g06-make-basic',
-      dur: 19.0,
+      dur: 20.0,
+      voiceOffset: 0.27,
+      voiceDur: 18.67,
       darkText: true,
       subtitles: [
-        { text: '第三招让家长带家长，先另做一张私密发放的券当奖品。', startFrame: 8, endFrame: 133 },
-        { text: '回到这张兑换券，在分享与转赠里打开允许转赠。', startFrame: 133, endFrame: 243 },
-        { text: '再打开开启转赠奖励。', startFrame: 243, endFrame: 298 },
-        { text: '挑刚才那张奖品券，奖品券只能是私密发放的有效券。', startFrame: 298, endFrame: 418 },
-        { text: '奖励不是在转赠那一下发，是第二个人核销之后才发。', startFrame: 418, endFrame: 538 },
+        { text: '第三招让家长带家长，先另做一张私密发放的券当奖品。', startFrame: 8, endFrame: 140 },
+        { text: '回到这张兑换券，在分享与转赠里打开允许转赠。', startFrame: 142, endFrame: 257 },
+        { text: '再打开开启转赠奖励。', startFrame: 259, endFrame: 309 },
+        { text: '挑刚才那张奖品券，奖品券只能是私密发放的有效券。', startFrame: 311, endFrame: 438 },
+        { text: '奖励不是在转赠那一下发，是第二个人核销之后才发。', startFrame: 440, endFrame: 568 },
       ],
       payload: {
         tag: '第三招 · 开关',
         navTitle: '制作兑换券',
-        crumb: '制作优惠券 › 兑换券 › 分享与转赠',
+        crumb: '制作优惠券 › 兑换券 › 分享与转赠 · 数值为示例',
         groups: [
           {
             head: '分享与转赠',
@@ -346,44 +369,52 @@ export const g06: VideoData = {
             ],
           },
         ],
-        foot: '奖品券要先做好，这里才挑得到',
+        // foot 留空（2026-09-01 用户指出）：奖品券的先后顺序已由口播①④、组标题"先做的那张奖品券"和行提示承载（共三处），
+        //   底部再放第四条就是"要上下看、还不一定留意到"的老问题。
+        foot: '',
       },
     },
     // ── S11 链路走完 + 核销页三件（复用 g06-chain 时间线，3 节点 4 句）──
     {
       type: 'advance',
       ui: 'g06-chain',
-      dur: 17.5,
+      dur: 16.5,
+      voiceOffset: 0.27,
+      voiceDur: 15.87,
       darkText: true,
       subtitles: [
-        { text: '家长 A 把券转给同学的家长 B，这张券谁先领到算谁的。', startFrame: 8, endFrame: 133 },
-        { text: 'B 领走，到店那天你一核销，券上标着转赠获得。', startFrame: 133, endFrame: 238 },
-        { text: '要是这张券还在转赠中，页面会挡下来，写着暂不可核销。', startFrame: 238, endFrame: 363 },
-        { text: 'B 一核销，A 的奖励券自动到账，A 也会收到到账通知。', startFrame: 363, endFrame: 498 },
+        { text: '家长 A 把券转给同学的家长 B，这张券谁先领到算谁的。', startFrame: 8, endFrame: 132 },
+        { text: 'B 领走，到店那天你一核销，券上标着转赠获得。', startFrame: 134, endFrame: 236 },
+        { text: '要是这张券还在转赠中，页面会挡下来，写着暂不可核销。', startFrame: 238, endFrame: 362 },
+        { text: 'B 一核销，A 的奖励券自动到账，A 也会收到到账通知。', startFrame: 364, endFrame: 484 },
       ],
       payload: {
         tag: '第三招 · 走完整条链',
         title: '家长 A 带来家长 B',
         sub: '开关在刚才那三行里，跑起来是这三步',
         nodes: [
-          { head: 'A 转赠给 B', desc: 'A 在自己券详情点「转赠给好友」', note: '弹窗写着「仅首位领取好友可获得本券」' },
+          { head: 'A 转赠给 B', desc: 'A 在自己券详情点「转赠给好友」', note: '弹窗会提示：只有最先领取的那位好友能拿到券' },
           { head: 'B 领取 · 到店核销', desc: '核销页券卡右下角标着「转赠获得」', note: '这一眼就知道这单是谁带来的' },
           { head: 'A 的奖励到账', desc: 'B 核销成功那一下，A 自动得那张奖品券', note: '这页显示「转赠奖励」状态：奖励成功 / 待补偿 / 失败', reward: true },
         ],
-        foot: '本页数值为示例配置',
+        // foot 留空（2026-09-01）：这屏是链路演示、屏上没有数值配置，那条示例值脚注是第十三轮压脚注时
+        //   误随 S4/S9 带过来的残留，与铁律 1 的示例值标注无关，删。
+        foot: '',
       },
     },
     // ── S12 收尾 · 三招收口 + 后台真词（复用 g06-cta）──
     {
       type: 'cta',
       ui: 'g06-cta',
-      dur: 15.0,
+      dur: 14.4,
+      voiceOffset: 0.27,
+      voiceDur: 13.20,
       darkText: true,
       subtitles: [
-        { text: '体验的孩子来了几个，看有效发放张数和核销率。', startFrame: 8, endFrame: 118 },
-        { text: '谈过的几家报没报名，领券记录导出来对一对。', startFrame: 118, endFrame: 223 },
-        { text: '带同学的这位，奖励券正在他卡包里等下一回。', startFrame: 223, endFrame: 328 },
-        { text: '这学期的招生，从做一张券开始。券到卡包。', startFrame: 328, endFrame: 423 },
+        { text: '体验的孩子来了几个，看有效发放张数和核销率。', startFrame: 8, endFrame: 112 },
+        { text: '谈过的几家报没报名，领券记录导出来对一对。', startFrame: 114, endFrame: 212 },
+        { text: '带同学的这位，奖励券正在他卡包里等下一回。', startFrame: 214, endFrame: 312 },
+        { text: '这学期的招生，从做一张券开始。券到卡包。', startFrame: 314, endFrame: 404 },
       ],
       payload: {
         title1: '一套攻略',

@@ -213,6 +213,33 @@ for (const [file, path] of allDocs) {
   });
 }
 
+// ── 3.7 文档宪法层（2026-09-01 用户拍板，条文见 `AGENTS.md` §二「文档宪法」）──
+// 铁律一：改动史只住 changelog——规则文档正文出现「第N轮 / R1x」式审计轮次叙事 = 硬失败；含"changelog"的指针行豁免。
+// 铁律二：校验戳只写日期与指针——「最后校验/更新/版本」起始行超 120 字符 = 戳里塞了改动摘要，硬失败。
+// 扫描面：注册文档（allDocs）+ spec/*.json（机器表同样禁嵌叙事）。
+const stampRe = /^>?\s*(最后校验|更新|版本)\s*[：:]/;
+const histRe = /第[一二三四五六七八九十0-9]{1,3}轮|\bR1[0-9]\b/;
+const constitutionScan = (rel, text) => {
+  let inCodeBlock = false;
+  text.split('\n').forEach((line, i) => {
+    if (/^\s*```/.test(line)) { inCodeBlock = !inCodeBlock; return; }
+    if (inCodeBlock) return;
+    if (stampRe.test(line) && line.length > 120) {
+      hardFails.push({ file: rel, line: i + 1, ref: line.trim().slice(0, 48), why: '宪法铁律二：校验戳超 120 字——戳内复述改动摘要，改为「日期（变更史见 changelog）」' });
+    }
+    if (histRe.test(line) && !/changelog/.test(line)) {
+      hardFails.push({ file: rel, line: i + 1, ref: line.trim().slice(0, 48), why: '宪法铁律一：正文写了审计轮次叙事——改动史归 changelog，此处只留规则 +「详见 changelog」指针' });
+    }
+  });
+};
+for (const [, p] of allDocs) constitutionScan(relative(ROOT, p), readFileSync(p, 'utf8'));
+{
+  const specDir = join(ROOT, 'spec');
+  for (const jf of readdirSync(specDir).filter((n) => n.endsWith('.json'))) {
+    constitutionScan(`spec/${jf}`, readFileSync(join(specDir, jf), 'utf8'));
+  }
+}
+
 // ── 4. 输出 ──
 const distinctHard = [...new Map(hardFails.map((h) => [`${h.file}:${h.line}:${h.ref}`, h])).values()];
 const distinctRev = [...new Map(reviews.map((h) => [`${h.file}:${h.line}:${h.ref}`, h])).values()];
@@ -226,6 +253,6 @@ if (distinctHard.length > 0) {
   console.log('❌ 存在失效引用。修复后重跑本脚本，全部通过才能声明「文档对齐」。\n');
   process.exit(1);
 } else {
-  console.log('✅ 文档引用与计数复述检查通过（失效引用 0 处）。\n');
+  console.log('✅ 文档引用 / 计数复述 / 宪法层检查通过（失效引用 0 处）。\n');
   process.exit(0);
 }

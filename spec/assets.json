@@ -2,17 +2,20 @@
   "_meta": {
     "desc": "素材登记唯一真源（机器可读）。迁移自 素材索引表（A/B/C/D 级登记数据）；登记流程历史上属 workflow 体系（已物理删除，git 历史可查），现行流程以 SKILL.md 为准。",
     "lastVerified": "2026-08-27",
+    "lastVerifiedNote": "字段语义：lastVerified = 最近一次**全量人工复核**日期；条目级修订（状态列更正、D 级增删）不移动此日期，改动史见 changelog。日常由 scripts/check-facts.mjs 机检路径存在性与 D 级数量对账，登记与磁盘不一致会硬失败。",
     "grading": "A 级（背景图+封面模板）= 必登记、AI 必用；B 级（纹理/插画/挂件）= 按需登记，AI 有代码替代兜底；C 级（字体）= 已 bundle；D 级（产品截图速查表）= 文章配图用，总数以 截图素材/ 磁盘文件数计。",
     "registerRule": "不登记不算入库。新素材放入目录后必须在本文件登记，AI 才「知道」它、才能选用。编号规则：背景 BG-ABS-序号-语义名、插画 IL-行业-序号-语义名、纹理 TX-序号-语义名。A 类背景复用前先渲染 1 帧 still 验证前景兼容。",
     "check": "scripts/check-facts.mjs 校验本文件：登记路径磁盘存在性 + D 级磁盘数量对账 + 未登记文件检出。"
   },
   "A": {
     "abstract": [
-      { "id": "BG-ABS-001", "name": "暖奶油卡片底", "colorScheme": "暖色系", "desc": "奶油色/暖棕抽象底，柔和光斑，适合暖色 palette（warm-orange/caramel）", "industries": "茶饮咖啡/餐饮等暖调行业", "path": "背景素材/抽象模板/暖色系/BG-ABS-001-暖奶油卡片底.png", "status": "可用（清零后改回；2026-08-30 审计发现漏改）" },
+      { "id": "BG-ABS-001", "name": "暖奶油卡片底", "colorScheme": "暖色系", "desc": "奶油色/暖棕抽象底，柔和光斑，适合暖色 palette（warm-orange/caramel）", "industries": "茶饮咖啡/餐饮等暖调行业", "path": "背景素材/抽象模板/暖色系/BG-ABS-001-暖奶油卡片底.png", "status": "可用" },
       { "id": "BG-ABS-002", "name": "冰蓝柔光底", "colorScheme": "冷色系", "desc": "冰蓝/薄荷/奶油黄多色柔光圆斑 + 下部白光，颗粒质感，适合冷色 palette（ink-green/deep-blue/mint-cool）", "industries": "茶饮咖啡（ink-green）/美业等冷调行业", "path": "背景素材/抽象模板/冷色系/BG-ABS-002-冰蓝柔光底.png", "status": "可用" },
       { "id": "BG-ABS-003", "name": "粉雾网格渐变底", "colorScheme": "暖色系（粉）", "desc": "粉→浅桃渐变 + 白色细网格 + 两角半透明圆形光斑，柔和梦幻；浅底，适合粉紫调（美业/美容养生）", "industries": "美业/美容养生", "darkText": true, "path": "背景素材/抽象模板/暖色系/BG-ABS-003-粉雾网格渐变底.png", "status": "已入库（前景验证通过）" },
       { "id": "BG-ABS-004", "name": "蓝绿光斑底", "colorScheme": "冷色系", "desc": "天蓝→薄荷绿渐变 + 白色/淡黄散焦光斑，下半光斑密集，清新通透；浅底；AI 生成（无版权问题，已裁去水印）", "industries": "洗车养车等冷调行业", "darkText": true, "path": "背景素材/抽象模板/冷色系/BG-ABS-004-蓝绿光斑底.png", "status": "已入库（前景验证通过）" },
-      { "id": "BG-ABS-006", "name": "粉晕光弧底", "colorScheme": "暖色系（粉）", "desc": "柔粉底 + 左上白色光晕 + 底部大弧形光弧 + 零星小圆，梦幻干净；浅底；用户自搜（商用授权待确认）", "industries": "美业/美容养生（粉调）", "darkText": true, "path": "背景素材/抽象模板/暖色系/BG-ABS-006-粉晕光弧底.png", "status": "已入库（前景验证通过）" }
+      { "id": "BG-ABS-006", "name": "粉晕光弧底", "colorScheme": "暖色系（粉）", "desc": "柔粉底 + 左上白色光晕 + 底部大弧形光弧 + 零星小圆，梦幻干净；浅底；用户自搜（商用授权待确认）", "industries": "美业/美容养生（粉调）", "darkText": true, "path": "背景素材/抽象模板/暖色系/BG-ABS-006-粉晕光弧底.png", "status": "已入库（前景验证通过）" },
+      { "id": "BG-ABS-007", "name": "暖金光斑底", "colorScheme": "暖色系", "desc": "左上暖光斜射渐变（奶油米白→浅焦糖棕）+ 下部散焦圆斑（bokeh）+ 细腻颗粒质感，暖金奶油色调；浅底；AI 生成（无版权问题，已裁去水印）", "industries": "茶饮咖啡/餐饮/烘焙等暖调行业", "darkText": true, "path": "背景素材/抽象模板/暖色系/BG-ABS-007-暖金光斑底.png", "status": "已入库（前景验证通过）" },
+      { "id": "BG-ABS-009", "name": "金砂柔光底", "colorScheme": "暖色系（金黄）", "desc": "浅金→深金上下渐变 + 中部柔光漫射 + 细腻金砂颗粒质感，极简干净；浅底；AI 生成（无版权问题，已裁去水印）", "industries": "餐饮/烘焙/美业/高端服务等暖调行业", "darkText": true, "path": "背景素材/抽象模板/暖色系/BG-ABS-009-金砂柔光底.png", "status": "已入库（前景验证通过）" }
     ],
     "abstractDeleted": [
       { "id": "BG-ABS-005", "name": "雾霾紫柔光底", "deletedAt": "2026-08-25", "reason": "用户判定偏艳抢前景（底部中紫饱和+光斑密集），文件已移回收站", "ban": "禁止再引用/选用", "replacement": "BG-ABS-003（G04 测试片已删，2026-08-29 清零）" }

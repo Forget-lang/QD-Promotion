@@ -1,8 +1,8 @@
 // 数据驱动核心：Scene 入口卡 + StyleConfig 风格配置（2026-08-29 大瘦身版）
 // 背景：12 个共享场景组件与 9 个"统一外观"业务组件已删除，无 type→渲染器回退。
-// Scene 因此瘦成「入口卡」：只描述 分发/时长/字幕/钩子形态 等通用字段；
+// Scene 因此瘦成「入口卡」：只描述 分发/时长/字幕/语音偏移 等通用字段；
 // 每屏真正的业务数据放 payload，形状由各片 `video/src/videos/gXX/types.ts` 自定义（组件内 pick 取型）。
-// 旧版在这里堆的 leftItems/metrics/cardFields/bracketGroups… 专属字段随其渲染器一并删除（git 历史可查）。
+// 旧版在这里堆的 leftItems/metrics/cardFields/bracketGroups… 专属字段随其渲染器一并删除（git 历史可查）；title/sub/hookNumber/hookUnit/hookTag/points 等零读取便捷字段 2026-09-02 Q4 清理删除。
 import type { PaletteKey } from './palette';
 
 /** 场景渲染器统一入参（本片专属组件用，scenes/index.tsx 分发时传入） */
@@ -46,8 +46,8 @@ export interface Scene {
    * 用 `scenes/index.tsx` 里 `VIDEO_RENDERERS[视频id][ui]` 注册的组件渲染；缺失或没注册直接抛错（2026-08-29 共享场景回退已删除，无旁路）。
    * **组件不写在数据文件里**（数据要能序列化，函数会丢），只在分发器按视频 id 注册一次。
    * 整屏结构指纹 = `type + ui`（机检见 `scripts/check-similarity.mjs`）。
-   * ⚠️ 别再往 payload 里加 `layout`/`cardVariant` 想"改指纹"：那两个键随 2026-08-29 共享场景一起删了，
-   * 现在脚本只认 type + ui，且 ui 带 `gXX-` 前缀 → 换前缀重做同款骨架永不碰撞。结构雷同靠一屏标杆人判。
+   * 准确构成（对齐脚本）：普通屏 type 段就是 `type`；钩子屏 type 段带风格前缀 `hook:<hookStyle>`；有 ui 时再拼 `#ui`。脚本另保留 `layout`/`cardVariant` 的归一化分支（'vertical'/'border-left' 视同缺省），但这两个键随 2026-08-29 共享场景已删、新片不要再用。
+   * ⚠️ 无论怎么拼，ui 都带 `gXX-` 前缀 → 换前缀重做同款骨架永不碰撞，这道机检只防"照抄上一片的 ui 名"。结构雷同一律靠一屏标杆人判。
    */
   ui: string;
   /** 本片本屏的业务数据载荷；形状由 `video/src/videos/gXX/types.ts` 定义，专属组件内取型。分发器不读 */
@@ -61,18 +61,6 @@ export interface Scene {
   subtitles?: SubtitleLine[];
   /** 浅色背景适配标记。⚠️ 已知短板（R3 §7.3）：Subtitle 尚未消费此字段（恒白字黑描边），接线须走组件提案；在那之前它只是数据标注 */
   darkText?: boolean;
-  // ── 钩子屏通用便捷字段（专属组件可选读取；其余内容一律进 payload）──
-  title?: string;
-  sub?: string;
-  /** number 型钩子：数字部分（如 "10"）/ 单位（如 "次"），供大字弹入 */
-  hookNumber?: string;
-  hookUnit?: string;
-  /** story 型钩子：场景锚点胶囊文字（如 "上周三 · 下午四点"）；challenge 型：徽章文字（缺省 "敢不敢"） */
-  hookTag?: string;
-  /** 编号要点列表（①②③ + 文字，多屏通用的"干货条"形态，专属组件可选渲染） */
-  points?: string[];
-  /** 页脚一句话（数据口径 / 免责小字） */
-  footnote?: string;
 }
 
 export interface StyleConfig {

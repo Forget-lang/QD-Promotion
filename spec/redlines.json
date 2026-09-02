@@ -4,7 +4,7 @@
     "lastVerified": "2026-08-28",
     "machineLayers": "codeBanned = 画面层硬禁（含视频字幕）；voiceBanned = 口播/文案层硬禁，实际扫描 token = codeBanned ∪ voiceBanned（md 层豁免「自查」小节与截图处理注记，见该层 note）；outputsReview = 文案层需人工确认；docsInfo = 文档层仅提示。",
     "designPrinciple": "宁少勿滥，避免大量误报导致闸门失去威慑力。单字/短词一律不加，只加明确的违禁词组。无来源数字（百分比/倍数/增长值）不入 token 表——产品参数数字合法，正则必然误报，改由 rules.numeric_claims 人工判。",
-    "changeProcess": "改红线两步：① 改本文件（机器层 tokens + rules 规则同步改）→ ② 跑 node scripts/check-redlines.mjs 验证 video/src + outputs 两层零命中。旧三步流程（R5 文档 + redlines.json 双维护）已随迁移作废。",
+    "changeProcess": "改红线两步：① 改本文件（机器层 tokens + rules 规则同步改）→ ② 跑 node scripts/check-redlines.mjs 验证 video/src + outputs 两层零命中。",
     "updated": "2026-08-28"
   },
   "codeBanned": {
@@ -80,7 +80,7 @@
     "exclude": [
       "outputs/archive/**"
     ],
-    "note": "口播稿/文案层硬禁。**本层实际扫描 token = codeBanned.tokens ∪ voiceBanned.tokens**（画面禁词同样不得出现在文案里，2026-08-28 修复：此前脚本只扫本层 token，导致 outputs 发布稿从不按画面禁词检查）。\n以下词一旦出现在旁白/正文文本即硬失败。\n豁免两类必然复述违禁词的位置（不计命中）：① 含「自查」二字的小节标签，仅认三种写法——Markdown 标题行（`#`~`######`）、独立一行的【…】标签、紧跟冒号的行首 **…**： 标签（自查清单必然逐条复述禁词）；注意 `**合规自查**（补充说明）：` 这种冒号前带括注的形式**不识别**，需复述禁词时请改用含「自查」的标题行；②「（发布前裁剪微信元素）」这类截图处理操作注记（video_visual 规定的图注用语，属操作指令非正文）。\n- 微信暗语/谐音（口播里可能用谐音绕开画面检查）\n- 搜索导流暗语\n- 诱导关注/私信类\n- 极限词的口语变体",
+    "note": "口播稿/文案层硬禁。**本层实际扫描 token = codeBanned.tokens ∪ voiceBanned.tokens**（画面禁词同样不得出现在文案里，两层合并扫描）。\n以下词一旦出现在旁白/正文文本即硬失败。\n豁免两类必然复述违禁词的位置（不计命中）：① 含「自查」二字的小节标签，仅认三种写法——Markdown 标题行（`#`~`######`）、独立一行的【…】标签、紧跟冒号的行首 **…**： 标签（自查清单必然逐条复述禁词）；注意 `**合规自查**（补充说明）：` 这种冒号前带括注的形式**不识别**，需复述禁词时请改用含「自查」的标题行；②「（发布前裁剪微信元素）」这类截图处理操作注记（video_visual 规定的图注用语，属操作指令非正文）。\n- 微信暗语/谐音（口播里可能用谐音绕开画面检查）\n- 搜索导流暗语\n- 诱导关注/私信类\n- 极限词的口语变体",
     "exitOnHit": true,
     "tokens": [
       "vx",

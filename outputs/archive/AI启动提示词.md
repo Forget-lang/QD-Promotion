@@ -1,6 +1,6 @@
 # 券到卡包 · AI 启动提示词
 
-> 更新：2026-08-31（第十五轮审计修复：本文与入口卡里的 "spec/ 三真源" 份数写法去掉——`spec/` 实际已有四份 json，份数只写在 AGENTS.md §二 清单里；此前同日第十四轮：场景 B「组标题也在真值范围内」条目不再复述 check-ui-truth 的机检层数——层数会随脚本演进过期，改指脚本输出；此前 2026-08-30：对齐清零重启后现状：作业文档 = 根目录 `SKILL.md` 唯一七步法，旧 workflow/ 体系与 G02~G05 产物均已物理删除，git 历史可查；质感锚 4 张 + 17 屏型底稿样张在 `outputs/bench/`。同日场景 B 追加三条：内容返工样式冻结 + 骨架几何硬上限 + 行不得提前占位、验收必须抽过程帧、组标题归属也属真值且已机检）
+> 更新：2026-09-01（变更史只记 changelog，本文不复述；原则：提示词只指路，不复述规则）
 > 用途：开新会话 / 换 AI 工具时，粘贴对应场景的提示词，让 AI 30 秒接手。
 > 原则：**提示词只指路，不复述规则**——所有口径以 `AGENTS.md`（入口，含真源清单）、`SKILL.md`（七步法）、`spec/` 机器可读真源为准。
 
@@ -69,7 +69,7 @@
 【硬性】禁止 CSS animation/transition，全部 useCurrentFrame + interpolate/spring；屏间必须 TransitionSeries；
 文案/颜色全从数据读，禁止硬编码；渲染必带 NODE_OPTIONS=""，浏览器用 Chrome Headless Shell
 （npx remotion browser ensure 后指 node_modules/.remotion/... 路径，本机系统 Chrome headless 会因显示链接挂死）。
-【验收】tsc 零错误 → 逐屏峰值帧 still → check-similarity 绿 → check-motion 达标（静止 ≤45%、中位帧间差 ≥0.35、占用率 ≥70%）→ 交真图给用户。
+【验收】tsc 零错误 → 逐屏峰值帧 still → check-similarity 绿 → check-motion 达标（静止 ≤45%、中位帧间差 ≥0.35、占用率 ≥70%——占用率只是防"空和死"的下限，高于它不代表更好，禁止为过线堆装饰：SKILL §四否决清单"对着指标凑画面"条 / 第十七轮定口径）→ 交真图给用户。
 ```
 
 ## 场景 D：背景图入库验证（用户找图后逐张验收）

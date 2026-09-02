@@ -1,44 +1,8 @@
 // 背景装饰组件 · 2026-08-17 视觉升级 · 2026-08-20 增加全片氛围层
-// - DotGrid：轻量点阵纹理，给浅底画面增加质感（不抢内容）
-// - GlowOrb：柔光圆斑，给深底画面增加层次感
-// - Grain / Vignette / AccentOverlay / KenBurnsBg：全片氛围层（VTemplate 统一挂载）
+// 2026-09-02 Q4 零引用件清理：DotGrid / GlowOrb 已删（零消费者；浅底点阵 / 深底柔光各片按需手写）。
+// 本文件只留 VTemplate 统一挂载的全片氛围层四件套：Grain / Vignette / AccentOverlay / KenBurnsBg。
 import React from 'react';
 import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame, useVideoConfig } from 'remotion';
-import { EASE_OUT } from './animations';
-
-/** 点阵背景（浅底画面用） */
-export const DotGrid: React.FC<{ color?: string; spacing?: number; size?: number; opacity?: number }> = ({
-  color = 'rgba(0,0,0,0.06)', spacing = 40, size = 3, opacity = 1,
-}) => (
-  <AbsoluteFill style={{ opacity }}>
-    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id={`dotgrid-${spacing}-${size}`} x="0" y="0" width={spacing} height={spacing} patternUnits="userSpaceOnUse">
-          <circle cx={size} cy={size} r={size} fill={color} />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill={`url(#dotgrid-${spacing}-${size})`} />
-    </svg>
-  </AbsoluteFill>
-);
-
-/** 柔光圆斑（深底画面用，2-3 个错位叠加营造氛围） */
-export const GlowOrb: React.FC<{
-  x: number; y: number; size: number; color: string; delay?: number;
-}> = ({ x, y, size, color, delay = 0 }) => {
-  const f = useCurrentFrame();
-  const opacity = interpolate(f - delay, [0, 40], [0, 0.35], {
-    extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT,
-  });
-  const drift = Math.sin((f - delay) / 40) * 12;
-  return (
-    <div style={{
-      position: 'absolute', left: x, top: y + drift, width: size, height: size,
-      borderRadius: '50%', background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
-      opacity, pointerEvents: 'none',
-    }} />
-  );
-};
 
 /** 全片颗粒层：feTurbulence 噪点，杀纯色渐变的色带 + 胶片质感。静态不动画，渲染稳定 */
 export const Grain: React.FC<{ opacity?: number }> = ({ opacity = 0.035 }) => (

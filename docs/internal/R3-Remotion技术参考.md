@@ -1,7 +1,7 @@
 # R3 · Remotion 技术参考（原理层）
 
-（2026-08-29 清零重启补注：以下历史链中提到的 workflow/pipeline、craft、弹药库、模板库等文件均已物理删除，git 历史可查，现行口径以 `SKILL.md` 为准。）
-> 最后校验：2026-08-29（**架构收口**：共享场景 12 组件 + 统一外观件 9 个（§3.2）删除，ui 必填无回退；§四 生长机制改写为"共享层冻结、只长原子件"；§五 扩展步骤改指 `videos/gXX/` + payload）（此前同日 文档收敛：原指向已归档 `workflow/pipeline.md` / `craft.md` 的 6 处引用全部改指 `SKILL.md` 或机检脚本，删除计数同步要求）（此前 §3.2 组件表按 applet 真值校准两处：`CouponCard` 金额右置 + 删假条码；`PhoneMockup` 新增 `nav` 顶栏 prop，取色与胶囊规格对齐 applet `pages.json` globalStyle 与 `m-navigation-bar.vue`——两组件现均已删除，真值口径转存 R6 §8）（此前 2026-08-28：§5.6 呈现手法库改为「只登记代码已落地的 14 种手法」并逐行写明数据文件写法与首用屏——原清单把 3 种未落地写法也计入，9 屏视频按规则选不到足够手法；新增「判定看视觉语法不看标签」防卡片流；计数真源变更已同步 pipeline §2.1.3 / craft §5 / AGENTS §二·5 / `ref-registry.json` counts.stale）（此前 2026-08-27：审计修正：§5.6 呈现手法清单口径对齐手法规格表——卡片不算手法（旧计数值见 registry stale）；文档重构阶段 3：R1/R5/M2 残留引用改指 `spec/facts.json`、`spec/redlines.json`、`workflow/pipeline.md`）（文档重构阶段 2：吸收 M2 §三 技术硬规则为 §七「制作硬规则（操作版）」；「与 M2 的关系」改指 `workflow/pipeline.md`）（08-25 新增 §5.4 CardFaceScene 规格、§5.5 产品 UI 参考+统计核对、§5.6 呈现手法库、atempo 语速；08-26 atempo 口径对齐——G04 定稿 1.2 后续沿用；08-26 组件状态纠错：§5.4 改为规格示例（CardFaceScene 已实现）、§5.6 手法状态对齐代码 + 真源指向资产盘点脚本）（从原 13 号文档拆分，本文件=原理与 API 参考；08-24 修订语速参数口径）
+> 最后校验：2026-09-01（变更史只记 changelog，本文不复述）。
+> 旧 workflow/pipeline、craft、弹药库等文件均已物理删除（git 可查），现行口径以 `SKILL.md` 为准；本文件=原理与 API 参考。
 > 这份文档是**参考层**：解释"为什么"和"组件怎么用"。正常做视频**不需要**读它，按 `SKILL.md` 的七步法操作即可；遇到渲染异常、需要新建积木/组件/图标、或想理解声画同步原理时，再查本文件。
 > 操作流程（怎么做出片）在 `SKILL.md`（七步法），制作硬规则（动画/转场/布局/代码结构操作版）在本文件 §七，本文件不重复流程环节。
 
@@ -85,7 +85,7 @@ const opacity = interpolate(frame, [0, 2 * fps], [0, 1], {
 spring({ frame: frame - delay, fps, config: { stiffness, damping, mass } });
 ```
 
-**参数安全带**：`stiffness 80-200`、`damping 20-60`。**damping 过小会导致无限震荡**（如 bouncy 应控制 damping ≥ 12）。本项目 `SPRING_CONFIG` 已有四套预设（bouncy/snappy/buttery/heavy），全部动画组件透传 `style.motion`，一般不需要自调参数。**现状如实**（见 §3.5）：那批透传组件当前零外部消费者，专属屏内 `spring()` 各自定 damping（g06 实测 18 处）——本段是**目标写法**，不是已生效机制。
+**参数安全带**：`stiffness 80-200`、`damping 20-60`。**damping 过小会导致无限震荡**（如 bouncy 应控制 damping ≥ 12）。本项目 `SPRING_CONFIG` 已有四套预设（bouncy/snappy/buttery/heavy），全部动画组件透传 `style.motion`，一般不需要自调参数。**注意：本段是目标写法，不是已生效机制**——实际消费者与屏内 damping 分派现状以 grep / `list-assets` 为准（文档宪法铁律三，本文不复述快照）。
 
 **使用建议**：
 - 用 `measureSpring()` 精确计算弹簧动画持续帧数，不要手估
@@ -116,7 +116,7 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 - 同屏元素 stagger 间隔 **4-8 帧**（太快=齐步走，太慢=拖沓）
 - 主体动画时长 **20-40 帧**（0.7-1.3s）：短于 0.5s 生硬，长于 1.5s 拖沓
 - 每屏只设一个**主动画时刻（peak frame）**，其余元素围绕它编排（对应"一屏一焦点"）
-- **禁止嵌套动画时序冲突**：父容器入场动画期间，子元素不要设独立 delay 超过父动画时长（会导致子元素在不可见期间空跑动画）。例：`<SlideInRight delay={14}><ScaleIn delay={40}>` 父动画 14-30 帧期间子元素 opacity=0
+- **禁止嵌套动画时序冲突**：父容器入场动画期间，子元素不要设独立 delay 超过父动画时长（会导致子元素在不可见期间空跑动画）。例：`<HandIn delay={14}><内联动画 delay={40}>`（各片内联入场包装同理）父动画 14-30 帧期间子元素 opacity=0
 
 ### 2.5 颜色过渡
 
@@ -133,27 +133,24 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 
 > 分发器在 `video/src/scenes/index.tsx`（ui 必填、无回退），本片专属屏组件在 `video/src/videos/gXX/`（g06 首条正式片已建：`index.tsx` 全部屏组件内联 + `types.ts` payload 形状；新片另起一个目录），原子组件库在 `video/src/components/`。组件是**原子积木，非成品模板**——每条视频独立设计、组合方式不同。组件靠纪律生长（见四）。
 
-### 3.1 动画组件（components/animations.tsx）
+### 3.1 动画原子（components/animations.tsx）
 
-| 组件 | 参数 | 用途 |
-|---|---|---|
-| `FadeInUp` | delay, dist, motion | 向上淡入（标题/正文/卡片通用） |
-| `SlideInLeft` | delay, motion | 从左滑入（痛点卡） |
-| `SlideInRight` | delay, motion | 从右滑入（解法卡） |
-| `ScaleIn` | delay, motion, startScale | 缩放弹入（数字/卡片/图标） |
-| `WipeIn` | delay, duration, direction | clip-path 擦入（标题 reveal） |
-| `Pulse` | delay, intensity, duration | 单次脉冲强调（数字/箭头） |
+2026-09-02 Q4 零引用件清理后，本文件只留三个被真实消费的原子，**无任何成品入场包装件**：
 
-这批组件全部透传 motion、spring config 从 `SPRING_CONFIG` 读取（⚠️ 指 `animations.tsx` 的入场原子件，当前**零外部消费者**，见 §3.5）；`EASE_OUT` 为标准缓动常量。
+| 原子 | 说明 |
+|---|---|
+| `SPRING_CONFIG` | bouncy/snappy/buttery/heavy 四档 spring 参数；VTemplate 转场 timing 与各片手写 spring 都从这里取 |
+| `EASE_OUT` / `EASE_IN` | expo-out / expo-in 标准缓动常量，非 spring 插值统一用 |
+
+> **已删的入场包装件**：`FadeInUp / SlideInLeft / SlideInRight / ScaleIn / WipeIn / Pulse`（零消费者，且与「每片入场内联手写」冲突，禁止回建）。**现行入场写法** = 各片 `videos/gXX/index.tsx` 内联一个 `HandIn` 包装（读 `SPRING_CONFIG[style.motion]` + 缓动），新片照此在片内重写，不再往共享层加成品入场件。
 
 ### 3.2 UI 组件（components/ui.tsx）
 
 | 组件 | 参数 | 用途 |
 |---|---|---|
 | `Subtitle` | lines[{text,startFrame,endFrame}] | 底部多行字幕（帧级精确同步）：白字黑描边，距底 60px，最多同时显示 2 行；分发器统一挂载 |
-| `CharReveal` | text/delay/stagger/duration/style | 逐字 mask 入场，大标题"贵感"来源 |
-| `AccentWord` | text/color/delay/peak | 重音词大字：字号+颜色同时弹入，对齐口播重音帧 |
-| `elevation(level, dark)` | — | 三级投影常量（浅底/深底两套）——**当前全库零消费者**：g06 的 7 处 `boxShadow` 用片内自定常量与字面量。保留作统一光影的候选件，用不用每片自定 |
+
+> **2026-09-02 Q4 清理**：`CharReveal`（逐字入场）、`AccentWord`（重音词）、`elevation`（投影常量）零消费者已删——逐字入场、重音词、阴影各片按锚稿手写。
 
 > ⚠️ **2026-08-29 删除的 9 个"统一外观"业务组件**：`SectionTitle`、`IconBadge`、`PhoneMockup`、`CouponCard`、`StatCounter`、`StatCard`、`StepFlow`、`CompareCard`、`HighLightText`——它们把券面/手机壳/步骤条外观焊死，违反「外观每片必新」，禁止以任何形式原样恢复；新屏外观一律照质感锚（`outputs/bench/anchor-*.png`）与 ref 底稿样张逐片手写。**沉淀为纪律的口径仍有效**：券面金额右置、全 App 无条形码不画条码、图标不裸放（须有容器）、滚动数字只用于真实可述口径、顶栏/胶囊规格按 R6 §8 真值复刻。
 
@@ -172,11 +169,11 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 
 | 组件 | 参数 | 用途 |
 |---|---|---|
-| `DotGrid` | color/spacing/size/opacity | 点阵纹理（浅底屏） |
-| `GlowOrb` | x/y/size/color/delay | 柔光圆斑（深底屏） |
 | `Grain` | opacity=0.035 | 全片颗粒层（VTemplate 挂载）：杀纯色渐变 banding，全片图层质感统一 |
 | `Vignette` | strength=0.25 | 全片暗角（VTemplate 挂载）：径向渐变聚焦中部视线 |
 | `AccentOverlay` | color/opacity=0.18 | 背景图主色统调（VTemplate 挂载，soft-light 只混下层） |
+
+> **2026-09-02 Q4 清理**：`DotGrid`（浅底点阵）、`GlowOrb`（深底柔光）零消费者已删——需要点阵/光斑的各片在屏内手写。（`KenBurnsBg` 也在本文件、由 VTemplate 挂载做背景图推近，属存活原子。）
 
 > ⚠️ 氛围层三件套（Grain/Vignette/AccentOverlay）是**全片必挂**（VTemplate 统一挂载，场景与设计稿无需处理），是画面"质感"的关键来源。缺失时画面偏平偏黑。
 > 注意挂载条件：Grain/Vignette 无条件挂全片；AccentOverlay 仅在 `video.style.bgImage` 存在（有背景图）时挂载（代码条件渲染，无背景图时不挂）。
@@ -185,8 +182,8 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 
 | 维度 | 字段 | 可选值 | 说明 |
 |---|---|---|---|
-| 配色 | `style.palette` | mint-cool / warm-orange / berry-purple / deep-blue / caramel / ink-green / neon（7 套） | `palette.ts` PALETTES。**现状如实**：主题变量只覆盖部分元素，专属屏内仍有硬编码色值（`videos/g06/index.tsx` 实测 38 处 hex）——要不要收口到 `p.accent` 等属设计决策，未拍板 |
-| 动画性格 | `style.motion` | bouncy / snappy / buttery / heavy（4 种） | `SPRING_CONFIG` 由 `animations.tsx` 的 4 个动画组件透传，**但那 4 个组件当前零外部消费者**（见 SKILL §三）；实际生效的唯一消费者 = VTemplate 转场 timing（`VTemplate.tsx:180`）。屏内 spring 各自定 damping（g06 实测 18 处），未按 motion 分派 |
+| 配色 | `style.palette` | mint-cool / warm-orange / berry-purple / deep-blue / caramel / ink-green / neon（7 套） | `palette.ts` PALETTES。注意：主题变量只覆盖部分元素，专属屏内仍有硬编码色值（数量以 grep 现查为准）；是否收口到 `p.accent` 等属未拍板的设计决策 |
+| 动画性格 | `style.motion` | bouncy / snappy / buttery / heavy（4 种） | `SPRING_CONFIG` 由转场 timing 消费（VTemplate）；屏内 spring 是否按 motion 分派属代码状态，以 grep 为准——未收口前别把透传当已生效机制 |
 | 转场 | `style.transition` | slide / wipe / dissolve / zoom / pop（5 种） | 自定义呈现组件在 VTemplate.tsx，五种观感真实可见 |
 | 钩子型 | `style.hookStyle` | 六值均为待本片实现的分派键（旧共享钩子已删，0/6 实现） | 本片实现时照锚稿手写钩子屏 |
 
@@ -210,12 +207,12 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 
 | 情况 | 做法 | 例子 |
 |---|---|---|
-| 纯运动/工具包装（不含外观） | ✅ 提成原子件跨片复用 | `FadeInUp`、`elevation`、`Subtitle` |
+| 纯运动/工具包装（不含外观） | ✅ 提成原子件跨片复用 | `SPRING_CONFIG`、`EASE_OUT`、`Subtitle` |
 | 带外观的成品结构（券面/步骤条/手机壳） | ❌ 不提成共享组件；本片内手写，下片照锚稿重新手写 | 原 CouponCard/StepFlow 等 9 件已删 |
 | 只此一家的场景结构 | ✅ 留在本片场景文件内 | 曲线抬升、撕纸缺口逻辑 |
 | 海报风装饰件（窗口容器/吊牌/波浪线） | ⚠️ 默认不建代码；设计稿确需时按需实现（判据是上文「少而精」原则 + 看真图，不设数量配额——2026-08-30 拍板，配额会绑架设计） | 浏览器顶栏容器、吊牌标签 |
 
-✅ 正确：三个行业各照锚稿手写券面，入场都复用 `FadeInUp`
+✅ 正确：三个行业各照锚稿手写券面，入场基于 `SPRING_CONFIG` / 缓动原子在各片内联 `HandIn` 包
 ❌ 错误①：把上一片的券面 JSX 原样 import 过来（= 换皮复用，`check-similarity` + 一屏标杆双拦）
 ❌ 错误：每屏都套浏览器顶栏容器当背景（装饰件滥用，像会动的 PPT）
 
@@ -295,7 +292,7 @@ interface CardfacePayload {
 
 **④ 与现有积木差异**：solution 是"白卡列表"（浅色卡片+图标+说明）；cardface 是"产品卡面"（深色磁条卡+字段网格）——信息组织方式根本不同（产品本体 vs 卖点列表），肉眼可辨，满足 5.3 结构独特标准。
 
-**⑤ 帧级动画时序**（参考）：
+**⑤ 帧级动画时序**（参考 · 此示例沿用 Q4 清理前的入场件名 `FadeInUp`/`ScaleIn`，现这些件已删，各片改内联 `HandIn` 同理，见 §3.1）：
 - 帧 0-2: 背景渐入
 - 帧 2-26: 标题 FadeInUp（motion=style.motion）
 - 帧 8-44: 卡面 ScaleIn（motion=style.motion，startScale=0.85）
@@ -388,8 +385,8 @@ interface CardfacePayload {
 | 禁止 CSS animation/transition | Remotion 逐帧渲染，CSS 时间轴与帧不同步 | `style={{animation: 'fadeIn 0.5s'}}` |
 | 全部用 useCurrentFrame + interpolate/spring | 唯一合法动画驱动方式 | — |
 | 非 spring 插值必须指定 easing | 统一用 `EASE_OUT = Easing.bezier(0.16, 1, 0.3, 1)`（expo-out） | `interpolate(f, [0,30], [0,1])` 缺 easing |
-| spring 必须透传 motion | motion 参数从 `style.motion` 读取，禁止硬编码覆盖 | `<FadeInUp motion='bouncy'>` 写死 |
-| 禁止嵌套动画时序冲突 | 父动画期间子元素 delay 超父时长 = 空跑 | `<SlideInRight delay={14}><ScaleIn delay={40}>` |
+| spring 必须透传 motion | motion 参数从 `style.motion` 读取，禁止硬编码覆盖 | `<HandIn motion='bouncy'>` 写死（各片内联入场包装） |
+| 禁止嵌套动画时序冲突 | 父动画期间子元素 delay 超父时长 = 空跑 | `<HandIn delay={14}><内联动画 delay={40}>` |
 | 颜色过渡用 interpolateColors | 禁止 boolean 瞬切 | `color={lit ? '#fff' : '#333'}` |
 
 ### 7.2 转场规则
@@ -410,7 +407,7 @@ interface CardfacePayload {
 | 字幕安全区 | 底部距底 60px，白字黑描边 34px，位于 y:1760-1920，不侵入内容区 |
 | 活动区硬底线 | y:120-1760，出界 = 不合格 |
 | **核心内容集中** | 核心内容（标题+卡片/图标/流程）集中在 **y:200-1100**；标题距顶 ≥200px；标题与内容间距 40-60px；多卡片间距 ≥ 卡片高度 20%；卡片内 padding ≥43px。只约束垂直分布，不限制风格 |
-| **绝对定位 vs 动画包装（2026-08-28 硬规则）** | 带 `transform` 的动画组件（`FadeInUp`/`ScaleIn`/`WipeIn`/`Pulse`…）会**成为后代的包含块**。写 `<FadeInUp><div style="position:absolute; left:80; right:80; bottom:280">` 时，`left+right` 相对一个零尺寸盒解析 → 元素塌缩不可见。**正确写法：外层普通 div 负责 `position:absolute` + 锚点，内层再套动画组件**。教训：`PainScene`（旧共享场景，2026-08-29 已删除）编号列表变体的红色结论条自 G04 起从未渲出来（G04 交付帧已取证），设计稿只写"必须显式传 rightSub"根本抓不到这个缺陷 |
+| **绝对定位 vs 动画包装（2026-08-28 硬规则）** | 带 `transform` 的入场包装组件（各片内联 `HandIn` 同理）会**成为后代的包含块**。写 `<HandIn><div style="position:absolute; left:80; right:80; bottom:280">` 时，`left+right` 相对一个零尺寸盒解析 → 元素塌缩不可见。**正确写法：外层普通 div 负责 `position:absolute` + 锚点，内层再套动画组件**。教训：`PainScene`（旧共享场景，2026-08-29 已删除）编号列表变体的红色结论条自 G04 起从未渲出来（G04 交付帧已取证），设计稿只写"必须显式传 rightSub"根本抓不到这个缺陷 |
 | 浅底字幕可读性（已知短板，待决） | `Subtitle` 无条件白字黑描边（`SceneRenderer` 不传 `darkText`）→ 浅底背景上全靠描边撑可读，观感偏弱。改它影响全片所有已渲视频的字幕层，须走组件提案 |
 
 ### 7.4 代码结构规则

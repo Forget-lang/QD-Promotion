@@ -14,6 +14,16 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+// 已裁项登记（scripts/ref-registry.json 的 motionWaivers）：用户逐张看过成片、认可「红灯是设计意图/交付终态」后登记，
+// 令效果尺子不再每会话挡路——但数字照实打印、行标签标「已裁」。check-motion 本身仍是纯尺子，直接跑必报真值。
+const REGISTRY = JSON.parse(createRequire(import.meta.url)('node:fs').readFileSync(join(ROOT, 'scripts/ref-registry.json'), 'utf8'));
+const motionWaiver = (vidPath) => {
+  const list = REGISTRY.motionWaivers || [];
+  if (!list.length) return null;
+  const m = /g\d{2}/i.exec(String(vidPath));
+  const key = m ? m[0].toLowerCase() : null;
+  return key ? (list.find((w) => String(w.video).toLowerCase() === key) || null) : null;
+};
 const GATES = [
   { key: 'redlines', label: '红线闸门（画面/口播硬禁）', args: ['scripts/check-redlines.mjs'] },
   { key: 'refs', label: '文档引用闸门（引用断链）', args: ['scripts/check-doc-references.mjs'] },
@@ -90,8 +100,10 @@ function srcNewest() {
   return walk(join(ROOT, 'video', 'src'));
 }
 if (vid) {
+  const wv = motionWaiver(vid);
   const vidM = require$fs().statSync(vid).mtimeMs;
   const srcM = srcNewest();
+  let row;
   if (srcM > vidM) {
     const diffMs = srcM - vidM;
     // 2026-08-31 修：不足 1 分钟（含 14ms 这种"同批写出/批量重置 mtime"）不能打「旧 0 分钟」——说明可疑并保守判过期
@@ -101,14 +113,21 @@ if (vid) {
         ? `仅旧 ${Math.round(diffMs / 1000)} 秒`
         : `旧 ${Math.round(diffMs / 60000)} 分钟`;
     const note = diffMs < 60000 ? '（疑似与源码同批写出或 mtime 被批量重置，无法证明是最新渲染）' : '';
-    rows.push({ ok: false, label: '效果尺子（最新成片）',
-      msg: `过期证据｜${vid.split('/').slice(-2).join('/')} 比 video/src 最新改动${age}${note}：这份数字测的可能是已作废版本，不算通过（设计阶段可带此红继续，交付前必须重渲重测）` });
+    row = { ok: false, label: '效果尺子（最新成片）',
+      msg: `过期证据｜${vid.split('/').slice(-2).join('/')} 比 video/src 最新改动${age}${note}：这份数字测的可能是已作废版本，不算通过（设计阶段可带此红继续，交付前必须重渲重测）` };
   } else {
     const { code, out } = run('node', ['scripts/check-motion.mjs', vid], ROOT);
     const m = out.match(/静止占比 (\d+)%/), d = out.match(/中位帧间差 ([\d.]+)/), o = out.match(/画面占用率 (\d+)%/);
-    rows.push({ ok: code === 0, label: '效果尺子（最新成片）',
-      msg: `${code === 0 ? '达标' : '未达标'}｜${vid.split('/').slice(-2).join('/')}｜静止 ${m?.[1]}% 中位帧差 ${d?.[1]} 占用率 ${o?.[1]}%` });
+    row = { ok: code === 0, label: '效果尺子（最新成片）',
+      msg: `${code === 0 ? '达标' : '未达标'}｜${vid.split('/').slice(-2).join('/')}｜静止 ${m?.[1]}% 中位帧差 ${d?.[1]} 占用率 ${o?.[1]}%` };
   }
+  if (!row.ok && wv) {
+    row.ok = true;
+    row.skipped = true;
+    row.label = '效果尺子（最新成片·已裁）';
+    row.msg = `已裁放行（${wv.approvedBy || '未记批准人'}）· 原判照旧显示 ｜${row.msg}｜理由：${wv.reason || '已登记例外'}`;
+  }
+  rows.push(row);
 } else {
   rows.push({ ok: true, skipped: true, label: '效果尺子', msg: '跳过（outputs 下暂无成片 mp4；出片后必跑）' });
 }
@@ -125,5 +144,5 @@ const skipped = rows.filter((r) => r.skipped).length;
 console.log('\n──────────────────────────────────────────────');
 console.log(failed.length
   ? `❌ ${failed.length}/${rows.length} 个闸门未通过 —— 修完再开工/再交付；禁止带着红灯产出或改文档。`
-  : `✅ ${rows.length - skipped}/${rows.length} 通过、${skipped} 项跳过（无成片，出片后必跑）——可以开工。`);
+  : `✅ ${rows.length - skipped}/${rows.length} 通过、${skipped} 项跳过（见上方 ⏭️ 行说明）——无红灯，可以开工。`);
 process.exit(failed.length ? 1 : 0);

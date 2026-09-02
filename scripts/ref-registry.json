@@ -146,5 +146,13 @@
       "path": "../applet/pages_user/coupon/public_receive.vue"
     }
   ],
-  "similarityExemptions": []
+  "similarityExemptions": [],
+  "motionWaivers": [
+    {
+      "video": "g06",
+      "reason": "g06 片1 有声成片为交付终态：长时制券阅读屏的安静经用户逐张看片认可为设计意图（非缺陷），不加强化微动、不为过线加晃动，样式冻结层不再改；效果尺子红灯转已裁放行。详见 changelog 2026-09-01。",
+      "approvedBy": "用户 2026-09-01（第十九轮·补5 审片裁决）",
+      "metrics": "静止 67% / 中位帧差 0.08 / 占用率 77%"
+    }
+  ]
 }

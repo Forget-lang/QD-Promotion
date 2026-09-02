@@ -180,18 +180,6 @@ const RowWipe: React.FC<{ delay?: number; children: React.ReactNode; style?: Rea
   );
 };
 
-/** 光带扫过（票面持续微动） */
-const Sweep: React.FC<{ period?: number; color?: string }> = ({ period = 120, color = 'rgba(255,255,255,0.16)' }) => {
-  const f = useCurrentFrame();
-  return (
-    <div style={{
-      position: 'absolute', top: 0, bottom: 0, width: 240, transform: 'skewX(-14deg)',
-      background: `linear-gradient(100deg, transparent, ${color}, transparent)`,
-      left: interpolate(f % period, [0, period], [-320, 1040]), pointerEvents: 'none',
-    }} />
-  );
-};
-
 // ── S1 钩子 · 全新做 ────────────────────────────────
 const S1Hook: React.FC<SceneRenderProps> = ({ scene }) => {
   const p = scene.payload as unknown as HookPayload;
@@ -393,16 +381,13 @@ const S3Idea: React.FC<SceneRenderProps> = ({ scene }) => {
 /** 第 i 句口播的起始帧：表单行的入场跟着口播走，不另拍 delay */
 const useBeatFrame = (subs?: SubtitleLine[]) => (i: number) => subs?.[i]?.startFrame ?? 8;
 
-/** 仿产品页面顶栏：返回 + 这一页的真实标题（券到卡包里就叫「制作兑换券」）*/
+/** 仿产品页面顶栏：这一页的真实标题（券到卡包里就叫「制作兑换券」）。返回键等页面 chrome 装饰不画（2026-09-01 用户拍板，见 SKILL 第 4 步）*/
 const MakeNav: React.FC<{ title: string; crumb: string; step: string }> = ({ title, crumb, step }) => {
   const f = useCurrentFrame();
   const p = interpolate(f - 4, [0, 16], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
   return (
     <div style={{ position: 'absolute', left: 60, right: 60, top: 116, opacity: p }}>
       <div style={{ position: 'relative', height: 62, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <svg width="24" height="32" viewBox="0 0 24 32" style={{ position: 'absolute', left: 8 }}>
-          <path d="M19 3L4 16l15 13" stroke={BROWN} strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
         <span style={{ fontFamily: FONT_ROUND, fontSize: 46, color: BROWN, letterSpacing: 3 }}>{title}</span>
         <span style={{
           position: 'absolute', right: 0, fontSize: 24, color: '#fff', background: CARAMEL,

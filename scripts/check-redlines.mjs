@@ -32,6 +32,14 @@ function expand(scopeList, excludeList = []) {
     .filter(p => exists(p));
   const out = new Set();
   for (const pat of scopeList) {
+    // 2026-09-01 修：scope 允许直指单个文件（如 "SKILL.md"）。旧版只认「dir/**/*.ext」形态——
+    // 单文件路径被当目录送进 collect()，readdirSync 抛错被 catch 静默吞 = 该层声明了却从不扫。
+    // 负向测试实锤：向 SKILL.md 注入「小程序码」，④ 文档层零报、exit 0。先判文件，再走目录展开。
+    const direct = join(ROOT, pat);
+    if (!pat.includes('/**/') && exists(direct)) {
+      if (!excludeDirs.some((d) => direct === d || direct.startsWith(d + '/'))) out.add(direct);
+      continue;
+    }
     const parts = pat.split('/**/');
     const baseDir = join(ROOT, parts[0]);
     const ext = parts[1] || null; // e.g. "*.md"

@@ -1,64 +1,11 @@
 // 通用 UI 原子件（仅提效，非模板）· 2026-08-29 大瘦身：
 // IconBadge / PhoneMockup / CouponCard / StatCounter / StatCard / StepFlow / CompareCard / SectionTitle / HighLightText
 // 共 9 个"统一外观"业务组件已删除——它们违反「外观每片必新」，且真值口径全部沉淀在 docs/internal/R6-applet前端UI储备.md（§0.1 黑名单 / §1.5 主题 / §8 校准表），要复刻照 R6 + bench 锚稿手写。
-// 本文件只留跨片通用的原子件：投影常量 / 逐字入场 / 重音词 / 底部字幕。
+// 2026-09-02 Q4 零引用件清理：elevation / CharReveal / AccentWord 已删（零消费者；投影与逐字入场各片按锚稿手写）。本文件只留跨片通用的底部字幕。
 import React from 'react';
-import { interpolate, interpolateColors, useCurrentFrame } from 'remotion';
-import { FONT_BODY, FONT_TITLE, INK } from '../palette';
+import { interpolate, useCurrentFrame } from 'remotion';
+import { FONT_BODY } from '../palette';
 import { EASE_OUT, EASE_IN } from './animations';
-
-/** 三级投影（浅底/深底两套），全片光影方向统一向下 */
-export const elevation = (level: 1 | 2 | 3, dark = false): string => {
-  const light = ['0 2px 8px rgba(15,17,21,0.08)', '0 12px 36px rgba(15,17,21,0.12)', '0 24px 64px rgba(15,17,21,0.20)'];
-  const darkShadows = ['0 2px 10px rgba(0,0,0,0.30)', '0 12px 36px rgba(0,0,0,0.38)', '0 24px 64px rgba(0,0,0,0.52)'];
-  return (dark ? darkShadows : light)[level - 1];
-};
-
-/** 逐字 mask 入场：每字从下方 reveal，stagger 默认 2 帧（大标题专用，贵感来源） */
-export const CharReveal: React.FC<{
-  text: string; delay?: number; stagger?: number; duration?: number; style?: React.CSSProperties;
-}> = ({ text, delay = 0, stagger = 2, duration = 14, style }) => {
-  const f = useCurrentFrame();
-  return (
-    <div style={{ display: 'inline-block', ...style }}>
-      {text.split('').map((ch, i) => {
-        const p = interpolate(f - delay - i * stagger, [0, duration], [0, 1], {
-          extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT,
-        });
-        return (
-          <span key={i} style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'top' }}>
-            <span style={{
-              display: 'inline-block',
-              transform: `translateY(${(1 - p) * 110}%)`,
-              opacity: Math.min(1, p * 1.6),
-            }}>{ch}</span>
-          </span>
-        );
-      })}
-    </div>
-  );
-};
-
-/** 重音词大字：字号 + 颜色同时弹入（对齐口播重音帧使用，位置由各视频设计稿决定） */
-export const AccentWord: React.FC<{
-  text: string; color: string; delay?: number; peak?: number; family?: string;
-}> = ({ text, color, delay = 0, peak = 96, family = FONT_TITLE }) => {
-  const f = useCurrentFrame();
-  const p = interpolate(f - delay, [0, 9], [0, 1], {
-    extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT,
-  });
-  const c = interpolateColors(p, [0, 1], [INK, color]);
-  return (
-    <div style={{
-      fontFamily: family, fontSize: peak, fontWeight: 900, color: c, lineHeight: 1.1,
-      transform: `scale(${0.55 + p * 0.45})`,
-      opacity: interpolate(p, [0, 0.3], [0, 1], { extrapolateRight: 'clamp' }),
-      textShadow: `0 6px 30px ${color}44`, display: 'inline-block',
-    }}>
-      {text}
-    </div>
-  );
-};
 
 /**
  * 底部多行字幕（帧级精确同步）
