@@ -1,12 +1,15 @@
 {
-  "description": "权威文档注册表：check-doc-references / check-facts 读取本文件。维护规则：新增权威文档时在此登记；文档清单变化时更新 aliases。（2026-08-29 文档收敛：废除 counts 计数治理层；归档文档从 extraDocs/aliases 移除。）",
+  "description": "权威文档注册表：check-doc-references / check-facts 读取本文件。维护规则：新增权威文档时在此登记；文档清单变化时更新 aliases；高危口径改值或新踩漂移坑时维护 caliberOwners（pattern+owner，属主外复述=硬失败）。（2026-08-29 文档收敛：废除 counts 计数治理层；归档文档从 extraDocs/aliases 移除。）",
   "docsDir": "docs/internal",
   "extraDocs": [
     "AGENTS.md",
     "docs/战略简报.md",
     "docs/AI使用手册.md",
     "SKILL.md",
-    "outputs/archive/AI启动提示词.md"
+    "outputs/archive/AI启动提示词.md",
+    "outputs/archive/文档架构总览.md",
+    "outputs/archive/挂账总览.md",
+    "outputs/archive/官网资源库落地规划.md"
   ],
   "excludeDirs": [],
   "aliases": {
@@ -153,6 +156,33 @@
       "reason": "g06 片1 有声成片为交付终态：长时制券阅读屏的安静经用户逐张看片认可为设计意图（非缺陷），不加强化微动、不为过线加晃动，样式冻结层不再改；效果尺子红灯转已裁放行。详见 changelog 2026-09-01。",
       "approvedBy": "用户 2026-09-01（第十九轮·补5 审片裁决）",
       "metrics": "静止 67% / 中位帧差 0.08 / 占用率 77%"
+    }
+  ],
+  "caliberOwners": [
+    {
+      "pattern": "atempo\\s*1\\.2|定稿\\s*1\\.2",
+      "owner": "SKILL.md",
+      "desc": "TTS 变速值（SKILL §二第 6 步）"
+    },
+    {
+      "pattern": "≤\\s*6\\s*字/秒|上限\\s*6\\s*字/秒|5\\.5-6\\s*字/秒",
+      "owner": "SKILL.md",
+      "desc": "语速口径（SKILL §二第 3 步）"
+    },
+    {
+      "pattern": "(60-90|90-120|120-150)\\s*s|硬上限\\s*200\\s*s|200\\s*s\\s*上限",
+      "owner": "SKILL.md",
+      "desc": "时长落位区间与硬上限（SKILL §二第 3 步）"
+    },
+    {
+      "pattern": "≤\\s*45\\s*%|≥\\s*0\\.35|≥\\s*70\\s*%",
+      "owner": "SKILL.md",
+      "desc": "效果尺子三阈值（机检以 check-motion 输出为准，SKILL §二第 6 步为文档属主）"
+    },
+    {
+      "pattern": "≤\\s*8\\s*%",
+      "owner": "SKILL.md",
+      "desc": "冗余句占比（SKILL §二第 3 步）"
     }
   ]
 }

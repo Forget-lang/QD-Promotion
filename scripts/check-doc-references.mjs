@@ -106,6 +106,7 @@ for (const [file, path] of allDocs) {
     legacyRefRe.lastIndex = 0;
     while ((m = legacyRefRe.exec(line)) !== null) {
       if (m[1].includes('归档')) continue; // 指向 outputs/archive/ 的溯源路径合法，不算断链
+      if (/`outputs\/[^`]*$/.test(line.slice(0, m.index))) continue; // outputs/ 反引号路径内的每片工件名（00-系列规划.md 等）归 3.5 资源路径检查管，不算旧手册引用
       if (!allDocs.has(m[1])) {
         hardFails.push({ file: rel, line: lineNo, ref: m[1], why: '被引文档不存在（旧手册已清理删除，原文在 git 历史；请改指 spec/ 或 SKILL 新真源）' });
       }
@@ -133,7 +134,7 @@ for (const [file, path] of allDocs) {
 
     if (!isArchivalNote && !isCounterExample) {
       // 章节引用
-      const secRe = /§([0-9]+(?:\.[0-9]+)*|[^§\s，。；：、）)」』"]+)/g;
+      const secRe = /§([0-9]+(?:\.[0-9]+)*|[^§\s，。；：、（）)」』"`]+)/g; // 2026-09-02 补：（ 与反引号入排除集，防「§二（第 7 步）」「§三`」式吞字
       while ((m = secRe.exec(line)) !== null) {
         const sec = m[1].replace(/[/"'，。]+$/, '');
         // 占位符（§x.y 含字母）跳过
@@ -238,6 +239,30 @@ for (const [, p] of allDocs) constitutionScan(relative(ROOT, p), readFileSync(p,
   for (const jf of readdirSync(specDir).filter((n) => n.endsWith('.json'))) {
     constitutionScan(`spec/${jf}`, readFileSync(join(specDir, jf), 'utf8'));
   }
+}
+
+// ── 3.8 口径唯一性（2026-09-02 用户拍板：高危口径只许一个属主，属主外复述数值 = 硬失败。
+// 注册表 ref-registry.json caliberOwners：pattern（数值特征）+ owner（属主文件名）+ desc。
+// 设计：模式只匹配「数值本体」（带比较符/单位），指针行（"见 SKILL"不含数值）天然不命中；
+// changelog 不在扫描面（历史留痕）；仅反例行（❌/错：/禁止/不使用）豁免——「已废止」注记带数值同样算复述
+//（宪法写法是「旧法已废止，详见 changelog」，不带数值）。踩一次漂移坑加一条，不建口径大全。──
+const caliberOwners = REGISTRY.caliberOwners || [];
+const caliberExemptRe = /(❌|错：|禁止|不使用)/;
+for (const [file, path] of allDocs) {
+  const rel = relative(ROOT, path);
+  const lines = readFileSync(path, 'utf8').split('\n');
+  let inCodeBlock = false;
+  lines.forEach((line, i) => {
+    if (/^\s*```/.test(line)) { inCodeBlock = !inCodeBlock; return; }
+    if (inCodeBlock) return;
+    if (caliberExemptRe.test(line)) return;
+    for (const c of caliberOwners) {
+      if (file === c.owner) continue;
+      if (new RegExp(c.pattern).test(line)) {
+        hardFails.push({ file: rel, line: i + 1, ref: line.trim().slice(0, 48), why: `口径唯一性：复述了「${c.desc}」，属主是 ${c.owner}——改指针不抄数值` });
+      }
+    }
+  });
 }
 
 // ── 4. 输出 ──
