@@ -8,11 +8,14 @@
     "render": "remotion render src/index.tsx"
   },
   "dependencies": {
-    "@remotion/cli": "^4.0.515",
-    "@remotion/transitions": "^4.0.515",
+    "@remotion/cli": "4.0.520",
+    "@remotion/media-utils": "4.0.520",
+    "@remotion/noise": "4.0.520",
+    "@remotion/paths": "4.0.520",
+    "@remotion/transitions": "4.0.520",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "remotion": "^4.0.515"
+    "remotion": "4.0.520"
   },
   "devDependencies": {
     "@types/react": "18.3.12",

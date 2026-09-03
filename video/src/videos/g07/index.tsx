@@ -350,7 +350,6 @@ const S6Chain: React.FC<SceneRenderProps> = ({ scene }) => {
           </div>
         );
       })}
-      <div style={{ position: 'absolute', left: 84, right: 84, bottom: 200, textAlign: 'center', fontSize: 24, color: FAINT, letterSpacing: 2, opacity: region(beat, 2, 2).opacity }}>{p.foot}</div>
     </AbsoluteFill>
   );
 };

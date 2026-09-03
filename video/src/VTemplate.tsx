@@ -16,6 +16,7 @@ import { FPS, PALETTES } from './palette';
 import { SceneRenderer } from './scenes';
 import { SPRING_CONFIG } from './components/animations';
 import { KenBurnsBg, Grain, Vignette, AccentOverlay } from './components/background';
+import { VoiceEnergyProvider } from './components/voice';
 import type { TransitionKey, VideoData } from './types';
 
 /** 转场时长：12 帧 = 0.4s */
@@ -68,7 +69,57 @@ const PopPresentation: React.FC<TransitionPresentationComponentProps<Record<stri
   );
 };
 
-const getPresentation = (t: TransitionKey): TransitionPresentation<Record<string, unknown>> => {
+/**
+ * reveal = 有机曲边扫过揭示（母题转场基座，2026-09-03 用户拍板）
+ * 进入侧被 S 形曲边从左向右揭示，边缘带主色描边（强度随 sin(πp) 起落）；
+ * 行业专属边缘形态（撕边/压落等）片 2 起在此骨架上按母题扩展。
+ */
+const REVEAL_W = 1080;
+const REVEAL_H = 1920;
+
+const revealEdgePath = (x: number): string =>
+  `M ${x} 0 C ${x + 180} ${REVEAL_H * 0.33}, ${x - 180} ${REVEAL_H * 0.66}, ${x} ${REVEAL_H}`;
+
+const RevealPresentation: React.FC<TransitionPresentationComponentProps<Record<string, unknown>>> = ({
+  children, presentationProgress: p, presentationDirection, passedProps,
+}) => {
+  const entering = presentationDirection === 'entering';
+  const accent = String(passedProps.accent ?? '#ffffff');
+  const id = React.useId().replace(/[^a-zA-Z0-9_-]/g, '');
+  const x = interpolate(p, [0, 1], [-240, REVEAL_W + 240]);
+  const edge = revealEdgePath(x);
+  const clipShape = entering
+    ? `${edge} L 0 ${REVEAL_H} L 0 0 Z`
+    : `${edge} L ${REVEAL_W} ${REVEAL_H} L ${REVEAL_W} 0 Z`;
+  const drift = entering
+    ? interpolate(p, [0, 1], [48, 0], { extrapolateRight: 'clamp' })
+    : interpolate(p, [0, 1], [0, -48], { extrapolateRight: 'clamp' });
+
+  return (
+    <AbsoluteFill>
+      <svg width="0" height="0" style={{ position: 'absolute' }}>
+        <defs>
+          <clipPath id={id}>
+            <path d={clipShape} />
+          </clipPath>
+        </defs>
+      </svg>
+      <AbsoluteFill style={{ clipPath: `url(#${id})`, transform: `translateX(${drift}px)` }}>
+        {children}
+      </AbsoluteFill>
+      {entering && (
+        <svg
+          viewBox={`0 0 ${REVEAL_W} ${REVEAL_H}`}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+        >
+          <path d={edge} fill="none" stroke={accent} strokeWidth={3} opacity={Math.sin(Math.PI * p) * 0.9} />
+        </svg>
+      )}
+    </AbsoluteFill>
+  );
+};
+
+const getPresentation = (t: TransitionKey, accent: string): TransitionPresentation<Record<string, unknown>> => {
   switch (t) {
     case 'wipe':
       return wipe({ direction: 'from-bottom' }) as TransitionPresentation<Record<string, unknown>>;
@@ -80,6 +131,8 @@ const getPresentation = (t: TransitionKey): TransitionPresentation<Record<string
       return { component: ZoomPresentation, props: {} };
     case 'pop':
       return { component: PopPresentation, props: {} };
+    case 'reveal':
+      return { component: RevealPresentation, props: { accent } };
     default:
       return fade();
   }
@@ -140,8 +193,8 @@ export const computeTotalFrames = (video: VideoData): number => {
 };
 
 export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
-  const presentation = getPresentation(video.style.transition);
   const p = PALETTES[video.style.palette];
+  const presentation = getPresentation(video.style.transition, p.accent);
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#0f1115' }}>
@@ -157,13 +210,15 @@ export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
           return (
             <React.Fragment key={i}>
               <TransitionSeries.Sequence durationInFrames={sceneFrames}>
-                <SceneRenderer
-                  scene={sc}
-                  style={video.style}
-                  index={i}
-                  total={video.scenes.length}
-                  videoId={video.id}
-                />
+                <VoiceEnergyProvider src={video.hasAudio ? staticFile(`audio/${video.id}/s${i + 1}.wav`) : null}>
+                  <SceneRenderer
+                    scene={sc}
+                    style={video.style}
+                    index={i}
+                    total={video.scenes.length}
+                    videoId={video.id}
+                  />
+                </VoiceEnergyProvider>
                 {video.hasAudio && (
                   <FadingAudio
                     src={staticFile(`audio/${video.id}/s${i + 1}.wav`)}

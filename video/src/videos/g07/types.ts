@@ -46,7 +46,6 @@ export interface MakePayload {
   couponType?: string;   // 声明券种（如「满减券」），供 check-ui-truth ⑥ 校验面额字段配对
   crumb: string;
   groups: FormGroup[];
-  foot: string;
   callout?: { l1: string; l2: string; tag: string };
 }
 
@@ -84,7 +83,6 @@ export interface ChainPayload {
   title: string;
   sub: string;
   nodes: ChainNode[];
-  foot: string;
 }
 
 export interface StepRow { act: string; desc: string; res: string; mark: string }

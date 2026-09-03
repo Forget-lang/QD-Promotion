@@ -3,3 +3,4 @@
 // 2026-08-29 清零重启：G02~G05 测试期产物全部删除（git 历史可查），基线从这里重建。
 export { g06 } from './g06';
 export { g07 } from './g07';
+export { g08 } from './g08';

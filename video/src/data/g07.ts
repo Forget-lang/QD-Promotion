@@ -1,19 +1,14 @@
-// g07 咖啡茶饮 · 片1 · 数据（无声版占位字幕，有声版按 TTS 实测回填 dur/voiceDur）
+// g07 咖啡茶饮 · 片1 · 数据（有声版 · 2026-09-03 阶段二回填）
+// 回填链：逐屏 TTS（seed-tts；speed_ratio 无效不用）→ loudnorm -16LUFS → atempo 1.2（定稿值）→ ffprobe 屏时长；
+//   句界 = 实测时长 × 字数占比（g06 同法）；dur = voiceOffset + voiceDur + 尾读缓冲（长读/数据/CTA 屏 0.85~0.9s，其余 0.45~0.6s）。
+//   实测各屏语速 4.9~5.9 字/秒，零超线。音频在 video/public/audio/g07/s1~s9.wav。
 // 每屏 ui 带 g07- 前缀并在 videos/g07 注册；payload 形状见 videos/g07/types.ts。
-// 字段名逐字回 spec/coupon-fields.json；金额/张数/天数均为示例值。
-import type { Scene, SubtitleLine, VideoData } from '../types';
-
-const FPS = 30;
-/** 把口播句均匀铺到本屏帧数上（无声版占位；有声版逐句 TTS 后精修 startFrame/endFrame） */
-const subs = (lines: string[], dur: number): SubtitleLine[] => {
-  const total = Math.floor(dur * FPS);
-  const per = total / lines.length;
-  return lines.map((text, i) => ({ text, startFrame: Math.round(i * per), endFrame: Math.round((i + 1) * per) - 2 }));
-};
+// 字段名逐字回 spec/coupon-fields.json；金额/张数/天数均为示例值（屏上顶部标注，口播数字用中文）。
+import type { Scene, VideoData } from '../types';
 
 const scenes: Scene[] = [
   {
-    type: 'hook', ui: 'g07-hook', dur: 8,
+    type: 'hook', ui: 'g07-hook', dur: 8.6, voiceOffset: 0.27, voiceDur: 7.85,
     payload: {
       tag: '咖啡茶饮 · 拉新复购',
       title1: '券发出去了，',
@@ -24,13 +19,13 @@ const scenes: Scene[] = [
       ticketBadge: '无门槛',
       ticketLine: '0 元领一杯',
     },
-    subtitles: subs([
-      '很多咖啡店老板发完券都纳闷，人是来了，怎么不回头？',
-      '先别怪客人，问题常常出在券的那一栏，门槛。',
-    ], 8),
+    subtitles: [
+      { text: '很多咖啡店老板发完券都纳闷，人是来了，怎么不回头？', startFrame: 8, endFrame: 136 },
+      { text: '先别怪客人，问题常常出在券的那一栏，门槛。', startFrame: 138, endFrame: 244 },
+    ],
   },
   {
-    type: 'pain', ui: 'g07-pain', dur: 9,
+    type: 'pain', ui: 'g07-pain', dur: 8.2, voiceOffset: 0.27, voiceDur: 7.52,
     payload: {
       tag: '无门槛的坑',
       title1: '无门槛白送，',
@@ -45,13 +40,13 @@ const scenes: Scene[] = [
         { t1: '发得越多', t2: '越像在请客' },
       ],
     },
-    subtitles: subs([
-      '无门槛的券，谁都想白拿一杯，喝完就走，你一分钱客单没提。',
-      '这种券发得越多，越像在请客，不像在做生意。',
-    ], 9),
+    subtitles: [
+      { text: '无门槛的券，谁都想白拿一杯，喝完就走，你一分钱客单没提。', startFrame: 8, endFrame: 136 },
+      { text: '这种券发得越多，越像在请客，不像在做生意。', startFrame: 138, endFrame: 234 },
+    ],
   },
   {
-    type: 'fields', ui: 'g07-make-basic', dur: 16,
+    type: 'fields', ui: 'g07-make-basic', dur: 19.7, voiceOffset: 0.27, voiceDur: 18.54,
     payload: {
       tag: '示例',
       navTitle: '制作满减券',
@@ -80,18 +75,17 @@ const scenes: Scene[] = [
         l2: '门槛设成 35 元（≈客单价）= 来了就得消费一次',
         tag: '这一栏，就是「拉新还是提客单」的分水岭',
       },
-      foot: '数值为示例',
     },
-    subtitles: subs([
-      '我们重做一张券，从券面这一栏开始设。',
-      '券名直接写清场景，比如到店咖啡券。',
-      '关键在门槛这一栏，别填 0，填 0 就是白送。',
-      '门槛设成客单价满 35，优惠金额减 8 块，数量先做 200 张。',
-      '有效期选领后 7 天，客人领了就得尽快来。',
-    ], 16),
+    subtitles: [
+      { text: '我们重做一张券，从券面这一栏开始设。', startFrame: 8, endFrame: 105 },
+      { text: '券名直接写清场景，比如到店咖啡券。', startFrame: 107, endFrame: 198 },
+      { text: '关键在门槛这一栏，别填零，填零就是白送。', startFrame: 200, endFrame: 303 },
+      { text: '门槛设成客单价满三十五，优惠金额减八块，数量先做两百张。', startFrame: 305, endFrame: 457 },
+      { text: '有效期选领后七天，客人领了就得尽快来。', startFrame: 459, endFrame: 564 },
+    ],
   },
   {
-    type: 'mechanism', ui: 'g07-mech', dur: 11,
+    type: 'mechanism', ui: 'g07-mech', dur: 13.8, voiceOffset: 0.27, voiceDur: 13,
     payload: {
       tag: '门槛对比',
       title1: '同样发券，',
@@ -106,15 +100,15 @@ const scenes: Scene[] = [
       rightNote: '减 8 块，换一单生意',
       punch: '这一栏，就是拉新还是提客单的分水岭',
     },
-    subtitles: subs([
-      '同样发券，门槛填法不一样，来的人完全不一样。',
-      '左边无门槛，人人来白拿，你贴钱。',
-      '右边满 35，来的都是要消费的，减 8 块换一单生意。',
-      '这一栏，就是拉新还是提客单的分水岭。',
-    ], 11),
+    subtitles: [
+      { text: '同样发券，门槛填法不一样，来的人完全不一样。', startFrame: 8, endFrame: 112 },
+      { text: '左边无门槛，人人来白拿，你贴钱。', startFrame: 114, endFrame: 185 },
+      { text: '右边满三十五，来的都是要消费的，减八块换一单生意。', startFrame: 187, endFrame: 307 },
+      { text: '这一栏，就是拉新还是提客单的分水岭。', startFrame: 309, endFrame: 398 },
+    ],
   },
   {
-    type: 'fields', ui: 'g07-issue', dur: 11,
+    type: 'fields', ui: 'g07-issue', dur: 9.8, voiceOffset: 0.27, voiceDur: 9.02,
     payload: {
       tag: '发放方式',
       title: '怎么发出去？',
@@ -126,32 +120,31 @@ const scenes: Scene[] = [
       otherDesc: '只发给指定的人，另一套玩法',
       result: '公开领取：把券存成海报贴门口，谁看到都能领',
     },
-    subtitles: subs([
-      '这张要拉新，发放方式选公开领取，谁看到都能领。',
-      '存成海报贴门口，路人顺手就领了；只发给指定人是另一套，今天先不碰。',
-    ], 11),
+    subtitles: [
+      { text: '这张要拉新，发放方式选公开领取，谁看到都能领。', startFrame: 8, endFrame: 117 },
+      { text: '存成海报贴门口，路人顺手就领了；只发给指定人是另一套，今天先不碰。', startFrame: 119, endFrame: 279 },
+    ],
   },
   {
-    type: 'advance', ui: 'g07-chain', dur: 12,
+    type: 'advance', ui: 'g07-chain', dur: 12.4, voiceOffset: 0.27, voiceDur: 11.22,
     payload: {
       tag: '复购开关',
       title: '用一张，再得一张',
       sub: '把一次客变成回头客',
       nodes: [
         { head: '开启核销后赠券', desc: '在核销限制里打开这颗开关', note: '核销后立奖本券一张' },
-        { head: '客人这次用掉券', desc: '到店核销成功', reward: true },
+        { head: '客人这次用掉券', desc: '到店核销成功', note: '顾客侧显示：核销奖励 · 到店核销后可再得本券一张', reward: true },
         { head: '自动再得一张', desc: '系统马上再给一张同款，直接到账', note: '他多半就会再来一趟' },
       ],
-      foot: '顾客侧显示：核销奖励 · 到店核销后可再得本券一张',
     },
-    subtitles: subs([
-      '最后开一个开关，把一次客变成回头客，核销后赠券。',
-      '打开它，客人这次把券用掉，系统马上再给他一张一样的，直接到账。',
-      '他为了用掉第二张，多半就会再来一趟。',
-    ], 12),
+    subtitles: [
+      { text: '最后开一个开关，把一次客变成回头客，核销后赠券。', startFrame: 8, endFrame: 117 },
+      { text: '打开它，客人这次把券用掉，系统马上再给他一张一样的，直接到账。', startFrame: 119, endFrame: 259 },
+      { text: '他为了用掉第二张，多半就会再来一趟。', startFrame: 261, endFrame: 345 },
+    ],
   },
   {
-    type: 'steps', ui: 'g07-steps', dur: 13,
+    type: 'steps', ui: 'g07-steps', dur: 15.1, voiceOffset: 0.27, voiceDur: 14.19,
     payload: {
       tag: '各方看到什么',
       title: '发出去之后',
@@ -162,14 +155,14 @@ const scenes: Scene[] = [
         { act: '到期前', desc: '券快过期那天', res: '给他发一条提醒，再跑一趟', mark: '提醒' },
       ],
     },
-    subtitles: subs([
-      '发出去之后，客人看到的是，一张满 35 才能用的券，用完又自动多一张。',
-      '你核销时扫他的码一验，这张能不能用、是不是别人转来的，页面上写得清清楚楚。',
-      '到期前再给他发一条提醒，让他再跑一趟。',
-    ], 13),
+    subtitles: [
+      { text: '发出去之后，客人看到的是，一张满三十五才能用的券，用完又自动多一张。', startFrame: 8, endFrame: 166 },
+      { text: '你核销时扫他的码一验，这张能不能用、是不是别人转来的，页面上写得清清楚楚。', startFrame: 168, endFrame: 342 },
+      { text: '到期前再给他发一条提醒，让他再跑一趟。', startFrame: 344, endFrame: 434 },
+    ],
   },
   {
-    type: 'mechanism', ui: 'g07-ledger', dur: 11,
+    type: 'mechanism', ui: 'g07-ledger', dur: 11.2, voiceOffset: 0.27, voiceDur: 10,
     payload: {
       tag: '商家后台',
       title: '发得怎么样，两个数',
@@ -180,13 +173,13 @@ const scenes: Scene[] = [
       ],
       punch: '发出去有没有人来，看核销率就知道',
     },
-    subtitles: subs([
-      '在后台不用猜，发出去多少张、有人真来核销没有，两个数就摆在那。',
-      '有效发放张数配着核销率看有没有人来，本店核销张数看这一阵来了多少单。',
-    ], 11),
+    subtitles: [
+      { text: '在后台不用猜，发出去多少张、有人真来核销没有，两个数就摆在那。', startFrame: 8, endFrame: 144 },
+      { text: '有效发放张数配着核销率看有没有人来，本店核销张数看这一阵来了多少单。', startFrame: 146, endFrame: 308 },
+    ],
   },
   {
-    type: 'cta', ui: 'g07-cta', dur: 10,
+    type: 'cta', ui: 'g07-cta', dur: 9.8, voiceOffset: 0.27, voiceDur: 8.67,
     payload: {
       title1: '一张券，',
       title2: '拉新又复购',
@@ -199,10 +192,10 @@ const scenes: Scene[] = [
       brand: '券到卡包',
       sub: '实体店的电子券工具',
     },
-    subtitles: subs([
-      '门槛设对、公开发出去、限期领了就来、用完再送一张，拉新和复购一张券办齐。',
-      '券到卡包，实体店的电子券工具。',
-    ], 10),
+    subtitles: [
+      { text: '门槛设对、公开发出去、限期领了就来、用完再送一张，拉新和复购一张券办齐。', startFrame: 8, endFrame: 190 },
+      { text: '券到卡包，实体店的电子券工具。', startFrame: 192, endFrame: 268 },
+    ],
   },
 ];
 
@@ -215,5 +208,5 @@ export const g07: VideoData = {
     hookStyle: 'question',
   },
   scenes,
-  hasAudio: false,
+  hasAudio: true,
 };

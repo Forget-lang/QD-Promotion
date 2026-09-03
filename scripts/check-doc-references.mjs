@@ -166,7 +166,7 @@ for (const [file, path] of allDocs) {
 
 // ── 3.5 资源路径存在性（反引号内指向仓库真实文件/目录的路径，防挪动/改名后文档指路失效——2026-08-29 锚图散位教训的机检化）──
 const RES_ROOTS = ['outputs/', 'spec/', 'docs/', 'scripts/', 'video/', '背景素材/', '插图库/', '图标素材/', '截图素材/', '商用字体/'];
-const placeholderRe = /(XX|NN|\*|\||~|…|\.\.|node_modules)/;
+const placeholderRe = /(XX|NN|\*|\||~|…|\.\.|node_modules|\{[^}]*\})/;
 for (const [file, path] of allDocs) {
   const rel = relative(ROOT, path);
   const lines = readFileSync(path, 'utf8').split('\n');

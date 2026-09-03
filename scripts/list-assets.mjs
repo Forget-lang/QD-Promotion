@@ -70,6 +70,8 @@ out();
 out(`- **动画**（animations.tsx）：${exportsOf('animations').map((n) => `\`${n}\``).join('、')}`);
 out(`- **UI**（ui.tsx）：${exportsOf('ui').map((n) => `\`${n}\``).join('、')}`);
 out(`- **氛围**（background.tsx）：${exportsOf('background').map((n) => `\`${n}\``).join('、')}`);
+out(`- **镜头感**（camera.tsx）：${exportsOf('camera').map((n) => `\`${n}\``).join('、')}`);
+out(`- **语音能量**（voice.tsx）：${exportsOf('voice').map((n) => `\`${n}\``).join('、')}`);
 const uiConsts = constsOf('ui');
 if (uiConsts.length) out(`- **UI 常量**（ui.tsx）：${uiConsts.map((n) => `\`${n}\``).join('、')}`);
 

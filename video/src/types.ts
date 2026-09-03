@@ -27,7 +27,7 @@ export type SceneType =
 
 // 风格配置四维（style：配色/动画性格/转场/钩子；2026-08-31 删 typography 维度——声明了从未有渲染器消费）
 export type MotionKey = 'bouncy' | 'snappy' | 'buttery' | 'heavy';
-export type TransitionKey = 'slide' | 'zoom' | 'wipe' | 'dissolve' | 'pop';
+export type TransitionKey = 'slide' | 'zoom' | 'wipe' | 'dissolve' | 'pop' | 'reveal';
 export type HookStyleKey = 'contrast' | 'number' | 'question' | 'story' | 'challenge' | 'clock';
 
 export interface SubtitleLine {
