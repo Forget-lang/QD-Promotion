@@ -17,9 +17,9 @@
  *      为什么单独立一层：2026-08-30 S5 把「到期提醒」挂进「领券顾客信息」组，
  *      字段名 ① 全过、归属是错的，商家翻后台会卡在"这一组里没这行"——① 拦不住这类错。
  *      我方自述的分步标题（「① 券面」「③ 期限」）不是原生组名，不参与本层判定。
- *   ④ 表外字段 —— 源码里有、`spec/coupon-fields.json` 没登记（⚠️ 提醒回写，不计失败）
- *   ⑤ 真值表自证 —— 表里每个行名/组名，必须逐字命中它自己 `src` 所指的源码行段（±10 行），查无 = 硬失败。
- *      为什么单独立一层：SKILL 第 4 步要求「字段名逐字取自 spec/coupon-fields.json」，**表本身错了就会污染后续每一片**，
+ *   ④ 表外字段 —— 源码里有、真值表（优惠券 `spec/coupon-fields.json` + 次卡 `spec/card-fields.json`）没登记（⚠️ 提醒回写，不计失败）
+ *   ⑤ 真值表自证 —— 双表里每个行名/组名，必须逐字命中它自己 `src` 所指的源码行段（±10 行），查无 = 硬失败。
+ *      为什么单独立一层：SKILL 第 4 步要求「字段名逐字取自真值表」，**表本身错了就会污染后续每一片**，
  *      而 ①③④ 都只拿表当尺子量画面、不量表自己。2026-08-30 审计即在表里抓出 8 处产品查无此名的行名
  *      （周期内可领张数 / 自定义领取名额 / 套餐明细 / 需提前预约 / 错挂到别组的封面图片…）。
  *      豁免：`onScreen: false` 的条目（按定义不上屏，是我方描述名）。
@@ -118,19 +118,30 @@ if (!existsSync(DATA_DIR)) {
 const corpus = loadAppletCorpus();
 const dataFiles = readdirSync(DATA_DIR).filter((f) => f.endsWith('.ts'));
 
-/** 分组归属真值 + ⑤ 层自证真值：spec/coupon-fields.json */
-const TRUTH = join(ROOT, 'spec', 'coupon-fields.json');
-const TABLE = existsSync(TRUTH) ? JSON.parse(readFileSync(TRUTH, 'utf8')) : {};
+/** 分组归属真值 + ⑤ 层自证真值：优惠券 spec/coupon-fields.json + 次卡 spec/card-fields.json 双表 */
+const TABLES = [
+  { path: join(ROOT, 'spec', 'coupon-fields.json'), tag: '优惠券' },
+  { path: join(ROOT, 'spec', 'card-fields.json'), tag: '次卡' },
+].filter((t) => existsSync(t.path)).map((t) => ({ ...t, json: JSON.parse(readFileSync(t.path, 'utf8')) }));
+const TABLE = TABLES[0] ? TABLES[0].json : {}; // 优惠券表（⑥ 券种↔面额仍只用它）
 const nativeGroups = new Map();
 const allRows = new Set();
-/** 行名 → 它在表里真正所属的组（③ 层报错时指出该挪去哪儿，而不是重复报已知的组名） */
+/** 行名 → 它在真值表里真正所属的组（③ 层报错时指出该挪去哪儿，而不是重复报已知的组名） */
 const rowHome = new Map();
-for (const g of TABLE.createGroups || []) {
-  for (const r of g.rows || []) {
-    allRows.add(r);
-    if (!rowHome.has(r)) rowHome.set(r, g.title || `无标题组 ${g.range}`);
+for (const { json, tag } of TABLES) {
+  // allRows 同时纳入 fields[].label 与 createGroups[].rows：次卡页无原生组名，字段只登记在 fields 里，
+  // 若只从 createGroups 取，次卡上屏字段会被 ④ 层误判为"表外需回写"。并入 fields 后消除该误报。
+  for (const f of json.fields || []) {
+    if (typeof f.label === 'string') allRows.add(f.label);
   }
-  if (g.title) nativeGroups.set(g.title, g.rows || []);
+  for (const g of json.createGroups || []) {
+    for (const r of g.rows || []) {
+      allRows.add(r);
+      if (!rowHome.has(r)) rowHome.set(r, `${tag}·${g.title || `无标题组 ${g.range}`}`);
+    }
+    // nativeGroups 只收有 title 的组：次卡页全部 title:null，不进入 ③ 原生组判定
+    if (g.title) nativeGroups.set(g.title, g.rows || []);
+  }
 }
 /** 剥掉「① 」「⑤ 」这类步进前缀，得到实际组名（覆盖 ①-⑳，不手写子集） */
 const stripStep = (s) => s.replace(/^[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳]\s*/, '').trim();
@@ -213,6 +224,12 @@ for (const c of corpus) {
   byBase.get(b).push(c.p);
 }
 const resolveSrc = (base) => {
+  // 带目录的完整路径（次卡表用，如 pages_card/card/create.vue）：直接相对 APPLET 解析
+  if (base.includes('/')) {
+    const p = join(APPLET, base);
+    return existsSync(p) ? p : null;
+  }
+  // 裸文件名（优惠券表用，create.vue 在 pages_coupon / pages_card 各有一份）：按 pages_coupon 优先消歧
   const list = byBase.get(base) || [];
   return list.find((p) => p.includes('pages_coupon')) || list[0] || null;
 };
@@ -235,12 +252,14 @@ const tableUnresolved = [];
 let tableTotal = 0;
 {
   const items = [];
-  for (const f of TABLE.fields || []) {
-    if (f.onScreen === false) continue;
-    items.push({ where: 'fields', name: f.label, src: f.src });
-  }
-  for (const g of TABLE.createGroups || []) {
-    for (const r of g.rows || []) items.push({ where: `createGroups「${g.title || '无标题'}」`, name: r, src: g.range });
+  for (const { json, tag } of TABLES) {
+    for (const f of json.fields || []) {
+      if (f.onScreen === false) continue;
+      items.push({ where: `${tag}·fields`, name: f.label, src: f.src });
+    }
+    for (const g of json.createGroups || []) {
+      for (const r of g.rows || []) items.push({ where: `${tag}·createGroups「${g.title || '无标题'}」`, name: r, src: g.range });
+    }
   }
   for (const it of items) {
     const m = String(it.src || '').match(/^([\w./-]+?):(\d+)(?:-(\d+))?/);
@@ -296,15 +315,17 @@ if (unknownRow.length) {
 }
 
 console.log('');
-if (!existsSync(TRUTH)) {
-  console.log('⑤ 真值表自证（表里的名字逐字回源码）  ⏭ 跳过 —— 未找到 spec/coupon-fields.json');
+if (!TABLES.length) {
+  console.log('⑤ 真值表自证（表里的名字逐字回源码）  ⏭ 跳过 —— 未找到 spec/coupon-fields.json 或 spec/card-fields.json');
 } else if (tableBad.length) {
   console.log(`⑤ 真值表自证  ❌ 硬失败 —— 表里 ${tableBad.length} 个名字在它自己 src 所指的源码行段里查无此文案：`);
   for (const x of tableBad) console.log(`   ${x.where}  «${x.name}»  src=${x.src}  — 源码查无：${x.miss.join(' / ')}`);
   console.log('   这类错比画面错更严重：SKILL 第 4 步要求字段名「逐字取自这张表」，表里的假名字会被后续每一片照抄。');
   console.log('   修法：回 ../applet/ 取该行真正的 title/label 原话改表；页面确实没有这一行就删掉它，或标 `onScreen: false` 并写明理由。');
 } else {
-  console.log(`⑤ 真值表自证  ✅ 通过 —— 表内 ${(TABLE.fields || []).filter((f) => f.onScreen !== false).length} 个字段名 + ${(TABLE.createGroups || []).reduce((n, g) => n + (g.rows || []).length, 0)} 个分组行名，逐字命中各自 src 所指源码行段`);
+  const fieldNames = TABLES.reduce((n, { json }) => n + (json.fields || []).filter((f) => f.onScreen !== false).length, 0);
+  const groupRows = TABLES.reduce((n, { json }) => n + (json.createGroups || []).reduce((m, g) => m + (g.rows || []).length, 0), 0);
+  console.log(`⑤ 真值表自证  ✅ 通过 —— 双表（优惠券+次卡）内 ${fieldNames} 个字段名 + ${groupRows} 个分组行名，逐字命中各自 src 所指源码行段`);
 }
 if (tableUnresolved.length) {
   console.log('');

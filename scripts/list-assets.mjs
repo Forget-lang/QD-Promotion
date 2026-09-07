@@ -70,8 +70,6 @@ out();
 out(`- **动画**（animations.tsx）：${exportsOf('animations').map((n) => `\`${n}\``).join('、')}`);
 out(`- **UI**（ui.tsx）：${exportsOf('ui').map((n) => `\`${n}\``).join('、')}`);
 out(`- **氛围**（background.tsx）：${exportsOf('background').map((n) => `\`${n}\``).join('、')}`);
-out(`- **镜头感**（camera.tsx）：${exportsOf('camera').map((n) => `\`${n}\``).join('、')}`);
-out(`- **语音能量**（voice.tsx）：${exportsOf('voice').map((n) => `\`${n}\``).join('、')}`);
 const uiConsts = constsOf('ui');
 if (uiConsts.length) out(`- **UI 常量**（ui.tsx）：${uiConsts.map((n) => `\`${n}\``).join('、')}`);
 
@@ -158,15 +156,34 @@ out();
 const assetsFile = join(root, 'spec', 'assets.json');
 if (existsSync(assetsFile)) {
   const assets = JSON.parse(read(assetsFile));
-  out('### A 级 · 抽象背景模板（视频背景优先用）');
-  out();
-  out('| 编号 | 名称 | 色系 | 深字 | 状态 |');
-  out('|---|---|---|---|---|');
-  for (const bg of assets.A.abstract) {
-    out(`| ${bg.id} | ${bg.name} | ${bg.colorScheme} | ${bg.darkText ? '是（浅底）' : '否'} | ${bg.status} |`);
+  // 2026-09-04 修：五族化后登记分区不止 A.abstract——按家族逐个渲染，零张的族也显式计数，
+  // 防"已入库但视图不可见"（g08 现用底 BG-GEO-002 曾因旧版只渲染 A.abstract 而不在开工视野内）
+  const families = [
+    ['abstract', '抽象光效'],
+    ['flat', '扁平纹理'],
+    ['geometric', '几何线稿'],
+    ['scene', '实景场景虚化'],
+    ['texture', '材质肌理'],
+  ];
+  for (const [key, label] of families) {
+    const list = Array.isArray(assets.A[key]) ? assets.A[key] : [];
+    out(`### A 级 · ${label}（A.${key}，${list.length} 张）`);
+    out();
+    if (!list.length) {
+      out('（暂无已入库图——该族候选图走 SKILL §五 三关验收后登记）');
+      out();
+      continue;
+    }
+    out('| 编号 | 名称 | 色系 | 深字 | 状态 |');
+    out('|---|---|---|---|---|');
+    for (const bg of list) {
+      out(`| ${bg.id} | ${bg.name} | ${bg.colorScheme} | ${bg.darkText ? '是（浅底）' : '否'} | ${bg.status} |`);
+    }
+    if (key === 'abstract' && Array.isArray(assets.A.abstractDeleted)) {
+      for (const d of assets.A.abstractDeleted) out(`> 🚫 ${d.id} ${d.name} 已删除（${d.deletedAt}），${d.ban}；替代：${d.replacement}`);
+    }
+    out();
   }
-  for (const d of assets.A.abstractDeleted) out(`> 🚫 ${d.id} ${d.name} 已删除（${d.deletedAt}），${d.ban}；替代：${d.replacement}`);
-  out();
   const caution = assets.A.xhs.filter((x) => x.caution);
   out(`- **A 级 · 小红书风格背景**：${assets.A.xhs.length} 张已登记（图文封面/配图氛围用）${caution.length ? `；⚠️ 慎用：${caution.map((x) => `${x.id}（${x.caution}）`).join('、')}` : ''}`);
   out(`- **B 级**：${assets.B.map((b) => `${b.id} ${b.name}（${b.status}）`).join('、')}`);

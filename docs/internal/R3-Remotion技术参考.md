@@ -148,7 +148,7 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 
 | 组件 | 参数 | 用途 |
 |---|---|---|
-| `Subtitle` | lines[{text,startFrame,endFrame}] | 底部多行字幕（帧级精确同步）：白字黑描边，距底 60px，最多同时显示 2 行；分发器统一挂载 |
+| `Subtitle` | lines[{text,startFrame,endFrame}]、motion?（MotionKey，缺省 snappy） | 底部多行字幕（帧级精确同步）：白字黑描边，距底 60px，最多同时显示 2 行；2026-09-03 动态字幕升级——入场 spring 上滑落定（透传 motion，分发器从 style.motion 传入）、新行在场时旧行降至 0.72、离场快速淡出；分发器统一挂载 |
 
 > **2026-09-02 Q4 清理**：`CharReveal`（逐字入场）、`AccentWord`（重音词）、`elevation`（投影常量）零消费者已删——逐字入场、重音词、阴影各片按锚稿手写。
 
@@ -178,13 +178,24 @@ interpolate(driver, [0, 0.3, 1], [0, 1, 1], {
 > ⚠️ 氛围层三件套（Grain/Vignette/AccentOverlay）是**全片必挂**（VTemplate 统一挂载，场景与设计稿无需处理），是画面"质感"的关键来源。缺失时画面偏平偏黑。
 > 注意挂载条件：Grain/Vignette 无条件挂全片；AccentOverlay 仅在 `video.style.bgImage` 存在（有背景图）时挂载（代码条件渲染，无背景图时不挂）。
 
-### 3.5 风格维度（video/src/palette.ts + data/gXX.ts style）
+### 3.5 镜头感组件（已移除，camera.tsx 已删）
+
+~~2026-09-03 动效升级四项新增：`components/camera.tsx` 提供 `Drift` 视差漂移（noise 驱动极慢浮动，背景/中景/前景三层 depth 0.4/1/1.6）与 `PushIn` 重点推近（停留期极慢缩放）。~~ 2026-09-07 经 g08 三案实测双双否决移除：
+- `PushIn`：任何缩放（含 0.001 量化步进）在步进点都会重光栅化文字——实测步进帧对 23.7dB（比连续缩放逐帧 36.4dB 单次更大），量化只是把逐帧沸腾改成每 6 帧一次的 5Hz 抽动（补30，g08 五屏文字层包裹已拆）。
+- `Drift`：补29 已证亚像素位移/微旋转逐帧重光栅化文字（50.7dB），取整后虽步内=inf，但整像素步进仍是主体元素（卡片/牌匾/角标）停留期持续移动——用户终裁「主体元素停留期不要持续微动」（补31，g08 五屏 Drift 包裹全拆）。
+- `camera.tsx` 零引用随删（2026-09-07）。停留期镜头感改由 KenBurnsBg 背景缓推（只动背景图，全片 1→1.04）+ 卡顶流光承担。**文字保锐 + 主体静止红线**详见 SKILL 第 5 步（新增镜头类组件一律先过此红线）。本节仅留移除记录防复述，勿再引用该文件。
+
+### 3.6 语音能量（已移除）
+
+~~2026-09-03 动效升级四项之一：`components/voice.tsx` 的 `useVoiceEnergy()` 取口播能量驱动强调元素微脉动。~~ 2026-09-07 经 g08 实测否决：瞬时波形接线后 hero 行持续高频抖动，加 0.5s 指数衰减平滑后观感仍为"微微颤动"（用户裁决此效果不要），`voice.tsx`、`useVoiceEnergy` 及 VTemplate 的 Provider 挂载已全部移除（changelog 补28）。动效升级自此为两项（动态字幕/母题转场，镜头感项随 camera.tsx 移除并入 KenBurnsBg 背景缓推，见 §3.5 与补31）。本节仅留移除记录防复述，勿再引用该组件。
+
+### 3.7 风格维度（video/src/palette.ts + data/gXX.ts style）
 
 | 维度 | 字段 | 可选值 | 说明 |
 |---|---|---|---|
 | 配色 | `style.palette` | mint-cool / warm-orange / berry-purple / deep-blue / caramel / ink-green / neon（7 套） | `palette.ts` PALETTES。注意：主题变量只覆盖部分元素，专属屏内仍有硬编码色值（数量以 grep 现查为准）；是否收口到 `p.accent` 等属未拍板的设计决策 |
 | 动画性格 | `style.motion` | bouncy / snappy / buttery / heavy（4 种） | `SPRING_CONFIG` 由转场 timing 消费（VTemplate）；屏内 spring 是否按 motion 分派属代码状态，以 grep 为准——未收口前别把透传当已生效机制 |
-| 转场 | `style.transition` | slide / wipe / dissolve / zoom / pop（5 种） | 自定义呈现组件在 VTemplate.tsx，五种观感真实可见 |
+| 转场 | `style.transition` | slide / wipe / dissolve / zoom / pop / reveal（6 种） | 自定义呈现组件在 VTemplate.tsx，六种观感真实可见；`reveal` = 母题有机曲边扫过揭示（+ 主色边缘描边），行业边缘形态按母题在骨架上每片扩展（口径见 SKILL 第 5 步） |
 | 钩子型 | `style.hookStyle` | 六值均为待本片实现的分派键（旧共享钩子已删，0/6 实现） | 本片实现时照锚稿手写钩子屏 |
 
 > 2026-08-31 删「字体性格」维度：`style.typography` 声明了从未有渲染器消费，TypographyKey/TYPOGRAPHY 表与 g06 的 'friendly' 声明一并删除；字体直接用 `palette.ts` 的 FONT_* 常量。

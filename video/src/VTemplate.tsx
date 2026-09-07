@@ -16,7 +16,6 @@ import { FPS, PALETTES } from './palette';
 import { SceneRenderer } from './scenes';
 import { SPRING_CONFIG } from './components/animations';
 import { KenBurnsBg, Grain, Vignette, AccentOverlay } from './components/background';
-import { VoiceEnergyProvider } from './components/voice';
 import type { TransitionKey, VideoData } from './types';
 
 /** 转场时长：12 帧 = 0.4s */
@@ -210,15 +209,13 @@ export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
           return (
             <React.Fragment key={i}>
               <TransitionSeries.Sequence durationInFrames={sceneFrames}>
-                <VoiceEnergyProvider src={video.hasAudio ? staticFile(`audio/${video.id}/s${i + 1}.wav`) : null}>
-                  <SceneRenderer
-                    scene={sc}
-                    style={video.style}
-                    index={i}
-                    total={video.scenes.length}
-                    videoId={video.id}
-                  />
-                </VoiceEnergyProvider>
+                <SceneRenderer
+                  scene={sc}
+                  style={video.style}
+                  index={i}
+                  total={video.scenes.length}
+                  videoId={video.id}
+                />
                 {video.hasAudio && (
                   <FadingAudio
                     src={staticFile(`audio/${video.id}/s${i + 1}.wav`)}

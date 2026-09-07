@@ -29,6 +29,8 @@ const GATES = [
   { key: 'refs', label: '文档引用闸门（引用断链）', args: ['scripts/check-doc-references.mjs'] },
   { key: 'facts', label: '事实闸门（资产路径与素材对账）', args: ['scripts/check-facts.mjs'] },
   { key: 'similarity', label: '相似度闸门（整屏结构不得复用）', args: ['scripts/check-similarity.mjs'] },
+  { key: 'layout', label: '布局指纹闸门（新片不得复用上一条布局）', args: ['scripts/check-layout-diversity.mjs'] },
+  { key: 'bg', label: '背景底闸门（每片必用背景图）', args: ['scripts/check-bg.mjs'] },
   { key: 'uitruth', label: '上屏真实性闸门（字段名回源码）', args: ['scripts/check-ui-truth.mjs'] },
 ];
 const WITH_TSC = process.argv.includes('--tsc');

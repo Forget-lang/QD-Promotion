@@ -30,6 +30,21 @@ export type MotionKey = 'bouncy' | 'snappy' | 'buttery' | 'heavy';
 export type TransitionKey = 'slide' | 'zoom' | 'wipe' | 'dissolve' | 'pop' | 'reveal';
 export type HookStyleKey = 'contrast' | 'number' | 'question' | 'story' | 'challenge' | 'clock';
 
+/**
+ * 布局指纹（粗粒度呈现架构类别，2026-09-07 加，供 `check-layout-diversity` 拦"新片与上一条同 type 屏同布局"）。
+ * 补 `type+ui` 结构指纹只防照抄 ui 名、防不住"换色换皮的同构"。新片每屏必填（闸门强制）。
+ */
+export type LayoutKind =
+  | 'card-list'      // 顶部承载物 + 一张大圆角卡装竖排「字段名左/值右」清单（g08 制券屏那套）
+  | 'form'           // 手机表单：值进输入框 + 开关药丸 + 左对齐分区（复刻真实创建页）
+  | 'two-column'     // 两栏对照（顾客/商家、方案A/B）
+  | 'flow'           // 横向流程 / 链路 / 步骤条
+  | 'hero-object'    // 单个实物特写为主 + 少量标注/引线
+  | 'compare-list'   // 现状→失效 编号对照清单
+  | 'hero-focus'     // 单一焦点大数字 / 大对象居中
+  | 'mechanism-diagram' // 机制图解（连线/象限/因果）
+  | 'cta-statement'; // 主张大字 + 品牌落章
+
 export interface SubtitleLine {
   /** 字幕文本（单行，建议 10-20 字） */
   text: string;
@@ -50,6 +65,11 @@ export interface Scene {
    * ⚠️ 无论怎么拼，ui 都带 `gXX-` 前缀 → 换前缀重做同款骨架永不碰撞，这道机检只防"照抄上一片的 ui 名"。结构雷同一律靠一屏标杆人判。
    */
   ui: string;
+  /**
+   * 布局指纹（呈现架构类别，见 LayoutKind）。新片每屏必填——`check-layout-diversity` 用它拦"新片与上一条同 type 屏用了同 layoutKind"（换皮同构）。
+   * 类型上可选只为不破坏历史片编译；闸门对最新一片强制要求每屏都有，缺失即红灯。
+   */
+  layoutKind?: LayoutKind;
   /** 本片本屏的业务数据载荷；形状由 `video/src/videos/gXX/types.ts` 定义，专属组件内取型。分发器不读 */
   payload?: Record<string, unknown>;
   dur: number;

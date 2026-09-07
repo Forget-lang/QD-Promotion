@@ -19,10 +19,15 @@
     ],
     "flat": [
       { "id": "BG-FLAT-001", "styleFamily": "扁平纹理", "name": "淡紫方格底", "colorScheme": "暖色系", "desc": "淡紫纯色 + 白色细方格网格，干净现代；浅底", "industries": "通用（教培/美业/文创等暖调行业）", "path": "背景素材/扁平纹理/暖色系/BG-FLAT-001-淡紫方格底.png", "status": "可用", "darkText": true, "source": "用户提供（商用授权待确认）" },
-      { "id": "BG-FLAT-002", "styleFamily": "扁平纹理", "name": "薄荷渐变网格底", "colorScheme": "冷色系", "desc": "薄荷绿上下渐变 + 白色细方格网格 + 顶部极简小半圆装饰，清新通透；浅底", "industries": "通用（茶饮/洗车/美业等冷调行业）", "path": "背景素材/扁平纹理/冷色系/BG-FLAT-002-薄荷渐变网格底.png", "status": "可用", "darkText": true, "source": "用户提供（商用授权待确认）" }
+      { "id": "BG-FLAT-002", "styleFamily": "扁平纹理", "name": "薄荷渐变网格底", "colorScheme": "冷色系", "desc": "薄荷绿上下渐变 + 白色细方格网格 + 顶部极简小半圆装饰，清新通透；浅底", "industries": "通用（茶饮/洗车/美业等冷调行业）", "path": "背景素材/扁平纹理/冷色系/BG-FLAT-002-薄荷渐变网格底.png", "status": "可用", "darkText": true, "source": "用户提供（商用授权待确认）" },
+      { "id": "BG-FLAT-003", "styleFamily": "扁平纹理", "name": "暖黄点阵底", "colorScheme": "暖色系", "desc": "暖黄→浅橙上下渐变 + 细密均匀点阵纹理，柔和克制有呼吸感；浅底", "industries": "通用（茶饮/烘焙/文创等暖调行业）", "path": "背景素材/扁平纹理/暖色系/BG-FLAT-003-暖黄点阵底.png", "status": "可用", "darkText": true, "source": "用户提供（商用授权待确认）" }
+    ],
+    "texture": [
+      { "id": "BG-TEX-001", "styleFamily": "材质肌理", "name": "灰白水泥肌理", "colorScheme": "冷色系（灰白）", "desc": "灰白水泥/石膏有机云状斑驳 + 细颗粒噪点肌理，侘寂质感，无彩克制；浅底", "industries": "通用（美业/文创/高端服务等极简风格行业）", "path": "背景素材/材质肌理/冷色系/BG-TEX-001-灰白水泥肌理.png", "status": "可用", "darkText": true, "source": "用户提供（商用授权待确认）" }
     ],
     "geometric": [
-      { "id": "BG-GEO-001", "styleFamily": "几何线稿", "name": "粉角几何底", "colorScheme": "暖色系（粉）", "desc": "粉系纯色底 + 四角几何装饰（斜线+小方格），中心大面积留白干净，科技结构感", "industries": "通用（美业/文创/教培等）", "path": "背景素材/几何线稿/BG-GEO-001-粉角几何底.png", "status": "可用", "source": "用户提供（商用授权待确认）" }
+      { "id": "BG-GEO-001", "styleFamily": "几何线稿", "name": "粉角几何底", "colorScheme": "暖色系（粉）", "desc": "粉系纯色底 + 四角几何装饰（斜线+小方格），中心大面积留白干净，科技结构感", "industries": "通用（美业/文创/教培等）", "path": "背景素材/几何线稿/BG-GEO-001-粉角几何底.png", "status": "可用", "source": "用户提供（商用授权待确认）" },
+      { "id": "BG-GEO-002", "styleFamily": "几何线稿", "name": "朱红海浪纹", "colorScheme": "暖色系（红）", "desc": "朱红底 + 暗红中式海浪纹（低对比重复纹样），喜庆、贴中式餐饮/节日档；整屏铺满、无专门中部留白带，中部前景可读性待一屏标杆兼容验证", "industries": "火锅/中式宴请/餐饮等暖红喜庆行业", "path": "背景素材/几何线稿/BG-GEO-002-朱红海浪纹.png", "status": "已入库（待前景兼容验证）", "source": "创客贴 · 商用会员授权（用户 2026-09-04 确认）" }
     ],
     "abstractDeleted": [
       { "id": "BG-ABS-005", "name": "雾霾紫柔光底", "deletedAt": "2026-08-25", "reason": "用户判定偏艳抢前景（底部中紫饱和+光斑密集），文件已移回收站", "ban": "禁止再引用/选用", "replacement": "BG-ABS-003（G04 测试片已删，2026-08-29 清零）" }

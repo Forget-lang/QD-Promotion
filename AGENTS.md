@@ -51,6 +51,7 @@
 - **用户拍板的口径必须回写** SKILL 或 `changelog.md`，不能只留在聊天里。
 - **审批画面必须给真图**（逐屏关键帧 / 短片）；给文字规格让人想象 = 没交付。
 - 改任何权威文档后：跑 `node scripts/gate-all.mjs` + 在 changelog 顶部追加一条。
+- **新片不得复用上一条行业的画面布局（2026-09-07 用户拍板，反复踩的头号坑）**：由 `check-layout-diversity` 闸门在 gate-all 里强制——新片每屏带 `layoutKind`，与上一条同 type 屏同布局即红灯。开工先读 SKILL 第 2 步 C-15（禁开旧片代码当模板）/ C-16（布局指纹）；撞红灯时**真换呈现架构**，不许删豁免或改标签蒙混，确需沿用须在 `scripts/ref-registry.json` 的 `layoutWaivers` 写非空 structuralDiff 证据。
 
 ## 六、目录
 

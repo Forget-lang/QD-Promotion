@@ -1,0 +1,376 @@
+{
+ "_meta": {
+  "desc": "次卡（卡产品族：通卡/次卡/权益卡）制作与发放/核销设置项真值表。与优惠券产品线分开：优惠券见 spec/coupon-fields.json。做次卡类内容（视频/文章/教程）前必查本表；功能点上禁止猜测与推理，凡本表没有的表述一律不上屏不进口播。",
+  "source": "applet/pages_card/card/choose_type.vue（类型选择）+ pages_card/card/create.vue（次卡创建页全量）+ pages_card/issue/private.vue（次卡私密发放）+ pages_card/verify/verify.vue（次卡核销）+ pages_user/card/detail.vue（顾客端次卡详情）+ constants/card.js（枚举语义）",
+  "lastVerified": "2026-09-07",
+  "usage": "字段名与提示语逐字取用（onScreen=true 的可直接上屏）；limits/defaults 是画面里能写的数字；visibleWhen/linkages 决定'这一屏该不该出现这一行'；playLeverage 是把设置项变成玩法话术的映射。改功能先改本表再改内容。",
+  "machineCheck": "video/src 与 outputs 里的次卡字段名由 scripts/check-ui-truth.mjs 回 applet 源码逐字对账（① 层扫全 applet，天然覆盖次卡）；本表 fields/createGroups 同时受 ⑤ 真值表自证（逐字命中各自 src 行段）与 ④ 表外提醒（并入 allRows 后不再误报）。hiddenFromScreen / onScreen:false 条目同时由 spec/redlines.json 红线层拦截。",
+  "scopeNote": "本表只登记次卡产品族（cardType 1 通卡 / 2 次卡 / 3 权益卡）。次卡与优惠券的关键差异：① 次卡创建页【没有】发放方式行——次卡天生仅私密发放（facts.forbidden_claims 4），不像优惠券有公开/私密/券包三选；② 次卡创建页【没有】到期提醒开关（到期提醒是优惠券 create.vue 的字段）；③ 次卡私密发放页【没有】发放数量行（优惠券私密发放有 1~10 张，次卡没有）；④ 有效期类型选项次卡说「自领券日起」（create.vue:256），优惠券说「自领取日起」（coupon create.vue）——两产品文案不同，别互相照抄。"
+ },
+ "cardTypes": [
+  {
+   "key": "UNLIMITED",
+   "label": "通卡",
+   "src": "pages_card/card/choose_type.vue:3",
+   "desc": "例如：景区年卡/会员卡/月卡，有效期内不限次数使用，凭卡核销进入",
+   "descOnScreen": true
+  },
+  {
+   "key": "TIMES",
+   "label": "次卡",
+   "src": "pages_card/card/choose_type.vue:11",
+   "desc": "例如：洗车10次卡，按次数核销",
+   "descOnScreen": true,
+   "note": "宠物洗护次卡走这一型：每张含固定次数、按次核销"
+  },
+  {
+   "key": "BENEFIT",
+   "label": "权益卡",
+   "src": "pages_card/card/choose_type.vue:19",
+   "desc": "例如：护理套餐卡，每次核销对应一项权益",
+   "descOnScreen": true
+  }
+ ],
+ "pageOrder": "类型选择（choose_type：通卡/次卡/权益卡）→ 次卡创建页 create.vue：封面图片 → 次卡名称/制作数量/每人限领/每张包含次数(仅次卡) → 有效期组（有效期类型/有效期 或 起止日期）→ 核销节奏组（限制核销间隔/核销间隔、开启动态核销码）→ 卡面主题 → 优惠内容(通卡·次卡) 或 权益项(权益卡) → 适用门店/发券员工 → 允许转赠/填写手机号 → 使用须知 → 创建次卡。创建后进次卡详情点「发放」→ 私密发放页 issue/private.vue：超时时间 → 发放方式(微信好友/二维码) → 发放备注 → 生成私密一对一领次卡码。",
+ "fields": [
+  {
+   "label": "封面图片",
+   "src": "pages_card/card/create.vue:14-15",
+   "limits": "最多 1 张，推荐尺寸 300×240",
+   "defaults": "空（必填）",
+   "onScreen": true,
+   "reason": "行名「封面图片」可上屏；但同行绿色说明原话「必填，用于私密发放与企微分享」含站外生态词（企微），不引用原句",
+   "playLeverage": "次卡封面就是顾客卡包与私密发放分享出去看到的那张图"
+  },
+  {
+   "label": "次卡名称",
+   "src": "pages_card/card/create.vue:35-37",
+   "kind": "input",
+   "limits": "最多 32 个字",
+   "required": true,
+   "playLeverage": "卡列表与卡面最显眼的字，行业场景第一落点（如「洗护5次卡」把项目+次数直接写进名字）"
+  },
+  {
+   "label": "制作数量",
+   "src": "pages_card/card/create.vue:46-48",
+   "kind": "input",
+   "limits": "最少 1 张，最多 1 万张",
+   "playLeverage": "库存；次卡是按人办的卡，数量对应能办多少张"
+  },
+  {
+   "label": "每人限领",
+   "src": "pages_card/card/create.vue:57-59",
+   "kind": "input",
+   "limits": "最少 1 张，最多 100 张",
+   "playLeverage": "防一人囤多张卡；宠物洗护次卡一般每人限领 1 张"
+  },
+  {
+   "label": "每张包含次数",
+   "src": "pages_card/card/create.vue:69-71",
+   "kind": "input",
+   "visibleWhen": "cardType = 次卡（TIMES）",
+   "limits": "最少 1 次，最多 1000 次",
+   "playLeverage": "次卡锁客的核心行：把「一次消费」变成「N 次到店」。次数按店里高频项目的合理周期定（洗澡两三周一次，做 5 次≈覆盖两三个月）"
+  },
+  {
+   "label": "有效期类型",
+   "src": "pages_card/card/create.vue:76-79",
+   "kind": "select",
+   "options": [
+    "固定有效期",
+    "自领券日起N天内有效",
+    "自领券次日起N天内有效"
+   ],
+   "defaults": "自领券日起N天内有效",
+   "playLeverage": "固定日期=压活动档期；自领券日起算=从办卡那天起给一段窗口，和次数/核销间隔配合决定卡能活多久"
+  },
+  {
+   "label": "有效期",
+   "src": "pages_card/card/create.vue:90-92",
+   "kind": "input",
+   "visibleWhen": "有效期类型 ≠ 固定有效期",
+   "limits": "最少 1 天，最多 365 天",
+   "playLeverage": "和次数、核销间隔一起算账：5 次 × 间隔 14 天 ≈ 至少 56 天才能用完，有效期给到 90~120 天才不逼人、也不让卡睡死"
+  },
+  {
+   "label": "有效开始时间",
+   "src": "pages_card/card/create.vue:94-101",
+   "kind": "date",
+   "visibleWhen": "有效期类型 = 固定有效期"
+  },
+  {
+   "label": "有效结束时间",
+   "src": "pages_card/card/create.vue:103-110",
+   "kind": "date",
+   "visibleWhen": "有效期类型 = 固定有效期"
+  },
+  {
+   "label": "限制核销间隔",
+   "src": "pages_card/card/create.vue:115-116",
+   "kind": "switch",
+   "defaults": "关",
+   "note": "行名原话「限制核销间隔」，同行说明「0=每天1次，1=间隔1天，最多30天」可上屏（无红线词）",
+   "playLeverage": "本片最该讲透的差异化机制：开关一开、下面多出「核销间隔」一行。它锁的是到店节奏——设 14 天=每两周才能用一次，防止一周把 5 次用光、也防止卡长期不来"
+  },
+  {
+   "label": "核销间隔",
+   "src": "pages_card/card/create.vue:128-130",
+   "kind": "input",
+   "visibleWhen": "限制核销间隔 = 开",
+   "limits": "0~30 天，0 表示每天 1 次",
+   "playLeverage": "0=每天可用1次（不设限）；14=两周一次。宠物洗护按洗澡频率设，是把「该不该来」交给规则而不是老板记性"
+  },
+  {
+   "label": "开启动态核销码",
+   "src": "pages_card/card/create.vue:132",
+   "kind": "switch",
+   "onScreen": false,
+   "reason": "动态核销码/活码类机制，2026-08-17 决策不在宣传中使用，画面与口播都跳过"
+  },
+  {
+   "label": "优惠内容",
+   "src": "pages_card/card/create.vue:154-156",
+   "kind": "textarea",
+   "visibleWhen": "cardType ≠ 权益卡（通卡/次卡显示此 textarea）",
+   "limits": "最多 500 字；次卡 placeholder 原话「例如：洗车10次卡」",
+   "playLeverage": "通卡/次卡用这一段写清「这张卡包含什么」；权益卡改用权益项列表"
+  },
+  {
+   "label": "适用门店",
+   "src": "pages_card/card/create.vue:164-167",
+   "kind": "select",
+   "required": true,
+   "note": "多选，默认自动选中"
+  },
+  {
+   "label": "发券员工",
+   "src": "pages_card/card/create.vue:173-176",
+   "kind": "select",
+   "required": true,
+   "note": "多选"
+  },
+  {
+   "label": "允许转赠",
+   "src": "pages_card/card/create.vue:183",
+   "kind": "switch",
+   "defaults": "开（default-value true）",
+   "playLeverage": "次卡默认允许转赠（顾客可把卡转给好友）；⚠️ 次卡只有转赠、没有转赠奖励（转赠奖励是优惠券独有，别混）"
+  },
+  {
+   "label": "填写手机号",
+   "src": "pages_card/card/create.vue:188",
+   "kind": "switch",
+   "defaults": "关",
+   "playLeverage": "留号开关，回访/下次活动靠它"
+  },
+  {
+   "label": "使用须知",
+   "src": "pages_card/card/create.vue:196-198",
+   "kind": "textarea",
+   "limits": "最多 500 字，placeholder「请输入使用须知」",
+   "playLeverage": "服务明细的家：怎么核销、间隔规则、有效期不顺延等都写这里"
+  },
+  {
+   "label": "一键套用模版",
+   "src": "pages_card/card/create.vue:212",
+   "note": "工具行原话「不会写？一键套用模版」+ 按钮「通用模版」；模板原文含遗失/找零/核销/适用范围等条款（create.vue:295-302），套完必须按自己行业改"
+  },
+  {
+   "label": "通用模版",
+   "src": "pages_card/card/create.vue:215",
+   "kind": "button"
+  },
+  {
+   "label": "创建次卡",
+   "src": "pages_card/card/create.vue:224-226",
+   "kind": "button",
+   "note": "结果页原话：创建成功 / 次卡已创建，可前往详情查看 / 查看详情 / 返回（create.vue:4-7）"
+  },
+  {
+   "label": "超时时间",
+   "src": "pages_card/issue/private.vue:4",
+   "kind": "select",
+   "options": ["5分钟", "1天", "7天", "30天", "永久"],
+   "defaults": "1天（expireMinute 1440）",
+   "note": "同行说明原话「超过有效期后，领取链接失效，需要重新发放。」（private.vue:12）可上屏",
+   "playLeverage": "私密发卡的领取时限；给办卡人发次卡，超时设宽一点（如 1 天/7 天）别把人卡在外面"
+  },
+  {
+   "label": "发放方式",
+   "src": "pages_card/issue/private.vue:20",
+   "kind": "select",
+   "note": "次卡私密发放的两个渠道按钮：微信好友 / 二维码（private.vue:27,34）"
+  },
+  {
+   "label": "微信好友",
+   "src": "pages_card/issue/private.vue:27",
+   "onScreen": false,
+   "reason": "渠道名含站外生态词（微信），画面与口播都不出现，只画「二维码」"
+  },
+  {
+   "label": "二维码",
+   "src": "pages_card/issue/private.vue:34",
+   "onScreen": true
+  },
+  {
+   "label": "发放备注",
+   "src": "pages_card/issue/private.vue:43",
+   "kind": "textarea",
+   "limits": "选填，最多 32 字，仅商家可见（placeholder「请输入备注信息（选填，仅商家可见）」）",
+   "playLeverage": "记录这张卡发给谁、办了什么——宠物店可写「张姐·金毛·洗护5次」，下次唤醒不用翻聊天记录"
+  },
+  {
+   "label": "私密一对一领次卡码",
+   "src": "pages_card/issue/private.vue:62",
+   "note": "弹层标题原话；同行提示「出示给客户扫码领取，领后此码失效。」（private.vue:73）。⚠️ 次卡私密发放页【没有】「发放数量」行——那是优惠券私密发放才有的字段，别把「1~10 张」安到次卡上"
+  }
+ ],
+ "createGroups": [
+  {
+   "range": "pages_card/card/create.vue:13-26",
+   "title": null,
+   "rows": ["封面图片"],
+   "note": "无标题块。页面最顶部封面上传区。"
+  },
+  {
+   "range": "pages_card/card/create.vue:28-73",
+   "title": null,
+   "rows": ["次卡名称", "制作数量", "每人限领", "每张包含次数"],
+   "note": "无标题块。每张包含次数仅 cardType=次卡 时出现。"
+  },
+  {
+   "range": "pages_card/card/create.vue:75-112",
+   "title": null,
+   "rows": ["有效期类型", "有效期", "有效开始时间", "有效结束时间"],
+   "note": "无标题块。有效期类型=固定有效期时换成起止日期两行、有效期天数行消失。"
+  },
+  {
+   "range": "pages_card/card/create.vue:114-137",
+   "title": null,
+   "rows": ["限制核销间隔", "核销间隔", "开启动态核销码"],
+   "note": "无标题块。核销间隔仅限制核销间隔=开时出现；开启动态核销码不上屏。"
+  },
+  {
+   "range": "pages_card/card/create.vue:153-161",
+   "title": null,
+   "rows": ["优惠内容"],
+   "note": "无标题块。通卡/次卡用此 textarea；权益卡改用权益项列表（m-card-item-editor）。"
+  },
+  {
+   "range": "pages_card/card/create.vue:163-180",
+   "title": null,
+   "rows": ["适用门店", "发券员工"],
+   "note": "无标题块。"
+  },
+  {
+   "range": "pages_card/card/create.vue:182-193",
+   "title": null,
+   "rows": ["允许转赠", "填写手机号"],
+   "note": "无标题块。"
+  },
+  {
+   "range": "pages_card/card/create.vue:195-221",
+   "title": null,
+   "rows": ["使用须知", "一键套用模版", "通用模版"],
+   "note": "无标题块。使用须知是 textarea maxlength 500；工具行原话「不会写？一键套用模版」+ 按钮「通用模版」。"
+  }
+ ],
+ "createGroupsRule": "次卡创建页所有 t-cell-group 均【无页面自带组名】（create.vue 全文无 title 的 cell-group），不像优惠券有 8 个原生组名。做教程时组标题一律用我方自述的分步标题（如「① 卡基本信息」「② 期限」「③ 核销节奏」「④ 发给谁」），这些自述名不参与 check-ui-truth ③ 分组归属判定（③ 只校验与原生组名同名的组）。次卡没有原生组名，故 ③ 对次卡屏天然放行；字段名硬校验靠 ① 层（扫全 applet 源码）。",
+ "linkages": [
+  {
+   "rule": "cardType = 次卡（TIMES）→ 创建页多出「每张包含次数」行；通卡/权益卡不显示",
+   "src": "create.vue:62"
+  },
+  {
+   "rule": "限制核销间隔 = 开 → 多出「核销间隔」输入行；关则该行消失",
+   "src": "create.vue:120-121"
+  },
+  {
+   "rule": "有效期类型 = 固定有效期 → 换成「有效开始时间/有效结束时间」两行，「有效期天数」行消失",
+   "src": "create.vue:83,95,104"
+  },
+  {
+   "rule": "cardType = 权益卡 → 用权益项列表（m-card-item-editor），不显示「优惠内容」textarea；通卡/次卡显示「优惠内容」",
+   "src": "create.vue:143-161"
+  },
+  {
+   "rule": "次卡创建页无发放方式行：次卡仅支持私密发放（facts.forbidden_claims 4），发放在创建后进次卡详情点「发放」→ 私密发放页",
+   "src": "facts.json products.card.issue"
+  }
+ ],
+ "issuePrivate": {
+  "entry": "次卡详情页点「发放」→「私密发放」→ 落到 pages_card/issue/private.vue 填：超时时间 → 发放方式(二维码) → 发放备注 → 生成「私密一对一领次卡码」",
+  "src": "pages_card/issue/private.vue:3-101",
+  "fields": ["超时时间", "发放方式", "二维码", "发放备注", "私密一对一领次卡码"],
+  "noField": "次卡私密发放页【没有】「发放数量」行（优惠券私密发放才有 1~10 张）——不要把发放数量写进次卡屏",
+  "teachValue": "发这一环要讲的就是：超时时间给多宽、只发给办卡的人（私密）、发放备注记是谁的哪只宠物。渠道只画二维码，微信好友那格不上屏不念。"
+ },
+ "verifyPageKeyInfo": {
+  "src": "pages_card/verify/verify.vue",
+  "items": [
+   {
+    "label": "核销记录",
+    "note": "分组标题（verify.vue:58）；每条记录显示「第 {useSort} 次」（verify.vue:73）——商家核销台一眼看到这是这张卡的第几次",
+    "dynamic": true
+   },
+   {
+    "label": "核销成功",
+    "note": "核销成功结果标题（verify.vue:264）；成功描述拼装：`第X次 + 权益 + ，剩余N次可用`（remain>0）或 `第X次 + 权益 + ，本次为该次卡最后一次`（remain=0）（verify.vue:334-335）",
+    "dynamic": true
+   },
+   {
+    "label": "领取信息",
+    "note": "分组标题（verify.vue:108）；下含 领取渠道/领取时间/发放门店/发放员工/发放备注（verify.vue:109-113）"
+   },
+   {
+    "label": "抵扣 / 享折 / 服务",
+    "note": "权益文案按项类型：金额→`抵扣¥xx`、折扣→`享x折`、服务→服务内容（verify.vue:303-309）；通卡/次卡多为一次一扣，权益卡才逐项",
+    "dynamic": true
+   }
+  ],
+  "teachValue": "核销这一屏只讲顾客/商家看得到的重要信息：第几次、还剩几次可用、最后一次提醒。怎么扫、怎么输码属于一次就会的动作。"
+ },
+ "customerSidePhrases": {
+  "src": "pages_user/card/detail.vue",
+  "items": [
+   {
+    "label": "剩余次数 / 已用 N 次",
+    "note": "磁条卡面（m-card-magnetic-face）显示总次数/剩余次数（detail.vue:14-26）；卡号下方「已用 {verifyCount+discardCount} 次」（detail.vue:67）——这是次卡锁客最关键的顾客侧结果：人自己看得见还剩几次",
+    "dynamic": true
+   },
+   {
+    "label": "核销码",
+    "note": "分组标题（detail.vue:33）；提示原话「向店员出示此码完成核销」（detail.vue:43）；另有「复制卡号」「联系商家」（detail.vue:55,60）"
+   },
+   {
+    "label": "使用须知",
+    "note": "分组标题（detail.vue:126）；内含 领取限制「每人限领N张」、使用间隔「每天可使用 1 次」或「间隔 N 天可使用 1 次」、支持转赠「领后支持转赠送给好友使用」、使用说明（detail.vue:130-151）。⚠️ 顾客端把制券的「限制核销间隔」显示成「使用间隔」——两个词都对，但顾客侧那一屏要用「使用间隔」，别混"
+   },
+   {
+    "label": "转赠给好友",
+    "note": "次卡详情入口（detail.vue:104）；转赠成功提示「好友领取前可多次分享，仅首位领取好友可获得本次卡」（detail.vue:189）"
+   }
+  ]
+ },
+ "offScript": {
+  "rule": "这些是真值、但判定不进内容（不上屏、不念、不写进发布稿）。",
+  "items": [
+   {
+    "fact": "开启动态核销码 / 核销码过期刷新 / 防截屏",
+    "src": "create.vue:132 / detail.vue:366-375",
+    "decision": "活码类机制，2026-08-17 决策不在宣传中使用，画面与口播都跳过。"
+   },
+   {
+    "fact": "次卡审核状态（auditStatus）",
+    "src": "constants/card.js CARD_AUDIT_STATUS",
+    "decision": "次卡发放前需平台审核通过（facts.unverified），属平台安全合规机制，宣传一律不提「审核/待审核/已认证」。"
+   },
+   {
+    "fact": "转赠中可取消转赠",
+    "src": "detail.vue:105,189",
+    "decision": "讲转赠只讲「仅首位领取好友可获得本次卡」这个结果，取消动作不进内容。"
+   }
+  ]
+ },
+ "contentWeightRule": "次卡类内容同样遵循 SKILL「制券环节=主体、难理解的讲透、简单的不细说」。本片（宠物洗护次卡）画面大头给次卡创建页的「每张包含次数 + 有效期 + 限制核销间隔」这三行怎么设、为什么这么设；发放环节只讲私密发放要设的（超时时间/发放备注）；核销环节只讲顾客/商家看得到的「第X次·剩余N次可用·最后一次」这一结果。次卡没有的字段（发放方式/到期提醒/发放数量）一律不臆造。"
+}

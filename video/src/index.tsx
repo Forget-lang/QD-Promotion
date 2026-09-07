@@ -6,11 +6,11 @@ import { BundleOpenBench } from './bench/BundleOpenBench';
 import { BenchPain, BenchMech } from './bench/BenchScreens';
 import { BenchTable } from './bench/BenchTable';
 import { G07Bench } from './bench/G07Bench';
-import { G08Bench } from './bench/G08Bench';
 import { R01, R02, R03, R04, R05, R06, R08, R09, R10 } from './bench/BenchRefsA';
 import { R11, R12, R13, R14, R16, R17, R18, R19 } from './bench/BenchRefsB';
 import { G06CoverDy, G06CoverXhs, G06CoverSohu } from './covers/G06Cover';
 import { G07CoverDy, G07CoverDy43, G07CoverXhs, G07CoverSohu } from './covers/G07Cover';
+import { G08CoverDy, G08CoverDy43, G08CoverXhs, G08CoverSohu } from './covers/G08Cover';
 import type { VideoData } from './types';
 
 // ── 注入项目商用字体（@font-face，Remotion 渲染前自动等待 document.fonts.ready）──
@@ -71,6 +71,11 @@ const RemotionRoot: React.FC = () => {
       <Composition id="g07-cover-dy43" component={G07CoverDy43} fps={FPS} width={1440} height={1080} durationInFrames={1} />
       <Composition id="g07-cover-xhs" component={G07CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
       <Composition id="g07-cover-sohu" component={G07CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
+      {/* g08 三平台封面（同规格，火锅母题：牌匾 + 号牌卡 + 真海浪纹底） */}
+      <Composition id="g08-cover-dy" component={G08CoverDy} fps={FPS} width={1080} height={1920} durationInFrames={1} />
+      <Composition id="g08-cover-dy43" component={G08CoverDy43} fps={FPS} width={1440} height={1080} durationInFrames={1} />
+      <Composition id="g08-cover-xhs" component={G08CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
+      <Composition id="g08-cover-sohu" component={G08CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
       {/* 一屏标杆（质感验证用，非交付片） */}
       <Composition id="BENCH-bundle-open" component={BundleOpenBench} fps={FPS} width={1080} height={1920} durationInFrames={150} />
       <Composition id="BENCH-pain" component={BenchPain} fps={FPS} width={1080} height={1920} durationInFrames={150} />
@@ -78,8 +83,6 @@ const RemotionRoot: React.FC = () => {
       <Composition id="BENCH-table" component={BenchTable} fps={FPS} width={1080} height={1920} durationInFrames={150} />
       {/* g07 咖啡茶饮 · 一屏标杆（质感验证，非交付片） */}
       <Composition id="BENCH-g07-coffee" component={G07Bench} fps={FPS} width={1080} height={1920} durationInFrames={210} />
-      {/* g08 火锅 · 一屏标杆（质感验证，非交付片） */}
-      <Composition id="BENCH-g08-hotpot" component={G08Bench} fps={FPS} width={1080} height={1920} durationInFrames={260} />
       {([["BENCH-r01", R01], ["BENCH-r02", R02], ["BENCH-r03", R03], ["BENCH-r04", R04], ["BENCH-r05", R05], ["BENCH-r06", R06], ["BENCH-r08", R08], ["BENCH-r09", R09], ["BENCH-r10", R10], ["BENCH-r11", R11], ["BENCH-r12", R12], ["BENCH-r13", R13], ["BENCH-r14", R14], ["BENCH-r16", R16], ["BENCH-r17", R17], ["BENCH-r18", R18], ["BENCH-r19", R19]] as const).map(([id, C]) => (
         <Composition key={id} id={id} component={C} fps={FPS} width={1080} height={1920} durationInFrames={90} />
       ))}

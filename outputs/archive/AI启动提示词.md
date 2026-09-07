@@ -1,6 +1,6 @@
 # 券到卡包 · AI 启动提示词
 
-> 更新：2026-09-03（变更史只记 changelog，本文不复述；原则：提示词只指路，不复述规则）
+> 更新：2026-09-07（变更史只记 changelog，本文不复述；原则：提示词只指路，不复述规则）
 > 用途：开新会话 / 换 AI 工具时，粘贴对应场景的提示词，让 AI 30 秒接手。
 > 原则：**提示词只指路，不复述规则**——所有口径以 `AGENTS.md`（入口，含真源清单）、`SKILL.md`（七步法）、`spec/` 机器可读真源为准。
 > 全局地图：新会话如需快速建立文档结构认知，可先读 `outputs/archive/文档架构总览.md`（2026-09-02 快照，只作路由指路，与权威文档冲突时以权威文档为准），再按开工三动作执行。
@@ -57,6 +57,8 @@
 【硬性】禁止 CSS animation/transition，全部 useCurrentFrame + interpolate/spring；屏间必须 TransitionSeries；
 文案/颜色全从数据读，禁止硬编码；渲染必带 NODE_OPTIONS=""，浏览器用 Chrome Headless Shell
 （npx remotion browser ensure 后指 node_modules/.remotion/... 路径，本机系统 Chrome headless 会因显示链接挂死）。
+镜头/动效红线见 SKILL 第 5 步——文字层禁持续 transform（缩放/位移/旋转）、主体元素停留期静止；
+`Drift`/`PushIn`/`useVoiceEnergy` 已被 g08 三案否决且组件已删（`camera.tsx`/`voice.tsx` 已删），勿再引用。
 【验收】tsc 零错误 → 逐屏峰值帧 still → check-similarity 绿 → check-motion 达标（阈值以脚本输出为准——占用率只是防"空和死"的下限，高于它不代表更好，禁止为过线堆装饰，见 SKILL §四否决清单"对着指标凑画面"条）→ 交真图给用户。
 ```
 
