@@ -11,6 +11,7 @@ import { R11, R12, R13, R14, R16, R17, R18, R19 } from './bench/BenchRefsB';
 import { G06CoverDy, G06CoverXhs, G06CoverSohu } from './covers/G06Cover';
 import { G07CoverDy, G07CoverDy43, G07CoverXhs, G07CoverSohu } from './covers/G07Cover';
 import { G08CoverDy, G08CoverDy43, G08CoverXhs, G08CoverSohu } from './covers/G08Cover';
+import { G09CoverDy, G09CoverDy43, G09CoverXhs, G09CoverSohu } from './covers/G09Cover';
 import type { VideoData } from './types';
 
 // ── 注入项目商用字体（@font-face，Remotion 渲染前自动等待 document.fonts.ready）──
@@ -76,6 +77,11 @@ const RemotionRoot: React.FC = () => {
       <Composition id="g08-cover-dy43" component={G08CoverDy43} fps={FPS} width={1440} height={1080} durationInFrames={1} />
       <Composition id="g08-cover-xhs" component={G08CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
       <Composition id="g08-cover-sohu" component={G08CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
+      {/* g09 三平台封面（同规格，宠物洗护母题：磁条卡 + 泡泡 + 蓝绿光斑底） */}
+      <Composition id="g09-cover-dy" component={G09CoverDy} fps={FPS} width={1080} height={1920} durationInFrames={1} />
+      <Composition id="g09-cover-dy43" component={G09CoverDy43} fps={FPS} width={1440} height={1080} durationInFrames={1} />
+      <Composition id="g09-cover-xhs" component={G09CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
+      <Composition id="g09-cover-sohu" component={G09CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
       {/* 一屏标杆（质感验证用，非交付片） */}
       <Composition id="BENCH-bundle-open" component={BundleOpenBench} fps={FPS} width={1080} height={1920} durationInFrames={150} />
       <Composition id="BENCH-pain" component={BenchPain} fps={FPS} width={1080} height={1920} durationInFrames={150} />

@@ -1,0 +1,33 @@
+{
+  "source_case_count": 985,
+  "likes_sum": 6632792,
+  "likes_median": 578,
+  "likes_mean": 6733.79,
+  "likes_p90": 10357,
+  "likes_max": 692222,
+  "comments_median": 38,
+  "script_chars_median": 571,
+  "script_chars_mean": 833.21,
+  "script_chars_p90": 1714,
+  "cta_present_count": 438,
+  "negative_trigger_present_count": 416,
+  "top_tags": [
+    ["实体店引流",204],["餐饮创业",158],["实体店",141],["餐饮",136],["餐饮人",99],
+    ["实体店经营",88],["餐饮营销",80],["商业思维",63],["干货分享",49],["创业",48],
+    ["服装实体店",39],["实体店老板",34],["短视频运营",31],["餐饮文案",31],["营销思维",29]
+  ],
+  "initial_diagnostics": {
+    "likes_vs_script_length_spearman": -0.014,
+    "likes_vs_sentence_count_spearman": 0.025,
+    "likes_vs_question_count_spearman": 0.056,
+    "likes_vs_cta_presence_spearman": -0.081,
+    "likes_vs_negative_trigger_presence_spearman": 0.011
+  },
+  "interpretation": [
+    "表现高度长尾，均值明显被少数极端爆款拉高，因此建模时优先使用分位数、log1p(likes)或同层基准。",
+    "文案长度没有简单线性关系，不应把短或长本身当作爆款规律。",
+    "CTA出现与点赞没有正向线性关系，不能机械认为CTA越强越爆。",
+    "语料高度集中于餐饮/实体店/创业/同城获客场景，跨行业规律需要更高证据门槛。",
+    "文本聚类更适合作为候选主题召回，而不是直接当作语义真相。"
+  ]
+}

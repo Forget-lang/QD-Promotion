@@ -83,6 +83,10 @@ const CardFace: React.FC<{
         boxShadow: '0 26px 54px rgba(18,73,95,0.42), inset 0 1px 0 rgba(255,255,255,0.25)',
         border: '1px solid rgba(255,255,255,0.28)',
       }}>
+        {/* 卡顶流光：白光沿卡顶边巡走（停留期镜头感两件套之一，g08 补31 同款机制、水感配色；只动装饰层不压文字） */}
+        <div style={{ position: 'absolute', inset: 0, borderRadius: 30, overflow: 'hidden', pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', top: -40, left: ((f * 6) % 1800) - 300, width: 220, height: 60, background: 'linear-gradient(100deg, transparent, rgba(255,255,255,0.22), transparent)', transform: 'rotate(6deg)' }} />
+        </div>
         <div style={{ height: 62, background: STRIPE, marginTop: 30 }} />
         <div style={{ padding: '30px 44px 40px' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
@@ -185,6 +189,24 @@ const RhythmStrip: React.FC<{ hint: string; delay: number }> = ({ hint, delay })
   );
 };
 
+// ── 底层光晕漂移（SKILL 第5步"底层持续微动"sanctioned 项；只动氛围层，不动主体/文字；帧驱动确定性）──
+const AmbientGlow: React.FC = () => {
+  const f = useCurrentFrame();
+  const x1 = 150 + Math.sin(f / 45) * 140;
+  const y1 = 1180 + Math.cos(f / 38) * 90;
+  const x2 = 760 + Math.cos(f / 55) * 120;
+  const y2 = 1480 + Math.sin(f / 42) * 100;
+  const x3 = 430 + Math.sin(f / 58 + 2) * 100;
+  const y3 = 880 + Math.cos(f / 50 + 1) * 80;
+  return (
+    <AbsoluteFill style={{ pointerEvents: 'none' }}>
+      <div style={{ position: 'absolute', left: x1, top: y1, width: 460, height: 460, borderRadius: '50%', background: 'radial-gradient(circle, rgba(47,191,158,0.16), transparent 70%)' }} />
+      <div style={{ position: 'absolute', left: x2, top: y2, width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.22), transparent 70%)' }} />
+      <div style={{ position: 'absolute', left: x3, top: y3, width: 380, height: 380, borderRadius: '50%', background: 'radial-gradient(circle, rgba(120,200,235,0.16), transparent 70%)' }} />
+    </AbsoluteFill>
+  );
+};
+
 // ── 顶部合规角标（各屏共用，固定不动，C-11 挂顶部）──
 const Badge: React.FC<{ text?: string }> = ({ text }) =>
   text ? <div style={{ position: 'absolute', right: 84, top: 92, fontSize: 22, color: TEAL_L, border: `2px solid ${MINT}`, borderRadius: 999, padding: '6px 20px', letterSpacing: 3, background: 'rgba(255,255,255,0.6)' }}>{text}</div> : null;
@@ -203,6 +225,7 @@ const G09Make: React.FC<SceneRenderProps> = ({ scene }) => {
   const rhythmDelay = d + 8;
   return (
     <AbsoluteFill style={{ fontFamily: FONT_BODY }}>
+      <AmbientGlow />
       <Badge text={p.badge} />
       <div style={{ position: 'absolute', left: 72, right: 72, top: 150, bottom: 120, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         {/* 表单导航标题行（仿小程序页标题；C-10 不画返回键/状态栏） */}
@@ -236,6 +259,7 @@ const G09Hook: React.FC<SceneRenderProps> = ({ scene }) => {
   const t = spring({ frame: f - 4, fps: FPS, config: { damping: 15, stiffness: 150 } });
   return (
     <AbsoluteFill style={{ fontFamily: FONT_BODY }}>
+      <AmbientGlow />
       <Badge text={p.badge} />
       <div style={{ position: 'absolute', left: 84, right: 84, top: 150, bottom: 120, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         {/* 痛点钩子大字 */}
@@ -260,6 +284,7 @@ const G09Pain: React.FC<SceneRenderProps> = ({ scene }) => {
   const h = spring({ frame: f - 4, fps: FPS, config: { damping: 15, stiffness: 150 } });
   return (
     <AbsoluteFill style={{ fontFamily: FONT_BODY }}>
+      <AmbientGlow />
       <Badge text={p.badge} />
       <div style={{ position: 'absolute', left: 84, right: 84, top: 150, bottom: 120, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <div style={{ opacity: interpolate(h, [0, 1], [0, 1]), transform: `translateY(${interpolate(h, [0, 1], [18, 0])}px)` }}>
@@ -296,6 +321,7 @@ const G09Result: React.FC<SceneRenderProps> = ({ scene }) => {
   const h = spring({ frame: f - 4, fps: FPS, config: { damping: 15, stiffness: 150 } });
   return (
     <AbsoluteFill style={{ fontFamily: FONT_BODY }}>
+      <AmbientGlow />
       <Badge text={p.badge} />
       <div style={{ position: 'absolute', left: 84, right: 84, top: 150, bottom: 120, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center', opacity: interpolate(h, [0, 1], [0, 1]), transform: `translateY(${interpolate(h, [0, 1], [18, 0])}px)` }}>
@@ -336,6 +362,7 @@ const G09Cta: React.FC<SceneRenderProps> = ({ scene }) => {
   const brand = spring({ frame: f - 70, fps: FPS, config: { damping: 14, stiffness: 170 } });
   return (
     <AbsoluteFill style={{ fontFamily: FONT_BODY }}>
+      <AmbientGlow />
       <div style={{ position: 'absolute', left: 84, right: 84, top: 150, bottom: 120, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         {/* 主张（"五次"由下面一排点亮的泡泡呼应） */}
         <div style={{ textAlign: 'center', opacity: interpolate(line, [0, 1], [0, 1]), transform: `translateY(${interpolate(line, [0, 1], [22, 0])}px)` }}>

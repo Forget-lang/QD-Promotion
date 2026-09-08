@@ -1,0 +1,51 @@
+{
+  "source": "heuristic seed from 985 cases",
+  "status": "candidate",
+  "patterns": [
+    {
+      "pattern_id": "SEED-001",
+      "name": "目标人群 + 直接利益/损失",
+      "layer": "cross_domain_candidate",
+      "formula": "[明确人群] + [强结果/强损失]",
+      "psychology": "提高相关性，让用户快速判断“这条内容和我有关”",
+      "evidence": "大量案例直接使用“老板/实体店/餐饮老板/朋友”等身份词，并与结果或问题绑定",
+      "confidence": 0.62
+    },
+    {
+      "pattern_id": "SEED-002",
+      "name": "反常识 + 新解释",
+      "layer": "cross_domain_candidate",
+      "formula": "大众认知 → 否定/质疑 → 新解释",
+      "psychology": "制造认知缺口和继续观看动机",
+      "evidence": "样本中高频出现“为什么/其实/别再/不是……而是……”类认知转换表达",
+      "confidence": 0.67
+    },
+    {
+      "pattern_id": "SEED-003",
+      "name": "结果数字 + 方法解释",
+      "layer": "domain_candidate",
+      "formula": "具体结果 → 方法 → 原理",
+      "psychology": "数字提供结果感，方法和原理提供可信度",
+      "evidence": "餐饮/实体店案例中常见会员、营业额、复购、价格等数字作为结果证据",
+      "confidence": 0.74
+    },
+    {
+      "pattern_id": "SEED-004",
+      "name": "具体场景 → 可执行动作",
+      "layer": "domain_candidate",
+      "formula": "真实经营场景 → 单一动作 → 数据/结果",
+      "psychology": "减少抽象感，让用户相信“我也能做”",
+      "evidence": "样本中存在大量“直接做什么/第一步/第二步/一周看数据”式落地表达",
+      "confidence": 0.7
+    },
+    {
+      "pattern_id": "SEED-005",
+      "name": "问题连续推进",
+      "layer": "cross_domain_candidate",
+      "formula": "提出问题 → 暂缓回答 → 再加一个问题/例子 → 最后揭示答案",
+      "psychology": "利用信息缺口形成留存",
+      "evidence": "样本中问句、追问和递进式解释较常见，但与点赞的简单相关性很弱，因此暂定候选规律",
+      "confidence": 0.48
+    }
+  ]
+}

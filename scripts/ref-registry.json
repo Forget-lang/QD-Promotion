@@ -9,7 +9,9 @@
     "outputs/archive/AI启动提示词.md",
     "outputs/archive/文档架构总览.md",
     "outputs/archive/挂账总览.md",
-    "outputs/archive/官网资源库落地规划.md"
+    "outputs/archive/官网资源库落地规划.md",
+    "knowledge/爆款整片解剖.md",
+    "knowledge/洞察库.md"
   ],
   "excludeDirs": [],
   "aliases": {
@@ -17,7 +19,9 @@
     "R2": "R2-业务流程.md",
     "R3": "R3-Remotion技术参考.md",
     "R6": "R6-applet前端UI储备.md",
-    "SKILL": "SKILL.md"
+    "SKILL": "SKILL.md",
+    "整片解剖": "knowledge/爆款整片解剖.md",
+    "洞察库": "knowledge/洞察库.md"
   },
   "factChecks": [
     {
