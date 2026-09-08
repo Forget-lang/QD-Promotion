@@ -71,7 +71,7 @@ for (const g of GATES) {
     if (/⚠️|需人工确认/.test(l) && !/✅\s*无/.test(l)) {
       warns.push(clean(l));
       capturing = true;
-    } else if (capturing && /^\s{2,}\S/.test(l) && (/»/.test(l) || /[\w./-]+:\d+/.test(l))) {
+    } else if (capturing && /^\s{2,}\S/.test(l) && (/»/.test(l) || /[\w./-]+:\d+/.test(l) || /\.(tsx?|md|json)\s{2,}\S/.test(l))) {
       warns.push(clean(l));
     } else {
       capturing = false;

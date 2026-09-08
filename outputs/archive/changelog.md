@@ -8,6 +8,20 @@
 > 📦 分卷索引（2026-09-02）：台账按月分卷，**2026-08 及更早的全部条目见 `changelog-2026-08.md`**；本主文件保留 2026-09 起，最新在前。只搬不删（文档宪法铁律一）。
 
 ---
+## 2026-09-08 · 第四十轮 · 文档审计 8 项修复落地（版本号对齐 / couponType 硬校验 / gate-all 警告捕获 / redlines 时间戳 / darkText 死字段清理）
+
+**触发**：上一轮场景 A 审计（只读、盘上取证）出的问题清单，用户「按照你的建议都修复吧」批准。本轮逐条落地，均属「文档说的与磁盘/代码不一致」类纠错，不动叙事口径与历史结论。
+
+**修复清单（5 文件组）**：
+- **版本号对齐**：`SKILL.md` frontmatter `version: 7.0.0-重置` → `8.0.0`（第三十六轮已把正文升到 v8 闭环故事版、frontmatter 漏改）；`AGENTS.md` 文档地图「SKILL.md 唯一作业文档（v7 清零重启版）」→「（v8 闭环故事版）」。
+- **couponType 硬校验升级**：`scripts/check-ui-truth.mjs` ⑥ 层把「用了面额字段却没声明 couponType」从 ⚠️ 提醒升级为 ❌ 硬失败（纳入 exit code），消除「不拦、靠人工」的口子；配套 `video/src/data/g06.ts` S4 制券屏补 `couponType: '兑换券'`、S7 补 `couponType: '满减券'`，`videos/g06/types.ts` 的 `MakePayload` 加可选 `couponType?` 字段。SKILL §四 C 组「券种决定面额字段组合」条同步更新「不再留口子」措辞。
+- **gate-all 警告捕获增强**：`scripts/gate-all.mjs` 捕获续行正则加 `\.(tsx?|md|json)\s{2,}\S` 分支，使 check-ui-truth ⑥ 层失败明细行（形如 `video/src/data/g06.ts  g06-xxx`）能进 gate-all 的「需人工确认」清单，不再被截断。
+- **redlines 时间戳**：`spec/redlines.json` `lastVerified` / `updated` 2026-08-28 → 2026-09-08。
+- **darkText 死字段清理**：`video/src/types.ts` 删 `Scene.darkText`（零消费——Subtitle 恒白字黑描边从未接线，只是数据标注）；`video/src/data/g06.ts` 12 处 `darkText: true` 一并删除；`docs/internal/R3-Remotion技术参考.md` §7.3「浅底字幕可读性」行改写为「字段已删、浅底适配改由背景素材选择 + 前景兼容验证帧人工判」。
+
+**取证**：`node scripts/gate-all.mjs --tsc` = **8/9 绿** + tsc 零错误；唯一红为效果尺子——g09 成片早于 `video/src` 改动，本轮 types.ts 删字段、数据文件加声明只改 mtime 不改画面输出，交付前重渲重测即消。负向测试：临时移除 g06 的 `couponType` → ⑥ 层硬失败点名该屏，还原后复绿。`grep darkText video/src/` 零残留。
+
+---
 ## 2026-09-08 · 第三十九轮 · g10 转全新行业（宠物店试点取消，暂缓启动）
 
 **拍板（用户）**：g10（原「宠物店 · 一条闭环故事」试点）已删除；g09 宠物店不改、保留原样。g10 移作**全新行业**（避开已产出的教培/咖啡茶饮/火锅/宠物），**暂缓启动**——用户将在新会话先验证两点再定行业：① 新会话是否还会沿用 g09 的风格；② 爆款文案的实际执行效果。

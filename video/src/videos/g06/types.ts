@@ -52,6 +52,7 @@ export interface FormGroup { head: string; rows: FormRow[] }
 export interface MakePayload {
   tag: string;
   navTitle: string;
+  couponType?: string;   // 声明券种（如「兑换券」「满减券」），供 check-ui-truth ⑥ 校验面额字段配对
   crumb: string;
   groups: FormGroup[];
   foot: string;

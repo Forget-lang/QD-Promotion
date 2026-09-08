@@ -59,7 +59,7 @@
 ```
 promotion/
 ├── AGENTS.md                      入口（本文件）
-├── SKILL.md                      唯一作业文档（v7 清零重启版）
+├── SKILL.md                      唯一作业文档（v8 闭环故事版）
 ├── spec/                          机器可读真源（事实 facts / 红线 redlines / 素材登记 assets / 制券字段 coupon-fields）
 ├── docs/internal/                 参考层：R2 业务流程 / R3 Remotion 技术 / R6 applet UI 储备
 ├── scripts/                       闸门（check-* / gate-all）+ 盘点（list-assets）+ TTS 工具

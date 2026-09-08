@@ -26,10 +26,10 @@
  *   ⑥ 券种↔面额字段配对 —— 制券屏须声明 `couponType: '满减券'` 等；本层校验该屏用到的面额字段
  *      （原价/券面额/优惠金额/折扣/兑换内容/随机最小·最大金额）全属该券种的 `couponTypes[key].faceFields`，
  *      且该券种要求的面额字段都在（硬失败）。为什么单独立一层：2026-09-03 g07 把满减券的"减 X"挂到代金券名下——
- *      "券面额"是真名、① 全过，但券种与字段集配错，①③⑤ 都拦不住。未声明 couponType 却用了面额字段的屏 → ⚠️ 提醒补声明。
+ *      "券面额"是真名、① 全过，但券种与字段集配错，①③⑤ 都拦不住。未声明 couponType 却用了面额字段的屏 → ❌ 硬失败（补上 couponType 才能过关）。
  *
  * 用法：node scripts/check-ui-truth.mjs
- * 退出码：0 = 通过；1 = 有硬失败（① 未取证的字段名 / ③ 分组归属错误 / ⑤ 真值表行名源码查无 / ⑥ 券种↔字段配对错）。
+ * 退出码：0 = 通过；1 = 有硬失败（① 未取证的字段名 / ③ 分组归属错误 / ⑤ 真值表行名源码查无 / ⑥ 券种↔字段配对错或未声明 couponType）。
  */
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
@@ -159,7 +159,7 @@ const misfiled = [];
 const unknownRow = [];
 const typeMismatch = [];   // ⑥ 用了不属于声明券种的面额字段（硬失败）
 const typeMissing = [];    // ⑥ 声明券种要求的面额字段缺失（硬失败）
-const undeclared = [];     // ⑥ 用了面额字段却没声明 couponType（⚠️ 提醒）
+const undeclared = [];     // ⑥ 用了面额字段却没声明 couponType（❌ 硬失败）
 const unknownType = [];    // ⑥ 声明的 couponType 不在表里（⚠️ 提醒）
 let fieldTotal = 0;
 
@@ -339,12 +339,13 @@ console.log('');
 if (!couponTypeMap.size) {
   console.log('⑥ 券种↔面额字段配对  ⏭ 跳过 —— 未找到 spec/coupon-fields.json 的 couponTypes');
 } else {
-  const typeFails = typeMismatch.length + typeMissing.length;
+  const typeFails = typeMismatch.length + typeMissing.length + undeclared.length;
   if (typeFails) {
     console.log(`⑥ 券种↔面额字段配对  ❌ 硬失败 —— ${typeFails} 处：`);
     for (const x of typeMismatch) console.log(`   ${x.file}  ${x.ui} 声明「${x.couponType}」却用了别券种的面额字段：${x.wrong.join(' / ')}（该券种只允许：${[...couponTypeMap.get(x.couponType)].join(' / ') || '无'}）`);
     for (const x of typeMissing) console.log(`   ${x.file}  ${x.ui} 声明「${x.couponType}」但缺它要求的面额字段：${x.miss.join(' / ')}`);
-    console.log('   修法：券种决定面额字段集——改对券种，或把字段换成该券种 faceFields 里的真名（见 coupon-fields.json）。');
+    for (const x of undeclared) console.log(`   ${x.file}  ${x.ui}  用了面额字段却没声明 couponType：${x.faceUsed.join(' / ')}`);
+    console.log('   修法：券种决定面额字段集——改对券种，或把字段换成该券种 faceFields 里的真名（见 coupon-fields.json）；没声明 couponType 的制券屏补上声明。');
   } else {
     const declared = dataFiles.reduce((n, f) => n + extractScenes(readFileSync(join(DATA_DIR, f), 'utf8')).filter((s) => s.couponType).length, 0);
     console.log(`⑥ 券种↔面额字段配对  ✅ 通过 —— ${declared} 个声明了券种的制券屏，面额字段都与券种对得上`);
@@ -352,10 +353,6 @@ if (!couponTypeMap.size) {
   if (unknownType.length) {
     console.log(`   ⚠️ 声明的 couponType 不在表里 —— ${unknownType.length} 处：`);
     for (const x of unknownType) console.log(`   ${x.file}  ${x.ui}  «${x.couponType}»`);
-  }
-  if (undeclared.length) {
-    console.log(`   ⚠️ 用了面额字段却没声明 couponType —— ${undeclared.length} 屏（不计失败；补上 couponType 才能被本层校验）：`);
-    for (const x of undeclared) console.log(`   ${x.file}  ${x.ui}  面额字段：${x.faceUsed.join(' / ')}`);
   }
 }
 
@@ -372,8 +369,8 @@ if (tableBad.length) {
   console.log(`❌ 真值表里有 ${tableBad.length} 个名字在产品源码中查无此文案（见 ⑤）。这张表是后续每一片抄字段名的源头，它错一片错一片。修完再声明通过。`);
   process.exit(1);
 }
-if (typeMismatch.length || typeMissing.length) {
-  console.log(`❌ 存在 ${typeMismatch.length + typeMissing.length} 处券种↔面额字段配对错误（见 ⑥）。券种选错，商家在后台找不到对应的金额栏，这一屏白教。修完再声明通过。`);
+if (typeMismatch.length || typeMissing.length || undeclared.length) {
+  console.log(`❌ 存在 ${typeMismatch.length + typeMissing.length + undeclared.length} 处券种↔面额字段配对错误（见 ⑥）。券种选错或没声明，商家在后台找不到对应的金额栏，这一屏白教。修完再声明通过。`);
   process.exit(1);
 }
 console.log(`✅ 通过：上屏字段名全部回源码取到原话、分组归属对得上制券页、真值表自证 ${tableTotal} 个名字逐字命中、券种↔面额字段配对无误。`);

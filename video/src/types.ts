@@ -79,8 +79,6 @@ export interface Scene {
   voiceDur?: number;
   /** 字幕多行数组（口播全文，按语义断行；无声版均匀分布占位，有声版按 TTS 实测精修） */
   subtitles?: SubtitleLine[];
-  /** 浅色背景适配标记。⚠️ 已知短板（R3 §7.3）：Subtitle 尚未消费此字段（恒白字黑描边），接线须走组件提案；在那之前它只是数据标注 */
-  darkText?: boolean;
 }
 
 export interface StyleConfig {

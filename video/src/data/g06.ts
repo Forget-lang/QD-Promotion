@@ -35,7 +35,6 @@ export const g06: VideoData = {
       dur: 9.9,
       voiceOffset: 0.27,
       voiceDur: 9.17,
-      darkText: true,
       subtitles: [
         { text: '开学那阵，托管班最忙。', startFrame: 8, endFrame: 59 },
         { text: '校门口发的传单，家长接了就走，一转身就没了下文。', startFrame: 61, endFrame: 182 },
@@ -60,7 +59,6 @@ export const g06: VideoData = {
       dur: 7.2,
       voiceOffset: 0.27,
       voiceDur: 6.50,
-      darkText: true,
       subtitles: [
         { text: '家长答应来试一次，回家没人提，这事就搁下了。', startFrame: 8, endFrame: 106 },
         { text: '你想打电话再约，翻遍本子，一个号码都没留。', startFrame: 108, endFrame: 203 },
@@ -93,7 +91,6 @@ export const g06: VideoData = {
       dur: 15.8,
       voiceOffset: 0.27,
       voiceDur: 14.67,
-      darkText: true,
       subtitles: [
         { text: '这套攻略三招，一招设一张券。', startFrame: 8, endFrame: 76 },
         { text: '第一招做张兑换券，把「来试一次」写成家长拿得走的东西。', startFrame: 78, endFrame: 211 },
@@ -118,7 +115,6 @@ export const g06: VideoData = {
       dur: 18.4,
       voiceOffset: 0.27,
       voiceDur: 17.53,
-      darkText: true,
       subtitles: [
         { text: '商户中心点制作优惠券，类型挑兑换券。', startFrame: 8, endFrame: 96 },
         { text: '优惠券名称把场景写进去，这一栏十八个字。', startFrame: 98, endFrame: 198 },
@@ -129,6 +125,7 @@ export const g06: VideoData = {
       payload: {
         tag: '第一招 · 券面',
         navTitle: '制作兑换券',
+        couponType: '兑换券',
         crumb: '商户中心 › 制作优惠券 › 类型：兑换券 · 数值为示例',
         groups: [
           {
@@ -158,7 +155,6 @@ export const g06: VideoData = {
       dur: 21.8,
       voiceOffset: 0.27,
       voiceDur: 20.90,
-      darkText: true,
       subtitles: [
         { text: '有效期类型选自领取日起几天内有效，天数填十四天。', startFrame: 8, endFrame: 134 },
         { text: '可用时段打开定制，只勾工作日下午三点半到六点半。', startFrame: 136, endFrame: 261 },
@@ -207,7 +203,6 @@ export const g06: VideoData = {
       dur: 13.7,
       voiceOffset: 0.27,
       voiceDur: 12.33,
-      darkText: true,
       subtitles: [
         { text: '券做好，进这张券点发放优惠券，选海报存下来贴门口。', startFrame: 8, endFrame: 129 },
         { text: '家长扫这个码，券进了他自己的卡包，写着能用到几号。', startFrame: 131, endFrame: 253 },
@@ -233,7 +228,6 @@ export const g06: VideoData = {
       dur: 16.9,
       voiceOffset: 0.27,
       voiceDur: 16.33,
-      darkText: true,
       subtitles: [
         { text: '第二招回到类型那一页，挑满减券。', startFrame: 8, endFrame: 83 },
         { text: '优惠券名称写清楚这张抵多少，十八个字以内。', startFrame: 85, endFrame: 188 },
@@ -244,6 +238,7 @@ export const g06: VideoData = {
       payload: {
         tag: '第二招 · 券面',
         navTitle: '制作满减券',
+        couponType: '满减券',
         crumb: '制作优惠券 › 类型：满减券 · 数值为示例',
         groups: [
           {
@@ -272,7 +267,6 @@ export const g06: VideoData = {
       dur: 17.5,
       voiceOffset: 0.27,
       voiceDur: 16.70,
-      darkText: true,
       subtitles: [
         { text: '在领券顾客信息里打开指定手机号可领取。', startFrame: 8, endFrame: 107 },
         { text: '号码导进去，每行一个，最多五百个，重复的自动跳过。', startFrame: 109, endFrame: 226 },
@@ -315,7 +309,6 @@ export const g06: VideoData = {
       dur: 15.7,
       voiceOffset: 0.27,
       voiceDur: 14.87,
-      darkText: true,
       subtitles: [
         { text: '点开这张券的发放优惠券，选私密发放里的面对面二维码。', startFrame: 8, endFrame: 135 },
         { text: '发放数量最多十张，一对一发就填一张。', startFrame: 137, endFrame: 221 },
@@ -341,7 +334,6 @@ export const g06: VideoData = {
       dur: 20.0,
       voiceOffset: 0.27,
       voiceDur: 18.67,
-      darkText: true,
       subtitles: [
         { text: '第三招让家长带家长，先另做一张私密发放的券当奖品。', startFrame: 8, endFrame: 140 },
         { text: '回到这张兑换券，在分享与转赠里打开允许转赠。', startFrame: 142, endFrame: 257 },
@@ -381,7 +373,6 @@ export const g06: VideoData = {
       dur: 16.5,
       voiceOffset: 0.27,
       voiceDur: 15.87,
-      darkText: true,
       subtitles: [
         { text: '家长 A 把券转给同学的家长 B，这张券谁先领到算谁的。', startFrame: 8, endFrame: 132 },
         { text: 'B 领走，到店那天你一核销，券上标着转赠获得。', startFrame: 134, endFrame: 236 },
@@ -409,7 +400,6 @@ export const g06: VideoData = {
       dur: 14.4,
       voiceOffset: 0.27,
       voiceDur: 13.20,
-      darkText: true,
       subtitles: [
         { text: '体验的孩子来了几个，看有效发放张数和核销率。', startFrame: 8, endFrame: 112 },
         { text: '谈过的几家报没报名，领券记录导出来对一对。', startFrame: 114, endFrame: 212 },

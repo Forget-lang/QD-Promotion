@@ -1,11 +1,11 @@
 {
   "_meta": {
     "desc": "内容红线唯一真源（机器可检 + 规则全量）。迁移自 R5-内容红线（全文）+ scripts/redlines.json（机器层），两份合一，改红线只改这一处。",
-    "lastVerified": "2026-08-28",
+    "lastVerified": "2026-09-08",
     "machineLayers": "codeBanned = 画面层硬禁（含视频字幕）；voiceBanned = 口播/文案层硬禁，实际扫描 token = codeBanned ∪ voiceBanned（md 层豁免「自查」小节与截图处理注记，见该层 note）；outputsReview = 文案层需人工确认；docsInfo = 文档层仅提示。",
     "designPrinciple": "宁少勿滥，避免大量误报导致闸门失去威慑力。单字/短词一律不加，只加明确的违禁词组。无来源数字（百分比/倍数/增长值）不入 token 表——产品参数数字合法，正则必然误报，改由 rules.numeric_claims 人工判。",
     "changeProcess": "改红线两步：① 改本文件（机器层 tokens + rules 规则同步改）→ ② 跑 node scripts/check-redlines.mjs 验证 video/src + outputs 两层零命中。",
-    "updated": "2026-08-28"
+    "updated": "2026-09-08"
   },
   "codeBanned": {
     "scope": [
