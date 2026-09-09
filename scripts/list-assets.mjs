@@ -164,6 +164,7 @@ if (existsSync(assetsFile)) {
     ['geometric', '几何线稿'],
     ['scene', '实景场景虚化'],
     ['texture', '材质肌理'],
+    ['coverBackground', '封面背景（封面专属，非视频背景）'],
   ];
   for (const [key, label] of families) {
     const list = Array.isArray(assets.A[key]) ? assets.A[key] : [];

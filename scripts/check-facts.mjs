@@ -32,6 +32,7 @@ for (const c of checks) {
 const registered = []; // 所有登记路径 → 存在性检查
 for (const bg of ASSETS.A.abstract) registered.push({ desc: `${bg.id} ${bg.name}`, path: bg.path });
 for (const x of ASSETS.A.xhs) registered.push({ desc: `${x.id} ${x.name}`, path: x.path });
+for (const cv of ASSETS.A.coverBackground) registered.push({ desc: `${cv.id} ${cv.name}`, path: cv.path });
 for (const b of ASSETS.B) registered.push({ desc: `${b.id} ${b.name}`, path: b.path });
 for (const f of ASSETS.C) registered.push({ desc: `字体 ${f.font}`, path: f.path });
 
