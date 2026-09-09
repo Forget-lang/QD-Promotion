@@ -265,6 +265,25 @@ for (const [file, path] of allDocs) {
   });
 }
 
+// ── 3.9 废弃话头（2026-09-09 用户拍板：替代型决策须同轮清旧；正文命中被替代旧话头 = 硬失败，防新旧口径并存误导新会话）──
+const deprecatedTerms = REGISTRY.deprecatedTerms || [];
+const depExemptRe = /(替代|取代|废止|旧法|反例|❌|错：|禁止|不使用)/;
+for (const [file, path] of allDocs) {
+  const rel = relative(ROOT, path);
+  const lines = readFileSync(path, 'utf8').split('\n');
+  let inCodeBlock = false;
+  lines.forEach((line, i) => {
+    if (/^\s*```/.test(line)) { inCodeBlock = !inCodeBlock; return; }
+    if (inCodeBlock) return;
+    if (depExemptRe.test(line)) return;
+    for (const d of deprecatedTerms) {
+      if (line.includes(d.term)) {
+        hardFails.push({ file: rel, line: i + 1, ref: line.trim().slice(0, 48), why: `废弃话头残留：「${d.desc}」——新口径已定，清掉旧表述` });
+      }
+    }
+  });
+}
+
 // ── 4. 输出 ──
 const distinctHard = [...new Map(hardFails.map((h) => [`${h.file}:${h.line}:${h.ref}`, h])).values()];
 const distinctRev = [...new Map(reviews.map((h) => [`${h.file}:${h.line}:${h.ref}`, h])).values()];
