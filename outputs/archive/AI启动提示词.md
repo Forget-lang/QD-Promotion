@@ -1,6 +1,6 @@
 # 券到卡包 · AI 启动提示词
 
-> 更新：2026-09-08（变更史只记 changelog，本文不复述；原则：提示词只指路，不复述规则）
+> 更新：2026-09-10（变更史只记 changelog，本文不复述；原则：提示词只指路，不复述规则）
 > 用途：开新会话 / 换 AI 工具时，粘贴对应场景的提示词，让 AI 30 秒接手。
 > 原则：**提示词只指路，不复述规则**——所有口径以 `AGENTS.md`（入口，含真源清单）、`SKILL.md`（七步法）、`spec/` 机器可读真源为准。
 > 全局地图：新会话如需快速建立文档结构认知，可先读 `outputs/archive/文档架构总览.md`（2026-09-02 快照，只作路由指路，与权威文档冲突时以权威文档为准），再按开工三动作执行。
@@ -40,53 +40,118 @@
   node scripts/gate-all.mjs   →   node scripts/list-assets.mjs   →  读 outputs/archive/changelog.md 顶部 10 条
 红灯不产出、不交付。
 第二步：**通读 SKILL.md 全文**（七步法、工程约定、清零重启否决清单、背景素材入库、封面设计规范与三平台标题钩子——后两项在第 7 步——都在里面）——本任务一切口径以 SKILL 为准，不凭记忆、不凭习惯、不以本提示词为准。
-第三步：严格照 SKILL.md 七步法执行，每进入一步重读 SKILL 对应章节确认不走样；SKILL 与任何其他材料冲突时，以 SKILL 为准。
+第三步：严格照 SKILL.md 七步法执行，每进入一步重读 SKILL 对应章节确认不走样；SKILL 与任何其他材料冲突时，以 SKILL 为准。**第 1 步交付物（内容输入包）须含「调研留痕」节，缺了即退回（要求见 SKILL 第 1 步「产出每片内容输入包」）。**
 【人工环节】方向拍板、一屏标杆、逐屏真图确认、素材提供（三确认节点见 AI使用手册 §六）——到点明确告诉我需要什么，等我完成再继续。
 【我的表达习惯】我说"这屏很空/很乱/不像"，你翻译成具体画面动作重渲给我看，不许只做放大字号式敷衍。
 ```
 
-## 场景 C：设计稿 → 编码（三模型分阶段接力）
+## 场景 C：全流程多模型接力（逐节点 → 模型 → 提示词）
 
-> **用途**：内容输入包（场景 B 第 1 步产出）就绪后，从「设计稿」到「编码成片」按节点换模型接力——每段一个模型、做到停点就交下一段，不跨段。**模型选型均为建议（非强制）**，以现场可用的 Agent 形态为准，全表见下方「AI 工具选型（要点）」。
+> **用途**：从新会话「选行业」到「成片发布」全程，按工作流节点换模型接力——先看总览表定位节点与模型，粘贴该节点提示词，做到「硬停」点就把产物交下一节点，不跨节点。**模型均为建议（非强制）**，以现场可用的 Agent 形态为准；选型依据、备选与「选档判断尺」见下方「AI 工具选型（要点）」。与场景 B 的分工：场景 B 用一个 Agent 端到端走完七步法；场景 C 在每个节点换最合适的模型。
 
-### C1 · 视觉母题 + 口播稿 — 建议 Seed 2.1 Pro
+### 总览：节点 → 建议模型（国内 / 国外排名）→ 硬停点
+
+> 每个节点国内、国外各给一组排名，① = 建议首选，其后为可选备选；换用备选仍受同节点提示词与硬停点约束。选型依据与备选详情见下方「AI 工具选型（要点）」。
+
+| 节点 | SKILL 步骤 | 国内（排名） | 国外（排名） | 硬停点（交下一节点的产物） |
+|---|---|---|---|---|
+| C1 · 选行业·调研·攻略深挖 | 第 1 步 | ①DeepSeek-V4-Pro ②通义千问 ③GLM-5.3 ④Kimi | ①Claude ②GPT ③Gemini Pro | 内容输入包 |
+| C2 · 行业视觉母题 | 第 2 步 | ①豆包 Seed 2.1 Pro ②通义千问-VL ③阶跃 | ①Gemini Pro ②Claude ③GPT | 母题一页（一屏标杆认可） |
+| C3 · 口播稿·爆款文案 | 第 3 步 | ①豆包 Seed 2.1 Pro ②通义千问 ③GLM ④Kimi | ①Claude ②GPT | 口播稿 |
+| C4 · 分镜稿·字段真值 | 第 4 步 | ①DeepSeek-V4-Pro ②通义千问 ③GLM-5.3 | ①Claude ②GPT ③Gemini | 分镜稿 |
+| C5 · Remotion 编码 + 三层运动 | 第 5 步 | ①GLM-5.3 ②DeepSeek ③Qwen-Coder ④Kimi | ①Claude ②GPT ③Gemini | 屏代码 |
+| C6 · 渲染验收 + 修帧循环 | 第 6 步 | ①deepseek-v4-flash ②GLM ③Qwen | ①Claude ②GPT | 成片真图 |
+| C7 · 三平台发布稿 + 标题 + 封面 | 第 7 步 | ①豆包 seed-2.1-turbo ②通义千问 ③GLM ④Kimi | ①GPT ②Claude | 三平台发布稿 |
+| C8 · TTS 语音合成 | 第 6 步（阶段二） | ①豆包 seed-tts（已定稿）②MiniMax Audio ③火山其余音色 | —（项目已定稿国产） | 音频 |
+
+### C1 · 选行业·调研·攻略深挖 — 首选 DeepSeek-V4-Pro
 
 ```
-你是「券到卡包」内容设计 AI，工作区 quandao/promotion。
+你是「券到卡包」内容策划 AI，工作区 quandao/promotion。
 
-【输入】读本片内容输入包（outputs/gXX-行业/）+ SKILL.md 第 2、3 步。
-【任务】只做两步：① 第 2 步行业视觉母题（先出开工视觉语言隔离声明）→ 母题一页；② 第 3 步口播稿（闭环五拍 + 去冗）→ 口播稿。
-【硬停】产出「母题一页 + 口播稿」即停；勿做分镜稿、勿写代码。
-【下一步】换 DeepSeek-V4-Pro，粘贴 C2 段提示词，带上母题一页 + 口播稿 + 内容输入包。
+【开工】按 AGENTS.md §三 跑开工三动作：node scripts/gate-all.mjs → node scripts/list-assets.mjs → 读 outputs/archive/changelog.md 顶部 10 条。
+【输入】通读 SKILL.md 第 1 步 + knowledge/爆款整片解剖.md（使用索引）+ knowledge/洞察库.md + spec/facts.json + spec/coupon-fields.json + spec/card-fields.json。
+【任务】只做第 1 步「选行业与定内容」：选定/接手行业 → 调研三问 → 回 cases.jsonl 检索同类语料 → 功能深挖三层 → 定攻略（闭环五拍骨架）→ **grill-me 拷问**（痛点真不真、定律承载的功能说不说得清、功能深挖三层到不到位）→ 产出「内容输入包」（须含「调研留痕」节，见 SKILL 第 1 步）。
+【硬停】产出「内容输入包」即停；勿做视觉母题、口播稿。
+【下一步】换豆包 Seed 2.1 Pro，粘贴 C2，带上内容输入包。
 ```
 
-### C2 · 分镜稿 — 建议 DeepSeek-V4-Pro
+### C2 · 行业视觉母题 — 首选 豆包 Seed 2.1 Pro
+
+```
+你是「券到卡包」视觉设计 AI，工作区 quandao/promotion。
+
+【输入】读内容输入包 + SKILL.md 第 2 步 + spec/assets.json + node scripts/list-assets.mjs（已产出片风格序列）。
+【任务】只做第 2 步「行业视觉母题」：先出开工视觉语言隔离声明 → 母题一页（信息载体 / 栅格 / 标题承载 / 容器语言 / 装饰母题 / 色彩质感 / 动效语法）。禁止 AI 自绘具象插画；背景底必选真实素材。
+【硬停】产出「母题一页」即停，交用户认可质感（一屏标杆）后才进下一节点。
+【下一步】换节点 C3（仍豆包 Seed 2.1 Pro），带上母题一页 + 内容输入包。
+```
+
+### C3 · 口播稿·爆款文案 — 首选 豆包 Seed 2.1 Pro
+
+```
+你是「券到卡包」口播文案 AI，工作区 quandao/promotion。
+
+【输入】读内容输入包 + SKILL.md 第 3 步（含「口播写法五条」）+ knowledge/爆款整片解剖.md + knowledge/洞察库.md。
+【任务】只做第 3 步「口播稿」：搭闭环五拍骨架 → 逐句过「口播写法五条」→ 去冗（画面写全、嘴上只讲画面没有的）。术语 / 机制 / 数字一律回 spec 验真后准入。
+【审稿】出稿后用 grill-me 逐句拷问：观众会怎么反驳？0 接触的商家听得懂吗？机制讲反了吗？拷出的漏洞当场改。
+【硬停】产出「口播稿」即停；勿做分镜稿、勿写代码。
+【下一步】换 DeepSeek-V4-Pro，粘贴 C4，带上母题一页 + 口播稿 + 内容输入包。
+```
+
+### C4 · 分镜稿·字段真值 — 首选 DeepSeek-V4-Pro
 
 ```
 你是「券到卡包」分镜设计 AI，工作区 quandao/promotion。
 
-【输入】读母题一页 + 口播稿 + 内容输入包 + SKILL.md 第 4 步 + spec/coupon-fields.json（字段真值）。
-【任务】只做第 4 步分镜稿：逐屏一条，字段名逐字回 spec/coupon-fields.json，每屏带「本屏判据」自查行。
+【输入】读母题一页 + 口播稿 + 内容输入包 + SKILL.md 第 4 步 + spec/coupon-fields.json / spec/card-fields.json（按本片产品线取字段真值）。
+【任务】只做第 4 步「分镜稿」：逐屏一条，字段名 / 组归属逐字回对应产品线真值表，每屏带「本屏判据」自查行。
+【审稿】出稿后用 grill-me 拷问：字段真值回 spec 了吗？组归属对不对？机制有没有讲反（如转赠奖励方向）？
 【硬停】产出「分镜稿」即停；勿动代码。
-【下一步】换 GLM-5.3，粘贴 C3 段提示词，带上分镜稿 + 母题一页。
+【下一步】换 GLM-5.3，粘贴 C5，带上分镜稿 + 母题一页。
 ```
 
-### C3 · 编码 + 渲染 — 建议 GLM-5.3
+### C5 · Remotion 编码 + 三层运动 — 首选 GLM-5.3
 
 ```
-你是「券到卡包」Remotion 视频编码 AI，工作区为 quandao/promotion/video。
+你是「券到卡包」Remotion 视频编码 AI，工作区 quandao/promotion/video。
 
-【输入】读根目录 SKILL.md（第 5~6 步）+ docs/internal/R3-Remotion技术参考.md（§五 扩展指南、§七 制作硬规则）
-+ outputs/gXX-行业/ 下本片分镜稿与内容输入包（交付物清单以 SKILL §三为准）+ node scripts/list-assets.mjs 实时组件清单。
-【任务】按设计稿实现专属屏组件（video/src/videos/gXX/）与数据文件（src/data/gXX.ts，屏上写 ui:'gXX-名字'，
-在 scenes/index.tsx 的 VIDEO_RENDERERS 注册）。
-【硬性】禁止 CSS animation/transition，全部 useCurrentFrame + interpolate/spring；屏间必须 TransitionSeries；
-文案/颜色全从数据读，禁止硬编码；渲染必带 NODE_OPTIONS=""，浏览器用 Chrome Headless Shell
-（npx remotion browser ensure 后指 node_modules/.remotion/... 路径，本机系统 Chrome headless 会因显示链接挂死）。
-镜头/动效红线见 SKILL 第 5 步——文字层禁持续 transform（缩放/位移/旋转）、主体元素停留期静止；
-`Drift`/`PushIn`/`useVoiceEnergy` 已被 g08 三案否决且组件已删（`camera.tsx`/`voice.tsx` 已删），勿再引用。
-【验收】tsc 零错误 → 逐屏峰值帧 still → check-similarity 绿 → check-motion 达标（阈值以脚本输出为准——占用率只是防"空和死"的下限，高于它不代表更好，禁止为过线堆装饰，见 SKILL §四否决清单"对着指标凑画面"条）→ 交真图给用户。
-【硬停】产出「屏代码 + 真图（成片）」即停，交真图给用户终审。
+【输入】读根目录 SKILL.md（第 5 步三层运动）+ docs/internal/R3-Remotion技术参考.md（§五 扩展指南、§七 制作硬规则）+ 本片分镜稿与内容输入包（交付物清单以 SKILL §三为准）+ node scripts/list-assets.mjs。
+【任务】按分镜稿实现专属屏组件（video/src/videos/gXX/）与数据文件（src/data/gXX.ts，屏上写 ui:'gXX-名字'，在 scenes/index.tsx 的 VIDEO_RENDERERS 注册）；三层运动照 SKILL 第 5 步。
+【参考】Remotion / React 技术细节可查 remotion-best-practices 技能（FFmpeg / 字幕 / 抽帧 / 合成管理），但本项目 SKILL 第 5 步硬规则优先，冲突以 SKILL 为准。
+【硬性】禁止 CSS animation/transition，全部 useCurrentFrame + interpolate/spring；屏间必须 TransitionSeries；文案/颜色全从数据读，禁止硬编码；文字层禁持续 transform、主体元素停留期静止；`Drift`/`PushIn`/`useVoiceEnergy` 已否决且组件已删（`camera.tsx`/`voice.tsx`），勿再引用。
+【硬停】产出「屏代码」即停（可先渲逐屏峰值帧自查）；勿做发布稿。
+【下一步】换 C6（deepseek-v4-flash）做渲染验收 + 修帧循环。
+```
+
+### C6 · 渲染验收 + 修帧循环 — 首选 deepseek-v4-flash
+
+```
+你是「券到卡包」渲染修帧 AI，工作区 quandao/promotion/video。
+
+【输入】读 SKILL.md 第 6 步 + 本片代码与分镜稿。
+【任务】跑 tsc → 渲逐屏峰值帧 → 按 SKILL 第 6 步跑各闸门（阈值以脚本输出为准），报错逐条修帧/修代码，循环到全绿；每屏抽「入场 / 中段 / 峰值」三帧交用户（交付帧取屏尾「全内容帧」）。无声版先渲逐屏单张过关，再逐屏 TTS（走 C8）→ loudnorm → ffprobe → atempo（变速值见 SKILL 第 6 步）→ dur 回填 → 渲染成片 → 盲听全片。
+【渲染纪律】NODE_OPTIONS="" + Chrome Headless Shell（先 npx remotion browser ensure，再 `B=$(find node_modules/.remotion/chrome-headless-shell -name chrome-headless-shell -type f)`，渲染命令用 `"$B"`；勿指系统 Chrome）。走管道时 `| tail` 会吞退出码，以产物文件存在为准。
+【参考】FFmpeg / 抽帧 / 字幕细节可查 remotion-best-practices，但以 SKILL 第 6 步定稿口径为准。
+【硬停】闸门绿 + 真图交用户终审即停。
+【下一步】换 seed-2.1-turbo，粘贴 C7，带上成片 + 内容输入包出发布稿。
+```
+
+### C7 · 三平台发布稿 + 标题 + 封面 — 首选 seed-2.1-turbo
+
+```
+你是「券到卡包」发布文案 AI，工作区 quandao/promotion。
+
+【输入】读内容输入包 + SKILL.md 第 7 步（发布 / 标题钩子 / 封面规范 / 入口三件套 / 账号配置）+ spec/redlines.json + cases.jsonl（同赛道标题参考池）。
+【任务】只做第 7 步「发布」：抖音 / 小红书 / 搜狐三平台发布稿（搜狐正文 3~5 个 ### 次标题）+ 标题候选批量（钩子结构与字数硬限见 SKILL 第 7 步）+ 封面规格（主标题 + 副标题 + 可选单一锚点，见 SKILL 第 7 步）。
+【红线】三平台绝口不提导流 / 变体暗号；封面成图不走 AI（走资源库 + 用户提供）。
+【硬停】产出「三平台发布稿」即停。
+```
+
+### C8 · TTS 语音合成 — seed-tts（专用工具，非通用 LLM）
+
+```
+【任务】口播稿 → seed-tts 合成语音：变速与语速口径见 SKILL.md 第 6 步（seed-tts 的 speed_ratio 无效，以 SKILL 定稿值为准）。
 ```
 
 ## 场景 D：背景图入库验证（用户找图后逐张验收）
@@ -111,17 +176,17 @@
 
 ## AI 工具选型（要点）
 
-> 以下只作**建议、非强制**，以现场可用的 Agent 形态为准。换模型真正会漂移的是**主观审美**（视觉环节别轻易换模型）；客观对错（字段真值/红线/引用/布局指纹/渲染参数）已被闸门机检兜底，换任何模型结果一样（2026-09-08 用户拍板三模型分工）。
+> 以下只作**建议、非强制**，以现场可用的 Agent 形态为准；每个节点国内、国外各给一组排名（① = 首选）。换模型真正会漂移的是**主观审美**（视觉环节别轻易换模型）；客观对错（字段真值/红线/引用/布局指纹/渲染参数）已被闸门机检兜底，换任何模型结果一样（2026-09-08 拍板三模型分工；2026-09-10 拍板按国内/国外分档列备选）。
 
-| 节点 | 建议模型（非强制，可等价替代） | 为什么 |
-|---|---|---|
-| 选行业·调研·攻略深挖 / 分镜稿·字段真值·文档结构 | DeepSeek-V4-Pro | 文本推理 + 长上下文 + 逐字回 `spec` 溯源，扬长避其视觉短板 |
-| 口播稿·爆款文案（中文口语） | 豆包 Seed 2.1 Pro | 中文创意语感强、多模态旗舰 |
-| 视觉母题·看图审稿·封面 | 豆包 Seed 2.1 Pro | 多模态视觉理解强；**封面/背景不 AI 生成**，此格只做「看图审稿 + 出规格」，成图走资源库 + 用户手动 |
-| Remotion 编码（Agent 形态） | GLM-5.3 | 编程最强开源、原生接 Agent 工具链；备选 Kimi 系 |
-| 闸门脚本 / 渲染修帧（Agent） | deepseek-v4-flash | 错误被 tsc/闸门当场抓，高频循环快且省（实测） |
-| 发布稿短文案 / 标题候选批量 | seed-2.1-turbo | 平台语感短文案，低风险高频 |
-| TTS 语音合成 | seed-tts（专用，非通用 LLM） | 项目已定稿口径 |
+| 节点 | 国内（排名） | 国外（排名） | 为什么 |
+|---|---|---|---|
+| 选行业·调研·攻略深挖 / 分镜稿·字段真值·文档结构 | ①DeepSeek-V4-Pro ②通义千问 ③GLM-5.3 ④Kimi | ①Claude ②GPT ③Gemini Pro | 文本推理 + 长上下文 + 逐字回 `spec` 溯源，扬长避其视觉短板 |
+| 口播稿·爆款文案（中文口语） | ①豆包 Seed 2.1 Pro ②通义千问 ③GLM ④Kimi | ①Claude ②GPT | 中文创意语感强、多模态旗舰 |
+| 视觉母题·看图审稿·封面 | ①豆包 Seed 2.1 Pro ②通义千问-VL ③阶跃 | ①Gemini Pro ②Claude ③GPT | 多模态视觉理解强；**封面/背景不 AI 生成**，此格只做「看图审稿 + 出规格」，成图走资源库 + 用户手动 |
+| Remotion 编码（Agent 形态） | ①GLM-5.3 ②DeepSeek ③Qwen-Coder ④Kimi | ①Claude ②GPT ③Gemini | 编程最强开源、原生接 Agent 工具链 |
+| 闸门脚本 / 渲染修帧（Agent） | ①deepseek-v4-flash ②GLM ③Qwen | ①Claude ②GPT | 错误被 tsc/闸门当场抓，高频循环快且省（实测） |
+| 发布稿短文案 / 标题候选批量 | ①豆包 seed-2.1-turbo ②通义千问 ③GLM ④Kimi | ①GPT ②Claude | 平台语感短文案，低风险高频 |
+| TTS 语音合成 | ①豆包 seed-tts（已定稿）②MiniMax Audio ③火山其余音色 | —（项目已定稿国产） | 项目已定稿口径 |
 
 - **选档判断尺（2026-09-03 用户拍板）**：看**错误被谁抓住、多快被抓住**——错误有硬校验当场抓的活用 flash 档；错误要发布后才暴露、或需跨文档全局一致性的活（攻略、文档架构、审计判断层）用旗舰档。梳理类拆两层：判断层旗舰、按已定清单搬运 flash。一句经济账：低频高价值买旗舰，高频循环买 flash。
 - **形态比模型重要**：编码/渲染/量数必须在 Agent 形态（能读代码库、改文件、跑命令、看真图）里跑，纯对话形态做不了。
@@ -141,7 +206,7 @@
 | Remotion 编码 / 技术执行（Agent） | Claude 系（编码公认第一档） | DeepSeek-V4-Pro/Flash、GPT-5 系、GLM-5.3、Qwen-Coder | 必须 Agent 形态；项目实测 flash 档够用且省 |
 | 看真图审片 / 多模态验收 | Gemini Pro 系、GPT-5 系 | Claude 视觉、Qwen-VL | 对照分镜核画面信息密度 |
 | 数据复盘 / 结构化分析 | GPT-5 系、DeepSeek-V4-Pro | Qwen-Plus、GLM-5.3 | 克制结论，不编数据 |
-| 背景图生成（素材线，须标注 AI 生成） | 即梦/Seedream、Midjourney | 通义万相、Recraft、Gemini Image | 仅抽象背景/纹理；具象人物插画禁（C-01） |
+| 背景图（素材线，不 AI 生成） | —（AI 出规格 + 检索词，用户找图回传） | — | 三关验收入库见 SKILL §五；封面/背景成图走资源库 + 用户手动，具象人物插画禁（C-01） |
 | TTS 语音合成 | 豆包 seed-tts（项目已定稿组合） | MiniMax Audio、火山其余音色 | 变速与语速口径见 SKILL 第 6 步 |
 
 > 上表不含的常见模型（Llama 系开源、混元、Step 等）：可作私有化/备份位，无突出项。

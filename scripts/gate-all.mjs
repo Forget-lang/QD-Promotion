@@ -32,6 +32,7 @@ const GATES = [
   { key: 'layout', label: '布局指纹闸门（新片不得复用上一条布局）', args: ['scripts/check-layout-diversity.mjs'] },
   { key: 'bg', label: '背景底闸门（每片必用背景图）', args: ['scripts/check-bg.mjs'] },
   { key: 'uitruth', label: '上屏真实性闸门（字段名回源码）', args: ['scripts/check-ui-truth.mjs'] },
+  { key: 'voicediscipline', label: '口播纪律闸门（数字中文）', args: ['scripts/check-voice-discipline.mjs'] },
 ];
 const WITH_TSC = process.argv.includes('--tsc');
 /** 效果尺子需要媒体文件：取 outputs 下最新的成片 mp4；没有就标跳过（不能假装通过） */

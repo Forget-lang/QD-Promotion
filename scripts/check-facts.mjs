@@ -31,6 +31,9 @@ for (const c of checks) {
 // ── ② 素材登记一致性（spec/assets.json）──
 const registered = []; // 所有登记路径 → 存在性检查
 for (const bg of ASSETS.A.abstract) registered.push({ desc: `${bg.id} ${bg.name}`, path: bg.path });
+for (const f of ASSETS.A.flat) registered.push({ desc: `${f.id} ${f.name}`, path: f.path });
+for (const t of ASSETS.A.texture) registered.push({ desc: `${t.id} ${t.name}`, path: t.path });
+for (const g of ASSETS.A.geometric) registered.push({ desc: `${g.id} ${g.name}`, path: g.path });
 for (const x of ASSETS.A.xhs) registered.push({ desc: `${x.id} ${x.name}`, path: x.path });
 for (const cv of ASSETS.A.coverBackground) registered.push({ desc: `${cv.id} ${cv.name}`, path: cv.path });
 for (const b of ASSETS.B) registered.push({ desc: `${b.id} ${b.name}`, path: b.path });

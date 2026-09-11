@@ -12,9 +12,10 @@
  *   2. 原子组件（动画 / UI / 氛围）
  *   3. 风格维度（色板键 / 图标键）
  *   4. 已产出视频数据（场景序列 + 风格键值，相似度比对基线从这里取）
- *   5. 封面组件与排版参照图
+ *   5. 封面组件
  *   6. 每条视频的专属屏（video/src/videos/gXX/，一条视频一套 UI 语言的落点）
  *   7. 排版参照图（outputs/样本库/，分镜设计借排版用）
+ *   8. 素材登记视图（spec/assets.json 各家族登记数与状态）
  */
 
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
@@ -105,9 +106,9 @@ for (const f of dataFiles) {
   out(`  - 场景序列（${sceneTypes.length} 屏）：${sceneTypes.join(' → ')}`);
 }
 
-// ── 5. 封面与参照图 ──
+// ── 5. 封面组件 ──
 out();
-out('## 5. 封面组件与排版参照图');
+out('## 5. 封面组件');
 out();
 const coversDir = join(videoSrc, 'covers');
 if (existsSync(coversDir)) {
@@ -115,11 +116,6 @@ if (existsSync(coversDir)) {
     const comps = [...read(join(coversDir, f)).matchAll(/export\s+const\s+(\w+)/g)].map(([, n]) => n);
     out(`- \`covers/${f}\`：${comps.join('、')}`);
   }
-}
-const refDir = join(root, 'outputs', 'archive', '排版参考');
-if (existsSync(refDir)) {
-  const refs = readdirSync(refDir).filter((f) => !f.startsWith('.')).sort();
-  out(`- **排版参照图**（outputs/archive/排版参考/，${refs.length} 张）：${refs.join('、')}`);
 }
 
 // ── 6. 每条视频的专属屏（一条视频一套 UI 语言）──

@@ -631,13 +631,13 @@ qrSize=360; qr.left=(750-360)/2=195; qr.top=round((676 + 1140 - 360)/2)
 
 > ⚠️ 2026-08-29：本表所有被校准组件（`CouponCard`/`CardFaceScene`/`PhoneMockup` 等共享场景与外观件）**已随架构收口删除**——但"校准结论"列是逐条实测 applet 源码得来的**视觉真值**，永久有效：复刻产品实物时每片专属组件照本表结论手写（金额右置、无条码、顶栏归属、磁卡光晕层序等），本表就是唯一底账。
 
-| 组件 | 校准结论 | 现状 |
-|---|---|---|
-| `CouponCard` 布局 | 原为金额在**左**，与 4.2 三种真券实现（`max-width:230rpx;text-align:right` / `order:1`）相反 | ✅ 2026-08-28 已修：内容左 + 金额右（`maxWidth:330; textAlign:'right'`） |
-| `CouponCard` 条码装饰 | 原有 16 条竖条 barcode；真产品全 App 无条形码（0.1 第 1 条），会被读成真实能力 | ✅ 2026-08-28 已删（连同 `BARS` 常量） |
-| `CouponCard` 缺角 | 20px 圆 + `holeColor` | 与真 `.coupon-line::before/after` 一致 → 无需改 |
-| `CardFaceScene` | 按 R3 §5.4 规格 | 与 `m-card-magnetic-face` 实测逐条一致 → 无需改；层序与斜章角度见 4.1 |
-| `PhoneMockup` | 壳内顶部应有产品顶栏。**归属校正**：红 `#e2453d` + 白字不是"B 端专属"，而是 `pages.json` globalStyle 的**全站默认**；`#f6f6f6` 浅底是 10 个页面显式覆盖（我的卡包 / 我的券包 / 次卡系列 / 券详情 / 我的商家），其中仅 3 页显式写 `navigationBarTextStyle:black`；9 页 `navigationStyle:custom` 走 `m-navigation-bar` 自绘胶囊（174×64rpx：返回 + 1×18rpx 分隔线 + 首页） | ✅ 2026-08-29 已修：新增 `nav:{title, variant:'brand'\|'light'}`，`brand` 红底白字 / `light` 浅底黑字，胶囊自绘；不传 `nav` 时与旧行为一致 |
+| 组件（已删，仅留真值） | 校准结论（永久视觉真值，复刻时照此手写） |
+|---|---|
+| `CouponCard` 布局 | 金额在**右**：4.2 三种真券实现为 `max-width:230rpx; text-align:right` / `order:1`（非左置）；复刻 = 内容左 + 金额右 |
+| `CouponCard` 条码装饰 | 真产品全 App 无条码（0.1 第 1 条）；复刻不得画 `BARS` 竖条 |
+| `CouponCard` 缺角 | 20px 圆 + `holeColor`，与真 `.coupon-line::before/after` 一致 |
+| `CardFaceScene` | 按 R3 §5.4 规格，与 `m-card-magnetic-face` 实测逐条一致；层序与斜章角度见 4.1 |
+| `PhoneMockup` | 壳内顶部应有产品顶栏。**归属校正**：红 `#e2453d` + 白字不是"B 端专属"，而是 `pages.json` globalStyle 的**全站默认**；`#f6f6f6` 浅底是 10 个页面显式覆盖（我的卡包 / 我的券包 / 次卡系列 / 券详情 / 我的商家），其中仅 3 页显式写 `navigationBarTextStyle:black`；9 页 `navigationStyle:custom` 走 `m-navigation-bar` 自绘胶囊（174×64rpx：返回 + 1×18rpx 分隔线 + 首页） |
 
 ---
 

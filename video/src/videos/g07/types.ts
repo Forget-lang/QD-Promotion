@@ -1,8 +1,6 @@
 // g07 咖啡茶饮 · 片1 · 本片 payload 形状（通用 Scene 只留分发字段，业务数据全在这里）
 // 组件在本目录 index.tsx，专属件不跨行业 import。
 
-export interface InfoBar { label: string; result: string }
-
 export interface HookPayload {
   tag: string;
   title1: string;

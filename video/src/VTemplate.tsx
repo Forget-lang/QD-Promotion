@@ -133,7 +133,7 @@ const getPresentation = (t: TransitionKey, accent: string): TransitionPresentati
     case 'reveal':
       return { component: RevealPresentation, props: { accent } };
     default:
-      return fade();
+      throw new Error(`未匹配的转场键：${t}`);
   }
 };
 
