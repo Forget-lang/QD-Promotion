@@ -76,16 +76,16 @@ jobs:
       - name: Diagnostic - facts
         run: node scripts/check-facts.mjs
         continue-on-error: true
-      - name: Render fresh g11 keyframes for pixel-level verification
+      - name: Render fresh g11 content-only keyframes for pixel-level verification
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p outputs/g11-烧烤/frames
           cd video
           for frame in 180 630 1200 1830 2460 2880; do
-            ./node_modules/.bin/remotion still src/index.tsx g11 --frame="$frame" --concurrency=2 --output="../outputs/g11-烧烤/frames/ci-safe-${frame}.png"
+            SAFE_AREA_PROBE=1 ./node_modules/.bin/remotion still src/index.tsx g11 --frame="$frame" --concurrency=2 --output="../outputs/g11-烧烤/frames/ci-safe-${frame}.png"
           done
-      - name: Upload fresh g11 frames for diagnosis
+      - name: Upload fresh g11 safe-area frames for diagnosis
         uses: actions/upload-artifact@v4
         with:
           name: g11-safe-frames-${{ github.run_number }}
