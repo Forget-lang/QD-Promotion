@@ -2,6 +2,7 @@
 
 > 状态：生效
 > 用途：索引权威关系与当前闭环状态，不新增业务规则。
+> 文档引用纪律：本账只引用当前有效路径；不保留已删除文件名、历史错误路径或“旧名→新名”的废弃话头。
 
 ## 1. 唯一主链
 
@@ -41,7 +42,7 @@ CLOSED
 | 视觉方法 | `docs/internal/R9-视觉导演与审美决策.md` | 镜头级视觉决策原则 | 生效 |
 | 视觉映射 | `docs/internal/R9-视觉映射表.md` | 叙事关系 → Remotion 视觉关系/组件 | 生效 |
 | 镜头契约 | `scripts/check-visual-shot-contract.mjs` + R9 ledger | 关键镜头的视觉主体、隐喻、Peak Frame、State Change、Exit | **检查通过** |
-| 成片验证 | `scripts/gate-all.mjs` | 统一总闸门 | **Run #64 / #65 已通过** |
+| 成片验证 | `scripts/gate-all.mjs` | 统一总闸门 | **以最新 CI 实际结果为准** |
 
 ## 3. 当前状态与已关闭事项
 
@@ -53,15 +54,15 @@ CLOSED
 - snapshot SHA-256：`d1248732f77a38c362844e242d3383fce46517f88b3ff75b2c6069694e7bd6d5`。
 - snapshot 已保存至 `spec/product-truth/applet/source.tar.xz`，Git Blob SHA：`ee34f4c2ecf397a6a43e7ecb7aa5eeb9a8f3804a`。
 - CI 已 materialize 该 snapshot，并通过 UI Truth / Facts / Doc refs / Redlines / Visual Shot Contract / gate-all。
-- **状态：CLOSED。** 历史“缺 snapshot / UI Truth 53 mismatch”只属于整改前状态，不得继续作为当前阻塞项。
+- **状态：CLOSED。** 历史整改前状态不作为当前阻塞项。
 
 ### P0-B：g11 安全区真实帧
 
 - `EmberParticles` 已完成坐标约束修复。
 - g11 `VTemplate` 生产 `sceneScale=0.76` 保持不变。
 - 安全区已改为 content-only 取证 + 左右 120px 信息安全硬边界；顶部仅诊断，合法 full-bleed 背景不判违规。
-- Run #64 / #65 已完成 fresh safe-area frames、production frames 与 gate-all 验证。
-- **状态：CLOSED。** 不得继续以旧 Run #46 无 job 明细作为当前失败依据。
+- fresh safe-area frames、production frames 与 gate-all 已完成验证；后续以最新 CI 实际结果为准。
+- **状态：CLOSED。**
 
 ## 4. 已完成且不得重新发明
 
