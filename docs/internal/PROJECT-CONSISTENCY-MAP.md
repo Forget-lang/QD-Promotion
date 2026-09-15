@@ -59,7 +59,8 @@ CLOSED
 ### P0-B：g11 安全区真实帧
 
 - 已对 `EmberParticles` 做实际坐标约束修复，使装饰粒子服从像素安全边界。
-- 尚未取得该修复后的新真实帧证据，因此本项仍未 CLOSED。
+- 已将 CI 改为在 Gate All 前从当前源码重新生成 g11 关键帧，避免旧静帧继续作为证据。
+- 尚未取得修复后的渲染证据，因此本项仍未 CLOSED。
 - 收口条件：最新渲染 → safe-area probe → 真图复核 → gate-all 对应闸门通过。
 
 ### P1：红线人工确认
@@ -85,12 +86,12 @@ Change Contract 已接入 gate-all；CLOSED 事务需要完整影响对账、机
 
 新 Agent / 新会话开始工作时，先读取本账，再读取：
 
-1. `AGENTS.md`
-2. `docs/internal/R8-变更收敛协议.md`
-3. `docs/internal/R9-视觉导演与审美决策.md`
-4. `docs/internal/R9-视觉映射表.md`
-5. `R10 产品事实源解析协议`
-6. 当前 active `docs/changes/*`（若有）
+- `AGENTS.md`
+- `docs/internal/R8-变更收敛协议.md`
+- `docs/internal/R9-视觉导演与审美决策.md`
+- `docs/internal/R9-视觉映射表.md`
+- `R10 产品事实源解析协议`
+- 当前 active `docs/changes/*`（若有）
 
 不要根据聊天历史猜测状态；以仓库文件与最新 CI 实际结果为准。
 
