@@ -1,5 +1,5 @@
 import { Composition, registerRoot, staticFile } from 'remotion';
-import { VTemplate, computeTotalFrames } from './VTemplate';
+import { VTemplate, G11SafeAreaProbe, computeTotalFrames } from './VTemplate';
 import { FPS } from './palette';
 import * as videoModules from './data';
 import { BundleOpenBench } from './bench/BundleOpenBench';
@@ -75,22 +75,22 @@ const RemotionRoot: React.FC = () => {
       <Composition id="g06-cover-dy" component={G06CoverDy} fps={FPS} width={1080} height={1920} durationInFrames={1} />
       <Composition id="g06-cover-xhs" component={G06CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
       <Composition id="g06-cover-sohu" component={G06CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
-      {/* g07 四平台封面（同规格，大字压屏系统） */}
+      {/* g07 四平台封面（大字压屏系统） */}
       <Composition id="g07-cover-dy" component={G07CoverDy} fps={FPS} width={1080} height={1920} durationInFrames={1} />
       <Composition id="g07-cover-dy43" component={G07CoverDy43} fps={FPS} width={1440} height={1080} durationInFrames={1} />
       <Composition id="g07-cover-xhs" component={G07CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
       <Composition id="g07-cover-sohu" component={G07CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
-      {/* g08 四平台封面（同规格，大字压屏系统） */}
+      {/* g08 四平台封面（大字压屏系统） */}
       <Composition id="g08-cover-dy" component={G08CoverDy} fps={FPS} width={1080} height={1920} durationInFrames={1} />
       <Composition id="g08-cover-dy43" component={G08CoverDy43} fps={FPS} width={1440} height={1080} durationInFrames={1} />
       <Composition id="g08-cover-xhs" component={G08CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
       <Composition id="g08-cover-sohu" component={G08CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
-      {/* g09 四平台封面（同规格，大字压屏系统） */}
+      {/* g09 四平台封面（大字压屏系统） */}
       <Composition id="g09-cover-dy" component={G09CoverDy} fps={FPS} width={1080} height={1920} durationInFrames={1} />
       <Composition id="g09-cover-dy43" component={G09CoverDy43} fps={FPS} width={1440} height={1080} durationInFrames={1} />
       <Composition id="g09-cover-xhs" component={G09CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
       <Composition id="g09-cover-sohu" component={G09CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
-      {/* g10 四平台封面（同规格，大字压屏系统） */}
+      {/* g10 四平台封面（大字压屏系统） */}
       <Composition id="g10-cover-dy" component={G10CoverDy} fps={FPS} width={1080} height={1920} durationInFrames={1} />
       <Composition id="g10-cover-dy43" component={G10CoverDy43} fps={FPS} width={1440} height={1080} durationInFrames={1} />
       <Composition id="g10-cover-xhs" component={G10CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
@@ -119,6 +119,16 @@ const RemotionRoot: React.FC = () => {
           defaultProps={{ video }}
         />
       ))}
+      {/* g11 安全区取证专用 Composition：与生产 g11 使用同一场景/transform，仅关闭 full-bleed 氛围层。 */}
+      <Composition
+        id="g11-safe-area-probe"
+        component={G11SafeAreaProbe}
+        fps={FPS}
+        width={1080}
+        height={1920}
+        durationInFrames={computeTotalFrames(videoModules.g11)}
+        defaultProps={{ video: videoModules.g11 }}
+      />
     </>
   );
 };
