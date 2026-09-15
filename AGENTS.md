@@ -12,7 +12,7 @@
 
 - 产品名：券到卡包（面向实体店的电子券工具：做券→发券→领券→扫码核销→统计）｜ 运营主体：郑州百桨数字科技 ｜ 工作区：`promotion/`
 - 阶段：宣传线冷启动（抖音短视频 + 小红书图文 + 搜狐长文），**无真实案例**，正文一律用行业泛称
-- 产品源码逻辑身份：`APPLET`。本机默认解析路径为 `../applet/`；跨 Agent / ChatGPT / CI 的路径规则见 `docs/internal/R10-产品事实源解析协议.md`。不得把任一绝对路径当成跨环境永久路径。
+- 产品源码逻辑身份：`APPLET`。本机默认解析路径为 `../applet/`；跨 Agent / ChatGPT / CI 的路径规则见产品事实源解析协议。不得把任一绝对路径当成跨环境永久路径。
 
 ## 二、文档在哪（每类知识只有一个真源）
 
@@ -23,7 +23,7 @@
 | **制券页字段、分组归属、上限与联动** | `spec/coupon-fields.json`——表里没有的字段/组名回 `APPLET` 源码取证并回写该行（带 `src` 行号），不得凭印象编 |
 | **次卡设置项** | `spec/card-fields.json`——表里没有的字段/组名回 `APPLET` 源码取证并回写，不得凭印象编 |
 | 业务流程 / Remotion 技术原理 / applet UI 真值 | `docs/internal/` R2 / R3 / R6 |
-| **Product Truth / applet 路径解析** | `docs/internal/R10-产品事实源解析协议.md` |
+| **Product Truth / applet 路径解析** | 产品事实源解析协议 |
 | **全局变更收敛协议** | `docs/internal/R8-变更收敛协议.md` |
 | 官网玩法蓝本 / 避雷台账 | `outputs/archive/官网资源库落地规划.md` |
 | 平台玩法组合视角 | `knowledge/玩法版图.md` |
@@ -38,7 +38,7 @@
 - **铁律二**：校验戳只写日期与指针。
 - **铁律三**：状态快照以脚本实时输出为准，不写静态规则文档。
 - **铁律四**：条款只写“做/不做”+ 一句判据；理由与过程进 changelog。
-- **铁律五**：替代型决策必须同时完成：①新口径进入唯一属主；②旧口径登记到 `scripts/ref-registry.json` 的 `deprecatedTerms` / `caliberOwners`；③ `check-doc-references` 通过。**新增不等于替代，旧口径没登记就视为未落地。**
+- **铁律五**：替代型决策必须同时完成：①新口径进入唯一属主；②旧口径登记到 `scripts/ref-registry.json` 的 `deprecatedTerms` / `caliberOwners`；③`check-doc-references` 通过。**新增不等于替代，旧口径没登记就视为未落地。**
 
 ## 三、开工三动作（每次新会话必执行）
 
