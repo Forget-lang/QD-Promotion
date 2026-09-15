@@ -1,5 +1,5 @@
 # CI contract: source-of-truth map and fresh g11 keyframes are part of verification evidence.
-# Evidence refresh: rerun this workflow on the current main revision after the latest g11 safe-area fix (sceneScale=0.94).
+# Evidence refresh: rerun this workflow on the current main revision after the latest g11 safe-area fix (sceneScale=0.76).
 name: visual-shot-contract
 
 on:
@@ -61,6 +61,9 @@ jobs:
         run: node scripts/test-visual-shot-contract-negative.mjs
       - name: Visual shot contract
         run: node scripts/check-visual-shot-contract.mjs
+      - name: Diagnostic - UI truth detail
+        run: node scripts/check-ui-truth.mjs
+        continue-on-error: true
       - name: Diagnostic - redlines
         run: node scripts/check-redlines.mjs
         continue-on-error: true
