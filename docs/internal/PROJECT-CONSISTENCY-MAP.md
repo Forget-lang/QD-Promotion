@@ -36,11 +36,11 @@ CLOSED
 |---|---|---|---|
 | 治理 | `docs/internal/R8-变更收敛协议.md` | Decision → Change Contract → Impact → Migration → Verification → CLOSED | 生效 |
 | 变更事务 | `docs/changes/*` | 实际变更的影响、迁移、验证、关闭状态 | 当前无 active transaction |
-| 产品事实 | `APPLET` + Product Truth | 产品字段、UI、流程事实 | snapshot 已重建并准备入库；等待本次提交后的 CI 验证 |
+| 产品事实 | `APPLET` + Product Truth | 产品字段、UI、流程事实 | snapshot 已重建；等待完整入库后的 CI 验证 |
 | 字段登记 | `spec/coupon-fields.json` / `spec/card-fields.json` | promotion 内可消费的字段真值登记 | 在位；必须可追溯到 APPLET |
 | 红线 | `spec/redlines.json` + `scripts/check-redlines.mjs` | 画面/口播硬禁及人工确认层 | 硬禁层无命中；人工确认层待收口 |
-| 视觉方法 | `docs/internal/R9-视觉导演与审美决策.md` | 镜头级视觉决策原则 | 生效 |
-| 视觉映射 | `docs/internal/R9-视觉映射表.md` | 叙事关系 → Remotion 视觉关系/组件 | 生效 |
+| 视觉方法 | R9 视觉导演文档 | 镜头级视觉决策原则 | 生效 |
+| 视觉映射 | R9 视觉映射表 | 叙事关系 → Remotion 视觉关系/组件 | 生效 |
 | 镜头契约 | `scripts/check-visual-shot-contract.mjs` + R9 ledger | 关键镜头的视觉主体、隐喻、Peak Frame、State Change、Exit | 已通过最近一次有效检查 |
 | 成片验证 | `scripts/gate-all.mjs` | 统一总闸门 | 等待本次 Product Truth 与 g11 画面修复后的新证据 |
 
@@ -52,14 +52,14 @@ CLOSED
 - 当前干净 snapshot 只纳入 `.vue/.js/.json`，排除 `node_modules`、`unpackage`、`uni_modules`、`.git` 与 macOS `._*` 元数据。
 - 干净 snapshot 文件数：**298**。
 - 干净 snapshot SHA-256：`d1248732f77a38c362844e242d3383fce46517f88b3ff75b2c6069694e7bd6d5`。
-- 归档位置约定：`spec/product-truth/applet/source.tar.xz`；CI 会从该归档 materialize `../applet`。
-- 收口条件：归档入主分支 → CI 解包范围/文件数核验 → `check-ui-truth` 真实验证 → gate-all 对应闸门通过。
+- 当前 Git 主分支尚未保存完整 snapshot archive；因此 Product Truth 仍不能算 CI 已验证。
+- 收口条件：完整 snapshot 入主分支 → CI 解包范围/文件数核验 → `check-ui-truth` 真实验证 → gate-all 对应闸门通过。
 - 禁止：partial snapshot、placeholder、合成 source、skip 或降低 checker。
 
 ### P0-B：g11 安全区真实帧
 
 - 已对 `EmberParticles` 做实际坐标约束修复，使装饰粒子服从像素安全边界。
-- 尚未取得该修复后的新 CI/真实帧证据，因此本项仍未 CLOSED。
+- 尚未取得该修复后的新真实帧证据，因此本项仍未 CLOSED。
 - 收口条件：最新渲染 → safe-area probe → 真图复核 → gate-all 对应闸门通过。
 
 ### P1：红线人工确认
@@ -89,7 +89,7 @@ Change Contract 已接入 gate-all；CLOSED 事务需要完整影响对账、机
 2. `docs/internal/R8-变更收敛协议.md`
 3. `docs/internal/R9-视觉导演与审美决策.md`
 4. `docs/internal/R9-视觉映射表.md`
-5. `docs/internal/R10-产品事实源解析协议.md`
+5. `R10 产品事实源解析协议`
 6. 当前 active `docs/changes/*`（若有）
 
 不要根据聊天历史猜测状态；以仓库文件与最新 CI 实际结果为准。
