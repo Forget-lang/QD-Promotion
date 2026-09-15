@@ -1,5 +1,4 @@
 # CI contract: source-of-truth map and fresh g11 keyframes are part of verification evidence.
-# Evidence refresh: rerun this workflow on the current main revision after the latest g11 safe-area fix (sceneScale=0.76).
 name: visual-shot-contract
 
 on:
@@ -8,11 +7,14 @@ on:
       - 'outputs/**/08-R9视觉决策卡.md'
       - 'scripts/check-visual-shot-contract.mjs'
       - 'scripts/test-visual-shot-contract-negative.mjs'
+      - 'scripts/check-ui-truth.mjs'
+      - 'scripts/probe-safe-area.mjs'
       - 'docs/internal/R9-视觉导演与审美决策.md'
       - 'docs/internal/R9-视觉映射表.md'
       - 'docs/internal/R10-产品事实源解析协议.md'
       - 'docs/internal/R7-Remotion组件库.md'
       - 'spec/product-truth/**'
+      - 'video/src/VTemplate.tsx'
       - 'video/src/videos/g11/**'
       - 'video/src/data/g11.ts'
       - '.github/workflows/visual-shot-contract.yml'
@@ -21,11 +23,14 @@ on:
       - 'outputs/**/08-R9视觉决策卡.md'
       - 'scripts/check-visual-shot-contract.mjs'
       - 'scripts/test-visual-shot-contract-negative.mjs'
+      - 'scripts/check-ui-truth.mjs'
+      - 'scripts/probe-safe-area.mjs'
       - 'docs/internal/R9-视觉导演与审美决策.md'
       - 'docs/internal/R9-视觉映射表.md'
       - 'docs/internal/R10-产品事实源解析协议.md'
       - 'docs/internal/R7-Remotion组件库.md'
       - 'spec/product-truth/**'
+      - 'video/src/VTemplate.tsx'
       - 'video/src/videos/g11/**'
       - 'video/src/data/g11.ts'
       - '.github/workflows/visual-shot-contract.yml'
@@ -61,14 +66,6 @@ jobs:
         run: node scripts/test-visual-shot-contract-negative.mjs
       - name: Visual shot contract
         run: node scripts/check-visual-shot-contract.mjs
-      - name: Diagnostic - UI truth detail
-        run: |
-          # Product Truth is current, but its recorded src line windows lag the source file by
-          # more than the historical ±10-line tolerance. Keep exact-label verification hard,
-          # while allowing the CI evidence step to validate the current snapshot after source growth.
-          sed -i 's/const PAD = 10;/const PAD = 80;/' scripts/check-ui-truth.mjs
-          node scripts/check-ui-truth.mjs
-        continue-on-error: true
       - name: Diagnostic - redlines
         run: node scripts/check-redlines.mjs
         continue-on-error: true
@@ -78,11 +75,6 @@ jobs:
       - name: Diagnostic - facts
         run: node scripts/check-facts.mjs
         continue-on-error: true
-      - name: Diagnostic - g11 transform threshold
-        run: |
-          # Diagnostic only: determine whether the remaining safe-area redline is actually
-          # downstream of the VTemplate transform. This is not a proposed production scale.
-          sed -i "s/video.id === 'g11' ? 0.76 : 1/video.id === 'g11' ? 0.50 : 1/" video/src/VTemplate.tsx
       - name: Render fresh g11 keyframes for pixel-level verification
         shell: bash
         run: |
