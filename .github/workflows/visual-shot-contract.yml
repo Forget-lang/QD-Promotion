@@ -1,4 +1,4 @@
-# CI contract: current source-of-truth map is validated before render evidence.
+# CI contract: source-of-truth map and fresh g11 keyframes are part of verification evidence.
 name: visual-shot-contract
 
 on:
