@@ -1,0 +1,26 @@
+name: change-contract-gate
+
+on:
+  push:
+    paths:
+      - 'docs/changes/**'
+      - 'scripts/check-change-contract.mjs'
+      - 'scripts/test-change-contract-negative.mjs'
+      - 'scripts/gate-all.mjs'
+      - '.github/workflows/change-contract-gate.yml'
+  pull_request:
+    paths:
+      - 'docs/changes/**'
+      - 'scripts/check-change-contract.mjs'
+      - 'scripts/test-change-contract-negative.mjs'
+      - 'scripts/gate-all.mjs'
+
+jobs:
+  change-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Negative test
+        run: node scripts/test-change-contract-negative.mjs
+      - name: Change contract gate
+        run: node scripts/check-change-contract.mjs
