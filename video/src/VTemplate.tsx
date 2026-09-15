@@ -20,6 +20,8 @@ import type { TransitionKey, VideoData } from './types';
 
 /** 转场时长：12 帧 = 0.4s */
 const TRANSITION_FRAMES = 12;
+/** SAFE_AREA_PROBE=1 只用于像素安全区取证：保留真实场景/字幕与 transform，去掉 full-bleed 氛围层。生产渲染不设置该变量。 */
+const SAFE_AREA_PROBE = process.env.SAFE_AREA_PROBE === '1';
 
 /** dissolve = 模糊 + 淡入淡出（真实呈现，非 fade 别名） */
 const DissolvePresentation: React.FC<TransitionPresentationComponentProps<Record<string, unknown>>> = ({
@@ -178,16 +180,15 @@ export const computeTotalFrames = (video: VideoData): number => {
 export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
   const p = PALETTES[video.style.palette];
   const presentation = getPresentation(video.style.transition, p.accent);
-  // g11 关键帧仍有大量像素侵入左右 120px 安全边带；0.94 只留 32px 余量不足以覆盖既有宽卡片。
-  // 收紧为 0.76 后，场景内容在 1080px 画布中保留约 130px 左右余量；背景与全片氛围层仍满屏。
+  // g11 生产值固定 0.76；安全区取证通过 SAFE_AREA_PROBE=1 去掉 full-bleed 氛围层，而不是继续缩小场景。
   const sceneScale = video.id === 'g11' ? 0.76 : 1;
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#0f1115' }}>
-      {/* 背景模板图（全质量显示 + Ken Burns 微动，只做氛围） */}
-      {video.style.bgImage && <KenBurnsBg src={video.style.bgImage} blur={video.style.bgBlur ?? 0} />}
+      {/* 背景模板图（全质量显示 + Ken Burns 微动，只做氛围；safe-area probe 不计 full-bleed 背景） */}
+      {!SAFE_AREA_PROBE && video.style.bgImage && <KenBurnsBg src={video.style.bgImage} blur={video.style.bgBlur ?? 0} />}
       {/* 主色调和：背景图与 UI 色系融合（soft-light 只混下层背景） */}
-      {video.style.bgImage && <AccentOverlay color={p.accent} opacity={0.18} />}
+      {!SAFE_AREA_PROBE && video.style.bgImage && <AccentOverlay color={p.accent} opacity={0.18} />}
 
       {/* 场景内容（转场 + UI 组件） */}
       <AbsoluteFill style={{ transform: `scale(${sceneScale})`, transformOrigin: 'center center' }}>
@@ -228,9 +229,9 @@ export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
         </TransitionSeries>
       </AbsoluteFill>
 
-      {/* 全片氛围层（质感三件套：暗角聚焦 + 颗粒杀色带 + 主色调和，始终挂载） */}
-      <Grain opacity={0.035} />
-      <Vignette strength={0.25} />
+      {/* 全片氛围层（质感三件套：暗角聚焦 + 颗粒杀色带 + 主色调和；safe-area probe 不计 full-bleed 氛围） */}
+      {!SAFE_AREA_PROBE && <Grain opacity={0.035} />}
+      {!SAFE_AREA_PROBE && <Vignette strength={0.25} />}
     </AbsoluteFill>
   );
 };
