@@ -1,34 +1,21 @@
 #!/usr/bin/env node
 /**
- * scripts/probe-safe-area.mjs · 文字安全区出界探针（**已接进 gate-all** 2026-09-14：对最新片静帧条件触发自动跑，无静帧跳过；仍可手动指定其它片静帧跑）
+ * scripts/probe-safe-area.mjs · 信息安全区取证探针（已接进 gate-all）
  *
- * 为什么要有它：`R3 §7.3` 定了「标题左右 padding ≥120px / 顶 ≥120px / 底 ≥160px」，
- * 而 `SKILL §三` 又要求「安全区达标与否量渲染像素，不靠读 CSS 推断」——此前没有任何工具量过像素，
- * 第十四轮那个"12 处出界"是读代码位置值读出来的，口径本身不成立。本探针补上这一量。
- * 2026-09-11 口径升级：左右 80px→120px——抖音 20:9 长屏全屏播放按屏比放大 1.18×、
- * 左右各实测裁约 82px（用户设备），iPhone 量级约 100px，80px 余量不足（教训见 project memory）。
+ * 核心目标：防止抖音发布后的横向裁边/侧边 UI 吃掉重要信息。
+ * 用户口径：信息内容要完整显示，不要明显贴着边缘；重点硬约束是左右内容安全。
  *
- * 判据口径（重要，别改成别的）：
- *   - 内容像素 = 与"边框背景色"RGB 任一通道差 > 24（与 check-motion 同一口径）
- *   - **底带不量**：R3 的"文字距底 ≥160px"与"字幕安全区 y1760~1920"是同一条 160px，
- *     字幕按设计就站在那里面。底带若照量，每一屏都出界，尺子立刻失去意义。
- *     字幕自己的问题改成单独一条：**字幕字形有没有越左右 120px 线**（越了会被抖音侧边 UI 挡）。
+ * 判据口径：
+ *   - 左/右 120px：硬闸门，检查局部内容像素是否侵入。
+ *   - 顶 120px：只做诊断记录，不作为硬失败；顶部不存在与抖音侧边裁切同等的风险，最终由真图审判断是否“明显贴边”。
+ *   - 底 160px：不量（与字幕带 y1760~1920 重合，字幕按设计位于底部带）。
+ *   - 字幕带：单独检查字形是否越左右 120px。
+ *   - full-bleed 氛围层：连续两侧高覆盖行过滤；content-only probe 优先从渲染入口去掉合法全屏背景。
  *
- * 为什么光数边带像素不能定罪（第一版实测踩到的）：R3 这条量的是**文字**出界，而我们的背景是
- * 全幅铺满的纸纹素材，纹理、光晕、装饰件与背景的差都 >24，会全部计进边带，把"背景铺满"误判成
- * "标题越界"。因此本探针同时输出两组更保守的量：
- *   - 墨级像素：与背景最大通道差 > INK_T(100)，近似只有深色文字 / 高饱和实色块会命中
- *   - 剖面：对每条边带输出"有墨的连续行（或列）区间"，据此在真图上指认到底是哪个元素越界
- * 边带像素计数保留作粗筛，**结论以墨级 + 剖面 + 真图三者对齐为准**。
+ * 这不是“所有像素离边缘必须 120px”的审美尺子，而是捕捉明确会影响信息可见性的危险侵入。
+ * 机器发现红灯后必须回真图确认是文字/实色信息，再决定是否修改；不为过机器而缩小整片。
  *
- * 2026-09-15 修正：VTemplate 的背景/暗角/颗粒/主色统调属于合法的 full-bleed 氛围层，且位于安全区探针之外的
- * "文字"对象语义范围。它们会在边带形成连续的 100+ RGB 差，不能被当成文字越界。现在对**连续整行的边带高覆盖墨级**
- * 做 full-bleed 过滤：当某行左/右边带均达到 75% 覆盖，视为全幅氛围层贡献；只有局部墨级仍进入判定。这样不改变
- * 120px 几何边界，也不靠 CSS 推断；同时保留行剖面，方便真图复核。字幕带采用同一过滤，避免全屏氛围层污染字幕字形判定。
- *
- * 用法：node scripts/probe-safe-area.mjs [--ink 100] outputs/gXX-行业/frames/片N/*.png
- * 退出码：有**局部墨级**像素侵入左/右 120px 或顶 120px 边带，或字幕字形局部越左右线 → 1；否则 0。
- *         **仅供人判取证，不代表成片合格。**
+ * 用法：node scripts/probe-safe-area.mjs [--ink 100] outputs/gXX-行业/frames/*.png
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
@@ -39,9 +26,9 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const FFMPEG = join(ROOT, 'video/node_modules/ffmpeg-static/ffmpeg');
 const W = 1080, H = 1920;
 const SAFE = { side: 120, top: 120, bottom: 160 };
-const SUB = { y0: 1760, y1: 1920 };   // 字幕带，整带排除
+const SUB = { y0: 1760, y1: 1920 };
 const BG_T = 24;
-const FULL_BLEED_RATIO = 0.75; // 两侧边带同一行均达到 75% 墨级覆盖时，判作 full-bleed 氛围贡献
+const FULL_BLEED_RATIO = 0.75;
 
 const files = process.argv.slice(2).filter((a) => !a.startsWith('--'));
 const inkArg = process.argv.indexOf('--ink');
@@ -56,7 +43,6 @@ function decode(p) {
   return r.stdout;
 }
 
-/** 边框背景色：取四边各 4 圈的像素，逐通道中位数 */
 function bgColor(px) {
   const b = [];
   for (let x = 0; x < W; x++) for (const y of [0, 1, 2, 3, H - 4, H - 3, H - 2, H - 1]) b.push([x, y]);
@@ -68,7 +54,6 @@ function bgColor(px) {
 const diff = (px, i, bg) => Math.max(
   Math.abs(px[i * 3] - bg[0]), Math.abs(px[i * 3 + 1] - bg[1]), Math.abs(px[i * 3 + 2] - bg[2]));
 
-/** 把"有内容的连续索引"压成区间列表（用于指认越界元素所在的行/列） */
 function runs(counts, min) {
   const out = [];
   let s = -1, peak = 0;
@@ -83,7 +68,7 @@ const fmt = (rs, min) => rs.filter((r) => r.peak >= min)
   .map((r) => `${r.from}-${r.to}(峰值${r.peak})`).join(' ') || '—';
 
 let anyFail = false;
-console.log(`\n══════ 文字安全区探针 ══════\n边带：左/右 ${SAFE.side}px｜顶 ${SAFE.top}px｜底 ${SAFE.bottom}px **不量**（与字幕带 y${SUB.y0}-${SUB.y1} 完全重合，R3 字幕本就站在那 160px 里）\n字幕带：只查字形有没有越左右 ${SAFE.side}px 线\n判据：粗筛=与背景差>${BG_T}（含背景纹理与装饰件，**不定罪**）；定罪=局部墨级差>${INK_T}（full-bleed 连续行过滤）\n`);
+console.log(`\n══════ 信息安全区探针 ══════\n硬闸门：左/右 ${SAFE.side}px（防抖音侧边裁切/遮挡）\n诊断：顶部 ${SAFE.top}px（不单独定罪，最终看真图是否明显贴边）\n底部 ${SAFE.bottom}px 不量｜字幕带：只查字形有没有越左右 ${SAFE.side}px 线\n判据：粗筛=与背景差>${BG_T}；定罪=局部墨级差>${INK_T}；full-bleed 连续行过滤\n`);
 
 for (const p of files) {
   const px = decode(p), bg = bgColor(px);
@@ -121,7 +106,6 @@ for (const p of files) {
     }
   }
 
-  // full-bleed 氛围层：同一行两侧都大面积命中时，不把整幅背景/暗角/颗粒当作文字。
   let filteredLeft = 0, filteredRight = 0;
   for (let y = SAFE.top; y < SUB.y0; y++) {
     if (rowL[y] >= SAFE.side * FULL_BLEED_RATIO && rowR[y] >= SAFE.side * FULL_BLEED_RATIO) {
@@ -144,14 +128,15 @@ for (const p of files) {
   subInk = 0;
   for (let y = SUB.y0; y < SUB.y1; y++) subInk += subRowL[y] + subRowR[y];
 
-  const fail = Object.values(ink).some((n) => n > 0) || subInk > 0;
+  // 只有左右边带和字幕字形越线属于本探针硬失败；顶部保留诊断信息，交给真图审判断“明显贴边”。
+  const fail = ink.left > 0 || ink.right > 0 || subInk > 0;
   anyFail ||= fail;
   const total = W * H;
   const pct = (n) => (n / total * 100).toFixed(3);
-  console.log(`${fail ? '❌' : '✅'} ${p.split('/').pop().padEnd(26)}\n   粗筛 左${pct(loose.left)}% 右${pct(loose.right)}% 顶${pct(loose.top)}%（含背景纹理，不定罪）\n   墨级 左${pct(ink.left)}% 右${pct(ink.right)}% 顶${pct(ink.top)}% 底 不计${fail ? '  ← 定罪' : ''}\n   full-bleed 过滤 左${filteredLeft} 右${filteredRight}｜字幕带过滤 ${subFiltered}\n   左带行区间 ${fmt(runs(rowL, 2), 8)}\n   右带行区间 ${fmt(runs(rowR, 2), 8)}\n   顶带列区间 ${fmt(runs(colT, 2), 8)}\n   字幕带 ${subInk ? `❌ 局部字形越左右线 ${subInk} 墨级像素（粗筛 ${subWide}）` : `✅ 未见局部字形越左右线（粗筛 ${subWide} 像素；full-bleed 过滤 ${subFiltered}）`}\n`);
+  console.log(`${fail ? '❌' : '✅'} ${p.split('/').pop().padEnd(26)}\n   粗筛 左${pct(loose.left)}% 右${pct(loose.right)}% 顶${pct(loose.top)}%（顶仅诊断）\n   墨级 左${pct(ink.left)}% 右${pct(ink.right)}% 顶${pct(ink.top)}%（顶仅诊断）\n   full-bleed 过滤 左${filteredLeft} 右${filteredRight}｜字幕带过滤 ${subFiltered}\n   左带行区间 ${fmt(runs(rowL, 2), 8)}\n   右带行区间 ${fmt(runs(rowR, 2), 8)}\n   顶带列区间 ${fmt(runs(colT, 2), 8)}\n   字幕带 ${subInk ? `❌ 局部字形越左右线 ${subInk} 墨级像素（粗筛 ${subWide}）` : `✅ 未见局部字形越左右线（粗筛 ${subWide} 像素；full-bleed 过滤 ${subFiltered}）`}\n`);
 }
 
 console.log(anyFail
-  ? `\n❌ 至少一屏仍有局部墨级像素侵入安全边带。full-bleed 连续行已排除背景/暗角等全幅氛围层；剩余行/列区间须与真图对齐，确认是文字/实色内容后再修。`
-  : `\n✅ 全部样本未见局部墨级像素侵入安全边带（全幅氛围层已按像素覆盖过滤）。不替代真图审。`);
+  ? `\n❌ 至少一屏有信息内容侵入左右安全边带或字幕字形越线。请回真图确认后修正，不为过闸门盲目缩小整片。`
+  : `\n✅ 全部样本未见信息内容侵入左右安全边带；顶部仅作诊断，最终由真图审确认是否明显贴边。`);
 process.exit(anyFail ? 1 : 0);
