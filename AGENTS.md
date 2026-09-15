@@ -12,7 +12,7 @@
 
 - 产品名：券到卡包（面向实体店的电子券工具：做券→发券→领券→扫码核销→统计）｜ 运营主体：郑州百桨数字科技 ｜ 工作区：`promotion/`
 - 阶段：宣传线冷启动（抖音短视频 + 小红书图文 + 搜狐长文），**无真实案例**，正文一律用行业泛称
-- 产品源码位于 `../applet/`，功能有疑问直接查代码验证
+- 产品源码逻辑身份：`APPLET`。本机默认解析路径为 `../applet/`；跨 Agent / ChatGPT / CI 的路径规则见 `docs/internal/R10-产品事实源解析协议.md`。不得把任一绝对路径当成跨环境永久路径。
 
 ## 二、文档在哪（每类知识只有一个真源）
 
@@ -20,9 +20,10 @@
 |---|---|
 | 怎么做一条宣传视频（**唯一作业文档**，八步法） | `SKILL.md` |
 | 产品事实 / 平台红线 / 素材登记 | `spec/facts.json` / `spec/redlines.json` / `spec/assets.json` |
-| **制券页字段、分组归属、上限与联动** | `spec/coupon-fields.json`——表里没有的字段/组名回 `../applet/` 源码取证并回写该行（带 `src` 行号），不得凭印象编 |
-| **次卡设置项** | `spec/card-fields.json`——表里没有的字段/组名回 `../applet/` 源码取证并回写，不得凭印象编 |
+| **制券页字段、分组归属、上限与联动** | `spec/coupon-fields.json`——表里没有的字段/组名回 `APPLET` 源码取证并回写该行（带 `src` 行号），不得凭印象编 |
+| **次卡设置项** | `spec/card-fields.json`——表里没有的字段/组名回 `APPLET` 源码取证并回写，不得凭印象编 |
 | 业务流程 / Remotion 技术原理 / applet UI 真值 | `docs/internal/` R2 / R3 / R6 |
+| **Product Truth / applet 路径解析** | `docs/internal/R10-产品事实源解析协议.md` |
 | **全局变更收敛协议** | `docs/internal/R8-变更收敛协议.md` |
 | 官网玩法蓝本 / 避雷台账 | `outputs/archive/官网资源库落地规划.md` |
 | 平台玩法组合视角 | `knowledge/玩法版图.md` |
@@ -68,6 +69,7 @@
 - **审批必须给真图**：逐屏关键帧/短片，不交纯文字想象稿。
 - 改任何权威文档后：跑 `node scripts/gate-all.mjs` + 在 changelog 顶部追加一条。
 - 新片不得无理由复用上一条行业的布局架构；由现有 `check-layout-diversity` 约束。
+- **APPLET 协作规则**：产品源码的逻辑身份永远是 `APPLET`；本机 live source 优先，CI 使用 committed snapshot materialized 到 `../applet`；snapshot 与最新 live source 不一致时必须重新生成 snapshot，不得静默接受旧快照。
 
 ## 六、目录
 
@@ -76,11 +78,15 @@ promotion/
 ├── AGENTS.md
 ├── SKILL.md
 ├── spec/
+│   └── product-truth/
 ├── docs/internal/
 │   ├── R2-业务流程.md
 │   ├── R3-Remotion技术参考.md
 │   ├── R6-applet前端UI储备.md
-│   └── R8-变更收敛协议.md
+│   ├── R8-变更收敛协议.md
+│   ├── R9-视觉导演与审美决策.md
+│   ├── R9-视觉映射表.md
+│   └── R10-产品事实源解析协议.md
 ├── scripts/
 ├── video/
 ├── 商用字体/ 图标素材/ 截图素材/ 插图库/ 背景素材/
