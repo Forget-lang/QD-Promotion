@@ -83,6 +83,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          rm -rf outputs/g11-烧烤/frames
           mkdir -p outputs/g11-烧烤/frames
           cd video
           for frame in 180 630 1200 1830 2460 2880; do
