@@ -24,8 +24,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Materialize APPLET product truth
-        run: node scripts/materialize-applet-truth.mjs
       - name: Negative test
         run: node scripts/test-change-contract-negative.mjs
       - name: Change contract gate
