@@ -8,6 +8,7 @@ on:
       - 'scripts/test-visual-shot-contract-negative.mjs'
       - 'docs/internal/R9-视觉导演与审美决策.md'
       - 'docs/internal/R9-视觉映射表.md'
+      - 'docs/internal/R10-产品事实源解析协议.md'
       - 'docs/internal/R7-Remotion组件库.md'
       - '.github/workflows/visual-shot-contract.yml'
   pull_request:
@@ -17,6 +18,7 @@ on:
       - 'scripts/test-visual-shot-contract-negative.mjs'
       - 'docs/internal/R9-视觉导演与审美决策.md'
       - 'docs/internal/R9-视觉映射表.md'
+      - 'docs/internal/R10-产品事实源解析协议.md'
       - 'docs/internal/R7-Remotion组件库.md'
       - '.github/workflows/visual-shot-contract.yml'
 
@@ -33,6 +35,9 @@ jobs:
         run: node scripts/check-visual-shot-contract.mjs
       - name: Diagnostic - redlines
         run: node scripts/check-redlines.mjs
+        continue-on-error: true
+      - name: Diagnostic - doc references
+        run: node scripts/check-doc-references.mjs
         continue-on-error: true
       - name: Diagnostic - facts
         run: node scripts/check-facts.mjs
