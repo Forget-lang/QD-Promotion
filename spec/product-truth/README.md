@@ -2,16 +2,36 @@
 
 本目录保存可提交、可追溯的 `APPLET` 产品源码快照。
 
-## 约束
+## 当前已核验基准
 
-- 快照来源必须有源 archive SHA-256。
-- 快照必须覆盖用于产品事实验证的完整源码集合，而不是人工摘录的字符串表。
-- 每个 materialized 文件必须保留源路径、内容 SHA-256 与字节数。
-- CI 必须先 materialize 快照到 `../applet`，再运行 `check-ui-truth.mjs`。
-- 快照与本机 live `APPLET` 不一致时，以最新产品源码为准并重新生成快照。
-- 禁止用不完整、合成或人工改写的内容冒充源码快照。
+- 原始输入：`applet.zip`
+- 原始 archive SHA-256：`afb1b0385cf167392eb78b2031d104b714134d72697a1e735d6d4313e6ca1ad7`
+- Snapshot 文件数：**299**
+- Snapshot archive SHA-256：`259fb2aa05c40f3e626e0d733c634e38bdec839860dd13b352193aa66fc9f59b`
+- Snapshot 范围：仅 `.vue` / `.js` / `.json`；排除 `node_modules`、`unpackage`、`uni_modules`、macOS `._*` 元数据。
 
-当前会话已核验的源 archive SHA-256：
-`afb1b0385cf167392eb78b2031d104b714134d72697a1e735d6d4313e6ca1ad7`
+## 正式提交要求
 
-当前仓库尚未提交完整源码快照包，因此 CI 在快照 materialize 完成前继续保持 `check-ui-truth` 缺源失败。这是有意保留的硬闸门，不是豁免。
+正式提交必须满足：
+
+1. Snapshot 与上述 SHA-256 完全一致；
+2. 解包后文件数为 299；
+3. 每个 materialized 文件保留源路径、内容 SHA-256 与字节数，并可追溯回本次 `applet.zip`；
+4. `spec/coupon-fields.json` 与 `spec/card-fields.json` 的 `src` 行段均能回溯到 materialized APPLET；
+5. CI 使用现有 `check-ui-truth.mjs` 验证，不降低验证等级、不跳过、不伪造 source。
+
+## CI 约定
+
+CI 将已提交的完整 Product Truth Snapshot materialize 为逻辑源 `../applet`，再运行 UI Truth 检查。`../applet` 只是执行环境中的物理解析路径，不是项目事实源名称。
+
+在完整 Snapshot 尚未提交前，`check-ui-truth` 必须保持硬失败；不得用 placeholder、partial snapshot、合成内容或 skip 使 Gate 变绿。
+
+## Agent 接续
+
+新的 Agent 不应根据聊天历史猜测 APPLET 状态。先读取：
+
+- `docs/internal/PROJECT-CONSISTENCY-MAP.md`
+- `docs/internal/R10-产品事实源解析协议.md`
+- 本文件
+
+然后以实际 Snapshot 文件、SHA-256 和 CI 结果为准。
