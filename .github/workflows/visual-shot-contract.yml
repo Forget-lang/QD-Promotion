@@ -1,4 +1,5 @@
 # CI contract: source-of-truth map and fresh g11 keyframes are part of verification evidence.
+# Evidence refresh: rerun this workflow on the current main revision after the latest g11 safe-area fix.
 name: visual-shot-contract
 
 on:
