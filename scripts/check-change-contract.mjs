@@ -27,6 +27,8 @@ const requiredHeadings = [
   '## 十二、Closure Report',
 ];
 
+const allowedStates = new Set(['PROPOSED', 'APPROVED', 'MIGRATING', 'VERIFYING', 'CLOSED']);
+
 function fail(message) {
   console.error(`CHANGE-CONTRACT FAIL: ${message}`);
   process.exitCode = 1;
@@ -63,19 +65,32 @@ for (const file of files) {
   if (!statusMatch) {
     errors += 1;
     console.error(`${file}: missing status`);
+  } else if (!allowedStates.has(statusMatch[1])) {
+    errors += 1;
+    console.error(`${file}: invalid status ${statusMatch[1]}`);
+  }
+
+  const impactSection = text.match(/## 七、Impact Map([\s\S]*?)(?=\n## 八、|$)/)?.[1] ?? '';
+  const pendingImpactRows = impactSection
+    .split('\n')
+    .filter((line) => line.trim().startsWith('|') && /\|\s*PENDING\s*\|\s*$/.test(line));
+  if (pendingImpactRows.length) {
+    errors += pendingImpactRows.length;
+    console.error(`${file}: impact map still contains ${pendingImpactRows.length} PENDING row(s)`);
   }
 
   if (/\*\*结论：CLOSED\*\*/.test(text)) {
-    for (const marker of ['旧口径扫描：PASS', '机械检查：PASS', '负向测试：PASS', '语义反例：PASS']) {
+    const mustPass = ['旧口径扫描：PASS', '机械检查：PASS', '负向测试：PASS', '语义反例：PASS', '本次新增红：0'];
+    for (const marker of mustPass) {
       if (!text.includes(marker)) {
         errors += 1;
         console.error(`${file}: CLOSED but missing ${marker}`);
       }
     }
-  }
-
-  if (/## 七、Impact Map[\s\S]*PENDING/.test(text)) {
-    console.error(`${file}: impact map still contains PENDING rows`);
+    if (!/- 状态：`CLOSED`/.test(text)) {
+      errors += 1;
+      console.error(`${file}: conclusion is CLOSED but status is not CLOSED`);
+    }
   }
 }
 
