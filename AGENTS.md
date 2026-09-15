@@ -22,11 +22,14 @@
 | 产品事实 / 平台红线 / 素材登记 | `spec/facts.json` / `spec/redlines.json` / `spec/assets.json` |
 | **制券页字段、分组归属、上限与联动** | `spec/coupon-fields.json`——表里没有的字段/组名回 `APPLET` 源码取证并回写该行（带 `src` 行号），不得凭印象编 |
 | **次卡设置项** | `spec/card-fields.json`——表里没有的字段/组名回 `APPLET` 源码取证并回写，不得凭印象编 |
-| 业务流程 / Remotion 技术原理 / applet UI 真值 | `docs/internal/` R2 / R3 / R6 |
-| **Product Truth / applet 路径解析** | 产品事实源解析协议 |
+| 业务流程说明 | `docs/internal/R2-业务流程.md`（只负责业务链路解释；不是 AI 开工必读入口，也不拥有产品字段真值） |
+| Remotion 技术原理 | `docs/internal/R3-Remotion技术参考.md` |
+| applet UI 视觉快照 | `docs/internal/R6-applet前端UI储备.md`（视觉参考；事实以 APPLET / Product Truth 为准） |
+| **Product Truth / applet 路径解析** | `docs/internal/R10-产品事实源解析协议.md` |
 | **全局变更收敛协议** | `docs/internal/R8-变更收敛协议.md` |
-| 官网玩法蓝本 / 避雷台账 | `outputs/archive/官网资源库落地规划.md` |
-| 平台玩法组合视角 | `knowledge/玩法版图.md` |
+| 视觉导演 / 视觉映射 | `docs/internal/R9-视觉导演与审美决策.md` / `docs/internal/R9-视觉映射表.md` |
+| 官网玩法蓝本 / 避雷台账 | `outputs/archive/官网资源库落地规划.md`（历史/参考，不是当前作业入口） |
+| 平台玩法组合视角 | `knowledge/玩法版图.md`（知识参考，不是规则 Owner） |
 | 项目总览 / 人机协作方法 | `docs/战略简报.md` / `docs/AI使用手册.md` |
 | 近期决策与踩坑 | `outputs/archive/changelog.md` 顶部约 10 条 |
 | 组件 / 素材 / 已产出片实时清单 | `node scripts/list-assets.mjs` |
@@ -40,8 +43,10 @@
 - **铁律四**：条款只写“做/不做”+ 一句判据；理由与过程进 changelog。
 - **铁律五**：替代型决策必须同时完成：①新口径进入唯一属主；②旧口径登记到 `scripts/ref-registry.json` 的 `deprecatedTerms` / `caliberOwners`；③`check-doc-references` 通过。**新增不等于替代，旧口径没登记就视为未落地。**
 - **铁律六（最高危险信号）**：任何整改如果出现“同一概念多个 Owner、多个当前入口、规则正文互相冲突、历史文档被当成当前规则、通过新增文档解决已有规则冲突、或为了迎合检查器而迁就错误语义”，立即停止继续改文档，先回到 Owner/冲突审计；**整改不得增加系统复杂度**。
-- **铁律七（唯一作业主干）**：`SKILL.md` 是唯一视频生产作业流程；R2/R3/R6/R9/R10 是各自领域的参考/协议 Owner，不得再创建第二套视频制作流程。R8 只在发生全局变更时作为治理覆盖层，不是第二套生产流程。
+- **铁律七（唯一作业主干）**：`SKILL.md` 是唯一视频生产作业流程；R2/R3/R6/R9/R10 各自只负责已经定义的领域，不得再创建第二套视频制作流程。R8 只在发生全局变更时作为治理覆盖层，不是第二套生产流程。
 - **铁律八（历史与当前彻底分离）**：`outputs/archive/` 与 `changelog` 不得成为当前作业入口；历史材料只能作为证据/参考。当前规则必须回到其唯一 Owner。
+- **铁律九（AI 读取顺序）**：正常开工只沿 `AGENTS → SKILL → 当前任务对应 Owner → 输出 → Gate` 主线读取；不要为了“完整”遍历全部内部文档。只有任务确实涉及对应领域时，才读取 R2/R3/R6/R8/R9/R10。发生全局变更时才进入 R8 覆盖流程。
+- **铁律十（权威声明最小化）**：只有真正拥有该概念的 Owner 才能使用“以本文为准 / 唯一真源 / 权威 / 必须”等权威表述；非 Owner 文档不得重新定义同一概念，只能引用、解释或指向 Owner。
 
 ## 三、开工三动作（每次新会话必执行）
 
