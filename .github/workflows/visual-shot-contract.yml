@@ -69,8 +69,9 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p outputs/g11-烧烤/frames
+          cd video
           for frame in 180 630 1200 1830 2460 2880; do
-            npx remotion still src/index.tsx g11 --frame="$frame" --output="../outputs/g11-烧烤/frames/ci-safe-${frame}.png"
+            ./node_modules/.bin/remotion still src/index.tsx g11 --frame="$frame" --output="../outputs/g11-烧烤/frames/ci-safe-${frame}.png"
           done
       - name: Gate all
         run: node scripts/gate-all.mjs
