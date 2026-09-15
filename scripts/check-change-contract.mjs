@@ -5,6 +5,9 @@
  * Purpose: prevent a global change from being declared complete while its
  * migration contract is incomplete. This check is intentionally structural;
  * semantic review and real-frame review remain separate gates.
+ *
+ * Important: section numbers are presentation, not identity. Governance
+ * sections may be inserted without invalidating the contract shape.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -12,19 +15,19 @@ import path from 'node:path';
 const root = process.cwd();
 const activeDir = path.join(root, 'docs', 'changes', 'active');
 
-const requiredHeadings = [
-  '## 一、基本信息',
-  '## 二、Goal',
-  '## 三、新口径 New Policy',
-  '## 四、Replace',
-  '## 五、Remove',
-  '## 六、Preserve',
-  '## 七、Impact Map',
-  '## 八、Migration Plan',
-  '## 九、Mechanical Checks',
-  '## 十、Negative / Semantic Counterexample',
-  '## 十一、Real Output Verification',
-  '## 十二、Closure Report',
+const requiredHeadingNames = [
+  '基本信息',
+  'Goal',
+  '新口径 New Policy',
+  'Replace',
+  'Remove',
+  'Preserve',
+  'Impact Map',
+  'Migration Plan',
+  'Mechanical Checks',
+  'Negative / Semantic Counterexample',
+  'Real Output Verification',
+  'Closure Report',
 ];
 
 const allowedStates = new Set(['PROPOSED', 'APPROVED', 'MIGRATING', 'VERIFYING', 'CLOSED']);
@@ -54,10 +57,11 @@ for (const file of files) {
   const fullPath = path.join(activeDir, file);
   const text = fs.readFileSync(fullPath, 'utf8');
 
-  for (const heading of requiredHeadings) {
-    if (!text.includes(heading)) {
+  for (const headingName of requiredHeadingNames) {
+    const headingRe = new RegExp(`^##\\s+\\S+\\s+${headingName.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}\\s*$`, 'm');
+    if (!headingRe.test(text)) {
       errors += 1;
-      console.error(`${file}: missing ${heading}`);
+      console.error(`${file}: missing heading ${headingName}`);
     }
   }
 
@@ -70,8 +74,12 @@ for (const file of files) {
     console.error(`${file}: invalid status ${statusMatch[1]}`);
   }
 
-  const impactSection = text.match(/## 七、Impact Map([\s\S]*?)(?=\n## 八、|$)/)?.[1] ?? '';
-  const pendingImpactRows = impactSection
+  const impactStart = text.match(/^##\s+\S+\s+Impact Map\s*$/m);
+  const nextHeading = impactStart ? text.slice(impactStart.index + impactStart[0].length).match(/^##\s+/m) : null;
+  const impactBody = impactStart
+    ? text.slice(impactStart.index + impactStart[0].length, impactStart.index + impactStart[0].length + (nextHeading?.index ?? text.length))
+    : '';
+  const pendingImpactRows = impactBody
     .split('\n')
     .filter((line) => line.trim().startsWith('|') && /\|\s*PENDING\s*\|\s*$/.test(line));
   if (pendingImpactRows.length) {
