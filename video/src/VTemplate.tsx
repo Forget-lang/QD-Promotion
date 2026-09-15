@@ -56,7 +56,6 @@ const PopPresentation: React.FC<TransitionPresentationComponentProps<Record<stri
   children, presentationProgress: p, presentationDirection,
 }) => {
   const entering = presentationDirection === 'entering';
-  // sin(π·p) 在中段过冲到 1.12 再回落到 1，模拟 spring 过冲
   const enterScale = 0.85 + 0.15 * p + 0.12 * Math.sin(Math.PI * p);
   return (
     <AbsoluteFill style={{
@@ -68,11 +67,7 @@ const PopPresentation: React.FC<TransitionPresentationComponentProps<Record<stri
   );
 };
 
-/**
- * reveal = 有机曲边扫过揭示（母题转场基座，2026-09-03 用户拍板）
- * 进入侧被 S 形曲边从左向右揭示，边缘带主色描边（强度随 sin(πp) 起落）；
- * 行业专属边缘形态（撕边/压落等）片 2 起在此骨架上按母题扩展。
- */
+/** reveal = 有机曲边扫过揭示（母题转场基座，2026-09-03 用户拍板） */
 const REVEAL_W = 1080;
 const REVEAL_H = 1920;
 
@@ -137,17 +132,6 @@ const getPresentation = (t: TransitionKey, accent: string): TransitionPresentati
   }
 };
 
-/**
- * 带尾音淡出的 Audio 组件（J-cut 上句淡出 · B 方案）
- *
- * 延迟开口实现：用 Sequence 包裹 Audio，from={voiceOffsetFrames}
- *   - Audio 在 Sequence 内部从第 0 帧开始播放完整音频（首字不丢）
- *   - Sequence 的 from 决定音频何时开始（真正的延迟播放）
- *   - 音量曲线基于 Sequence 内部帧号（从 0 开始的音频时间轴）
- *
- * 淡出起点（B 方案）：从「语音实际结束点」开始线性降到 0，尾字零削波；
- * 数据未回填 voiceDur 时退回旧逻辑（最后 12 帧固定淡出）。
- */
 const FadingAudio: React.FC<{
   src: string;
   sceneDurationInFrames: number;
@@ -194,8 +178,9 @@ export const computeTotalFrames = (video: VideoData): number => {
 export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
   const p = PALETTES[video.style.palette];
   const presentation = getPresentation(video.style.transition, p.accent);
-  // g11 的屏内排版需要同时满足像素实测安全区与 20:9 裁边余量；只收缩场景内容，背景仍保持满屏。
-  const sceneScale = video.id === 'g11' ? 0.94 : 1;
+  // g11 关键帧仍有大量像素侵入左右 120px 安全边带；0.94 只留 32px 余量不足以覆盖既有宽卡片。
+  // 收紧为 0.76 后，场景内容在 1080px 画布中保留约 130px 左右余量；背景与全片氛围层仍满屏。
+  const sceneScale = video.id === 'g11' ? 0.76 : 1;
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#0f1115' }}>
