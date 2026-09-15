@@ -1,5 +1,5 @@
 # CI contract: source-of-truth map and fresh g11 keyframes are part of verification evidence.
-# 2026-09-15 convergence run: verify Product Truth, local pixel probe, and production g11 scale together.
+# 2026-09-15 convergence run: verify Product Truth, side-crop safety, and production g11 scale together.
 # Safe-area evidence: content-only probe removes full-bleed atmosphere; production render remains unchanged.
 name: visual-shot-contract
 
@@ -101,3 +101,20 @@ jobs:
         continue-on-error: true
       - name: Gate all
         run: node scripts/gate-all.mjs
+      - name: Render fresh production g11 keyframes for visual review
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf outputs/g11-烧烤/final-frames
+          mkdir -p outputs/g11-烧烤/final-frames
+          cd video
+          for frame in 180 630 1200 1830 2460 2880; do
+            ./node_modules/.bin/remotion still src/index.tsx g11 --frame="$frame" --concurrency=2 --output="../outputs/g11-烧烤/final-frames/ci-final-${frame}.png"
+          done
+      - name: Upload fresh production g11 frames for visual review
+        uses: actions/upload-artifact@v4
+        with:
+          name: g11-final-frames-${{ github.run_number }}
+          path: outputs/g11-烧烤/final-frames/ci-final-*.png
+          if-no-files-found: error
+          retention-days: 3
