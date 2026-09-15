@@ -82,7 +82,7 @@ for (const file of files) {
   const impactBody = nextHeadingIndex >= 0 ? impactTail.slice(0, nextHeadingIndex) : impactTail;
   const pendingImpactRows = impactBody
     .split('\n')
-    .filter((line) => line.trim().startsWith('|') && /\|\s*PENDING\s*\|\s*$/.test(line));
+    .filter((line) => line.trim().startsWith('|') && /\|\s*\*{0,2}PENDING\*{0,2}\s*\|\s*$/.test(line));
   if (pendingImpactRows.length) {
     errors += pendingImpactRows.length;
     console.error(`${file}: impact map still contains ${pendingImpactRows.length} PENDING row(s)`);
