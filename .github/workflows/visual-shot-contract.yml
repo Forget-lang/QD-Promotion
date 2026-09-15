@@ -12,6 +12,8 @@ on:
       - 'docs/internal/R10-产品事实源解析协议.md'
       - 'docs/internal/R7-Remotion组件库.md'
       - 'spec/product-truth/**'
+      - 'video/src/videos/g11/**'
+      - 'video/src/data/g11.ts'
       - '.github/workflows/visual-shot-contract.yml'
   pull_request:
     paths:
@@ -23,6 +25,8 @@ on:
       - 'docs/internal/R10-产品事实源解析协议.md'
       - 'docs/internal/R7-Remotion组件库.md'
       - 'spec/product-truth/**'
+      - 'video/src/videos/g11/**'
+      - 'video/src/data/g11.ts'
       - '.github/workflows/visual-shot-contract.yml'
 
 jobs:
