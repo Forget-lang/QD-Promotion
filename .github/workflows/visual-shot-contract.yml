@@ -6,6 +6,8 @@ on:
       - 'outputs/**/08-R9视觉决策卡.md'
       - 'scripts/check-visual-shot-contract.mjs'
       - 'scripts/test-visual-shot-contract-negative.mjs'
+      - 'scripts/materialize-applet-truth.mjs'
+      - 'spec/product-truth/applet-snapshot.json'
       - 'docs/internal/R9-视觉导演与审美决策.md'
       - 'docs/internal/R9-视觉映射表.md'
       - 'docs/internal/R7-Remotion组件库.md'
@@ -15,6 +17,8 @@ on:
       - 'outputs/**/08-R9视觉决策卡.md'
       - 'scripts/check-visual-shot-contract.mjs'
       - 'scripts/test-visual-shot-contract-negative.mjs'
+      - 'scripts/materialize-applet-truth.mjs'
+      - 'spec/product-truth/applet-snapshot.json'
       - 'docs/internal/R9-视觉导演与审美决策.md'
       - 'docs/internal/R9-视觉映射表.md'
       - 'docs/internal/R7-Remotion组件库.md'
@@ -25,6 +29,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Materialize APPLET product truth
+        run: node scripts/materialize-applet-truth.mjs
       - name: Negative test
         run: node scripts/test-visual-shot-contract-negative.mjs
       - name: Visual shot contract
