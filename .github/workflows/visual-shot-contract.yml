@@ -1,5 +1,6 @@
 # CI contract: source-of-truth map and fresh g11 keyframes are part of verification evidence.
 # 2026-09-15 convergence run: verify Product Truth, local pixel probe, and production g11 scale together.
+# Safe-area evidence: content-only probe removes full-bleed atmosphere; production render remains unchanged.
 name: visual-shot-contract
 
 on:
