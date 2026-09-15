@@ -33,7 +33,8 @@ if (result.status === 0) {
 }
 
 const output = `${result.stdout}${result.stderr}`;
-if (!output.includes('PENDING') || !output.includes('2 PENDING row(s)')) {
+const pendingMatches = output.match(/impact map still contains \d+ PENDING row\(s\)/g) || [];
+if (pendingMatches.length !== 2) {
   console.error('NEGATIVE TEST FAIL: checker did not reject both plain and bold PENDING rows.');
   process.exit(1);
 }
