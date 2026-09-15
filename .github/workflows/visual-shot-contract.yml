@@ -1,0 +1,33 @@
+name: visual-shot-contract
+
+on:
+  push:
+    paths:
+      - 'outputs/**/08-R9视觉决策卡.md'
+      - 'scripts/check-visual-shot-contract.mjs'
+      - 'scripts/test-visual-shot-contract-negative.mjs'
+      - 'docs/internal/R9-视觉导演与审美决策.md'
+      - 'docs/internal/R9-视觉映射表.md'
+      - 'docs/internal/R7-Remotion组件库.md'
+      - '.github/workflows/visual-shot-contract.yml'
+  pull_request:
+    paths:
+      - 'outputs/**/08-R9视觉决策卡.md'
+      - 'scripts/check-visual-shot-contract.mjs'
+      - 'scripts/test-visual-shot-contract-negative.mjs'
+      - 'docs/internal/R9-视觉导演与审美决策.md'
+      - 'docs/internal/R9-视觉映射表.md'
+      - 'docs/internal/R7-Remotion组件库.md'
+      - '.github/workflows/visual-shot-contract.yml'
+
+jobs:
+  visual-shot-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Negative test
+        run: node scripts/test-visual-shot-contract-negative.mjs
+      - name: Visual shot contract
+        run: node scripts/check-visual-shot-contract.mjs
+      - name: Gate all
+        run: node scripts/gate-all.mjs
