@@ -42,8 +42,8 @@ CLOSED
 | 红线 | `spec/redlines.json` + `scripts/check-redlines.mjs` | 画面/口播硬禁及人工确认层 | 硬禁 0 命中；人工确认项仍存在 |
 | 视觉方法 | `docs/internal/R9-视觉导演与审美决策.md` | 镜头级视觉决策原则 | 生效 |
 | 视觉映射 | `docs/internal/R9-视觉映射表.md` | 叙事关系 → Remotion 视觉关系/组件 | 生效 |
-| 镜头契约 | `scripts/check-visual-shot-contract.mjs` + R9 ledger | 每个关键镜头必须有视觉主体、隐喻、Peak Frame、State Change、Exit 等 | **CI 通过** |
-| 成片验证 | `scripts/gate-all.mjs` | 统一总闸门 | **当前失败 2/15** |
+| 镜头契约 | `scripts/check-visual-shot-contract.mjs` + R9 ledger | 每个关键镜头必须有视觉主体、隐喻、Peak Frame、State Change、Exit 等 | **最近一次已知 CI 通过**（commit `d504b3ae...`）；`cb254e7c...` 之后尚未观察到新的 workflow run，故不宣称当前 CI 通过 |
+| 成片验证 | `scripts/gate-all.mjs` | 统一总闸门 | **最近一次已知结果失败 2/15**（commit `d504b3ae...`）；`cb254e7c...` 之后尚未产生新的总闸门证据 |
 
 ## 3. 当前未闭环事项
 
