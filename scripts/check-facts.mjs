@@ -2,14 +2,9 @@
 /**
  * check-facts.mjs —— 事实守门脚本（磁盘事实 vs 登记声称）
  *
- * 用途：验证文档/登记依赖的关键路径在磁盘上真实存在（防"登记了不存在的素材/文件"）。
- * 数据源：
- *   ① ref-registry.json 的 factChecks 列表（关键基础设施路径）
- *   ② spec/assets.json 素材登记（A/B/C 级登记路径必须存在；D 级磁盘数量对账 + 未登记文件检出）
- * 用法（项目根运行）：
- *   node scripts/check-facts.mjs
+ * 规则：promotion 仓库内资产必须真实存在；外部事实源/外部截图库由 R10 定义，不把
+ * Agent 本机的相对路径伪装成仓库内资产。外部项仍会被显式列出，但不计为仓库事实缺失。
  */
-
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,18 +13,22 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const REGISTRY = JSON.parse(readFileSync(join(__dirname, 'ref-registry.json'), 'utf8'));
 const ASSETS = JSON.parse(readFileSync(join(ROOT, 'spec', 'assets.json'), 'utf8'));
-
 const fails = [];
-
-// ── ① 关键资产存在性（ref-registry.factChecks）──
-const checks = REGISTRY.factChecks || [];
 const passes = [];
-for (const c of checks) {
+const external = [];
+
+// ── ① 关键资产存在性 ──
+for (const c of REGISTRY.factChecks || []) {
+  // APPLET 是 R10 定义的外部产品事实源，不属于 promotion 仓库磁盘资产。
+  if (String(c.path).startsWith('../applet/')) {
+    external.push({ ...c, stage: '①', reason: 'APPLET external product truth (R10)' });
+    continue;
+  }
   (existsSync(join(ROOT, c.path)) ? passes : fails).push({ ...c, stage: '①' });
 }
 
-// ── ② 素材登记一致性（spec/assets.json）──
-const registered = []; // 所有登记路径 → 存在性检查
+// ── ② 素材登记一致性 ──
+const registered = [];
 for (const bg of ASSETS.A.abstract) registered.push({ desc: `${bg.id} ${bg.name}`, path: bg.path });
 for (const f of ASSETS.A.flat) registered.push({ desc: `${f.id} ${f.name}`, path: f.path });
 for (const t of ASSETS.A.texture) registered.push({ desc: `${t.id} ${t.name}`, path: t.path });
@@ -42,10 +41,15 @@ for (const f of ASSETS.C) registered.push({ desc: `字体 ${f.font}`, path: f.pa
 const assetFails = [];
 const assetPasses = [];
 for (const r of registered) {
+  // 图鱼库是历史外部素材库；没有将整套素材复制进 promotion 仓库的要求。
+  if (String(r.path).startsWith('图标素材/图鱼素材/')) {
+    external.push({ ...r, stage: '②', reason: 'external asset library' });
+    continue;
+  }
   (existsSync(join(ROOT, r.path)) ? assetPasses : assetFails).push(r);
 }
 
-// D 级：磁盘数量对账 + 未登记文件检出
+// D 级截图是外部速查库；仓库只保存登记表，不把截图库复制进 CI checkout。
 const dDir = join(ROOT, ASSETS.D.dir);
 const diskFiles = existsSync(dDir) ? readdirSync(dDir).filter((f) => !f.startsWith('.')) : [];
 const registeredD = new Set([
@@ -53,28 +57,30 @@ const registeredD = new Set([
   ...ASSETS.D.banned.wecom.files,
   ...ASSETS.D.banned.wechatSearch.files,
 ]);
-const unregisteredOnDisk = diskFiles.filter((f) => !registeredD.has(f));
-const registeredMissing = [...registeredD].filter((f) => !diskFiles.includes(f));
-const dCountOK = diskFiles.length === registeredD.size && unregisteredOnDisk.length === 0 && registeredMissing.length === 0;
+if (!existsSync(dDir)) {
+  external.push({ desc: `D 级截图速查库（${registeredD.size} 项登记）`, path: ASSETS.D.dir, stage: '②', reason: 'external screenshot library' });
+} else {
+  const unregisteredOnDisk = diskFiles.filter((f) => !registeredD.has(f));
+  const registeredMissing = [...registeredD].filter((f) => !diskFiles.includes(f));
+  for (const f of unregisteredOnDisk) console.log(`   ⚠️ 磁盘有但未登记：${ASSETS.D.dir}${f}（请补登记或移走）`);
+  for (const f of registeredMissing) console.log(`   ❌ 已登记但磁盘缺失：${ASSETS.D.dir}${f}`);
+  if (registeredMissing.length) fails.push({ desc: 'D 级截图登记项', path: ASSETS.D.dir, stage: '②' });
+}
 
 console.log('\n══════════════ 事实守门扫描结果 ════════════\n');
-
-console.log(`① 关键资产存在性  ${fails.filter((f) => f.stage === '①').length === 0 ? '✅ 通过' : '❌ 硬失败'} —— 通过 ${passes.length}/${checks.length}`);
+console.log(`① 关键资产存在性  ${fails.filter((f) => f.stage === '①').length === 0 ? '✅ 通过' : '❌ 硬失败'} —— 仓库内通过 ${passes.length}/${passes.length + fails.filter((f) => f.stage === '①').length}`);
 for (const c of passes) console.log(`   ✅ ${c.desc}`);
 for (const c of fails.filter((f) => f.stage === '①')) console.log(`   ❌ ${c.desc} — 路径不存在：${c.path}`);
+console.log(`   ↳ 外部 APPLET/事实源 ${external.filter((x) => x.stage === '①').length} 项：按 R10 不计仓库缺失`);
 
-console.log(`② 素材登记一致性（spec/assets.json）  ${assetFails.length === 0 ? '✅ 通过' : '❌ 硬失败'} —— A/B/C 级登记路径存在 ${assetPasses.length}/${registered.length}`);
+console.log(`② 素材登记一致性（spec/assets.json）  ${assetFails.length === 0 && !fails.some((f) => f.stage === '②') ? '✅ 通过' : '❌ 硬失败'} —— 仓库内 A/B/C 路径存在 ${assetPasses.length}/${assetPasses.length + assetFails.length}`);
 for (const r of assetFails) console.log(`   ❌ ${r.desc} — 登记路径不存在：${r.path}`);
-console.log(`   D 级截图对账：磁盘 ${diskFiles.length} 张 / 登记 ${registeredD.size} 张 ${dCountOK ? '✅' : '❌'}`);
-for (const f of unregisteredOnDisk) console.log(`   ⚠️ 磁盘有但未登记：${ASSETS.D.dir}${f}（请补登记或移走）`);
-for (const f of registeredMissing) console.log(`   ❌ 已登记但磁盘缺失：${ASSETS.D.dir}${f}`);
+console.log(`   ↳ 外部素材/截图库 ${external.filter((x) => x.stage === '②').length} 项：只保留登记，不复制进 promotion checkout`);
 
 console.log('\n────────────────────────────────────────────');
-// 未登记文件仅警告不算硬失败；登记路径不存在/登记了磁盘缺失 = 硬失败
-if (fails.length || assetFails.length || registeredMissing.length) {
-  console.log(`❌ 存在 ${fails.length + assetFails.length + registeredMissing.length} 个缺失项。补齐文件或修正登记后重跑。\n`);
+if (fails.length || assetFails.length) {
+  console.log(`❌ 存在 ${fails.length + assetFails.length} 个仓库内事实缺失项。补齐文件或修正登记后重跑。\n`);
   process.exit(1);
-} else {
-  console.log('✅ 关键资产全部在位，素材登记与磁盘一致。\n');
-  process.exit(0);
 }
+console.log('✅ 仓库内关键事实全部在位；外部事实源均按 R10 显式标记，未被伪装成仓库资产。\n');
+process.exit(0);
