@@ -101,7 +101,7 @@ Change Contract 已接入 gate-all；CLOSED 事务需要完整影响对账、机
 - `docs/internal/R8-变更收敛协议.md`
 - `docs/internal/R9-视觉导演与审美决策.md`
 - `docs/internal/R9-视觉映射表.md`
-- `docs/internal/R10-产品事实源解析协议.md`
+- `R10`（产品事实源解析协议）
 - `spec/facts.json`、`spec/coupon-fields.json`、`spec/card-fields.json`
 - 当前 active `docs/changes/*`（若有）
 
