@@ -58,7 +58,8 @@ for (const file of files) {
   const text = fs.readFileSync(fullPath, 'utf8');
 
   for (const headingName of requiredHeadingNames) {
-    const headingRe = new RegExp(`^##\\s+\\S+\\s+${headingName.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}\\s*$`, 'm');
+    const escaped = headingName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const headingRe = new RegExp(`^##\\s+(?:[^\\s、]+、)?${escaped}\\s*$`, 'm');
     if (!headingRe.test(text)) {
       errors += 1;
       console.error(`${file}: missing heading ${headingName}`);
@@ -74,11 +75,11 @@ for (const file of files) {
     console.error(`${file}: invalid status ${statusMatch[1]}`);
   }
 
-  const impactStart = text.match(/^##\s+\S+\s+Impact Map\s*$/m);
-  const nextHeading = impactStart ? text.slice(impactStart.index + impactStart[0].length).match(/^##\s+/m) : null;
-  const impactBody = impactStart
-    ? text.slice(impactStart.index + impactStart[0].length, impactStart.index + impactStart[0].length + (nextHeading?.index ?? text.length))
-    : '';
+  const impactMatch = text.match(/^##\s+(?:[^\s、]+、)?Impact Map\s*$/m);
+  const impactStart = impactMatch ? impactMatch.index + impactMatch[0].length : -1;
+  const impactTail = impactStart >= 0 ? text.slice(impactStart) : '';
+  const nextHeadingIndex = impactTail.search(/^##\s+/m);
+  const impactBody = nextHeadingIndex >= 0 ? impactTail.slice(0, nextHeadingIndex) : impactTail;
   const pendingImpactRows = impactBody
     .split('\n')
     .filter((line) => line.trim().startsWith('|') && /\|\s*PENDING\s*\|\s*$/.test(line));
