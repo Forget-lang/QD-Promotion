@@ -20,8 +20,6 @@ import type { TransitionKey, VideoData } from './types';
 
 /** 转场时长：12 帧 = 0.4s */
 const TRANSITION_FRAMES = 12;
-/** SAFE_AREA_PROBE=1 只用于像素安全区取证：保留真实场景/字幕与 transform，去掉 full-bleed 氛围层。生产渲染不设置该变量。 */
-const SAFE_AREA_PROBE = process.env.SAFE_AREA_PROBE === '1';
 
 /** dissolve = 模糊 + 淡入淡出（真实呈现，非 fade 别名） */
 const DissolvePresentation: React.FC<TransitionPresentationComponentProps<Record<string, unknown>>> = ({
@@ -177,18 +175,24 @@ export const computeTotalFrames = (video: VideoData): number => {
   return totalSceneFrames - overlapFrames;
 };
 
-export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
+type VTemplateProps = {
+  video: VideoData;
+  /** 仅安全区取证：保留真实场景/字幕/生产 transform，去掉 full-bleed 氛围层。生产 Composition 永不启用。 */
+  safeAreaProbe?: boolean;
+};
+
+export const VTemplate: React.FC<VTemplateProps> = ({ video, safeAreaProbe = false }) => {
   const p = PALETTES[video.style.palette];
   const presentation = getPresentation(video.style.transition, p.accent);
-  // g11 生产值固定 0.76；安全区取证通过 SAFE_AREA_PROBE=1 去掉 full-bleed 氛围层，而不是继续缩小场景。
+  // g11 生产值固定 0.76；安全区取证通过独立 Composition 显式传 safeAreaProbe=true，而不是继续缩小场景。
   const sceneScale = video.id === 'g11' ? 0.76 : 1;
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#0f1115' }}>
       {/* 背景模板图（全质量显示 + Ken Burns 微动，只做氛围；safe-area probe 不计 full-bleed 背景） */}
-      {!SAFE_AREA_PROBE && video.style.bgImage && <KenBurnsBg src={video.style.bgImage} blur={video.style.bgBlur ?? 0} />}
+      {!safeAreaProbe && video.style.bgImage && <KenBurnsBg src={video.style.bgImage} blur={video.style.bgBlur ?? 0} />}
       {/* 主色调和：背景图与 UI 色系融合（soft-light 只混下层背景） */}
-      {!SAFE_AREA_PROBE && video.style.bgImage && <AccentOverlay color={p.accent} opacity={0.18} />}
+      {!safeAreaProbe && video.style.bgImage && <AccentOverlay color={p.accent} opacity={0.18} />}
 
       {/* 场景内容（转场 + UI 组件） */}
       <AbsoluteFill style={{ transform: `scale(${sceneScale})`, transformOrigin: 'center center' }}>
@@ -230,8 +234,13 @@ export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
       </AbsoluteFill>
 
       {/* 全片氛围层（质感三件套：暗角聚焦 + 颗粒杀色带 + 主色调和；safe-area probe 不计 full-bleed 氛围） */}
-      {!SAFE_AREA_PROBE && <Grain opacity={0.035} />}
-      {!SAFE_AREA_PROBE && <Vignette strength={0.25} />}
+      {!safeAreaProbe && <Grain opacity={0.035} />}
+      {!safeAreaProbe && <Vignette strength={0.25} />}
     </AbsoluteFill>
   );
 };
+
+/** 独立安全区取证 Composition：输入 props 可序列化，避免依赖 bundle-time 环境变量缓存。 */
+export const G11SafeAreaProbe: React.FC<{ video: VideoData }> = ({ video }) => (
+  <VTemplate video={video} safeAreaProbe />
+);
