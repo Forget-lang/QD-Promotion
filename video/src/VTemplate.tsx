@@ -194,6 +194,8 @@ export const computeTotalFrames = (video: VideoData): number => {
 export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
   const p = PALETTES[video.style.palette];
   const presentation = getPresentation(video.style.transition, p.accent);
+  // g11 的屏内排版需要同时满足像素实测安全区与 20:9 裁边余量；只收缩场景内容，背景仍保持满屏。
+  const sceneScale = video.id === 'g11' ? 0.94 : 1;
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#0f1115' }}>
@@ -203,41 +205,43 @@ export const VTemplate: React.FC<{ video: VideoData }> = ({ video }) => {
       {video.style.bgImage && <AccentOverlay color={p.accent} opacity={0.18} />}
 
       {/* 场景内容（转场 + UI 组件） */}
-      <TransitionSeries>
-        {video.scenes.map((sc, i) => {
-          const sceneFrames = Math.floor(sc.dur * FPS);
-          return (
-            <React.Fragment key={i}>
-              <TransitionSeries.Sequence durationInFrames={sceneFrames}>
-                <SceneRenderer
-                  scene={sc}
-                  style={video.style}
-                  index={i}
-                  total={video.scenes.length}
-                  videoId={video.id}
-                />
-                {video.hasAudio && (
-                  <FadingAudio
-                    src={staticFile(`audio/${video.id}/s${i + 1}.wav`)}
-                    sceneDurationInFrames={sceneFrames}
-                    voiceOffsetFrames={Math.floor((sc.voiceOffset || 0) * FPS)}
-                    voiceDurationInFrames={sc.voiceDur != null ? Math.floor(sc.voiceDur * FPS) : undefined}
+      <AbsoluteFill style={{ transform: `scale(${sceneScale})`, transformOrigin: 'center center' }}>
+        <TransitionSeries>
+          {video.scenes.map((sc, i) => {
+            const sceneFrames = Math.floor(sc.dur * FPS);
+            return (
+              <React.Fragment key={i}>
+                <TransitionSeries.Sequence durationInFrames={sceneFrames}>
+                  <SceneRenderer
+                    scene={sc}
+                    style={video.style}
+                    index={i}
+                    total={video.scenes.length}
+                    videoId={video.id}
+                  />
+                  {video.hasAudio && (
+                    <FadingAudio
+                      src={staticFile(`audio/${video.id}/s${i + 1}.wav`)}
+                      sceneDurationInFrames={sceneFrames}
+                      voiceOffsetFrames={Math.floor((sc.voiceOffset || 0) * FPS)}
+                      voiceDurationInFrames={sc.voiceDur != null ? Math.floor(sc.voiceDur * FPS) : undefined}
+                    />
+                  )}
+                </TransitionSeries.Sequence>
+                {i < video.scenes.length - 1 && (
+                  <TransitionSeries.Transition
+                    presentation={presentation}
+                    timing={springTiming({
+                      config: SPRING_CONFIG[video.style.motion],
+                      durationInFrames: TRANSITION_FRAMES,
+                    })}
                   />
                 )}
-              </TransitionSeries.Sequence>
-              {i < video.scenes.length - 1 && (
-                <TransitionSeries.Transition
-                  presentation={presentation}
-                  timing={springTiming({
-                    config: SPRING_CONFIG[video.style.motion],
-                    durationInFrames: TRANSITION_FRAMES,
-                  })}
-                />
-              )}
-            </React.Fragment>
-          );
-        })}
-      </TransitionSeries>
+              </React.Fragment>
+            );
+          })}
+        </TransitionSeries>
+      </AbsoluteFill>
 
       {/* 全片氛围层（质感三件套：暗角聚焦 + 颗粒杀色带 + 主色调和，始终挂载） */}
       <Grain opacity={0.035} />
