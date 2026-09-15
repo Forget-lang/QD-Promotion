@@ -17,6 +17,7 @@ on:
       - 'docs/internal/R7-Remotion组件库.md'
       - 'spec/product-truth/**'
       - 'video/src/VTemplate.tsx'
+      - 'video/src/index.tsx'
       - 'video/src/videos/g11/**'
       - 'video/src/data/g11.ts'
       - '.github/workflows/visual-shot-contract.yml'
@@ -33,6 +34,7 @@ on:
       - 'docs/internal/R7-Remotion组件库.md'
       - 'spec/product-truth/**'
       - 'video/src/VTemplate.tsx'
+      - 'video/src/index.tsx'
       - 'video/src/videos/g11/**'
       - 'video/src/data/g11.ts'
       - '.github/workflows/visual-shot-contract.yml'
@@ -84,7 +86,7 @@ jobs:
           mkdir -p outputs/g11-烧烤/frames
           cd video
           for frame in 180 630 1200 1830 2460 2880; do
-            SAFE_AREA_PROBE=1 ./node_modules/.bin/remotion still src/index.tsx g11 --frame="$frame" --concurrency=2 --output="../outputs/g11-烧烤/frames/ci-safe-${frame}.png"
+            ./node_modules/.bin/remotion still src/index.tsx g11-safe-area-probe --frame="$frame" --concurrency=2 --output="../outputs/g11-烧烤/frames/ci-safe-${frame}.png"
           done
       - name: Upload fresh g11 safe-area frames for diagnosis
         uses: actions/upload-artifact@v4
