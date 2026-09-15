@@ -1,0 +1,14 @@
+{
+  "source_archive": "applet.zip",
+  "archive_sha256": "afb1b0385cf167392eb78b2031d104b714134d72697a1e735d6d4313e6ca1ad7",
+  "snapshot_archive": "source.tar.xz",
+  "snapshot_sha256": "d1248732f77a38c362844e242d3383fce46517f88b3ff75b2c6069694e7bd6d5",
+  "file_count": 298,
+  "scope": "all .vue/.js/.json source files, excluding node_modules, unpackage, uni_modules, .git and macOS metadata",
+  "generated_at": "2026-09-15",
+  "verification": [
+    "snapshot sha256 verified locally",
+    "snapshot contains exactly 298 source files",
+    "snapshot excludes .git and generated dependency/build directories"
+  ]
+}
