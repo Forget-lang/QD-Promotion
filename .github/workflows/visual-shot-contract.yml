@@ -42,12 +42,12 @@ jobs:
             count=$(find ../applet -type f \( -name '*.vue' -o -name '*.js' -o -name '*.json' \) | wc -l | tr -d ' ')
             test "$count" = "298"
             echo "APPLET Product Truth Snapshot materialized: $count source files."
-          elif [ -d "spec/product-truth/applet" ]; then
+          elif find spec/product-truth/applet -type f \( -name '*.vue' -o -name '*.js' -o -name '*.json' \) -print -quit | grep -q .; then
             mkdir -p ../applet
-            cp -a spec/product-truth/applet/. ../applet/
-            echo "APPLET snapshot materialized from committed directory."
+            find spec/product-truth/applet -type f \( -name '*.vue' -o -name '*.js' -o -name '*.json' \) -exec cp --parents '{}' ../applet/ \;
+            echo "APPLET snapshot materialized from committed source files."
           else
-            echo "APPLET snapshot not committed; check-ui-truth remains a hard-fail until a complete traceable snapshot exists."
+            echo "APPLET Product Truth source is not committed; check-ui-truth remains a hard-fail."
           fi
       - name: Negative test
         run: node scripts/test-visual-shot-contract-negative.mjs
