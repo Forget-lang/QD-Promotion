@@ -13,6 +13,7 @@ export const BG_DARK = '#16182a';
 export const BG_DARK2 = '#1f2238';
 
 export const FONT_TITLE = "'DeyiHei', sans-serif";
+export const FONT_IMPACT = "'Alimama ShuHei', sans-serif"; // 数黑体：端正超重海报字（封面大字专用）
 export const FONT_BODY = "'Alibaba PuHuiTi 3', sans-serif";
 export const FONT_ROUND = "'Alimama FangYuan', sans-serif";
 

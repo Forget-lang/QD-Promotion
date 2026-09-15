@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 /**
- * scripts/probe-safe-area.mjs · 文字安全区出界探针（**未接进 gate-all**，按需手跑）
+ * scripts/probe-safe-area.mjs · 文字安全区出界探针（**已接进 gate-all** 2026-09-14：对最新片静帧条件触发自动跑，无静帧跳过；仍可手动指定其它片静帧跑）
  *
- * 为什么要有它：`R3 §7.3` 定了「标题左右 padding ≥80px / 顶 ≥120px / 底 ≥160px」，
+ * 为什么要有它：`R3 §7.3` 定了「标题左右 padding ≥120px / 顶 ≥120px / 底 ≥160px」，
  * 而 `SKILL §三` 又要求「安全区达标与否量渲染像素，不靠读 CSS 推断」——此前没有任何工具量过像素，
  * 第十四轮那个"12 处出界"是读代码位置值读出来的，口径本身不成立。本探针补上这一量。
+ * 2026-09-11 口径升级：左右 80px→120px——抖音 20:9 长屏全屏播放按屏比放大 1.18×、
+ * 左右各实测裁约 82px（用户设备），iPhone 量级约 100px，80px 余量不足（教训见 project memory）。
  *
  * 判据口径（重要，别改成别的）：
  *   - 内容像素 = 与"边框背景色"RGB 任一通道差 > 24（与 check-motion 同一口径）
  *   - **底带不量**：R3 的"文字距底 ≥160px"与"字幕安全区 y1760~1920"是同一条 160px，
  *     字幕按设计就站在那里面。底带若照量，每一屏都出界，尺子立刻失去意义。
- *     字幕自己的问题改成单独一条：**字幕字形有没有越左右 80px 线**（越了会被抖音侧边 UI 挡）。
+ *     字幕自己的问题改成单独一条：**字幕字形有没有越左右 120px 线**（越了会被抖音侧边 UI 挡）。
  *
  * 为什么光数边带像素不能定罪（第一版实测踩到的）：R3 这条量的是**文字**出界，而我们的背景是
  * 全幅铺满的纸纹素材，纹理、光晕、装饰件与背景的差都 >24，会全部计进边带，把"背景铺满"误判成
@@ -20,7 +22,7 @@
  * 边带像素计数保留作粗筛，**结论以墨级 + 剖面 + 真图三者对齐为准**。
  *
  * 用法：node scripts/probe-safe-area.mjs [--ink 100] outputs/gXX-行业/frames/片N/*.png
- * 退出码：有**墨级**像素侵入左/右 80px 或顶 120px 边带，或字幕字形越左右线 → 1；否则 0。
+ * 退出码：有**墨级**像素侵入左/右 120px 或顶 120px 边带，或字幕字形越左右线 → 1；否则 0。
  *         **仅供人判取证，不代表成片合格。**
  */
 import { spawnSync } from 'node:child_process';
@@ -31,7 +33,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const FFMPEG = join(ROOT, 'video/node_modules/ffmpeg-static/ffmpeg');
 const W = 1080, H = 1920;
-const SAFE = { side: 80, top: 120, bottom: 160 };
+const SAFE = { side: 120, top: 120, bottom: 160 };
 const SUB = { y0: 1760, y1: 1920 };   // 字幕带，整带排除
 const BG_T = 24;
 

@@ -41,7 +41,8 @@ export const Subtitle: React.FC<{
       right: 0,
       bottom: 60,
       textAlign: 'center',
-      padding: '0 60px',
+      // 安全区口径 R3 §7.3：左右 ≥120px（2026-09-11 抖音 20:9 全屏实测放大 1.18×、左右各裁约 82px 起）
+      padding: '0 120px',
       pointerEvents: 'none',
     }}>
       {visibleLines.map((line) => {
@@ -73,7 +74,8 @@ export const Subtitle: React.FC<{
           >
             <span style={{
               fontFamily: FONT_BODY,
-              fontSize: 34,
+              // 34→31：单行最长卡（26 字）须在 840px 行宽内单行放下，否则 24+2 字破词孤行
+              fontSize: 31,
               fontWeight: 500,
               lineHeight: 1.4,
               color: '#ffffff',

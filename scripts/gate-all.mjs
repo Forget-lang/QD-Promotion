@@ -31,8 +31,11 @@ const GATES = [
   { key: 'similarity', label: '相似度闸门（整屏结构不得复用）', args: ['scripts/check-similarity.mjs'] },
   { key: 'layout', label: '布局指纹闸门（新片不得复用上一条布局）', args: ['scripts/check-layout-diversity.mjs'] },
   { key: 'bg', label: '背景底闸门（每片必用背景图）', args: ['scripts/check-bg.mjs'] },
+  { key: 'motifcard', label: '母题卡闸门（视觉定位卡四栏+素材张数）', args: ['scripts/check-motif-card.mjs'] },
   { key: 'uitruth', label: '上屏真实性闸门（字段名回源码）', args: ['scripts/check-ui-truth.mjs'] },
   { key: 'voicediscipline', label: '口播纪律闸门（数字中文）', args: ['scripts/check-voice-discipline.mjs'] },
+  { key: 'voicebrand', label: '口播品牌点检（画面零品牌·口播必提一次）', args: ['scripts/check-voice-brand.mjs'] },
+  { key: 'releasefeedback', label: '发布后验回填闸门（已发布片必回填后台四数）', args: ['scripts/check-release-feedback.mjs'] },
 ];
 const WITH_TSC = process.argv.includes('--tsc');
 /** 效果尺子需要媒体文件：取 outputs 下最新的成片 mp4；没有就标跳过（不能假装通过） */
@@ -51,6 +54,24 @@ function newestVideo() {
   return best?.p ?? null;
 }
 function require$fs() { return createRequire(import.meta.url)('node:fs'); }
+
+/** 探针只对最新一批静帧把关（与效果尺子「最新成片」同思路）：历史 gXX 静帧按旧安全区口径渲过、不回改，不列入扫描，否则误锁红灯 */
+function newestFrames() {
+  const { readdirSync, statSync } = require$fs();
+  let bestDir = null, bestM = 0;
+  for (const d of readdirSync(join(ROOT, 'outputs'))) {
+    const fd = join(ROOT, 'outputs', d, 'frames');
+    let st;
+    try { st = statSync(fd); } catch { continue; }
+    if (!st.isDirectory()) continue;
+    const pngs = readdirSync(fd).filter((f) => f.endsWith('.png'));
+    if (!pngs.length) continue;
+    const dm = Math.max(...pngs.map((f) => statSync(join(fd, f)).mtimeMs));
+    if (dm > bestM) { bestM = dm; bestDir = fd; }
+  }
+  if (!bestDir) return [];
+  return readdirSync(bestDir).filter((f) => f.endsWith('.png')).map((f) => join(bestDir, f));
+}
 
 const run = (cmd, args, cwd) => {
   const r = spawnSync(cmd, args, { cwd, encoding: 'utf8' });
@@ -84,6 +105,18 @@ if (WITH_TSC) {
   const { code, out } = run('npx', ['tsc', '--noEmit'], join(ROOT, 'video'));
   const err = out.split('\n').filter((l) => /error TS/.test(l));
   rows.push({ ok: code === 0, label: 'tsc --noEmit', msg: err.length ? err[0].slice(0, 96) : '零错误' });
+}
+
+// 文字安全区探针（2026-09-14 ⨠ gate-all）：与效果尺子同思路，只对最新片静帧把关；无静帧跳过而不是假装通过。
+// 仅像素判据（墨级侵入/字幕越线），不替代真图审——探针自带该提示。
+const safeFrames = newestFrames();
+if (safeFrames.length) {
+  const { code, out } = run('node', ['scripts/probe-safe-area.mjs', ...safeFrames], ROOT);
+  const lastLine = out.trim().split('\n').filter(Boolean).pop() || '(无输出)';
+  rows.push({ ok: code === 0, label: '文字安全区探针（最新静帧）',
+    msg: lastLine.replace(/^[\s✅❌⚠️]+/, '').trim().slice(0, 96), warns: [] });
+} else {
+  rows.push({ ok: true, skipped: true, label: '文字安全区探针', msg: '跳过（outputs 下暂无静帧 png；出静帧后必跑）' });
 }
 
 const vid = newestVideo();

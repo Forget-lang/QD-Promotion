@@ -9,6 +9,7 @@ import { G07_RENDERERS } from '../videos/g07';
 import { G08_RENDERERS } from '../videos/g08';
 import { G09_RENDERERS } from '../videos/g09';
 import { G10_RENDERERS } from '../videos/g10';
+import { G11_RENDERERS } from '../videos/g11';
 
 /**
  * 本片专属渲染器注册表：按视频 id 索引。
@@ -21,6 +22,7 @@ const VIDEO_RENDERERS: Record<string, Record<string, React.ComponentType<SceneRe
   g08: G08_RENDERERS,
   g09: G09_RENDERERS,
   g10: G10_RENDERERS,
+  g11: G11_RENDERERS,
 };
 
 export const SceneRenderer: React.FC<SceneRenderProps & { videoId: string }> = ({

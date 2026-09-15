@@ -6,3 +6,4 @@ export { g07 } from './g07';
 export { g08 } from './g08';
 export { g09 } from './g09';
 export { g10 } from './g10';
+export { g11 } from './g11';

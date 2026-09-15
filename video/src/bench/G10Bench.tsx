@@ -4,7 +4,7 @@
 //   ② 容器：竖版圆角邀请卡 + 缎带顶 + 撕齿 + 磁条底栏（社交信物），非横版磁条次卡
 //   ③ 强调：缎带色块 + 引线，非 g09 绿色胶囊 tag
 //   ④ 底色：粉晕光弧浅底（暖粉紫），非蓝绿光斑冷底
-// 字段名逐字回 ../applet/pages_coupon/coupon/create.vue；数值为示例（顶部面包屑行尾标注，C-11）。骨架全内联本文件。
+// 字段名逐字回 ../applet/pages_coupon/coupon/create.vue；数值为示例（画面零面包屑、零示例标，示例性由口播教学语气承载）。骨架全内联本文件。
 import React from 'react';
 import {
   AbsoluteFill, Img, staticFile, interpolate, useCurrentFrame,
@@ -100,14 +100,7 @@ const Header: React.FC = () => {
   const p = interpolate(f - 4, [0, 18], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
   return (
     <div style={{ position: 'absolute', left: 64, right: 64, top: 128, opacity: p }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ width: 32, height: 32, display: 'inline-block' }}>{Ico.gift(ACCENT)}</span>
-          <span style={{ fontSize: 25, color: ACCENT_DK, letterSpacing: 4, fontWeight: 700 }}>券到卡包 · 美业沙龙</span>
-        </div>
-        <span style={{ fontSize: 21, color: MUTED, border: `1.5px solid ${LINE}`, borderRadius: 999, padding: '6px 18px' }}>数值为示例</span>
-      </div>
-      <div style={{ marginTop: 16, fontFamily: FONT_TITLE, fontSize: 82, color: INK, letterSpacing: 3, lineHeight: 1.08 }}>先做这张体验邀请卡</div>
+      <div style={{ fontFamily: FONT_TITLE, fontSize: 82, color: INK, letterSpacing: 3, lineHeight: 1.08 }}>先做这张体验邀请卡</div>
       <div style={{ marginTop: 18, height: 3, background: `linear-gradient(90deg, ${ACCENT}, transparent)`, borderRadius: 2 }} />
     </div>
   );
@@ -123,7 +116,7 @@ const Note: React.FC<{ delay: number }> = ({ delay }) => {
       <div style={{ border: `1.5px solid ${LINE}`, borderRadius: 18, padding: '26px 32px', background: 'rgba(171,71,188,0.07)', display: 'flex', alignItems: 'center', gap: 18 }}>
         <span style={{ width: 38, height: 38, flexShrink: 0, display: 'inline-block' }}>{Ico.users(ACCENT_DK)}</span>
         <div style={{ fontSize: 30, color: INK, lineHeight: 1.42 }}>
-          这套玩法天生要<span style={{ color: ACCENT_DK, fontWeight: 800 }}>两张券</span>：这张体验券当「转赠物」，还得另做一张私密券当「奖励」——下一屏讲转赠怎么开。
+          这套玩法天生要<span style={{ color: ACCENT_DK, fontWeight: 800 }}>两张券</span>：这张体验券当「转赠物」，还得另做一张私密券当「奖励」。
         </div>
       </div>
     </div>

@@ -94,7 +94,7 @@ if (missing.length) {
   fail = true;
   console.log(`\n① 新片缺布局标注  ❌ 硬失败 —— ${missing.length} 处：`);
   for (const x of missing) console.log(`   ${x}`);
-  console.log('   修法：给最新一片每个 Scene 补 layoutKind（card-list/form/two-column/flow/hero-object/compare-list/hero-focus/mechanism-diagram/cta-statement）。');
+  console.log('   修法：给最新一片每个 Scene 补 layoutKind（card-list/form/two-column/flow/hero-object/compare-list/hero-focus/mechanism-diagram/cta-statement/layered-stage）。');
 }
 
 if (collisions.length) {

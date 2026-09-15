@@ -13,6 +13,7 @@ import { G06CoverDy, G06CoverXhs, G06CoverSohu } from './covers/G06Cover';
 import { G07CoverDy, G07CoverDy43, G07CoverXhs, G07CoverSohu } from './covers/G07Cover';
 import { G08CoverDy, G08CoverDy43, G08CoverXhs, G08CoverSohu } from './covers/G08Cover';
 import { G09CoverDy, G09CoverDy43, G09CoverXhs, G09CoverSohu } from './covers/G09Cover';
+import { G10CoverDy, G10CoverDy43, G10CoverXhs, G10CoverSohu } from './covers/G10Cover';
 import type { VideoData } from './types';
 
 // ── 注入项目商用字体（@font-face，Remotion 渲染前自动等待 document.fonts.ready）──
@@ -48,6 +49,12 @@ const FONT_CSS = `
   font-display: swap;
 }
 @font-face {
+  font-family: 'Alimama ShuHei';
+  src: url('${staticFile('fonts/AlimamaShuHeiTi-Bold.ttf')}') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
   font-family: 'Alimama FangYuan';
   src: url('${staticFile('fonts/阿里妈妈方圆体.ttf')}') format('truetype');
   font-weight: 400;
@@ -64,25 +71,30 @@ const RemotionRoot: React.FC = () => {
       {/* 全局字体声明 */}
       <style dangerouslySetInnerHTML={{ __html: FONT_CSS }} />
       {/* 一条视频一条 Composition；封面在 src/covers/ 建好后在此注册 */}
-      {/* g06 三平台封面（抖音 9:16 / 小红书 3:4 / 搜狐 16:9，代码渲染文字） */}
+      {/* g06 三平台封面（大字压屏系统 coverKit：hook 白 + payoff 金 + 副标方圆体） */}
       <Composition id="g06-cover-dy" component={G06CoverDy} fps={FPS} width={1080} height={1920} durationInFrames={1} />
       <Composition id="g06-cover-xhs" component={G06CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
       <Composition id="g06-cover-sohu" component={G06CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
-      {/* g07 三平台封面（同规格，咖啡母题：小票条 + 咖啡渍圈） */}
+      {/* g07 四平台封面（同规格，大字压屏系统） */}
       <Composition id="g07-cover-dy" component={G07CoverDy} fps={FPS} width={1080} height={1920} durationInFrames={1} />
       <Composition id="g07-cover-dy43" component={G07CoverDy43} fps={FPS} width={1440} height={1080} durationInFrames={1} />
       <Composition id="g07-cover-xhs" component={G07CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
       <Composition id="g07-cover-sohu" component={G07CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
-      {/* g08 三平台封面（同规格，火锅母题：牌匾 + 号牌卡 + 真海浪纹底） */}
+      {/* g08 四平台封面（同规格，大字压屏系统） */}
       <Composition id="g08-cover-dy" component={G08CoverDy} fps={FPS} width={1080} height={1920} durationInFrames={1} />
       <Composition id="g08-cover-dy43" component={G08CoverDy43} fps={FPS} width={1440} height={1080} durationInFrames={1} />
       <Composition id="g08-cover-xhs" component={G08CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
       <Composition id="g08-cover-sohu" component={G08CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
-      {/* g09 三平台封面（同规格，宠物洗护母题：磁条卡 + 泡泡 + 蓝绿光斑底） */}
+      {/* g09 四平台封面（同规格，大字压屏系统） */}
       <Composition id="g09-cover-dy" component={G09CoverDy} fps={FPS} width={1080} height={1920} durationInFrames={1} />
       <Composition id="g09-cover-dy43" component={G09CoverDy43} fps={FPS} width={1440} height={1080} durationInFrames={1} />
       <Composition id="g09-cover-xhs" component={G09CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
       <Composition id="g09-cover-sohu" component={G09CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
+      {/* g10 四平台封面（同规格，大字压屏系统） */}
+      <Composition id="g10-cover-dy" component={G10CoverDy} fps={FPS} width={1080} height={1920} durationInFrames={1} />
+      <Composition id="g10-cover-dy43" component={G10CoverDy43} fps={FPS} width={1440} height={1080} durationInFrames={1} />
+      <Composition id="g10-cover-xhs" component={G10CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
+      <Composition id="g10-cover-sohu" component={G10CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
       {/* 一屏标杆（质感验证用，非交付片） */}
       <Composition id="BENCH-bundle-open" component={BundleOpenBench} fps={FPS} width={1080} height={1920} durationInFrames={150} />
       <Composition id="BENCH-pain" component={BenchPain} fps={FPS} width={1080} height={1920} durationInFrames={150} />
