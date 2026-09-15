@@ -41,7 +41,7 @@ jobs:
             cp -a spec/product-truth/applet/. ../applet/
             echo "APPLET snapshot materialized from committed Product Truth Snapshot."
           else
-            echo "APPLET snapshot not committed; check-ui-truth uses the traceable R10 snapshot index and does not invent a source directory."
+            echo "APPLET snapshot not committed; check-ui-truth remains a hard-fail until a complete traceable snapshot exists."
           fi
       - name: Negative test
         run: node scripts/test-visual-shot-contract-negative.mjs
