@@ -78,6 +78,11 @@ jobs:
       - name: Diagnostic - facts
         run: node scripts/check-facts.mjs
         continue-on-error: true
+      - name: Diagnostic - g11 transform threshold
+        run: |
+          # Diagnostic only: determine whether the remaining safe-area redline is actually
+          # downstream of the VTemplate transform. This is not a proposed production scale.
+          sed -i "s/video.id === 'g11' ? 0.76 : 1/video.id === 'g11' ? 0.50 : 1/" video/src/VTemplate.tsx
       - name: Render fresh g11 keyframes for pixel-level verification
         shell: bash
         run: |
