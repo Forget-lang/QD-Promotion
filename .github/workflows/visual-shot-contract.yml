@@ -42,10 +42,12 @@ jobs:
             count=$(find ../applet -type f \( -name '*.vue' -o -name '*.js' -o -name '*.json' \) | wc -l | tr -d ' ')
             test "$count" = "298"
             echo "APPLET Product Truth Snapshot materialized: $count source files."
-          elif find spec/product-truth/applet -type f \( -name '*.vue' -o -name '*.js' -o -name '*.json' \) -print -quit | grep -q .; then
+          elif find spec/product-truth/applet -type f \( -name '*.vue' -o -name '*.js' -o -name '*.json' \) ! -name 'manifest.json' -print -quit | grep -q .; then
             mkdir -p ../applet
-            find spec/product-truth/applet -type f \( -name '*.vue' -o -name '*.js' -o -name '*.json' \) -exec cp --parents '{}' ../applet/ \;
-            echo "APPLET snapshot materialized from committed source files."
+            find spec/product-truth/applet -type f \( -name '*.vue' -o -name '*.js' -o -name '*.json' \) ! -name 'manifest.json' -exec cp --parents '{}' ../applet/ \;
+            count=$(find ../applet -type f \( -name '*.vue' -o -name '*.js' -o -name '*.json' \) | wc -l | tr -d ' ')
+            test "$count" = "298"
+            echo "APPLET snapshot materialized from committed source files: $count."
           else
             echo "APPLET Product Truth source is not committed; check-ui-truth remains a hard-fail."
           fi
@@ -62,5 +64,13 @@ jobs:
       - name: Diagnostic - facts
         run: node scripts/check-facts.mjs
         continue-on-error: true
+      - name: Render fresh g11 keyframes for pixel-level verification
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p outputs/g11-烧烤/frames
+          for frame in 180 630 1200 1830 2460 2880; do
+            npx remotion still src/index.tsx g11 --frame="$frame" --output="../outputs/g11-烧烤/frames/ci-safe-${frame}.png"
+          done
       - name: Gate all
         run: node scripts/gate-all.mjs
