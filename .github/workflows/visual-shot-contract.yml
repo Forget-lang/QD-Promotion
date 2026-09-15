@@ -31,5 +31,11 @@ jobs:
         run: node scripts/test-visual-shot-contract-negative.mjs
       - name: Visual shot contract
         run: node scripts/check-visual-shot-contract.mjs
+      - name: Diagnostic - redlines
+        run: node scripts/check-redlines.mjs
+        continue-on-error: true
+      - name: Diagnostic - facts
+        run: node scripts/check-facts.mjs
+        continue-on-error: true
       - name: Gate all
         run: node scripts/gate-all.mjs
