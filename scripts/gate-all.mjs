@@ -14,8 +14,6 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-// 已裁项登记（scripts/ref-registry.json 的 motionWaivers）：用户逐张看过成片、认可「红灯是设计意图/交付终态」后登记，
-// 令效果尺子不再每会话挡路——但数字照实打印、行标签标「已裁」。check-motion 本身仍是纯尺子，直接跑必报真值。
 const REGISTRY = JSON.parse(createRequire(import.meta.url)('node:fs').readFileSync(join(ROOT, 'scripts/ref-registry.json'), 'utf8'));
 const motionWaiver = (vidPath) => {
   const list = REGISTRY.motionWaivers || [];
@@ -25,6 +23,7 @@ const motionWaiver = (vidPath) => {
   return key ? (list.find((w) => String(w.video).toLowerCase() === key) || null) : null;
 };
 const GATES = [
+  { key: 'changecontract', label: '变更收敛闸门（Change Contract）', args: ['scripts/check-change-contract.mjs'] },
   { key: 'redlines', label: '红线闸门（画面/口播硬禁）', args: ['scripts/check-redlines.mjs'] },
   { key: 'refs', label: '文档引用闸门（引用断链）', args: ['scripts/check-doc-references.mjs'] },
   { key: 'facts', label: '事实闸门（资产路径与素材对账）', args: ['scripts/check-facts.mjs'] },
@@ -38,7 +37,6 @@ const GATES = [
   { key: 'releasefeedback', label: '发布后验回填闸门（已发布片必回填后台四数）', args: ['scripts/check-release-feedback.mjs'] },
 ];
 const WITH_TSC = process.argv.includes('--tsc');
-/** 效果尺子需要媒体文件：取 outputs 下最新的成片 mp4；没有就标跳过（不能假装通过） */
 function newestVideo() {
   const { readdirSync, statSync } = require$fs();
   let best = null;
@@ -54,8 +52,6 @@ function newestVideo() {
   return best?.p ?? null;
 }
 function require$fs() { return createRequire(import.meta.url)('node:fs'); }
-
-/** 探针只对最新一批静帧把关（与效果尺子「最新成片」同思路）：历史 gXX 静帧按旧安全区口径渲过、不回改，不列入扫描，否则误锁红灯 */
 function newestFrames() {
   const { readdirSync, statSync } = require$fs();
   let bestDir = null, bestM = 0;
@@ -72,18 +68,14 @@ function newestFrames() {
   if (!bestDir) return [];
   return readdirSync(bestDir).filter((f) => f.endsWith('.png')).map((f) => join(bestDir, f));
 }
-
 const run = (cmd, args, cwd) => {
   const r = spawnSync(cmd, args, { cwd, encoding: 'utf8' });
   return { code: r.status ?? 1, out: `${r.stdout || ''}${r.stderr || ''}` };
 };
-
 const rows = [];
 for (const g of GATES) {
   const { code, out } = run('node', g.args, ROOT);
   const outLines = out.trim().split('\n').filter(Boolean);
-  // 2026-08-31 修（补完第十四轮 A1/A2 的另一半）：摘要不取"末行"——末行常是收尾话术（红线闸门的"确认无误即可收口。"），
-  // 改取最后一条 ✅/❌ 结果行；⚠️ 提醒除标题行外连带收其下逐条证据行（含 «token» 或 file:行号），话术行与"✅ 无"空结果不收。
   const statusLines = outLines.filter((l) => /^\s*[✅❌]/.test(l));
   const last = (statusLines.length ? statusLines[statusLines.length - 1] : outLines[outLines.length - 1]) || '(无输出)';
   const clean = (l) => l.replace(/^[\s✅❌⚠️]+/, '').trim();
@@ -106,9 +98,6 @@ if (WITH_TSC) {
   const err = out.split('\n').filter((l) => /error TS/.test(l));
   rows.push({ ok: code === 0, label: 'tsc --noEmit', msg: err.length ? err[0].slice(0, 96) : '零错误' });
 }
-
-// 文字安全区探针（2026-09-14 ⨠ gate-all）：与效果尺子同思路，只对最新片静帧把关；无静帧跳过而不是假装通过。
-// 仅像素判据（墨级侵入/字幕越线），不替代真图审——探针自带该提示。
 const safeFrames = newestFrames();
 if (safeFrames.length) {
   const { code, out } = run('node', ['scripts/probe-safe-area.mjs', ...safeFrames], ROOT);
@@ -118,9 +107,7 @@ if (safeFrames.length) {
 } else {
   rows.push({ ok: true, skipped: true, label: '文字安全区探针', msg: '跳过（outputs 下暂无静帧 png；出静帧后必跑）' });
 }
-
 const vid = newestVideo();
-/** 遍历 video/src 取最新源码修改时间 */
 function srcNewest() {
   const { readdirSync, statSync } = require$fs();
   const walk = (dir) => {
@@ -142,7 +129,6 @@ if (vid) {
   let row;
   if (srcM > vidM) {
     const diffMs = srcM - vidM;
-    // 2026-08-31 修：不足 1 分钟（含 14ms 这种"同批写出/批量重置 mtime"）不能打「旧 0 分钟」——说明可疑并保守判过期
     const age = diffMs < 1000
       ? `仅旧 ${Math.round(diffMs)} 毫秒`
       : diffMs < 60000
@@ -167,7 +153,6 @@ if (vid) {
 } else {
   rows.push({ ok: true, skipped: true, label: '效果尺子', msg: '跳过（outputs 下暂无成片 mp4；出片后必跑）' });
 }
-
 console.log('\n══════════════ 闸门总览（gate-all）══════════════');
 for (const r of rows) console.log(`${r.ok ? (r.skipped ? '⏭️' : '✅') : '❌'} ${r.label.padEnd(26)} ${r.msg}`);
 const warnRows = rows.filter((r) => r.warns?.length);
