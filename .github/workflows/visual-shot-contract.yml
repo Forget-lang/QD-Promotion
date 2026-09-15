@@ -85,6 +85,13 @@ jobs:
           for frame in 180 630 1200 1830 2460 2880; do
             ./node_modules/.bin/remotion still src/index.tsx g11 --frame="$frame" --concurrency=2 --output="../outputs/g11-烧烤/frames/ci-safe-${frame}.png"
           done
+      - name: Upload fresh g11 frames for diagnosis
+        uses: actions/upload-artifact@v4
+        with:
+          name: g11-safe-frames-${{ github.run_number }}
+          path: outputs/g11-烧烤/frames/ci-safe-*.png
+          if-no-files-found: error
+          retention-days: 3
       - name: Diagnostic - safe area coordinates
         run: node scripts/probe-safe-area.mjs outputs/g11-烧烤/frames/ci-safe-180.png outputs/g11-烧烤/frames/ci-safe-630.png outputs/g11-烧烤/frames/ci-safe-1200.png outputs/g11-烧烤/frames/ci-safe-1830.png outputs/g11-烧烤/frames/ci-safe-2460.png outputs/g11-烧烤/frames/ci-safe-2880.png
         continue-on-error: true
