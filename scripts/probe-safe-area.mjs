@@ -21,8 +21,13 @@
  *   - 剖面：对每条边带输出"有墨的连续行（或列）区间"，据此在真图上指认到底是哪个元素越界
  * 边带像素计数保留作粗筛，**结论以墨级 + 剖面 + 真图三者对齐为准**。
  *
+ * 2026-09-15 修正：VTemplate 的背景/暗角/颗粒/主色统调属于合法的 full-bleed 氛围层，且位于安全区探针之外的
+ * "文字"对象语义范围。它们会在边带形成连续的 100+ RGB 差，不能被当成文字越界。现在对**连续整行的边带高覆盖墨级**
+ * 做 full-bleed 过滤：当某行左/右边带均达到 75% 覆盖，视为全幅氛围层贡献；只有局部墨级仍进入判定。这样不改变
+ * 120px 几何边界，也不靠 CSS 推断；同时保留行剖面，方便真图复核。字幕带采用同一过滤，避免全屏氛围层污染字幕字形判定。
+ *
  * 用法：node scripts/probe-safe-area.mjs [--ink 100] outputs/gXX-行业/frames/片N/*.png
- * 退出码：有**墨级**像素侵入左/右 120px 或顶 120px 边带，或字幕字形越左右线 → 1；否则 0。
+ * 退出码：有**局部墨级**像素侵入左/右 120px 或顶 120px 边带，或字幕字形局部越左右线 → 1；否则 0。
  *         **仅供人判取证，不代表成片合格。**
  */
 import { spawnSync } from 'node:child_process';
@@ -36,6 +41,7 @@ const W = 1080, H = 1920;
 const SAFE = { side: 120, top: 120, bottom: 160 };
 const SUB = { y0: 1760, y1: 1920 };   // 字幕带，整带排除
 const BG_T = 24;
+const FULL_BLEED_RATIO = 0.75; // 两侧边带同一行均达到 75% 墨级覆盖时，判作 full-bleed 氛围贡献
 
 const files = process.argv.slice(2).filter((a) => !a.startsWith('--'));
 const inkArg = process.argv.indexOf('--ink');
@@ -77,19 +83,16 @@ const fmt = (rs, min) => rs.filter((r) => r.peak >= min)
   .map((r) => `${r.from}-${r.to}(峰值${r.peak})`).join(' ') || '—';
 
 let anyFail = false;
-console.log(`\n══════ 文字安全区探针 ══════
-边带：左/右 ${SAFE.side}px｜顶 ${SAFE.top}px｜底 ${SAFE.bottom}px **不量**（与字幕带 y${SUB.y0}-${SUB.y1} 完全重合，R3 字幕本就站在那 160px 里）
-字幕带：只查字形有没有越左右 ${SAFE.side}px 线
-判据：粗筛=与背景差>${BG_T}（含背景纹理与装饰件，**不定罪**）；定罪=墨级 差>${INK_T}（近似文字与实色块）
-`);
+console.log(`\n══════ 文字安全区探针 ══════\n边带：左/右 ${SAFE.side}px｜顶 ${SAFE.top}px｜底 ${SAFE.bottom}px **不量**（与字幕带 y${SUB.y0}-${SUB.y1} 完全重合，R3 字幕本就站在那 160px 里）\n字幕带：只查字形有没有越左右 ${SAFE.side}px 线\n判据：粗筛=与背景差>${BG_T}（含背景纹理与装饰件，**不定罪**）；定罪=局部墨级差>${INK_T}（full-bleed 连续行过滤）\n`);
 
 for (const p of files) {
   const px = decode(p), bg = bgColor(px);
   const loose = { left: 0, right: 0, top: 0 };
   const ink = { left: 0, right: 0, top: 0 };
   const rowL = new Int32Array(H), rowR = new Int32Array(H);
+  const subRowL = new Int32Array(H), subRowR = new Int32Array(H);
   const colT = new Int32Array(W);
-  let subWide = 0, subInk = 0;
+  let subWide = 0, subInk = 0, subFiltered = 0;
 
   for (let y = 0; y < H; y++) {
     const inSub = y >= SUB.y0 && y < SUB.y1;
@@ -99,7 +102,13 @@ for (const p of files) {
       if (d <= BG_T) continue;
       const outSide = x < SAFE.side || x >= W - SAFE.side;
       if (inSub) {
-        if (outSide) { subWide++; if (d > INK_T) subInk++; }
+        if (outSide) {
+          subWide++;
+          if (d > INK_T) {
+            if (x < SAFE.side) subRowL[y]++;
+            else subRowR[y]++;
+          }
+        }
         continue;
       }
       if (x < SAFE.side) loose.left++;
@@ -111,21 +120,38 @@ for (const p of files) {
       if (y < SAFE.top) { ink.top++; colT[x]++; }
     }
   }
+
+  // full-bleed 氛围层：同一行两侧都大面积命中时，不把整幅背景/暗角/颗粒当作文字。
+  let filteredLeft = 0, filteredRight = 0;
+  for (let y = SAFE.top; y < SUB.y0; y++) {
+    if (rowL[y] >= SAFE.side * FULL_BLEED_RATIO && rowR[y] >= SAFE.side * FULL_BLEED_RATIO) {
+      filteredLeft += rowL[y];
+      filteredRight += rowR[y];
+      rowL[y] = 0;
+      rowR[y] = 0;
+    }
+  }
+  ink.left -= filteredLeft;
+  ink.right -= filteredRight;
+
+  for (let y = SUB.y0; y < SUB.y1; y++) {
+    if (subRowL[y] >= SAFE.side * FULL_BLEED_RATIO && subRowR[y] >= SAFE.side * FULL_BLEED_RATIO) {
+      subFiltered += subRowL[y] + subRowR[y];
+      subRowL[y] = 0;
+      subRowR[y] = 0;
+    }
+  }
+  subInk = 0;
+  for (let y = SUB.y0; y < SUB.y1; y++) subInk += subRowL[y] + subRowR[y];
+
   const fail = Object.values(ink).some((n) => n > 0) || subInk > 0;
   anyFail ||= fail;
   const total = W * H;
   const pct = (n) => (n / total * 100).toFixed(3);
-  console.log(`${fail ? '❌' : '✅'} ${p.split('/').pop().padEnd(26)}
-   粗筛 左${pct(loose.left)}% 右${pct(loose.right)}% 顶${pct(loose.top)}%（含背景纹理，不定罪）
-   墨级 左${pct(ink.left)}% 右${pct(ink.right)}% 顶${pct(ink.top)}% 底 不计${fail ? '  ← 定罪' : ''}
-   左带行区间 ${fmt(runs(rowL, 2), 8)}
-   右带行区间 ${fmt(runs(rowR, 2), 8)}
-   顶带列区间 ${fmt(runs(colT, 2), 8)}
-   字幕带 ${subInk ? `❌ 字形越左右线 ${subInk} 墨级像素（粗筛 ${subWide}）` : `✅ 字形未越左右线（粗筛 ${subWide} 像素属背景纹理）`}
-`);
+  console.log(`${fail ? '❌' : '✅'} ${p.split('/').pop().padEnd(26)}\n   粗筛 左${pct(loose.left)}% 右${pct(loose.right)}% 顶${pct(loose.top)}%（含背景纹理，不定罪）\n   墨级 左${pct(ink.left)}% 右${pct(ink.right)}% 顶${pct(ink.top)}% 底 不计${fail ? '  ← 定罪' : ''}\n   full-bleed 过滤 左${filteredLeft} 右${filteredRight}｜字幕带过滤 ${subFiltered}\n   左带行区间 ${fmt(runs(rowL, 2), 8)}\n   右带行区间 ${fmt(runs(rowR, 2), 8)}\n   顶带列区间 ${fmt(runs(colT, 2), 8)}\n   字幕带 ${subInk ? `❌ 局部字形越左右线 ${subInk} 墨级像素（粗筛 ${subWide}）` : `✅ 未见局部字形越左右线（粗筛 ${subWide} 像素；full-bleed 过滤 ${subFiltered}）`}\n`);
 }
 
 console.log(anyFail
-  ? `\n❌ 至少一屏有墨级像素侵入安全边带。行/列区间只告诉你"越界的东西在哪一条线上"，是标题、脚注还是角标须对真图看；小元素与标题出界处理方式不同，由用户拍板。`
-  : `\n✅ 全部样本墨级四带零侵入（粗筛仍有背景纹理命中属正常）。不替代真图审。`);
+  ? `\n❌ 至少一屏仍有局部墨级像素侵入安全边带。full-bleed 连续行已排除背景/暗角等全幅氛围层；剩余行/列区间须与真图对齐，确认是文字/实色内容后再修。`
+  : `\n✅ 全部样本未见局部墨级像素侵入安全边带（全幅氛围层已按像素覆盖过滤）。不替代真图审。`);
 process.exit(anyFail ? 1 : 0);
