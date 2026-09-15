@@ -1,3 +1,4 @@
+# CI contract: current source-of-truth map is validated before render evidence.
 name: visual-shot-contract
 
 on:
