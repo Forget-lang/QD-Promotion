@@ -60,6 +60,15 @@ const FONT_CSS = `
   font-weight: 400;
   font-display: swap;
 }
+
+/* g11 安全区修复：两类贴近 x=120/960 的暖橙卡片阴影会把实色边缘扩入安全带。
+   保留卡面与层次，仅把外扩阴影收为内阴影；不改变安全区探针判据。 */
+[style*="0 8px 40px rgba(255, 107, 53"] {
+  box-shadow: inset 0 0 28px rgba(255, 107, 53, 0.08) !important;
+}
+[style*="0 4px 40px rgba(255, 107, 53"] {
+  box-shadow: inset 0 0 28px rgba(255, 107, 53, 0.10) !important;
+}
 `;
 
 // 收集所有视频数据（从 data/index.ts 统一导出）
