@@ -35,7 +35,7 @@ CLOSED
 | 层 | 权威 | 负责什么 | 当前状态 |
 |---|---|---|---|
 | 治理 | `docs/internal/R8-变更收敛协议.md` | Decision → Change Contract → Impact → Migration → Verification → CLOSED | 生效 |
-| 变更事务 | `docs/changes/*` | 实际变更的影响、迁移、验证、关闭状态 | 当前无 active transaction |
+| 变更事务 | `docs/changes/*` | 实际变更的影响、迁移、验证、关闭状态 | **1 个 active transaction：CHANGE-20260915-004，状态 MIGRATING** |
 | 产品事实 | `APPLET` + Product Truth | 产品字段、UI、流程事实 | **snapshot 已入主分支；CI 已验证** |
 | 字段登记 | `spec/coupon-fields.json` / `spec/card-fields.json` | promotion 内可消费的字段真值登记 | 在位；必须可追溯到 APPLET |
 | 红线 | `spec/redlines.json` + `scripts/check-redlines.mjs` | 画面/口播硬禁及人工确认层 | 硬禁层无命中；人工确认按当前生产流程执行 |
@@ -113,4 +113,4 @@ Change Contract 已接入 gate-all；CLOSED 事务需要完整影响对账、机
 
 ## 7. 当前结论
 
-**核心治理、Product Truth、g11 安全区与 R9 视觉契约整改均已闭环。** 当前不存在 P0-A/P0-B 遗留阻塞；后续新变更必须新建独立 Change Contract，不得把已关闭事务重新当作待办。
+**核心治理、Product Truth、g11 安全区与 R9 视觉契约整改均已闭环。** 当前不存在 P0-A/P0-B 遗留阻塞；CHANGE-20260915-004 正在进行最后的文档一致性收口，未关闭前不得把项目整体声明为完成。
