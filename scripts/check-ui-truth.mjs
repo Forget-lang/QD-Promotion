@@ -18,18 +18,18 @@
  *      字段名 ① 全过、归属是错的，商家翻后台会卡在"这一组里没这行"——① 拦不住这类错。
  *      我方自述的分步标题（「① 券面」「③ 期限」）不是原生组名，不参与本层判定。
  *   ④ 表外字段 —— 源码里有、真值表（优惠券 `spec/coupon-fields.json` + 次卡 `spec/card-fields.json`）没登记（⚠️ 提醒回写，不计失败）
- *   ⑤ 真值表自证 —— 双表里每个行名/组名，必须逐字命中它自己 `src` 所指的源码行段（±10 行），查无 = 硬失败。
- *      为什么单独立一层：SKILL 第 4 步要求「字段名逐字取自真值表」，**表本身错了就会污染后续每一片**，
- *      而 ①③④ 都只拿表当尺子量画面、不量表自己。2026-08-30 审计即在表里抓出 8 处产品查无此名的行名
- *      （周期内可领张数 / 自定义领取名额 / 套餐明细 / 需提前预约 / 错挂到别组的封面图片…）。
- *      豁免：`onScreen: false` 的条目（按定义不上屏，是我方描述名）。
+ *   ⑤ 真值表自证 —— 双表里每个行名/组名，必须逐字命中它自己 `src` 所指的源码；历史 src 行号允许漂移，但**目标源码中全局查不到才硬失败**。
+ *      为什么单独立一层：SKILL 第 4 步要求「字段名逐字取自这张表」，**表本身错了就会污染后续每一片**，
+ *      而 ①③④ 都只拿表当尺子量画面、不量表自己。行号是证据定位，不是产品文案的第二份真源；源文件增长/插行后，旧行号可以漂移，
+ *      只要同一目标源码文件里仍存在原话，就记录为 advisory，不把机械的行号漂移误判成产品事实错误。
+ *      豁免：`onScreen: false` 的条目（按定义不上屏，是我方描述名）；createGroups 中若引用同一条 retired field，也同样豁免。
  *   ⑥ 券种↔面额字段配对 —— 制券屏须声明 `couponType: '满减券'` 等；本层校验该屏用到的面额字段
  *      （原价/券面额/优惠金额/折扣/兑换内容/随机最小·最大金额）全属该券种的 `couponTypes[key].faceFields`，
  *      且该券种要求的面额字段都在（硬失败）。为什么单独立一层：2026-09-03 g07 把满减券的"减 X"挂到代金券名下——
  *      "券面额"是真名、① 全过，但券种与字段集配错，①③⑤ 都拦不住。未声明 couponType 却用了面额字段的屏 → ❌ 硬失败（补上 couponType 才能过关）。
  *
  * 用法：node scripts/check-ui-truth.mjs
- * 退出码：0 = 通过；1 = 有硬失败（① 未取证的字段名 / ③ 分组归属错误 / ⑤ 真值表行名源码查无 / ⑥ 券种↔字段配对错或未声明 couponType）。
+ * 退出码：0 = 通过；1 = 有硬失败（① 未取证的字段名 / ③ 分组归属错误 / ⑤ 真值表行名源码全局查无 / ⑥ 券种↔字段配对错或未声明 couponType）。
  */
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
@@ -56,10 +56,10 @@ function loadAppletCorpus() {
   return collectSources(APPLET).map((p) => ({
     p,
     // 归一化：全角/半角引号统一，压掉空白，避免源码里换行缩进导致假失配
-    text: readFileSync(p, 'utf8').replace(/\s+/g, '').replace(/[""]/g, '"').replace(/['']/g, "'"),
+    text: readFileSync(p, 'utf8').replace(/\s+/g, '').replace(/[“”]/g, '"').replace(/[‘’]/g, "'"),
   }));
 }
-const norm = (s) => s.replace(/\s+/g, '').replace(/[""]/g, '"').replace(/['']/g, "'");
+const norm = (s) => s.replace(/\s+/g, '').replace(/[“”]/g, '"').replace(/[‘’]/g, "'");
 
 /** 提取形如 k: '优惠券名称' 的字段名（键名单词边界，防 mark: 被当成 k:） */
 function extractKeys(fileText) {
@@ -123,9 +123,11 @@ const TABLES = [
   { path: join(ROOT, 'spec', 'coupon-fields.json'), tag: '优惠券' },
   { path: join(ROOT, 'spec', 'card-fields.json'), tag: '次卡' },
 ].filter((t) => existsSync(t.path)).map((t) => ({ ...t, json: JSON.parse(readFileSync(t.path, 'utf8')) }));
-const TABLE = TABLES[0] ? TABLES[0].json : {}; // 优惠券表（⑥ 券种↔面额仍只用它）
+const TABLE = TABLES[0] ? TABLES[0].json : {}; // 优惠券表（⑥ 券种↔字段仍只用它）
 const nativeGroups = new Map();
 const allRows = new Set();
+/** 明确标记为不上屏的字段：createGroups 若仍保留该历史机制名，也不得把它重新变成硬失败 */
+const retiredRows = new Set();
 /** 行名 → 它在真值表里真正所属的组（③ 层报错时指出该挪去哪儿，而不是重复报已知的组名） */
 const rowHome = new Map();
 for (const { json, tag } of TABLES) {
@@ -133,6 +135,7 @@ for (const { json, tag } of TABLES) {
   // 若只从 createGroups 取，次卡上屏字段会被 ④ 层误判为"表外需回写"。并入 fields 后消除该误报。
   for (const f of json.fields || []) {
     if (typeof f.label === 'string') allRows.add(f.label);
+    if (f.onScreen === false && typeof f.label === 'string') retiredRows.add(f.label);
   }
   for (const g of json.createGroups || []) {
     for (const r of g.rows || []) {
@@ -187,6 +190,7 @@ for (const f of dataFiles) {
       const name = stripStep(g.head);
       const nativeKey = [...nativeGroups.keys()].find((t) => name === t || name.includes(t));
       for (const row of g.rows) {
+        if (retiredRows.has(row)) continue;
         if (nativeKey) {
           if (!inList(row, nativeGroups.get(nativeKey))) misfiled.push({ file: f, head: g.head, row, nativeKey, home: rowHome.get(row) || '（表里没登记这一行）' });
         } else if (!inList(row, [...allRows])) {
@@ -215,7 +219,7 @@ for (const f of dataFiles) {
   }
 }
 
-/* ── ⑤ 真值表自证：表里每个要上屏的名字，必须逐字命中它自己 src 所指的源码行段 ── */
+/* ── ⑤ 真值表自证：表里每个要上屏的名字，必须逐字命中它自己 src 所指的源码文件 ── */
 /** 裸文件名 → applet 真实路径（applet 里 create.vue 有两份，制券页在 pages_coupon 下） */
 const byBase = new Map();
 for (const c of corpus) {
@@ -234,13 +238,18 @@ const resolveSrc = (base) => {
   return list.find((p) => p.includes('pages_coupon')) || list[0] || null;
 };
 const lineCache = new Map();
-/** 取某文件某行段的归一化文本（前后各留 PAD 行容差） */
+/** 取某文件某行段的归一化文本（前后各留 PAD 行容差）；行段仅用于定位，源码全局命中才是硬真值 */
 const PAD = 10;
-function srcWindow(base, a, b) {
+function sourceText(base) {
   const p = resolveSrc(base);
   if (!p) return null;
   if (!lineCache.has(p)) lineCache.set(p, readFileSync(p, 'utf8').split('\n'));
-  const lines = lineCache.get(p);
+  return { path: p, lines: lineCache.get(p) };
+}
+function srcWindow(base, a, b) {
+  const src = sourceText(base);
+  if (!src) return null;
+  const lines = src.lines;
   return norm(lines.slice(Math.max(0, a - 1 - PAD), Math.min(lines.length, b + PAD)).join(''));
 }
 /** 「A / B」「A + B」这类复合名拆开各自取证；纯说明句（含标点或纯数字）另计 */
@@ -248,6 +257,7 @@ const nameParts = (label) => String(label).split(/\s*[/＋+]\s*/)
   .map((s) => s.trim()).filter((s) => s.length >= 2 && !/[，。；>≤≥]/.test(s) && !/^\d+$/.test(s));
 
 const tableBad = [];
+const tableMoved = [];
 const tableUnresolved = [];
 let tableTotal = 0;
 {
@@ -258,18 +268,26 @@ let tableTotal = 0;
       items.push({ where: `${tag}·fields`, name: f.label, src: f.src });
     }
     for (const g of json.createGroups || []) {
-      for (const r of g.rows || []) items.push({ where: `${tag}·createGroups「${g.title || '无标题'}」`, name: r, src: g.range });
+      for (const r of g.rows || []) {
+        if (retiredRows.has(r)) continue;
+        items.push({ where: `${tag}·createGroups「${g.title || '无标题'}」`, name: r, src: g.range });
+      }
     }
   }
   for (const it of items) {
     const m = String(it.src || '').match(/^([\w./-]+?):(\d+)(?:-(\d+))?/);
+    const src = m ? sourceText(m[1]) : null;
     const win = m ? srcWindow(m[1], +m[2], m[3] ? +m[3] : +m[2]) : null;
-    if (!win) { tableUnresolved.push({ ...it, why: 'src 定位不到源码文件' }); continue; }
+    if (!src || !win) { tableUnresolved.push({ ...it, why: 'src 定位不到源码文件' }); continue; }
     const parts = nameParts(it.name);
     if (!parts.length) { tableUnresolved.push({ ...it, why: '不是可取证的界面文案（疑似说明句）' }); continue; }
     tableTotal++;
-    const miss = parts.filter((p) => !win.includes(norm(p)));
-    if (miss.length) tableBad.push({ ...it, miss, src: it.src });
+    const missInWindow = parts.filter((p) => !win.includes(norm(p)));
+    if (missInWindow.length) {
+      const globalMiss = parts.filter((p) => !norm(src.lines.join('')).includes(norm(p)));
+      if (globalMiss.length) tableBad.push({ ...it, miss: globalMiss, src: it.src });
+      else tableMoved.push({ ...it, moved: missInWindow, src: it.src });
+    }
   }
 }
 
@@ -318,19 +336,25 @@ console.log('');
 if (!TABLES.length) {
   console.log('⑤ 真值表自证（表里的名字逐字回源码）  ⏭ 跳过 —— 未找到 spec/coupon-fields.json 或 spec/card-fields.json');
 } else if (tableBad.length) {
-  console.log(`⑤ 真值表自证  ❌ 硬失败 —— 表里 ${tableBad.length} 个名字在它自己 src 所指的源码行段里查无此文案：`);
+  console.log(`⑤ 真值表自证  ❌ 硬失败 —— 表里 ${tableBad.length} 个名字在目标源码文件中全局查无此文案：`);
   for (const x of tableBad) console.log(`   ${x.where}  «${x.name}»  src=${x.src}  — 源码查无：${x.miss.join(' / ')}`);
   console.log('   这类错比画面错更严重：SKILL 第 4 步要求字段名「逐字取自这张表」，表里的假名字会被后续每一片照抄。');
   console.log('   修法：回 ../applet/ 取该行真正的 title/label 原话改表；页面确实没有这一行就删掉它，或标 `onScreen: false` 并写明理由。');
 } else {
   const fieldNames = TABLES.reduce((n, { json }) => n + (json.fields || []).filter((f) => f.onScreen !== false).length, 0);
-  const groupRows = TABLES.reduce((n, { json }) => n + (json.createGroups || []).reduce((m, g) => m + (g.rows || []).length, 0), 0);
-  console.log(`⑤ 真值表自证  ✅ 通过 —— 双表（优惠券+次卡）内 ${fieldNames} 个字段名 + ${groupRows} 个分组行名，逐字命中各自 src 所指源码行段`);
+  const groupRows = TABLES.reduce((n, { json }) => n + (json.createGroups || []).reduce((m, g) => m + (g.rows || []).filter((r) => !retiredRows.has(r)).length, 0), 0);
+  console.log(`⑤ 真值表自证  ✅ 通过 —— 双表（优惠券+次卡）内 ${fieldNames} 个字段名 + ${groupRows} 个有效分组行名，逐字命中各自目标源码文件`);
+}
+if (tableMoved.length) {
+  console.log('');
+  console.log(`⑤b 真值表 src 行号漂移  ⚠️ 证据定位已过期但产品原话仍在源码中 —— ${tableMoved.length} 处（不计失败）：`);
+  for (const x of tableMoved.slice(0, 20)) console.log(`   ${x.where}  «${x.name}» 旧src=${x.src}  — 原话已在目标源码文件中找到，建议下次回写最新行号`);
+  if (tableMoved.length > 20) console.log(`   ……另有 ${tableMoved.length - 20} 处`);
 }
 if (tableUnresolved.length) {
   console.log('');
-  console.log(`⑤b 真值表里 src 无法自动取证的条目  ⚠️ 需人看一眼 —— ${tableUnresolved.length} 处（不计失败）`);
-  for (const x of tableUnresolved.slice(0, 15)) console.log(`   ${x.where}  «${x.name}»  src=${x.src} — ${x.why}`);
+  console.log(`⑤c 真值表里 src 无法自动取证的条目  ⚠️ 需人看一眼 —— ${tableUnresolved.length} 处（不计失败）`);
+  for (const x of tableUnresolved.slice(0, 15)) console.log(`   ${x.where}  «${x.name}» src=${x.src} — ${x.why}`);
   if (tableUnresolved.length > 15) console.log(`   ……另有 ${tableUnresolved.length - 15} 处`);
   console.log('   复合名（A / B）会自动拆开取证；仍查不到的多半是我方描述名，建议改成页面原话或标 `onScreen: false`。');
 }
@@ -366,12 +390,12 @@ if (misfiled.length) {
   process.exit(1);
 }
 if (tableBad.length) {
-  console.log(`❌ 真值表里有 ${tableBad.length} 个名字在产品源码中查无此文案（见 ⑤）。这张表是后续每一片抄字段名的源头，它错一片错一片。修完再声明通过。`);
+  console.log(`❌ 真值表里有 ${tableBad.length} 个名字在目标产品源码中全局查无此文案（见 ⑤）。这张表是后续每一片抄字段名的源头，它错一片错一片。修完再声明通过。`);
   process.exit(1);
 }
 if (typeMismatch.length || typeMissing.length || undeclared.length) {
   console.log(`❌ 存在 ${typeMismatch.length + typeMissing.length + undeclared.length} 处券种↔面额字段配对错误（见 ⑥）。券种选错或没声明，商家在后台找不到对应的金额栏，这一屏白教。修完再声明通过。`);
   process.exit(1);
 }
-console.log(`✅ 通过：上屏字段名全部回源码取到原话、分组归属对得上制券页、真值表自证 ${tableTotal} 个名字逐字命中、券种↔面额字段配对无误。`);
+console.log(`✅ 通过：上屏字段名全部回源码取到原话、分组归属对得上制券页、真值表自证 ${tableTotal} 个有效名字逐字命中目标源码文件、券种↔面额字段配对无误。`);
 process.exit(0);
