@@ -35,11 +35,17 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if [ -d "spec/product-truth/applet" ]; then
-            rm -rf ../applet
+          rm -rf ../applet
+          if [ -f "spec/product-truth/applet/source.tar.xz" ]; then
+            mkdir -p ../applet
+            tar -xJf spec/product-truth/applet/source.tar.xz -C ../applet
+            count=$(find ../applet -type f \( -name '*.vue' -o -name '*.js' -o -name '*.json' \) | wc -l | tr -d ' ')
+            test "$count" = "298"
+            echo "APPLET Product Truth Snapshot materialized: $count source files."
+          elif [ -d "spec/product-truth/applet" ]; then
             mkdir -p ../applet
             cp -a spec/product-truth/applet/. ../applet/
-            echo "APPLET snapshot materialized from committed Product Truth Snapshot."
+            echo "APPLET snapshot materialized from committed directory."
           else
             echo "APPLET snapshot not committed; check-ui-truth remains a hard-fail until a complete traceable snapshot exists."
           fi
