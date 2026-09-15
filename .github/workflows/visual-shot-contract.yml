@@ -10,6 +10,7 @@ on:
       - 'docs/internal/R9-视觉映射表.md'
       - 'docs/internal/R10-产品事实源解析协议.md'
       - 'docs/internal/R7-Remotion组件库.md'
+      - 'spec/product-truth/**'
       - '.github/workflows/visual-shot-contract.yml'
   pull_request:
     paths:
@@ -20,6 +21,7 @@ on:
       - 'docs/internal/R9-视觉映射表.md'
       - 'docs/internal/R10-产品事实源解析协议.md'
       - 'docs/internal/R7-Remotion组件库.md'
+      - 'spec/product-truth/**'
       - '.github/workflows/visual-shot-contract.yml'
 
 jobs:
@@ -29,6 +31,18 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install video dependencies
         run: npm ci --prefix video
+      - name: Materialize APPLET snapshot when present
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -d "spec/product-truth/applet" ]; then
+            rm -rf ../applet
+            mkdir -p ../applet
+            cp -a spec/product-truth/applet/. ../applet/
+            echo "APPLET snapshot materialized from committed Product Truth Snapshot."
+          else
+            echo "APPLET snapshot not committed; check-ui-truth remains a hard-fail until a complete traceable snapshot exists."
+          fi
       - name: Negative test
         run: node scripts/test-visual-shot-contract-negative.mjs
       - name: Visual shot contract
