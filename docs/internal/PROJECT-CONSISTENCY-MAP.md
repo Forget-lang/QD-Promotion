@@ -38,7 +38,7 @@ CLOSED
 | 总治理宪法 | `AGENTS.md` | 最高戒律、唯一 AI 入口、Owner/入口/历史边界、全局变更总路由 | 生效 |
 | 治理协议 | `docs/internal/R8-变更收敛协议.md` | Decision → 全局侦察 → Owner/入口 → Change Contract → Impact → Migration → Verification → CLOSED | 生效 |
 | 整改排兵布阵 | `docs/internal/整改作战总纲.md` | 整改前资源/Owner/冲突/依赖/能力/优先级审计 | 生效；不是第二生产流程 |
-| 变更事务 | `docs/changes/*` | 实际变更的影响、迁移、验证、关闭状态 | **CHANGE-20260916-003 已 CLOSED，并已归档至 `docs/changes/closed/`** |
+| 变更事务 | `docs/changes/*` | 实际变更的影响、迁移、验证、关闭状态 | **CHANGE-20260916-004 为当前唯一 active 事务；003 已 CLOSED 并归档至 `docs/changes/closed/`** |
 | 产品事实 | `APPLET` + Product Truth | 产品字段、UI、流程事实 | **snapshot 已入主分支；CI 已验证** |
 | 字段登记 | `spec/coupon-fields.json` / `spec/card-fields.json` | promotion 内可消费的字段真值登记 | 在位；必须可追溯到 APPLET |
 | 红线 | `spec/redlines.json` + `scripts/check-redlines.mjs` | 画面/口播硬禁及人工确认层 | 硬禁层无命中；人工确认按当前生产流程执行 |
