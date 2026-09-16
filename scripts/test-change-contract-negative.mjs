@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
  * Negative tests for check-change-contract.mjs.
- * Proves the gate rejects incomplete Impact Map rows and transactions that are
- * illegally scattered at docs/changes/ root instead of active/ or closed/.
+ * Proves the gate rejects incomplete active transactions, illegal root-level
+ * transactions, and closed transactions without a valid CLOSED conclusion.
  */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -57,4 +57,17 @@ runFixture((tempRoot) => {
   }
 });
 
-console.log('NEGATIVE TEST PASS: pending rows and illegal root-level transactions were rejected.');
+runFixture((tempRoot) => {
+  const closedDir = path.join(tempRoot, 'docs', 'changes', 'closed');
+  fs.mkdirSync(closedDir, { recursive: true });
+  const fixture = '# Change Contract\n\n## 基本信息\n- 状态：`CLOSED`\n\n## Closure Report\n- 关闭记录缺失结论\n';
+  fs.writeFileSync(path.join(closedDir, 'CHANGE-invalid-closed.md'), fixture);
+}, (status, output) => {
+  if (status === 0 || !/closed\/CHANGE-invalid-closed\.md: closed transaction missing CLOSED conclusion/.test(output)) {
+    console.error('NEGATIVE TEST FAIL: checker accepted a closed transaction without a CLOSED conclusion.');
+    console.error(output);
+    process.exit(1);
+  }
+});
+
+console.log('NEGATIVE TEST PASS: active pending rows, illegal root transactions, and invalid closed transactions were rejected.');
