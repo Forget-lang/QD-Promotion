@@ -45,7 +45,7 @@ CLOSED
 | 视觉方法 | `docs/internal/R9-视觉导演与审美决策.md` | 镜头级视觉决策原则 | 生效 |
 | 视觉映射 | `docs/internal/R9-视觉映射表.md` | 叙事关系 → Remotion 视觉关系/组件 | 生效 |
 | 镜头契约 | `scripts/check-visual-shot-contract.mjs` + R9 ledger | 关键镜头的视觉主体、隐喻、Peak Frame、State Change、Exit | **检查通过** |
-| 成片验证 | `scripts/gate-all.mjs` | 统一总闸门 | **fresh visual-shot-contract Run #113：PASS；fresh production g11 keyframes / safe-area verification 已完成** |
+| 成片验证 | `scripts/gate-all.mjs` | 统一总闸门 | **fresh visual-shot-contract Run #124：PASS；fresh production g11 keyframes / safe-area verification 已完成** |
 
 ## 3. 当前状态与已关闭事项
 
@@ -85,7 +85,7 @@ CHANGE-20260916-003 已完成并关闭：
 - 历史前身：`outputs/archive/AI启动提示词.md`
 - 当前事务已归档：`docs/changes/closed/CHANGE-20260916-003-全局治理阵型收口.md`
 - 本轮 Closure Report：CLOSED
-- fresh CI：`change-contract-gate` #64 PASS；`visual-shot-contract` #113 PASS
+- fresh CI：`change-contract-gate` #75 PASS；`visual-shot-contract` #124 PASS
 - changelog：第七十九轮已置顶，历史台账保持完整
 
 ### 5. R9 / Visual Shot Contract
