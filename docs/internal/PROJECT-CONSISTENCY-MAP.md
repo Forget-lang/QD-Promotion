@@ -38,14 +38,14 @@ CLOSED
 | 总治理宪法 | `AGENTS.md` | 最高戒律、唯一 AI 入口、Owner/入口/历史边界、全局变更总路由 | 生效 |
 | 治理协议 | `docs/internal/R8-变更收敛协议.md` | Decision → 全局侦察 → Owner/入口 → Change Contract → Impact → Migration → Verification → CLOSED | 生效 |
 | 整改排兵布阵 | `docs/internal/整改作战总纲.md` | 整改前资源/Owner/冲突/依赖/能力/优先级审计 | 生效；不是第二生产流程 |
-| 变更事务 | `docs/changes/*` | 实际变更的影响、迁移、验证、关闭状态 | **CHANGE-20260916-003 正在 MIGRATING；此前 CHANGE-20260915-004 已 CLOSED 并位于 `docs/changes/closed/`** |
+| 变更事务 | `docs/changes/*` | 实际变更的影响、迁移、验证、关闭状态 | **CHANGE-20260916-003 已完成迁移，当前处于 VERIFYING；changelog 完成后关闭并归档** |
 | 产品事实 | `APPLET` + Product Truth | 产品字段、UI、流程事实 | **snapshot 已入主分支；CI 已验证** |
 | 字段登记 | `spec/coupon-fields.json` / `spec/card-fields.json` | promotion 内可消费的字段真值登记 | 在位；必须可追溯到 APPLET |
 | 红线 | `spec/redlines.json` + `scripts/check-redlines.mjs` | 画面/口播硬禁及人工确认层 | 硬禁层无命中；人工确认按当前生产流程执行 |
 | 视觉方法 | `docs/internal/R9-视觉导演与审美决策.md` | 镜头级视觉决策原则 | 生效 |
 | 视觉映射 | `docs/internal/R9-视觉映射表.md` | 叙事关系 → Remotion 视觉关系/组件 | 生效 |
 | 镜头契约 | `scripts/check-visual-shot-contract.mjs` + R9 ledger | 关键镜头的视觉主体、隐喻、Peak Frame、State Change、Exit | **检查通过** |
-| 成片验证 | `scripts/gate-all.mjs` | 统一总闸门 | **以最新 CI 实际结果为准** |
+| 成片验证 | `scripts/gate-all.mjs` | 统一总闸门 | **最新 visual-shot-contract Run #101：PASS** |
 
 ## 3. 当前状态与已关闭事项
 
@@ -72,6 +72,13 @@ CLOSED
 ### 全局治理阵型
 
 最高原则已经统一到 `AGENTS.md` 的零号戒律；R8 负责全局变更协议；整改总纲负责前置排兵布阵；本账只负责当前状态索引。不得再新增平行治理 Owner、平行 AI 入口或平行生产流程。
+
+用户侧操作层现在固定只有两份文档：
+
+- `AI工作启动指令.md`：用户个人工作控制台，负责“怎么叫 AI 开始干活”；不承担规则 Owner，不承担 AI 自动入口。
+- `docs/AI使用手册.md`：用户协作说明书，负责“我怎样和 AI 协作、何时拍板、如何看证据”；不承担规则 Owner，不承担 AI 自动入口。
+
+二者均不进入权威规则链，也不要求 `AGENTS.md` 反向引用；AI 进入仓库后仍从 `AGENTS.md` 开始，并回到当前唯一 Owner。
 
 ### R8 变更收敛
 
@@ -124,4 +131,4 @@ Change Contract 已接入 gate-all；全局变更必须先完成侦察、Owner/�
 
 ## 7. 当前结论
 
-**当前正在执行的唯一全局治理事务是 CHANGE-20260916-003；在其完成前，不宣称本轮文档治理已全面 CLOSED。** CHANGE-20260915-004 已完成并归档至 `docs/changes/closed/`，不得再作为当前 active transaction 继续执行。
+**当前唯一全局治理事务 CHANGE-20260916-003 已完成 Migration 与 fresh Verification，当前仅剩 changelog 最终补记及事务归档/关闭手续；在完成前保持 VERIFYING，不宣称本轮文档治理已全面 CLOSED。** CHANGE-20260915-004 已完成并归档至 `docs/changes/closed/`，不得再作为当前 active transaction 继续执行。
