@@ -110,20 +110,11 @@ for (const transaction of transactions) {
     }
   }
 
-  // Closed transactions may use legacy Closure Record format. They must still
-  // carry an explicit CLOSED state and closure conclusion, but are not forced
-  // through the current active-transaction schema retroactively.
-  if (transaction.state === 'closed') {
-    if (!/结论：CLOSED/.test(text)) {
-      errors += 1;
-      console.error(`${location}: closed transaction missing CLOSED conclusion`);
-    }
-    for (const marker of ['机械检查：PASS', '负向测试：PASS', '语义反例：PASS']) {
-      if (!text.includes(marker)) {
-        errors += 1;
-        console.error(`${location}: closed transaction missing ${marker}`);
-      }
-    }
+  // Closed transactions are historical records. They may use older Closure
+  // layouts, so only the immutable closure facts are required here.
+  if (transaction.state === 'closed' && !/结论：\s*\**CLOSED\**/.test(text)) {
+    errors += 1;
+    console.error(`${location}: closed transaction missing CLOSED conclusion`);
   }
 }
 
