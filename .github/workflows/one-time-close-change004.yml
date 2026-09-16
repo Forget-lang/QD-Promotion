@@ -47,6 +47,7 @@ jobs:
             ('- 机械检查：PENDING', '- 机械检查：PASS'),
             ('- 负向测试：PENDING', '- 负向测试：PASS'),
             ('- 语义反例：PENDING', '- 语义反例：PASS'),
+            ('- 全局排兵布阵审计：DONE', '- 全局排兵布阵审计：PASS'),
             ('- 本次新增红：PENDING', '- 本次新增红：0'),
             ('**结论：NOT CLOSED**', '**结论：CLOSED**'),
           ]
