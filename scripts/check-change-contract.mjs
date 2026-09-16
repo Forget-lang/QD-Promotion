@@ -8,6 +8,7 @@
  *
  * Important: section numbers are presentation, not identity. Governance
  * sections may be inserted without invalidating the contract shape.
+ * Fresh verification marker: 2026-09-16.
  */
 import fs from 'node:fs';
 import path from 'node:path';
