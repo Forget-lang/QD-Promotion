@@ -1,6 +1,6 @@
 # 券到卡包 · 内容运营项目（AI 入口）
 
-> 最后校验：2026-09-15（变更史见 `outputs/archive/changelog.md`）。
+> 最后校验：2026-09-16（变更史见 `outputs/archive/changelog.md`）。
 > 任何 AI 助手在本仓库开工前，先读本文件，然后按「§三 开工三动作」执行。
 
 > **改动权威文档：决策层你拍板，执行层机器自证**。改动对象限本立项的权威文档——`SKILL.md` / `spec/` / `docs/internal/` / `AGENTS.md` / `docs/战略简报.md` / `docs/AI使用手册.md`。
@@ -25,6 +25,7 @@
 | 业务流程说明 | `docs/internal/R2-业务流程.md`（只负责业务链路解释；不是 AI 开工必读入口，也不拥有产品字段真值） |
 | Remotion 技术原理 | `docs/internal/R3-Remotion技术参考.md` |
 | applet UI 视觉快照 | `docs/internal/R6-applet前端UI储备.md`（视觉参考；事实以 APPLET / Product Truth 为准） |
+| **Remotion 组件目录与复用登记** | `docs/internal/R7-Remotion组件库.md`（组件 Owner；不决定镜头与视觉方向） |
 | **Product Truth / applet 路径解析** | `docs/internal/R10-产品事实源解析协议.md` |
 | **全局变更收敛协议** | `docs/internal/R8-变更收敛协议.md` |
 | 视觉导演 / 视觉映射 | `docs/internal/R9-视觉导演与审美决策.md` / `docs/internal/R9-视觉映射表.md` |
@@ -32,6 +33,7 @@
 | 官网玩法蓝本 / 避雷台账 | `outputs/archive/官网资源库落地规划.md`（历史/参考，不是当前作业入口） |
 | 平台玩法组合视角 | `knowledge/玩法版图.md`（知识参考，不是规则 Owner） |
 | 项目总览 / 人机协作方法 | `docs/战略简报.md` / `docs/AI使用手册.md` |
+| 当前状态总账 | `docs/internal/PROJECT-CONSISTENCY-MAP.md`（只恢复状态，不作为新会话第一入口） |
 | 近期决策与踩坑 | `outputs/archive/changelog.md` 顶部约 10 条 |
 | 组件 / 素材 / 已产出片实时清单 | `node scripts/list-assets.mjs` |
 | 爆款叙事方法 + 语料 + 洞察 | `knowledge/爆款整片解剖.md` / `knowledge/洞察库.md` / `knowledge/爆款文案技能包/` |
@@ -44,9 +46,9 @@
 - **铁律四**：条款只写“做/不做”+ 一句判据；理由与过程进 changelog。
 - **铁律五**：替代型决策必须同时完成：①新口径进入唯一属主；②旧口径登记到 `scripts/ref-registry.json` 的 `deprecatedTerms` / `caliberOwners`；③`check-doc-references` 通过。**新增不等于替代，旧口径没登记就视为未落地。**
 - **铁律六（最高危险信号）**：任何整改如果出现“同一概念多个 Owner、多个当前入口、规则正文互相冲突、历史文档被当成当前规则、通过新增文档解决已有规则冲突、或为了迎合检查器而迁就错误语义”，立即停止继续改文档，先回到 Owner/冲突审计；**整改不得增加系统复杂度**。
-- **铁律七（唯一作业主干）**：`SKILL.md` 是唯一视频生产作业流程；R2/R3/R6/R9/R10 各自只负责已经定义的领域，不得再创建第二套视频制作流程。R8 只在发生全局变更时作为治理覆盖层，不是第二套生产流程。
+- **铁律七（唯一作业主干）**：`SKILL.md` 是唯一视频生产作业流程；R2/R3/R6/R7/R9/R10 各自只负责已经定义的领域，不得再创建第二套视频制作流程。R8 只在发生全局变更时作为治理覆盖层，不是第二套生产流程。
 - **铁律八（历史与当前彻底分离）**：`outputs/archive/` 与 `changelog` 不得成为当前作业入口；历史材料只能作为证据/参考。当前规则必须回到其唯一 Owner。
-- **铁律九（AI 读取顺序）**：正常开工只沿 `AGENTS → SKILL → 当前任务对应 Owner → 输出 → Gate` 主线读取；不要为了“完整”遍历全部内部文档。只有任务确实涉及对应领域时，才读取 R2/R3/R6/R8/R9/R10。发生全局变更时才进入 R8 覆盖流程。
+- **铁律九（AI 读取顺序）**：正常开工只沿 `AGENTS → SKILL → 当前任务对应 Owner → 输出 → Gate` 主线读取；不要为了“完整”遍历全部内部文档。只有任务确实涉及对应领域时，才读取 R2/R3/R6/R7/R8/R9/R10。发生全局变更时才进入 R8 覆盖流程。
 - **铁律十（权威声明最小化）**：只有真正拥有该概念的 Owner 才能使用“以本文为准 / 唯一真源 / 权威 / 必须”等权威表述；非 Owner 文档不得重新定义同一概念，只能引用、解释或指向 Owner。
 - **铁律十一（整改先侦察、后开战）**：任何“整改/治理/收口/清理/架构整理/全局一致性”任务，**必须先读 `docs/internal/整改作战总纲.md` 并完成全局排兵布阵审计，未完成不得进入 Migration，不得以局部检查结果代替全局判断**。审计至少覆盖资源、军规、Owner、能力强弱、冲突、重复、断档、依赖、当前/历史边界与 P0/P1/P2 优先级。若任一项未知，**强制 STOP，继续侦察，不得猜、不准补丁式开工**。
 
@@ -95,6 +97,7 @@ promotion/
 │   ├── R2-业务流程.md
 │   ├── R3-Remotion技术参考.md
 │   ├── R6-applet前端UI储备.md
+│   ├── R7-Remotion组件库.md
 │   ├── R8-变更收敛协议.md
 │   ├── R9-视觉导演与审美决策.md
 │   ├── R9-视觉映射表.md
