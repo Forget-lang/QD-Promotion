@@ -35,8 +35,10 @@ CLOSED
 
 | 层 | 权威 | 负责什么 | 当前状态 |
 |---|---|---|---|
-| 治理 | `docs/internal/R8-变更收敛协议.md` | Decision → Change Contract → Impact → Migration → Verification → CLOSED | 生效 |
-| 变更事务 | `docs/changes/*` | 实际变更的影响、迁移、验证、关闭状态 | **当前无 active transaction；CHANGE-20260915-004 已 CLOSED 并位于 `docs/changes/closed/`** |
+| 总治理宪法 | `AGENTS.md` | 最高戒律、唯一 AI 入口、Owner/入口/历史边界、全局变更总路由 | 生效 |
+| 治理协议 | `docs/internal/R8-变更收敛协议.md` | Decision → 全局侦察 → Owner/入口 → Change Contract → Impact → Migration → Verification → CLOSED | 生效 |
+| 整改排兵布阵 | `docs/internal/整改作战总纲.md` | 整改前资源/Owner/冲突/依赖/能力/优先级审计 | 生效；不是第二生产流程 |
+| 变更事务 | `docs/changes/*` | 实际变更的影响、迁移、验证、关闭状态 | **CHANGE-20260916-003 正在 MIGRATING；此前 CHANGE-20260915-004 已 CLOSED 并位于 `docs/changes/closed/`** |
 | 产品事实 | `APPLET` + Product Truth | 产品字段、UI、流程事实 | **snapshot 已入主分支；CI 已验证** |
 | 字段登记 | `spec/coupon-fields.json` / `spec/card-fields.json` | promotion 内可消费的字段真值登记 | 在位；必须可追溯到 APPLET |
 | 红线 | `spec/redlines.json` + `scripts/check-redlines.mjs` | 画面/口播硬禁及人工确认层 | 硬禁层无命中；人工确认按当前生产流程执行 |
@@ -67,9 +69,13 @@ CLOSED
 
 ## 4. 已完成且不得重新发明
 
+### 全局治理阵型
+
+最高原则已经统一到 `AGENTS.md` 的零号戒律；R8 负责全局变更协议；整改总纲负责前置排兵布阵；本账只负责当前状态索引。不得再新增平行治理 Owner、平行 AI 入口或平行生产流程。
+
 ### R8 变更收敛
 
-Change Contract 已接入 gate-all；CLOSED 事务需要完整影响对账、机械验证、反例验证与收口证据。
+Change Contract 已接入 gate-all；全局变更必须先完成侦察、Owner/入口确认与影响面布阵；CLOSED 事务需要完整影响对账、机械验证、反例验证与收口证据。
 
 ### R9 视觉导演
 
@@ -118,4 +124,4 @@ Change Contract 已接入 gate-all；CLOSED 事务需要完整影响对账、机
 
 ## 7. 当前结论
 
-**核心治理、Product Truth、g11 安全区与 R9 视觉契约整改均已闭环。** 当前不存在 P0-A/P0-B 遗留阻塞；CHANGE-20260915-004 已完成并归档至 `docs/changes/closed/`，不得再作为当前 active transaction 继续执行。
+**当前正在执行的唯一全局治理事务是 CHANGE-20260916-003；在其完成前，不宣称本轮文档治理已全面 CLOSED。** CHANGE-20260915-004 已完成并归档至 `docs/changes/closed/`，不得再作为当前 active transaction 继续执行。
