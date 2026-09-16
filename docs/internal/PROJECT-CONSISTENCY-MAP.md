@@ -3,6 +3,7 @@
 > 状态：生效
 > 用途：索引权威关系与当前闭环状态，不新增业务规则。
 > 文档引用纪律：本账只引用当前有效路径；不保留已删除文件名、历史错误路径或“旧名→新名”的废弃话头。
+> 接班纪律：本账是当前状态总账，不是新会话第一入口。新会话统一从 `AGENTS.md` 开始，再按当前任务读取 `SKILL.md` 与对应 Owner。
 
 ## 1. 唯一主链
 
@@ -35,7 +36,7 @@ CLOSED
 | 层 | 权威 | 负责什么 | 当前状态 |
 |---|---|---|---|
 | 治理 | `docs/internal/R8-变更收敛协议.md` | Decision → Change Contract → Impact → Migration → Verification → CLOSED | 生效 |
-| 变更事务 | `docs/changes/*` | 实际变更的影响、迁移、验证、关闭状态 | **1 个 active transaction：CHANGE-20260915-004，状态 MIGRATING** |
+| 变更事务 | `docs/changes/*` | 实际变更的影响、迁移、验证、关闭状态 | **当前无 active transaction；CHANGE-20260915-004 已 CLOSED 并位于 `docs/changes/closed/`** |
 | 产品事实 | `APPLET` + Product Truth | 产品字段、UI、流程事实 | **snapshot 已入主分支；CI 已验证** |
 | 字段登记 | `spec/coupon-fields.json` / `spec/card-fields.json` | promotion 内可消费的字段真值登记 | 在位；必须可追溯到 APPLET |
 | 红线 | `spec/redlines.json` + `scripts/check-redlines.mjs` | 画面/口播硬禁及人工确认层 | 硬禁层无命中；人工确认按当前生产流程执行 |
@@ -94,16 +95,20 @@ Change Contract 已接入 gate-all；CLOSED 事务需要完整影响对账、机
 
 ## 5. Agent 接续规则
 
-新 Agent / 新会话开始工作时，先读取本账，再读取：
+本账只用于恢复当前状态，**不承担新会话第一入口职责**。新 Agent / 新会话统一执行：
+
+1. 先读 `AGENTS.md`；
+2. 再按 `AGENTS.md` 的「AI 读取顺序」读取 `SKILL.md` 与当前任务 Owner；
+3. 只有任务涉及治理状态时，才回读本账；
+4. 当前事务状态以 `docs/changes/active/` 与 `docs/changes/closed/` 的实际位置及事务正文为准。
+
+当前正常作业路由：
 
 - `AGENTS.md`
-- `SKILL.md`（当前为八步法；第 4.5 步为正式视觉转换关）
-- `docs/internal/R8-变更收敛协议.md`
-- `docs/internal/R9-视觉导演与审美决策.md`
-- `docs/internal/R9-视觉映射表.md`
-- `R10`（产品事实源解析协议）
-- `spec/facts.json`、`spec/coupon-fields.json`、`spec/card-fields.json`
-- 当前 active `docs/changes/*`（若有）
+- `SKILL.md`
+- 当前任务对应 Owner
+- 输出 / 产物
+- Gate / 验收
 
 不要根据聊天历史猜测状态；以仓库文件与最新 CI 实际结果为准。
 
@@ -113,4 +118,4 @@ Change Contract 已接入 gate-all；CLOSED 事务需要完整影响对账、机
 
 ## 7. 当前结论
 
-**核心治理、Product Truth、g11 安全区与 R9 视觉契约整改均已闭环。** 当前不存在 P0-A/P0-B 遗留阻塞；CHANGE-20260915-004 正在进行最后的文档一致性收口，未关闭前不得把项目整体声明为完成。
+**核心治理、Product Truth、g11 安全区与 R9 视觉契约整改均已闭环。** 当前不存在 P0-A/P0-B 遗留阻塞；CHANGE-20260915-004 已完成并归档至 `docs/changes/closed/`，不得再作为当前 active transaction 继续执行。
