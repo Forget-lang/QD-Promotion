@@ -156,64 +156,88 @@
 
 ## 模型阶梯参考｜按“节点能力”选，不做永久模型绑定
 
-> **更新时间：2026-09-16。** 这是我的工作流选型参考，不是项目规则，也不是永久排行榜。模型会更新；每次真正开工时，优先检查当前仍可用的版本。
+> **更新时间：2026-09-16。** 这是我的工作流选型参考，不是项目规则，也不是永久排行榜。模型会更新；真正开工时，应先确认当前可用版本，再按节点选择。
 
 ### 第一阶梯｜旗舰推理 / 总控 / 高风险决策
 
-| 模型 | 最适合的节点 | 说明 |
+| 模型 | 更适合的节点 | 说明 |
 |---|---|---|
-| **GPT-5.4 Pro / GPT-5.4 Thinking** | 总体架构、复杂规划、跨文档统筹、研究综合、最终方案、工具型长链路 | OpenAI 将 GPT-5.4 定位为其面向专业工作的旗舰前沿模型，并强化了推理、编码、工具调用、计算机使用与长上下文能力。适合做“总参谋 / 总控”。 |
-| **Claude Opus 5** | 深度研究、复杂知识工作、长链路 Agent、艰难代码任务、最终复核 | Anthropic 将 Opus 5 定位为其高端旗舰，并强调复杂编码、Agent 与知识工作表现，适合长时间持续执行和高难度工程任务。 |
-| **Gemini 3.1 Pro** | 多模态总控、超长上下文、图片/视频/PDF/代码仓库综合理解 | Google DeepMind 将其定位为高级复杂任务模型，原生支持文本、图片、视频、音频、PDF，并提供 1M 输入上下文。特别适合“东西很多、而且不只是文字”的任务。 |
+| **GPT-5.6 Sol / Sol Pro** | 总体架构、复杂规划、跨文档统筹、研究综合、最终方案、长链路 Agent | OpenAI 当前 GPT-5.6 系列旗舰，覆盖复杂知识工作、编码、科学与 Agent 工作；Sol Pro 适合最高难度任务。 |
+| **Claude Opus 5** | 深度研究、复杂知识工作、长链路 Agent、艰难代码任务、最终复核 | Anthropic 当前高端 Opus，官方强调其软件工程、知识工作与长期 Agent 能力。 |
+| **Gemini 3.1 Pro** | 多模态总控、超长上下文、图片/视频/PDF/代码仓库综合理解 | 适合同时处理大量异构资料，尤其是文本 + 图片 + 视频 + 文档 + 代码的任务。 |
+| **Kimi K3** | 超长上下文、长程代码、知识工作、Agent 调度、多模型并行 | Kimi 当前旗舰，原生视觉，最高 1M 上下文，重点面向长程编程、知识工作和推理。 |
+| **GLM-5.2** | 大型工程、长程 Agent、复杂代码、中文工程环境 | 智谱当前旗舰之一，支持 1M 无损上下文，重点强化复杂系统工程、深度调试和长程任务。 |
+| **DeepSeek-V4-Pro** | Agent、复杂推理、代码工程、工具调用 | DeepSeek 当前 Pro 系列重点强化 Agent 与生产级工具使用，适合复杂工程和多步任务。 |
 
-**使用规则：** 第一阶梯不是“三个一起上”。先按任务属性选择一个主将；涉及高价值判断或明显不确定性时，再用另一个第一阶梯模型做独立复核。
+**使用规则：** 第一阶梯不是“全部一起上”。按节点属性选择一个主将；高价值或明显不确定的节点，再用另一模型独立复核。
 
-### 第二阶梯｜专业执行 / 可靠协作
+### 第二阶梯｜专业执行 / 稳定生产
 
 | 模型 | 更适合的节点 | 说明 |
 |---|---|---|
-| **Claude Sonnet 5** | Agent 执行、常规复杂编码、知识整理、重复性较高但仍需质量的工作 | Anthropic 将 Sonnet 5 描述为更高 Agent 化能力的 Sonnet，在编码、工具使用和知识工作上接近更高阶模型，同时成本与速度更适合日常生产。 |
-| **GPT-5.4** | 复杂文档、研究、编码、工具调用、生产型知识工作 | 在不需要 Pro 档最高性能时，可作为 GPT 系列的主力执行模型。官方资料明确强调其专业工作、编码、工具使用和长上下文能力。 |
-| **Gemini 3.1 Pro** | 长文档、多模态理解、复杂资料整合、代码仓库理解 | 当任务输入同时包含大量文字、图片、视频、PDF、代码时，常常值得作为第二意见。 |
+| **GPT-5.6 Terra** | 研究、复杂文档、生产型知识工作、常规编码与工具调用 | GPT-5.6 的均衡档，适合多数非旗舰级工作。 |
+| **Claude Sonnet 5** | Agent 执行、常规复杂编码、知识整理、迭代修改 | 更适合日常专业生产，不必把每个节点都交给 Opus。 |
+| **Qwen3.5-Plus** | 中文研究、长文档、多模态知识工作、Agent 工作流 | 通义千问当前托管旗舰之一，1M 上下文，并强化原生多模态 Agent 能力。 |
+| **MiniMax M3** | Coding、Agent、图片/视频理解、长上下文综合任务 | MiniMax M3 原生多模态，最高 1M 上下文，同时面向 Coding 与 Agent。 |
+| **Doubao / Seed2.1-Pro** | 中文知识工作、Agent、代码工程、多模态理解 | Seed2.1 面向真实生产力场景，官方强调 Agent、端到端 Coding 和多模态能力。 |
+| **GLM-5.1 / GLM-5.3** | 长程工程、Coding Agent、复杂项目执行 | 适合持续执行、多轮工具调用、长上下文工程任务。 |
 
 ### 第三阶梯｜高吞吐 / 成本敏感 / 机械执行
 
 | 模型 | 更适合的节点 | 说明 |
 |---|---|---|
-| **Gemini 3.6 Flash** | 批量整理、初筛、资料抽取、快速多模态检查、低延迟 Agent 工作 | Google 将 3.6 Flash 定位为适合规模化 Agent 的工作马，强调速度、效率、编码、知识工作和多模态能力。 |
-| **其他当前可用的中小型快速模型** | 分类、改写、格式转换、批量清洗、简单检查、重复性任务 | 只要任务不承担核心判断，可以优先选择低成本高吞吐模型，不要浪费旗舰模型。 |
+| **GPT-5.6 Luna** | 批量整理、快速初筛、改写、格式化、低成本 Agent | GPT-5.6 系列高性价比档，适合大量非核心判断任务。 |
+| **DeepSeek-V4-Flash** | 批量代码、分类、初筛、Agent 执行、结构化处理 | DeepSeek 官方将其定位为高吞吐版本，并强化 Agent、编码和工具调用。 |
+| **Qwen3.6-27B** | Coding、视觉/视频理解、文档处理、批量工程任务 | 原生多模态且强调 Agentic Coding，适合大量需要质量又不能全上旗舰的节点。 |
+| **GLM-4.7-FlashX / 同级快速模型** | 轻量 Coding、批处理、格式转换、快速检查 | 主要用于降低成本和提高吞吐，不承担核心方向判断。 |
 
-### 按工作节点直接选模型
+### 中国大陆模型的节点级推荐
 
 | 工作节点 | 第一阶梯 | 第二阶梯 | 第三阶梯 |
 |---|---|---|---|
-| **全局统筹 / 任务拆解** | GPT-5.4 Pro / Thinking | Claude Opus 5 | GPT-5.4 / Sonnet 5 |
-| **复杂研究 / 综合判断** | GPT-5.4 Pro / Thinking | Claude Opus 5 / Gemini 3.1 Pro | Sonnet 5 / Gemini 3.6 Flash |
-| **长文档 / 大仓库理解** | Gemini 3.1 Pro | Claude Opus 5 | GPT-5.4 / Sonnet 5 |
-| **复杂代码 / 长链路工程** | Claude Opus 5 / GPT-5.4 Pro | Gemini 3.1 Pro / GPT-5.4 | Sonnet 5 / Gemini 3.6 Flash |
-| **Remotion / 前端 / 工程实现** | Claude Opus 5 / GPT-5.4 | Gemini 3.1 Pro | Sonnet 5 / Gemini 3.6 Flash |
-| **视觉 / 图片 / 视频 / PDF 综合理解** | Gemini 3.1 Pro | GPT-5.4 Pro / Thinking | Gemini 3.6 Flash |
-| **内容创意 / 脚本 / VO** | GPT-5.4 Pro / Thinking | Claude Opus 5 / Gemini 3.1 Pro | Sonnet 5 / Gemini 3.6 Flash |
-| **批量整理 / 初筛 / 分类** | GPT-5.4 | Sonnet 5 | Gemini 3.6 Flash |
+| **全局统筹 / 任务拆解** | Kimi K3 / GLM-5.2 / DeepSeek-V4-Pro | Qwen3.5-Plus / Seed2.1-Pro | Qwen3.6-27B / DeepSeek-V4-Flash |
+| **复杂研究 / 综合判断** | Kimi K3 / DeepSeek-V4-Pro | Qwen3.5-Plus / GLM-5.2 | DeepSeek-V4-Flash / Qwen3.6-27B |
+| **长文档 / 大仓库理解** | Kimi K3 / GLM-5.2 | Qwen3.5-Plus / MiniMax M3 | Qwen3.6-27B |
+| **复杂代码 / 长链路工程** | GLM-5.2 / Kimi K3 / DeepSeek-V4-Pro | Qwen3.5-Plus / MiniMax M3 | Qwen3.6-27B / DeepSeek-V4-Flash |
+| **Remotion / 前端 / 工程实现** | Kimi K3 / GLM-5.2 / DeepSeek-V4-Pro | Qwen3.5-Plus / MiniMax M3 | Qwen3.6-27B / DeepSeek-V4-Flash |
+| **视觉 / 图片 / 视频 / PDF 综合理解** | Kimi K3 / Qwen3.5-Plus / MiniMax M3 | Seed2.1-Pro / Qwen3.6-27B | DeepSeek-V4-Flash |
+| **中文内容创意 / 脚本 / VO** | Kimi K3 / Qwen3.5-Plus / DeepSeek-V4-Pro | Seed2.1-Pro / GLM-5.2 | DeepSeek-V4-Flash / Qwen3.6-27B |
+| **批量整理 / 初筛 / 分类** | Qwen3.5-Plus / DeepSeek-V4-Pro | Seed2.1-Pro / GLM-5.1 | DeepSeek-V4-Flash / Qwen3.6-27B |
 | **独立最终复核** | 与生产模型不同的第一阶梯模型 | 第二阶梯模型 | 第三阶梯仅做机械核对 |
 
-### 我真正采用的调度原则
+### 国际模型 + 中国大陆模型一起调度
+
+| 工作节点 | 第一阶梯优先候选 | 第二阶梯优先候选 | 第三阶梯优先候选 |
+|---|---|---|---|
+| **全局统筹 / 任务拆解** | GPT-5.6 Sol / Claude Opus 5 / Kimi K3 / GLM-5.2 | GPT-5.6 Terra / Qwen3.5-Plus / Sonnet 5 | GPT-5.6 Luna / Qwen3.6-27B / DeepSeek-V4-Flash |
+| **复杂研究 / 综合判断** | GPT-5.6 Sol / Claude Opus 5 / Gemini 3.1 Pro / DeepSeek-V4-Pro | GPT-5.6 Terra / Kimi K3 / Qwen3.5-Plus | GPT-5.6 Luna / DeepSeek-V4-Flash |
+| **长文档 / 大仓库理解** | Gemini 3.1 Pro / Kimi K3 / GLM-5.2 | Claude Opus 5 / Qwen3.5-Plus / GPT-5.6 Terra | Qwen3.6-27B / DeepSeek-V4-Flash |
+| **复杂代码 / 长链路工程** | Claude Opus 5 / GPT-5.6 Sol / Kimi K3 / GLM-5.2 | GPT-5.6 Terra / Qwen3.5-Plus / MiniMax M3 | Qwen3.6-27B / DeepSeek-V4-Flash |
+| **Remotion / 前端 / 工程实现** | Claude Opus 5 / GPT-5.6 Sol / Kimi K3 / GLM-5.2 | GPT-5.6 Terra / Qwen3.5-Plus / MiniMax M3 | GPT-5.6 Luna / Qwen3.6-27B / DeepSeek-V4-Flash |
+| **视觉 / 图片 / 视频 / PDF 综合理解** | Gemini 3.1 Pro / Kimi K3 / Qwen3.5-Plus / MiniMax M3 | Seed2.1-Pro / GPT-5.6 Sol / Qwen3.6-27B | GPT-5.6 Luna / DeepSeek-V4-Flash |
+| **内容创意 / 脚本 / VO** | GPT-5.6 Sol / Claude Opus 5 / Kimi K3 | GPT-5.6 Terra / Qwen3.5-Plus / Seed2.1-Pro | GPT-5.6 Luna / DeepSeek-V4-Flash |
+| **批量整理 / 初筛 / 分类** | GPT-5.6 Terra / Qwen3.5-Plus / DeepSeek-V4-Pro | GPT-5.6 Luna / Seed2.1-Pro / GLM-5.1 | DeepSeek-V4-Flash / Qwen3.6-27B |
+| **独立最终复核** | 与生产模型不同的第一阶梯模型 | 第二阶梯模型 | 第三阶梯仅做机械核对 |
+
+### 我的真正调度原则
 
 **1. 最难的不是“写”，而是“判断”。** 核心决策、跨文档统筹、最终取舍优先给第一阶梯。
 
-**2. 生产和验收尽量不要同一模型。** 代码由 Claude/GPT 做，关键视觉判断可以交给 Gemini；研究由 GPT 做，结论可再由 Claude 独立复核。
+**2. 生产和验收尽量不要同一模型。** 代码由一个模型生产，关键视觉判断或结构复核交给另一个模型。
 
-**3. 多模态任务优先考虑 Gemini 3.1 Pro。** 尤其是同时有图片、视频、PDF、截图、代码仓库的任务。其官方模型卡明确列出了这些输入模态及 1M 上下文能力。 
+**3. 多模态任务不要只看“语言能力”。** 图片、视频、PDF、截图、代码仓库混合输入时，优先选明确具备原生多模态和长上下文能力的模型。
 
-**4. 长链路代码优先考虑 Claude Opus 5 或 GPT-5.4 Pro。** 不要用高吞吐模型硬扛复杂工程。
+**4. 中国大陆模型不是“便宜替代品”。** Kimi、GLM、DeepSeek、Qwen、MiniMax、Seed 在长上下文、Coding、Agent、多模态等不同节点上各有适合的位置，按节点选，而不是按厂商选。
 
 **5. 大量机械任务不使用旗舰模型。** 能用第三阶梯解决的，就不把第一阶梯耗在上面。
 
 **6. 出现以下情况必须升级一阶：** 模型反复误解任务、跨文件修改开始失控、需要自己规划多个工具步骤、出现高价值判断、验证与实现互相打架、或者当前证据不足以证明完成。
 
-**7. 这张表只做“推荐起点”。** 如果当前模型版本发生更新，应让 AI 重新检查官方模型信息，再调整本表；不要把旧型号当成永久标准。
+**7. 高价值节点适合“双模型交叉”。** 例如：一个模型负责方案，另一个独立复核；一个模型负责代码，另一个模型负责审查。不要把“同一个模型自评 PASS”当成最强证据。
 
-> **模型信息来源：** OpenAI GPT-5.4 官方发布说明；Anthropic Claude Opus 5 / Sonnet 5 官方发布说明；Google DeepMind Gemini 3.1 Pro 官方模型卡；Google Gemini 3.6 Flash 官方发布说明。citeturn669923search0turn669923search1turn669923search3turn669923search6
+**8. 模型名称会变化。** 本表是 2026-09-16 的推荐起点，不是永久排名。模型升级后，先重新核查官方模型信息，再更新这张表。
+
+> 主要依据：各厂商截至 2026-09-16 的官方模型发布与文档信息。包括 OpenAI GPT-5.6 系列、Anthropic Claude Opus 5、Google Gemini 3.1 Pro、Moonshot Kimi K3、DeepSeek V4、智谱 GLM-5.2、阿里通义 Qwen3.5/Qwen3.6、MiniMax M3、字节 Seed2.1 等官方资料。
 
 ---
 
