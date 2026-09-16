@@ -44,8 +44,8 @@ CLOSED
 | 红线 | `spec/redlines.json` + `scripts/check-redlines.mjs` | 画面/口播硬禁及人工确认层 | 硬禁层无命中；人工确认按当前生产流程执行 |
 | 视觉方法 | `docs/internal/R9-视觉导演与审美决策.md` | 镜头级视觉决策原则 | 生效 |
 | 视觉映射 | `docs/internal/R9-视觉映射表.md` | 叙事关系 → Remotion 视觉关系/组件 | 生效 |
-| 镜头契约 | `scripts/check-visual-shot-contract.mjs` + R9 ledger | 关键镜头的视觉主体、隐喻、Peak Frame、State Change、Exit | **检查通过** |
-| 成片验证 | `scripts/gate-all.mjs` | 统一总闸门 | **fresh visual-shot-contract Run #124：PASS；fresh production g11 keyframes / safe-area verification 已完成** |
+| 镜头契约 | `scripts/check-visual-shot-contract.mjs` + R9 ledger | 关键镜头的视觉主体、隐喻、Peak Frame、State Change、Exit | 机制生效；新 g11 尚未进入机检收口 |
+| 成片验证 | `scripts/gate-all.mjs` | 统一总闸门 | 新 g11 尚未进入最终 Gate；上一版产物已全部删除，不再作为当前证据 |
 
 ## 3. 当前状态与已关闭事项
 
@@ -59,13 +59,18 @@ CLOSED
 - CI 已 materialize 该 snapshot，并通过 UI Truth / Facts / Doc refs / Redlines / Visual Shot Contract / gate-all。
 - **状态：CLOSED。** 历史整改前状态不作为当前阻塞项。
 
-### P0-B：g11 安全区真实帧
+### 当前生产事项：g11 · 烧烤夜宵 · 片1
 
-- `EmberParticles` 已完成坐标约束修复。
-- g11 `VTemplate` 生产 `sceneScale=0.76` 保持不变。
-- 安全区已改为 content-only 取证 + 左右 120px 信息安全硬边界；顶部仅诊断，合法 full-bleed 背景不判违规。
-- fresh safe-area frames、production frames 与 gate-all 已完成验证；后续以最新 CI 实际结果为准。
-- **状态：CLOSED。**
+- 旧 g11 内容、VO、母题、分镜、R9 决策、benchmark 视频与渲染帧已全部删除，不再作为当前证据。
+- 新版已按当前 SKILL 八步法重新从第 1 步开始：
+  - `01-内容输入包.md`：完成；
+  - `02-口播文案.md`：完成；
+  - `03-母题一页.md`：完成；
+  - `07-片1-分镜稿.md`：第 4 步 + 第 4.5 步完成；
+  - `08-R9视觉决策卡.md`：完成；
+- 当前视觉/内容方向：**“双节聚会 + 转赠奖励”社交裂变闭环**，核心机制为 `A 领券 → A 转给 B → B 核销 → A 获指定私密奖励券`。
+- **当前节点：第 5 步｜工程 / Remotion 实现待开始。**
+- 尚未产生新版 g11 的真实渲染帧、Visual Shot Contract 机检结果、最终 Gate 或发布后验，因此不得描述为已完成。
 
 ## 4. 已完成且不得重新发明
 
@@ -92,7 +97,7 @@ CHANGE-20260916-003 已完成并关闭：
 
 - R9 视觉导演与视觉映射表为现行视觉决策层。
 - `scripts/check-visual-shot-contract.mjs` 是关键镜头契约机检 Owner。
-- g11 当前验证链已完成：safe-area diagnostic、gate-all、fresh production keyframes 均通过。
+- 新 g11 当前仅完成内容、分镜与 R9 决策，尚未进入最终 Visual Shot Contract 机检与成片 Gate。
 
 ### 6. 当前接班规则
 
