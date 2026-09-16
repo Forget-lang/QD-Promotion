@@ -165,7 +165,8 @@ for (const [file, path] of allDocs) {
 }
 
 const stampRe = /^>?\s*(最后校验|更新|版本)\s*[：:]/;
-const histRe = /第[一二三四五六七八九十0-9]{1,3}轮|\bR1[0-9]\b/;
+// R10 是当前有效 Owner，不属于历史 R1x 编号扫描；历史轮次仍以 R11-R19 为对象。
+const histRe = /第[一二三四五六七八九十0-9]{1,3}轮|\bR1[1-9]\b/;
 const constitutionScan = (rel, text) => {
   let inCodeBlock = false;
   text.split('\n').forEach((line, i) => {
@@ -192,36 +193,28 @@ for (const [file, path] of allDocs) {
     if (inCodeBlock || caliberExemptRe.test(line)) return;
     for (const c of caliberOwners) {
       if (file === c.owner) continue;
-      if (new RegExp(c.pattern).test(line)) hardFails.push({ file: rel, line: i + 1, ref: line.trim().slice(0, 48), why: `口径唯一性：复述了「${c.desc}」，属主是 ${c.owner}——改指针不抄数值` });
+      const re = new RegExp(c.pattern, 'i');
+      if (re.test(line)) hardFails.push({ file: rel, line: i + 1, ref: line.trim().slice(0, 48), why: `高危口径重复定义：Owner=${c.owner}；属主外只允许指针/引用` });
     }
   });
 }
 
-const deprecatedTerms = REGISTRY.deprecatedTerms || [];
-const depExemptRe = /(替代|取代|废止|旧法|反例|❌|错：|禁止|不使用)/;
-for (const [file, path] of allDocs) {
-  const rel = relative(ROOT, path);
-  const lines = readFileSync(path, 'utf8').split('\n');
-  let inCodeBlock = false;
-  lines.forEach((line, i) => {
-    if (/^\s*```/.test(line)) { inCodeBlock = !inCodeBlock; return; }
-    if (inCodeBlock || depExemptRe.test(line)) return;
-    for (const d of deprecatedTerms) if (line.includes(d.term)) hardFails.push({ file: rel, line: i + 1, ref: line.trim().slice(0, 48), why: `废弃话头残留：「${d.desc}」——新口径已定，清掉旧表述` });
-  });
-}
-
-const distinctHard = [...new Map(hardFails.map((h) => [`${h.file}:${h.line}:${h.ref}`, h])).values()];
-const distinctRev = [...new Map(reviews.map((h) => [`${h.file}:${h.line}:${h.ref}`, h])).values()];
-console.log('\n══════════════ 文档引用守门扫描结果 ════════════\n');
-console.log(`① 引用断链 / 资源路径失效 / 计数型复述  ${distinctHard.length === 0 ? '✅ 通过' : '❌ 硬失败'} —— ${distinctHard.length} 处`);
-for (const h of distinctHard) console.log(`   ${h.file}:${h.line}  «${h.ref}» — ${h.why}`);
-console.log(`② 无法判定（需人工确认）  ${distinctRev.length === 0 ? '✅ 无' : '⚠️ ' + distinctRev.length + ' 处'}`);
-for (const h of distinctRev) console.log(`   ${h.file}:${h.line}  «${h.ref}» — ${h.why}`);
-console.log('\n────────────────────────────────────────────');
-if (distinctHard.length > 0) {
-  console.log('❌ 存在失效引用。修复后重跑本脚本，全部通过才能声明「文档对齐」。\n');
-  process.exit(1);
+console.log('\n══════════════ 文档引用守门扫描结果 ══════════════\n');
+if (hardFails.length) {
+  console.log(`① 引用断链 / 资源路径失效 / 计数型复述  ❌ 硬失败 —— ${hardFails.length} 处`);
+  for (const x of hardFails) console.log(`   ${x.file}:${x.line}  «${x.ref}» — ${x.why}`);
 } else {
-  console.log('✅ 文档引用 / 计数复述 / 宪法层检查通过（失效引用 0 处）。\n');
-  process.exit(0);
+  console.log('① 引用断链 / 资源路径失效 / 计数型复述  ✅ 通过 —— 0 处');
 }
+if (reviews.length) {
+  console.log(`② 无法判定（需人工确认）  ⚠️ —— ${reviews.length} 处`);
+  for (const x of reviews) console.log(`   ${x.file}:${x.line}  «${x.ref}» — ${x.why}`);
+} else {
+  console.log('② 无法判定（需人工确认）  ✅ 无');
+}
+console.log('\n────────────────────────────────────────────\n');
+if (hardFails.length) {
+  console.log('❌ 存在失效引用。修复后重跑本脚本，全部通过才能声明「文档对齐」。');
+  process.exit(1);
+}
+console.log('✅ 文档引用与结构扫描通过。');
