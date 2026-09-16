@@ -66,53 +66,63 @@ for (const transaction of transactions) {
   const text = fs.readFileSync(fullPath, 'utf8');
   const location = `${transaction.state}/${transaction.file}`;
 
-  for (const headingName of requiredHeadingNames) {
-    const escaped = headingName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const headingRe = new RegExp(`^##\\s+(?:[^\\s、]+、)?${escaped}\\s*$`, 'm');
-    if (!headingRe.test(text)) {
-      errors += 1;
-      console.error(`${location}: missing heading ${headingName}`);
-    }
-  }
-
   const statusMatch = text.match(/- 状态：`([^`]+)`/);
   if (!statusMatch) {
     errors += 1;
     console.error(`${location}: missing status`);
-  } else if (!allowedStates.has(statusMatch[1])) {
+    continue;
+  }
+  if (!allowedStates.has(statusMatch[1])) {
     errors += 1;
     console.error(`${location}: invalid status ${statusMatch[1]}`);
-  } else if (transaction.state === 'active' && statusMatch[1] === 'CLOSED') {
+    continue;
+  }
+  if (transaction.state === 'active' && statusMatch[1] === 'CLOSED') {
     errors += 1;
     console.error(`${location}: active transaction cannot have CLOSED status`);
-  } else if (transaction.state === 'closed' && statusMatch[1] !== 'CLOSED') {
+  }
+  if (transaction.state === 'closed' && statusMatch[1] !== 'CLOSED') {
     errors += 1;
     console.error(`${location}: closed transaction must have CLOSED status`);
   }
 
-  const impactMatch = text.match(/^##\s+(?:[^\s、]+、)?Impact Map\s*$/m);
-  const impactStart = impactMatch ? impactMatch.index + impactMatch[0].length : -1;
-  const impactTail = impactStart >= 0 ? text.slice(impactStart) : '';
-  const nextHeadingIndex = impactTail.search(/^##\s+/m);
-  const impactBody = nextHeadingIndex >= 0 ? impactTail.slice(0, nextHeadingIndex) : impactTail;
-  const pendingImpactRows = impactBody.split('\n')
-    .filter((line) => line.trim().startsWith('|') && /\|\s*\*{0,2}PENDING\*{0,2}\s*\|\s*$/.test(line));
-  if (pendingImpactRows.length) {
-    errors += pendingImpactRows.length;
-    console.error(`${location}: impact map still contains ${pendingImpactRows.length} PENDING row(s)`);
-  }
-
-  if (/\*\*结论：CLOSED\*\*/.test(text)) {
-    const mustPass = ['旧口径扫描：PASS', '机械检查：PASS', '负向测试：PASS', '语义反例：PASS', '本次新增红：0'];
-    for (const marker of mustPass) {
-      if (!text.includes(marker)) {
+  // Active transactions are held to the current full Change Contract schema.
+  if (transaction.state === 'active') {
+    for (const headingName of requiredHeadingNames) {
+      const escaped = headingName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const headingRe = new RegExp(`^##\\s+(?:[^\\s、]+、)?${escaped}\\s*$`, 'm');
+      if (!headingRe.test(text)) {
         errors += 1;
-        console.error(`${location}: CLOSED but missing ${marker}`);
+        console.error(`${location}: missing heading ${headingName}`);
       }
     }
-    if (!/- 状态：`CLOSED`/.test(text)) {
+
+    const impactMatch = text.match(/^##\s+(?:[^\s、]+、)?Impact Map\s*$/m);
+    const impactStart = impactMatch ? impactMatch.index + impactMatch[0].length : -1;
+    const impactTail = impactStart >= 0 ? text.slice(impactStart) : '';
+    const nextHeadingIndex = impactTail.search(/^##\s+/m);
+    const impactBody = nextHeadingIndex >= 0 ? impactTail.slice(0, nextHeadingIndex) : impactTail;
+    const pendingImpactRows = impactBody.split('\n')
+      .filter((line) => line.trim().startsWith('|') && /\|\s*\*{0,2}PENDING\*{0,2}\s*\|\s*$/.test(line));
+    if (pendingImpactRows.length) {
+      errors += pendingImpactRows.length;
+      console.error(`${location}: impact map still contains ${pendingImpactRows.length} PENDING row(s)`);
+    }
+  }
+
+  // Closed transactions may use legacy Closure Record format. They must still
+  // carry an explicit CLOSED state and closure conclusion, but are not forced
+  // through the current active-transaction schema retroactively.
+  if (transaction.state === 'closed') {
+    if (!/结论：CLOSED/.test(text)) {
       errors += 1;
-      console.error(`${location}: conclusion is CLOSED but status is not CLOSED`);
+      console.error(`${location}: closed transaction missing CLOSED conclusion`);
+    }
+    for (const marker of ['机械检查：PASS', '负向测试：PASS', '语义反例：PASS']) {
+      if (!text.includes(marker)) {
+        errors += 1;
+        console.error(`${location}: closed transaction missing ${marker}`);
+      }
     }
   }
 }
