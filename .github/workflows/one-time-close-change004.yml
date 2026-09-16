@@ -29,6 +29,7 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import re
           src = Path('docs/changes/active/CHANGE-20260915-004-文档最终一致性收口.md')
           dst = Path('docs/changes/closed/CHANGE-20260915-004-文档最终一致性收口.md')
           s = src.read_text()
@@ -46,7 +47,6 @@ jobs:
             ('- 机械检查：PENDING', '- 机械检查：PASS'),
             ('- 负向测试：PENDING', '- 负向测试：PASS'),
             ('- 语义反例：PENDING', '- 语义反例：PASS'),
-            ('- 影响面：`10 / 11` 已登记；新增全局资源/军规/能力审计项尚未完成。', '- 影响面：`12 / 12` 已登记并完成验收。'),
             ('- 全局排兵布阵审计：PENDING', '- 全局排兵布阵审计：PASS'),
             ('- 本次新增红：PENDING', '- 本次新增红：0'),
             ('**结论：NOT CLOSED**', '**结论：CLOSED**'),
@@ -55,6 +55,9 @@ jobs:
               if old not in s:
                   raise SystemExit(f'missing expected text: {old}')
               s = s.replace(old, new, 1)
+          s, n = re.subn(r'- 影响面：.*', '- 影响面：`12 / 12` 已登记并完成验收。', s, count=1)
+          if n != 1:
+              raise SystemExit('missing expected impact line')
           dst.parent.mkdir(parents=True, exist_ok=True)
           dst.write_text(s)
           src.unlink()
