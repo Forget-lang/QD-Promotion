@@ -1,0 +1,33 @@
+name: one-time-doc-ref-fix
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fix stale SKILL reference and self-remove
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('SKILL.md')
+          s = p.read_text(encoding='utf-8')
+          old = 'outputs/archive/docs/internal/内容资源调用协议.md'
+          new = 'docs/internal/内容资源调用协议.md'
+          if s.count(old) != 1:
+              raise SystemExit(f'expected exactly one stale reference, found {s.count(old)}')
+          p.write_text(s.replace(old, new), encoding='utf-8')
+          PY
+          rm -f .github/workflows/one-time-doc-ref-fix.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add SKILL.md .github/workflows/one-time-doc-ref-fix.yml
+          git commit -m '治理：修正 SKILL 资源协议引用并完成一次性迁移'
+          git push
