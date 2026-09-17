@@ -1,5 +1,5 @@
 {
-  "description": "权威文档注册表：check-doc-references / check-facts 读取本文件。维护规则：新增权威文档时在此登记；文档清单变化时更新 aliases；高危口径改值或新踩漂移坑时维护 caliberOwners（pattern+owner，属主外复述=硬失败）。（2026-09-15 文档最终收口：R7/R8/R9/R10 纳入权威别名，安全区属主口径同步为左右信息安全边界。）",
+  "description": "权威文档注册表 + 检查器登记表：**读者面以实际代码为准，勿在此写死条数**（除文档引用与事实闸门外，背景、布局多样性、相似度与总闸门等脚本同样读取本文件）。维护规则：新增权威文档时在此登记；文档清单变化时更新 aliases；高危口径改值或新踩漂移坑时维护 caliberOwners（pattern+owner，属主外复述=硬失败）。本文件另承载各闸门的历史豁免与废止话头登记（背景 / 布局 / 相似度 / 动作豁免、deprecatedTerms 等）。**不承载变更事务状态**（依 `R10` 第 67 行）。（2026-09-15 文档最终收口：R7/R8/R9/R10 纳入权威别名，安全区属主口径同步为左右信息安全边界。）",
   "docsDir": "docs/internal",
   "extraDocs": ["AGENTS.md","docs/战略简报.md","docs/AI使用手册.md","SKILL.md","outputs/archive/AI启动提示词.md","outputs/archive/文档架构总览.md","outputs/archive/挂账总览.md","outputs/archive/官网资源库落地规划.md","knowledge/爆款整片解剖.md","knowledge/洞察库.md","knowledge/玩法版图.md"],
   "excludeDirs": [],
