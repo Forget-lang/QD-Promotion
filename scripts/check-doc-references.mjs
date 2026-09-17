@@ -173,7 +173,7 @@ const constitutionScan = (rel, text) => {
     if (/^\s*```/.test(line)) { inCodeBlock = !inCodeBlock; return; }
     if (inCodeBlock) return;
     if (stampRe.test(line) && line.length > 120) hardFails.push({ file: rel, line: i + 1, ref: line.trim().slice(0, 48), why: '宪法铁律二：校验戳超 120 字——戳内复述改动摘要，改为「日期（变更史见 docs/changes/）」' });
-    if (histRe.test(line) && !/changelog|docs\/changes/.test(line)) hardFails.push({ file: rel, line: i + 1, ref: line.trim().slice(0, 48), why: '宪法铁律一：正文写了审计轮次叙事——改动史归 docs/changes/，此处只留规则 +「详见对应变更事务」指针' });
+    if (histRe.test(line) && !/docs\/changes/.test(line)) hardFails.push({ file: rel, line: i + 1, ref: line.trim().slice(0, 48), why: '宪法铁律一：正文写了审计轮次叙事——改动史归 docs/changes/，此处只留规则 +「详见对应变更事务」指针' });
   });
 };
 for (const [, p] of allDocs) constitutionScan(relative(ROOT, p), readFileSync(p, 'utf8'));
@@ -199,15 +199,16 @@ for (const [file, path] of allDocs) {
   });
 }
 
-// 已退役文件名守门（2026-09-17 CHANGE-20260917-009 补）：
+// 已退役文件名守门（2026-09-17 CHANGE-20260917-009 立，CHANGE-20260917-011 扩）：
 // 文件删除后若不显式登记，闸门会因「它不再是已知文件名」而对其引用静默放行——
 // 这正是本项目反复出现的失效模式（闸门失去检查对象即默认放行），故在此硬拦。
-// 注意：只拦 changelog.md 本体，不拦仍在用的 changelog-2026-08.md。
-const RETIRED_DOC_RE = /(?<![\w-])`?changelog\.md`?/;
+// 2026-09-17 CHANGE-20260917-011：changelog 全系退役（主文件 + 2026-08 分卷），两个名字都拦；
+// 此处按**行内文件名**判，不依赖路径解析，故裸文件名（无 outputs/archive/ 前缀）同样拦得住。
+const RETIRED_DOC_RE = /(?<![\w-])`?changelog(?:-2026-08)?\.md`?/;
 for (const [file, p] of allDocs) {
   readFileSync(p, 'utf8').split('\n').forEach((line, i) => {
     if (RETIRED_DOC_RE.test(line)) {
-      hardFails.push({ file: relative(ROOT, p), line: i + 1, ref: line.trim().slice(0, 48), why: '引用已退役的 changelog 主文件——变更史见 docs/changes/（2026-08 及更早见 changelog-2026-08.md）' });
+      hardFails.push({ file: relative(ROOT, p), line: i + 1, ref: line.trim().slice(0, 48), why: '引用已退役的 changelog 账本（主文件 / 2026-08 分卷均已退役）——变更史见 docs/changes/' });
     }
   });
 }

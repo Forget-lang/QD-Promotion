@@ -32,7 +32,7 @@
 | 整改前置侦察 | `docs/internal/整改作战总纲.md` | 全局整改前排兵布阵 |
 | 组合玩法视角 | `knowledge/玩法版图.md` | 功能原子 × 功能原子组合成生意打法 |
 | 传播研究资源 | `knowledge/爆款文案技能包/` / `knowledge/爆款整片解剖.md` / `knowledge/洞察库.md` | Hook、结构、信息增量、教学节奏、反模式、洞察 |
-| 历史证据 | `outputs/archive/` | 回顾与审计证据（2026-08 及更早的变更条目见 `outputs/archive/changelog-2026-08.md`） |
+| 历史证据 | `outputs/archive/` | 回顾与审计证据（只作证据，不承担当前规则） |
 
 **`docs/internal/内容资源调用协议.md` 不是第二视频流程；它只定义资源职责边界。**
 

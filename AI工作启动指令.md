@@ -94,7 +94,7 @@ Gate / 真实产物 / 用户最终验收
 - 视觉导演：`R9`
 - 资源职责边界：`docs/internal/内容资源调用协议.md`
 - 整改前置侦察：`docs/internal/整改作战总纲.md`
-- 历史证据：`outputs/archive/`（2026-08 及更早见 `changelog-2026-08.md`）
+- 历史证据：`outputs/archive/`（只作证据，不承担当前规则）
 
 如果同一个概念出现两个当前 Owner：**停止执行，先解决 Owner 冲突。**
 

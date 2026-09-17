@@ -91,7 +91,7 @@ CHANGE-20260916-003 已完成并关闭：
 - 当前事务已归档：`docs/changes/closed/CHANGE-20260916-003-全局治理阵型收口.md`
 - 本轮 Closure Report：CLOSED
 - fresh CI：`change-contract-gate` #75 PASS；`visual-shot-contract` #124 PASS
-- 变更史：以 `docs/changes/`（变更事务库）与 `outputs/archive/changelog-2026-08.md`（2026-08 及更早）为准；历史主台账已退役
+- 变更史：以 `docs/changes/`（变更事务库）为准；历史账本（主文件与 2026-08 分卷）均已全系退役，追溯走 git 历史
 
 ### 5. R9 / Visual Shot Contract
 
