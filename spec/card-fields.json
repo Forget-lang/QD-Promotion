@@ -2,11 +2,12 @@
  "_meta": {
   "desc": "次卡（卡产品族：通卡/次卡/权益卡）制作与发放/核销设置项真值表。与优惠券产品线分开：优惠券见 spec/coupon-fields.json。做次卡类内容（视频/文章/教程）前必查本表；功能点上禁止猜测与推理，凡本表没有的表述一律不上屏不进口播。",
   "source": "applet/pages_card/card/choose_type.vue（类型选择）+ pages_card/card/create.vue（次卡创建页全量）+ pages_card/issue/private.vue（次卡私密发放）+ pages_card/verify/verify.vue（次卡核销）+ pages_user/card/detail.vue（顾客端次卡详情）+ constants/card.js（枚举语义）",
-  "lastVerified": "2026-09-07",
+  "lastVerified": "2026-09-17",
   "usage": "字段名与提示语逐字取用（onScreen=true 的可直接上屏）；limits/defaults 是画面里能写的数字；visibleWhen/linkages 决定'这一屏该不该出现这一行'；playLeverage 是把设置项变成玩法话术的映射。改功能先改本表再改内容。",
   "machineCheck": "video/src 与 outputs 里的次卡字段名由 scripts/check-ui-truth.mjs 回 applet 源码逐字对账（① 层扫全 applet，天然覆盖次卡）；本表 fields/createGroups 同时受 ⑤ 真值表自证（逐字命中各自 src 行段）与 ④ 表外提醒（并入 allRows 后不再误报）。hiddenFromScreen / onScreen:false 条目同时由 spec/redlines.json 红线层拦截。",
   "scopeNote": "本表只登记次卡产品族（cardType 1 通卡 / 2 次卡 / 3 权益卡）。次卡与优惠券的关键差异：① 次卡创建页【没有】发放方式行——次卡天生仅私密发放（facts.forbidden_claims 4），不像优惠券有公开/私密/券包三选；② 次卡创建页【没有】到期提醒开关（到期提醒是优惠券 create.vue 的字段）；③ 次卡私密发放页【没有】发放数量行（优惠券私密发放有 1~10 张，次卡没有）；④ 有效期类型选项次卡说「自领券日起」（create.vue:256），优惠券说「自领取日起」（coupon create.vue）——两产品文案不同，别互相照抄。"
  },
+ "versionGate": "次卡（TIMES）无版本门禁，免费版可用；通卡 / 权益卡**需专业版及以上**（choose_type.vue:8-9,29-31 带角标、56-64 走 check，受限文案同源「…专业版及以上版本支持，请升级版本。」）。对外一律不提版本约束（forbidden_claims #11）。",
  "cardTypes": [
   {
    "key": "UNLIMITED",
@@ -69,7 +70,7 @@
    "src": "pages_card/card/create.vue:69-71",
    "kind": "input",
    "visibleWhen": "cardType = 次卡（TIMES）",
-   "limits": "最少 1 次，最多 1000 次",
+   "limits": "最少 1 次；上限**随版本档位**：免费 7 / 标准 30 / 专业 100 / 企业 365（create.vue:286-289 动态「最少1次，最多N次」，constants/edition.js:120-131）；对外口径维持 1000（用户 2026-09-17 裁定，见 forbidden_claims #11）",
    "playLeverage": "次卡锁客的核心行：把「一次消费」变成「N 次到店」。次数按店里高频项目的合理周期定（洗澡两三周一次，做 5 次≈覆盖两三个月）"
   },
   {
@@ -89,7 +90,7 @@
    "src": "pages_card/card/create.vue:90-92",
    "kind": "input",
    "visibleWhen": "有效期类型 ≠ 固定有效期",
-   "limits": "最少 1 天，最多 365 天",
+   "limits": "最少 1 天；上限**随版本档位**：免费/标准/专业 365、企业 1095（create.vue:291-294 动态上限）",
    "playLeverage": "和次数、核销间隔一起算账：5 次 × 间隔 14 天 ≈ 至少 56 天才能用完，有效期给到 90~120 天才不逼人、也不让卡睡死"
   },
   {
@@ -223,6 +224,22 @@
    "label": "私密一对一领次卡码",
    "src": "pages_card/issue/private.vue:62",
    "note": "弹层标题原话；同行提示「出示给客户扫码领取，领后此码失效。」（private.vue:73）。⚠️ 次卡私密发放页【没有】「发放数量」行——那是优惠券私密发放才有的字段，别把「1~10 张」安到次卡上"
+  },
+   {
+    "label": "仅新客户可领",
+    "src": "pages_card/card/create.vue:205-208",
+    "kind": "switch",
+    "limits": "判定逐字「该商户下从未领过优惠券、券包、次卡的顾客才可领取」（后端判定）；**需标准版及以上**（受限文案「仅新客户可领功能，标准版及以上版本支持，请升级版本。」）",
+    "playLeverage": "新客首单礼、拉新防薅——只给没来过的人"
+   },
+   {
+    "label": "券内容图片",
+    "src": "pages_card/card/create.vue:227-230",
+    "kind": "uploader",
+    "onScreen": false,
+    "limits": "最多 9 张；tip 逐字「可上传活动长图、店内环境、菜单等图片」",
+    "note": "onScreen=false 理由：该行为 m-cover-uploader 上传组件，页面**没有自带标题文案**（无 label 原话可逐字引用）；内容中可讲「最多放 9 张图」，但不得引用「券内容图片」这个字段名（闸门已验证源码查无）",
+    "playLeverage": "把次卡的『这些都能用』拍给顾客看，长图当菜单/服务清单用"
   }
  ],
  "createGroups": [
@@ -377,5 +394,10 @@
    }
   ]
  },
- "contentWeightRule": "次卡类内容同样遵循 SKILL「制券环节=主体、难理解的讲透、简单的不细说」。本片（宠物洗护次卡）画面大头给次卡创建页的「每张包含次数 + 有效期 + 限制核销间隔」这三行怎么设、为什么这么设；发放环节只讲私密发放要设的（超时时间/发放备注）；核销环节只讲顾客/商家看得到的「第X次·剩余N次可用·最后一次」这一结果。次卡没有的字段（发放方式/到期提醒/发放数量）一律不臆造。"
+ "contentWeightRule": "次卡类内容同样遵循 SKILL「制券环节=主体、难理解的讲透、简单的不细说」。本片（宠物洗护次卡）画面大头给次卡创建页的「每张包含次数 + 有效期 + 限制核销间隔」这三行怎么设、为什么这么设；发放环节只讲私密发放要设的（超时时间/发放备注）；核销环节只讲顾客/商家看得到的「第X次·剩余N次可用·最后一次」这一结果。次卡没有的字段（发放方式/到期提醒/发放数量）一律不臆造。",
+ "uiNotes202609": ["使用须知组新增「清空」按钮及确认弹窗（create.vue:240-242）"],
+ "unverified": [
+  { "item": "「允许转赠」默认值", "detail": "form 初始 isTransfer:false 与 :default-value=\"true\" 并存（create.vue:191,320），实际默认取决于组件对 undefined 的处理，需实测。" },
+  { "item": "优惠券「到期提醒」默认值", "detail": "form 初始 true 但 switch 带 :default-value=\"false\"（coupon create.vue:490,630），需实测。" }
+ ]
 }

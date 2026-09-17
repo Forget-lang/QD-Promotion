@@ -6,7 +6,7 @@
 - 标题：Product Truth 重基线——五项新功能真值表 + features 扩展 + 玩法版图原子 + 存量字段重核（第一批）
 - 负责人：用户 + 本地 Agent
 - 范围：`global`
-- 状态：`VERIFYING`
+- 状态：`CLOSED`
 - 基线：`HEAD = origin/main = 0773d7b`
 - **定位说明**：触及 `spec/`（Product Truth Owner）＋ `knowledge/玩法版图.md`（组合视角 Owner）＝ **两个权威对象** → 属全局变更走 R8。
 - **顺序偏差声明**：本契约在**取证完成之后、落盘真值表之前**起草；因取证量极大（三路并行只读，报告见工作区当日日志），为不伪造"先立后迁"的外观特此明写。**残留差异**：契约未能约束取证过程，只约束落盘内容。
@@ -57,7 +57,7 @@
 | `spec/card-fields.json` | Product Truth | PRESERVE | **本轮不动**（次卡完整重核留下一批，agent 报告已留档） | DONE |
 | `spec/redlines.json` | 红线真源 | PRESERVE | 零改动 | DONE |
 | `scripts/*.mjs` | 检查器 | PRESERVE | 零改动 | DONE |
-| `docs/changes/active/CHANGE-20260917-015-*.md` | 本事务 | ADD | 本文件 | DONE |
+| `docs/changes/closed/CHANGE-20260917-015-*.md` | 本事务 | ADD | 本文件 | DONE |
 
 ## 八、Migration Plan
 
@@ -115,7 +115,7 @@
 
 ## 十二、Closure Report
 
-- 已修改：`spec/point-fields.json`（新建，14 条字段）、`spec/member-fields.json`（新建，10 条字段）、`spec/coupon-fields.json`（5 处过期修正 + `fields` ＋2 行 + `wecard` 节 + `linkages` ＋2 + `unverified` ＋3 + `lastVerified` 前推 2026-09-17）、`spec/facts.json`（`features` ＋ `point/member/wecard/mass` 四键）、`knowledge/玩法版图.md`（⑥族 ＋3 条、新增 ⑦发放承载族 ⑧新客圈定族）、`docs/changes/active/CHANGE-20260917-015-*.md`
+- 已修改：`spec/point-fields.json`（新建，14 条字段）、`spec/member-fields.json`（新建，10 条字段）、`spec/coupon-fields.json`（5 处过期修正 + `fields` ＋2 行 + `wecard` 节 + `linkages` ＋2 + `unverified` ＋3 + `lastVerified` 前推 2026-09-17）、`spec/facts.json`（`features` ＋ `point/member/wecard/mass` 四键）、`knowledge/玩法版图.md`（⑥族 ＋3 条、新增 ⑦发放承载族 ⑧新客圈定族）、`docs/changes/closed/CHANGE-20260917-015-*.md`
 - 已废止：无
 - 已保留：`facts.constraints` 全部数值（次卡 1~1000 维持，为对外口径上限）；`card-fields.json`（本轮不动，完整重核留下一批）；`redlines.json`、`scripts/`、`spec/product-truth/` 快照零改动；`R2`/`R6` 等其余 Owner 零改动
 - 影响面：`9 / 9`
@@ -126,7 +126,9 @@
 - 真图/成片：N/A（not-applicable，见 §十一）
 - 本次新增红：**0** —— 最终 `gate-all` 为 `2/15` 且红项构成逐项一致；迁移中的第 3 道红系本人写入的字段名错误，属**闸门正常拦截**，已当场修正
 
-**结论：NOT CLOSED**
+**结论：CLOSED**
+
+**关闭依据（2026-09-17 14:3x，用户确认）**：关闭条件已逐条满足（证据见本文件 §十二）。机械验证按 `CHANGE-20260917-012` 修定的口径执行——在候选状态的干净检出上重跑各闸门，`gate-all` 为 `2/15` 且红项构成与基线逐项一致（全部属 g11 线），本笔新增红 0。
 
 **未做（下一批，已留证据）**：
 1. **`spec/card-fields.json` 完整重核**：本轮实证需补「仅新客户可领」「券内容图片上传（≤9 张）」「通卡/权益卡版本门禁与角标」「使用须知清空按钮」，且「每张包含次数」「有效期」上限已随版本档位动态化；另 2 条需实测（转赠默认值、到期提醒默认值）。

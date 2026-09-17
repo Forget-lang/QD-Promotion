@@ -6,7 +6,7 @@
 - 标题：Product Truth 口径订正——免费可讲·版本不提·会员积分按真实实现讲
 - 负责人：用户 + 本地 Agent
 - 范围：`global`
-- 状态：`VERIFYING`
+- 状态：`CLOSED`
 - 基线：`HEAD = origin/main = 3446aab`
 - **定位说明**：Owner 落点只有 1 个（`APPLET / spec/`），但语义覆盖**全部内容生产**（三平台文案与口播的可用/禁用边界）→ 属全局规则 → 按 `AGENTS.md` §一 升级为全局变更走 R8。
 - **前置**：本事务是 `CHANGE-20260917-013` 的**同源后继**。013 落的是"审核与版本档位不进内容"；本事务处理的是**同一轮对账/侦察**揭出的、**更危险的一类问题——spec 里"说没有"的东西，applet 代码里已经有了**（详见 §二）。
@@ -67,7 +67,7 @@
 | 三份 `_meta.lastVerified` | 真源元信息 | PRESERVE | 三处不变 | DONE（`git diff spec/ \| grep -c 'lastVerified'` = **0**） |
 | `spec/product-truth/applet/source.tar.xz` | 产品快照 | PRESERVE | 零改动（实测已与 live source 一致） | DONE（`git status --porcelain spec/product-truth/` = **0 行**） |
 | `scripts/*.mjs` | 检查器 | PRESERVE | 零改动 | DONE（`git status --porcelain scripts/` = **0 行**） |
-| `docs/changes/active/CHANGE-20260917-014-*.md` | 本事务 | ADD | 本文件 | DONE |
+| `docs/changes/closed/CHANGE-20260917-014-*.md` | 本事务 | ADD | 本文件 | DONE |
 
 ## 八、Migration Plan
 
@@ -121,7 +121,7 @@
 
 ## 十二、Closure Report
 
-- 已修改：`spec/facts.json`（4 行：`positioning.businessModel`、`forbidden_claims#1/#7/#11`）、`spec/redlines.json`（3 行：`false_claims.core` 两条、免费类 `notThis` 一条）、`docs/changes/active/CHANGE-20260917-014-*.md`（本契约）
+- 已修改：`spec/facts.json`（4 行：`positioning.businessModel`、`forbidden_claims#1/#7/#11`）、`spec/redlines.json`（3 行：`false_claims.core` 两条、免费类 `notThis` 一条）、`docs/changes/closed/CHANGE-20260917-014-*.md`（本契约）
 - 已废止：作为**当前生效口径**的四处旧表述——「当前免费…后续是否收费/增值服务为未定事项」「无会员等级/积分体系」「产品不做收款」（绝对句）、「后续商业模式未定」
 - 已保留：`facts.constraints` 全部数值（含次卡 1~1000）；三份 `_meta.lastVerified`；`spec/product-truth/applet/source.tar.xz`（实测与 live source 298/298 逐字节一致，**本轮确认无需重建**）；`redlines.json` 免费类"可说但不强调、不作封面主卖点/钩子/CTA"三条；`forbidden_claims#10`（本轮复核 `pages_wecom/batch/index` **仍是死链**，禁令仍成立）
 - 影响面：`11 / 11`
@@ -132,7 +132,9 @@
 - 真图/成片：N/A（not-applicable，见 §十一）
 - 本次新增红：**0** —— `gate-all` 迁移前后同为 `2/15`，红项构成逐项一致；新增闸门红 0、判定改动 0、检查器改动 0
 
-**结论：NOT CLOSED**
+**结论：CLOSED**
+
+**关闭依据（2026-09-17 14:3x，用户确认）**：关闭条件已逐条满足（证据见本文件 §十二）。机械验证按 `CHANGE-20260917-012` 修定的口径执行——在候选状态的干净检出上重跑各闸门，`gate-all` 为 `2/15` 且红项构成与基线逐项一致（全部属 g11 线），本笔新增红 0。
 
 **未做（后继事务，已留证据）**：
 1. **新增真值表**：积分（`pages_point/*` 10 条路由）、会员等级/会员权益（2 条路由）、微信卡包（4 条路由，细节已与外部能力文档逐字对上）、仅新客户可领、群发（**两个不同的功能**：企微客户群发 vs 群发优惠券）。实现细节本轮已取证并记入工作区记忆，待另立事务落 `spec/`。
