@@ -36,7 +36,7 @@
  "fields": [
   {
    "label": "封面图片",
-   "src": "pages_card/card/create.vue:14-15",
+   "src": "pages_card/card/create.vue:14",
    "limits": "最多 1 张，推荐尺寸 300×240",
    "defaults": "空（必填）",
    "onScreen": true,
@@ -45,7 +45,7 @@
   },
   {
    "label": "次卡名称",
-   "src": "pages_card/card/create.vue:35-37",
+   "src": "pages_card/card/create.vue:36",
    "kind": "input",
    "limits": "最多 32 个字",
    "required": true,
@@ -53,21 +53,21 @@
   },
   {
    "label": "制作数量",
-   "src": "pages_card/card/create.vue:46-48",
+   "src": "pages_card/card/create.vue:47",
    "kind": "input",
    "limits": "最少 1 张，最多 1 万张",
    "playLeverage": "库存；次卡是按人办的卡，数量对应能办多少张"
   },
   {
    "label": "每人限领",
-   "src": "pages_card/card/create.vue:57-59",
+   "src": "pages_card/card/create.vue:58",
    "kind": "input",
    "limits": "最少 1 张，最多 100 张",
    "playLeverage": "防一人囤多张卡；宠物洗护次卡一般每人限领 1 张"
   },
   {
    "label": "每张包含次数",
-   "src": "pages_card/card/create.vue:69-71",
+   "src": "pages_card/card/create.vue:70",
    "kind": "input",
    "visibleWhen": "cardType = 次卡（TIMES）",
    "limits": "最少 1 次；上限**随版本档位**：免费 7 / 标准 30 / 专业 100 / 企业 365（create.vue:286-289 动态「最少1次，最多N次」，constants/edition.js:120-131）；对外口径维持 1000（用户 2026-09-17 裁定，见 forbidden_claims #11）",
@@ -75,7 +75,7 @@
   },
   {
    "label": "有效期类型",
-   "src": "pages_card/card/create.vue:76-79",
+   "src": "pages_card/card/create.vue:78",
    "kind": "select",
    "options": [
     "固定有效期",
@@ -87,7 +87,7 @@
   },
   {
    "label": "有效期",
-   "src": "pages_card/card/create.vue:90-92",
+   "src": "pages_card/card/create.vue:78",
    "kind": "input",
    "visibleWhen": "有效期类型 ≠ 固定有效期",
    "limits": "最少 1 天；上限**随版本档位**：免费/标准/专业 365、企业 1095（create.vue:291-294 动态上限）",
@@ -95,19 +95,19 @@
   },
   {
    "label": "有效开始时间",
-   "src": "pages_card/card/create.vue:94-101",
+   "src": "pages_card/card/create.vue:99",
    "kind": "date",
    "visibleWhen": "有效期类型 = 固定有效期"
   },
   {
    "label": "有效结束时间",
-   "src": "pages_card/card/create.vue:103-110",
+   "src": "pages_card/card/create.vue:108",
    "kind": "date",
    "visibleWhen": "有效期类型 = 固定有效期"
   },
   {
    "label": "限制核销间隔",
-   "src": "pages_card/card/create.vue:115-116",
+   "src": "pages_card/card/create.vue:115",
    "kind": "switch",
    "defaults": "关",
    "note": "行名原话「限制核销间隔」，同行说明「0=每天1次，1=间隔1天，最多30天」可上屏（无红线词）",
@@ -115,7 +115,7 @@
   },
   {
    "label": "核销间隔",
-   "src": "pages_card/card/create.vue:128-130",
+   "src": "pages_card/card/create.vue:115",
    "kind": "input",
    "visibleWhen": "限制核销间隔 = 开",
    "limits": "0~30 天，0 表示每天 1 次",
@@ -130,7 +130,7 @@
   },
   {
    "label": "优惠内容",
-   "src": "pages_card/card/create.vue:154-156",
+   "src": "pages_card/card/create.vue:161",
    "kind": "textarea",
    "visibleWhen": "cardType ≠ 权益卡（通卡/次卡显示此 textarea）",
    "limits": "最多 500 字；次卡 placeholder 原话「例如：洗车10次卡」",
@@ -138,52 +138,52 @@
   },
   {
    "label": "适用门店",
-   "src": "pages_card/card/create.vue:164-167",
+   "src": "pages_card/card/create.vue:172",
    "kind": "select",
    "required": true,
    "note": "多选，默认自动选中"
   },
   {
    "label": "发券员工",
-   "src": "pages_card/card/create.vue:173-176",
+   "src": "pages_card/card/create.vue:181",
    "kind": "select",
    "required": true,
    "note": "多选"
   },
   {
    "label": "允许转赠",
-   "src": "pages_card/card/create.vue:183",
+   "src": "pages_card/card/create.vue:189",
    "kind": "switch",
    "defaults": "开（default-value true）",
    "playLeverage": "次卡默认允许转赠（顾客可把卡转给好友）；⚠️ 次卡只有转赠、没有转赠奖励（转赠奖励是优惠券独有，别混）"
   },
   {
    "label": "填写手机号",
-   "src": "pages_card/card/create.vue:188",
+   "src": "pages_card/card/create.vue:197",
    "kind": "switch",
    "defaults": "关",
    "playLeverage": "留号开关，回访/下次活动靠它"
   },
   {
    "label": "使用须知",
-   "src": "pages_card/card/create.vue:196-198",
+   "src": "pages_card/card/create.vue:221",
    "kind": "textarea",
    "limits": "最多 500 字，placeholder「请输入使用须知」",
    "playLeverage": "服务明细的家：怎么核销、间隔规则、有效期不顺延等都写这里"
   },
   {
    "label": "一键套用模版",
-   "src": "pages_card/card/create.vue:212",
+   "src": "pages_card/card/create.vue:236",
    "note": "工具行原话「不会写？一键套用模版」+ 按钮「通用模版」；模板原文含遗失/找零/核销/适用范围等条款（create.vue:295-302），套完必须按自己行业改"
   },
   {
    "label": "通用模版",
-   "src": "pages_card/card/create.vue:215",
+   "src": "pages_card/card/create.vue:239",
    "kind": "button"
   },
   {
    "label": "创建次卡",
-   "src": "pages_card/card/create.vue:224-226",
+   "src": "pages_card/card/create.vue:249",
    "kind": "button",
    "note": "结果页原话：创建成功 / 次卡已创建，可前往详情查看 / 查看详情 / 返回（create.vue:4-7）"
   },
@@ -227,7 +227,7 @@
   },
    {
     "label": "仅新客户可领",
-    "src": "pages_card/card/create.vue:205-208",
+    "src": "pages_card/card/create.vue:208",
     "kind": "switch",
     "limits": "判定逐字「该商户下从未领过优惠券、券包、次卡的顾客才可领取」（后端判定）；**需标准版及以上**（受限文案「仅新客户可领功能，标准版及以上版本支持，请升级版本。」）",
     "playLeverage": "新客首单礼、拉新防薅——只给没来过的人"
@@ -244,49 +244,49 @@
  ],
  "createGroups": [
   {
-   "range": "pages_card/card/create.vue:13-26",
+   "range": "pages_card/card/create.vue:14",
    "title": null,
    "rows": ["封面图片"],
    "note": "无标题块。页面最顶部封面上传区。"
   },
   {
-   "range": "pages_card/card/create.vue:28-73",
+   "range": "pages_card/card/create.vue:36-70",
    "title": null,
    "rows": ["次卡名称", "制作数量", "每人限领", "每张包含次数"],
    "note": "无标题块。每张包含次数仅 cardType=次卡 时出现。"
   },
   {
-   "range": "pages_card/card/create.vue:75-112",
+   "range": "pages_card/card/create.vue:78-108",
    "title": null,
    "rows": ["有效期类型", "有效期", "有效开始时间", "有效结束时间"],
    "note": "无标题块。有效期类型=固定有效期时换成起止日期两行、有效期天数行消失。"
   },
   {
-   "range": "pages_card/card/create.vue:114-137",
+   "range": "pages_card/card/create.vue:115",
    "title": null,
    "rows": ["限制核销间隔", "核销间隔", "开启动态核销码"],
    "note": "无标题块。核销间隔仅限制核销间隔=开时出现；开启动态核销码不上屏。"
   },
   {
-   "range": "pages_card/card/create.vue:153-161",
+   "range": "pages_card/card/create.vue:161",
    "title": null,
    "rows": ["优惠内容"],
    "note": "无标题块。通卡/次卡用此 textarea；权益卡改用权益项列表（m-card-item-editor）。"
   },
   {
-   "range": "pages_card/card/create.vue:163-180",
+   "range": "pages_card/card/create.vue:172-181",
    "title": null,
    "rows": ["适用门店", "发券员工"],
    "note": "无标题块。"
   },
   {
-   "range": "pages_card/card/create.vue:182-193",
+   "range": "pages_card/card/create.vue:189-197",
    "title": null,
    "rows": ["允许转赠", "填写手机号"],
    "note": "无标题块。"
   },
   {
-   "range": "pages_card/card/create.vue:195-221",
+   "range": "pages_card/card/create.vue:225-239",
    "title": null,
    "rows": ["使用须知", "一键套用模版", "通用模版"],
    "note": "无标题块。使用须知是 textarea maxlength 500；工具行原话「不会写？一键套用模版」+ 按钮「通用模版」。"

@@ -17,7 +17,7 @@
  *      为什么单独立一层：2026-08-30 S5 把「到期提醒」挂进「领券顾客信息」组，
  *      字段名 ① 全过、归属是错的，商家翻后台会卡在"这一组里没这行"——① 拦不住这类错。
  *      我方自述的分步标题（「① 券面」「③ 期限」）不是原生组名，不参与本层判定。
- *   ④ 表外字段 —— 源码里有、真值表（优惠券 `spec/coupon-fields.json` + 次卡 `spec/card-fields.json`）没登记（⚠️ 提醒回写，不计失败）
+ *   ④ 表外字段 —— 源码里有、真值表（优惠券/次卡/积分/会员权益 四表）没登记（⚠️ 提醒回写，不计失败）
  *   ⑤ 真值表自证 —— 双表里每个行名/组名，必须逐字命中它自己 `src` 所指的源码；历史 src 行号允许漂移，但**目标源码中全局查不到才硬失败**。
  *      为什么单独立一层：SKILL 第 4 步要求「字段名逐字取自这张表」，**表本身错了就会污染后续每一片**，
  *      而 ①③④ 都只拿表当尺子量画面、不量表自己。行号是证据定位，不是产品文案的第二份真源；源文件增长/插行后，旧行号可以漂移，
@@ -118,10 +118,12 @@ if (!existsSync(DATA_DIR)) {
 const corpus = loadAppletCorpus();
 const dataFiles = readdirSync(DATA_DIR).filter((f) => f.endsWith('.ts'));
 
-/** 分组归属真值 + ⑤ 层自证真值：优惠券 spec/coupon-fields.json + 次卡 spec/card-fields.json 双表 */
+/** 分组归属真值 + ⑤ 层自证真值：优惠券 + 次卡 + 积分 + 会员权益 四表（CHANGE-20260917-017 扩容） */
 const TABLES = [
-  { path: join(ROOT, 'spec', 'coupon-fields.json'), tag: '优惠券' },
+  { path: join(ROOT, 'spec', 'coupon-fields.json'), tag: '优惠券', nativeGroupEligible: true },
   { path: join(ROOT, 'spec', 'card-fields.json'), tag: '次卡' },
+  { path: join(ROOT, 'spec', 'point-fields.json'), tag: '积分' },
+  { path: join(ROOT, 'spec', 'member-fields.json'), tag: '会员权益' },
 ].filter((t) => existsSync(t.path)).map((t) => ({ ...t, json: JSON.parse(readFileSync(t.path, 'utf8')) }));
 const TABLE = TABLES[0] ? TABLES[0].json : {}; // 优惠券表（⑥ 券种↔字段仍只用它）
 const nativeGroups = new Map();
@@ -130,9 +132,7 @@ const allRows = new Set();
 const retiredRows = new Set();
 /** 行名 → 它在真值表里真正所属的组（③ 层报错时指出该挪去哪儿，而不是重复报已知的组名） */
 const rowHome = new Map();
-for (const { json, tag } of TABLES) {
-  // allRows 同时纳入 fields[].label 与 createGroups[].rows：次卡页无原生组名，字段只登记在 fields 里，
-  // 若只从 createGroups 取，次卡上屏字段会被 ④ 层误判为"表外需回写"。并入 fields 后消除该误报。
+for (const { json, tag, nativeGroupEligible } of TABLES) {
   for (const f of json.fields || []) {
     if (typeof f.label === 'string') allRows.add(f.label);
     if (f.onScreen === false && typeof f.label === 'string') retiredRows.add(f.label);
@@ -142,8 +142,10 @@ for (const { json, tag } of TABLES) {
       allRows.add(r);
       if (!rowHome.has(r)) rowHome.set(r, `${tag}·${g.title || `无标题组 ${g.range}`}`);
     }
-    // nativeGroups 只收有 title 的组：次卡页全部 title:null，不进入 ③ 原生组判定
-    if (g.title) nativeGroups.set(g.title, g.rows || []);
+    // nativeGroups 只收有 title 的组：次卡页全部 title:null，不进入 ③ 原生组判定。
+    // 017 起：仅 nativeGroupEligible 表（优惠券）供给 ③——积分/会员表无分组行结构，
+    // 若混入会凭组名 includes() 误匹配视频分镜的组标题。
+    if (g.title && nativeGroupEligible) nativeGroups.set(g.title, g.rows || []);
   }
 }
 /** 剥掉「① 」「⑤ 」这类步进前缀，得到实际组名（覆盖 ①-⑳，不手写子集） */
@@ -262,7 +264,7 @@ const tableUnresolved = [];
 let tableTotal = 0;
 {
   const items = [];
-  for (const { json, tag } of TABLES) {
+  for (const { json, tag, nativeGroupEligible } of TABLES) {
     for (const f of json.fields || []) {
       if (f.onScreen === false) continue;
       items.push({ where: `${tag}·fields`, name: f.label, src: f.src });
@@ -334,7 +336,7 @@ if (unknownRow.length) {
 
 console.log('');
 if (!TABLES.length) {
-  console.log('⑤ 真值表自证（表里的名字逐字回源码）  ⏭ 跳过 —— 未找到 spec/coupon-fields.json 或 spec/card-fields.json');
+  console.log('⑤ 真值表自证（表里的名字逐字回源码）  ⏭ 跳过 —— TABLES 四表一个都没找到');
 } else if (tableBad.length) {
   console.log(`⑤ 真值表自证  ❌ 硬失败 —— 表里 ${tableBad.length} 个名字在目标源码文件中全局查无此文案：`);
   for (const x of tableBad) console.log(`   ${x.where}  «${x.name}»  src=${x.src}  — 源码查无：${x.miss.join(' / ')}`);
@@ -343,7 +345,7 @@ if (!TABLES.length) {
 } else {
   const fieldNames = TABLES.reduce((n, { json }) => n + (json.fields || []).filter((f) => f.onScreen !== false).length, 0);
   const groupRows = TABLES.reduce((n, { json }) => n + (json.createGroups || []).reduce((m, g) => m + (g.rows || []).filter((r) => !retiredRows.has(r)).length, 0), 0);
-  console.log(`⑤ 真值表自证  ✅ 通过 —— 双表（优惠券+次卡）内 ${fieldNames} 个字段名 + ${groupRows} 个有效分组行名，逐字命中各自目标源码文件`);
+  console.log(`⑤ 真值表自证  ✅ 通过 —— ${TABLES.map((t) => t.tag).join('+')}（共 ${TABLES.length} 表）内 ${fieldNames} 个字段名 + ${groupRows} 个有效分组行名，逐字命中各自目标源码文件`);
 }
 if (tableMoved.length) {
   console.log('');
