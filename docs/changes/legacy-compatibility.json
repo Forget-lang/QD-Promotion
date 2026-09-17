@@ -1,0 +1,38 @@
+{
+  "description": "历史 Change Contract 兼容登记表。Owner：docs/changes/README.md；Checker：scripts/check-change-contract.mjs。只登记「经实测确认、确属旧格式、且不补历史文档」的已归档事务；每条必须逐项列出 scopeOfExemption，禁止 blanket 豁免。未登记的事务一律按当前关闭证据标准判定。新事务不得走豁免；豁免项一旦补齐须删除对应条目。条数由实测决定，不预设目标值。",
+  "entries": [
+    {
+      "changeId": "CHANGE-20260915-002",
+      "legacyReason": "关闭于 2026-09-15 13:55，当时关闭证据字段尚未定型；按「关闭后的事务不继续承担新整改范围」原则不回填。",
+      "legacyFormat": "Closure Report 为叙述式条目（新口径/旧口径/机械约束/影响面），无逐项 PASS/FAIL 证据字段",
+      "scopeOfExemption": [
+        "旧口径扫描",
+        "机械检查",
+        "负向测试",
+        "语义反例",
+        "本次新增红"
+      ]
+    },
+    {
+      "changeId": "CHANGE-20260915-003",
+      "legacyReason": "关闭于 2026-09-15，当时关闭证据字段尚未定型；不回填。",
+      "legacyFormat": "无 Mechanical Checks / Negative-Semantic Counterexample 章节，且 Closure Report 无逐项证据字段",
+      "scopeOfExemption": [
+        "旧口径扫描",
+        "机械检查",
+        "负向测试",
+        "语义反例",
+        "本次新增红"
+      ]
+    },
+    {
+      "changeId": "CHANGE-20260916-003",
+      "legacyReason": "早期轻量事务，只记录结论与 CI 运行号；不回填。",
+      "legacyFormat": "无 12 章节结构；Closure Report 为 text 代码块，缺「本次新增红」与 Real Output Verification 章节",
+      "scopeOfExemption": [
+        "本次新增红",
+        "Real Output Verification 章节"
+      ]
+    }
+  ]
+}
