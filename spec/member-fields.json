@@ -1,0 +1,40 @@
+{
+ "_meta": {
+  "desc": "会员权益（会员等级）功能真值表：入口、字段、上限、提示语逐字。做会员/等级类内容前必查本表；功能点上禁止猜测与推理，凡本表没有的表述一律不上屏不进口播。",
+  "source": "applet/pages_merchant/customer/member-benefit.vue + pages_merchant/customer/index.vue（入口）+ pages_merchant/customer/detail.vue:151-166,273-296（指派）+ pages_merchant/customer/mass_create.vue:14-18,87-103（按等级圈人）+ pages_user/merchant/member-benefit.vue（顾客侧）+ constants/memberLevel.js",
+  "lastVerified": "2026-09-17",
+  "versionGate": "需专业版及以上：EDITION_FEATURES.MEMBER_BENEFIT requiredEdition=3（constants/edition.js:158-159）。**对外不提版本约束（forbidden_claims #11）**；但真值层必须保留该事实，防止误把免费版当可用。",
+  "usage": "字段名与提示语逐字取用；讲法必须务实到「商家给自己的顾客手动打的等级标签 + 一张全店共用的权益海报」，不得演绎成常规会员体系。"
+ },
+ "positioning": "**会员等级＝商家给自己的顾客手动打的等级标签**，不是平台给商家评级，也不是常规会员体系：**没有任何升级条件**（无消费额、无次数、无成长值、无积分门槛，等级一律手动指派）；**不参与计价**（无会员价、无等级折扣）；**不产生差异化权益**（只有一张全店共用的「会员权益海报」，不按等级区分）。",
+ "entry": "商户中心 → 「客户管理」页 → 「客户营销」分组 → cell「会员权益｜等级与权益设置」（customer/index.vue:24-32,77-81）→ pages_merchant/customer/member-benefit.vue（页面标题「会员权益」，pages.json:160）。另一入口：客户详情页「客户资料」→「会员等级」行直接改单人等级（detail.vue:151-166）。",
+ "fields": [
+  { "label": "等级数量", "key": "MEMBER_LEVEL_MAX", "limits": "**最多 5 个**；空态逐字「尚未设置会员等级，最多可添加 5 个」，满额「已达 5 个上限」", "src": "constants/memberLevel.js:32；member-benefit.vue:6,28", "onScreen": true },
+  { "label": "等级名称", "key": "name", "limits": "**≤6 字**（placeholder「最多6个字」，报错「等级名称最多6个字」）", "src": "constants/memberLevel.js:33；member-benefit.vue:70-78,248-250", "onScreen": true },
+  { "label": "等级图标", "key": "iconKey", "limits": "6 选 1（逐字）：VIP / 星星 / 会员 / 勋章 / 爱心 / 火箭", "defaults": "crown（VIP）", "src": "constants/memberLevel.js:2-9；member-benefit.vue:177", "onScreen": true },
+  { "label": "等级颜色", "key": "color", "limits": "11 个预设色（#63b359…#333333）；徽章前景/底色写死以保证对比度", "defaults": "#d09a45（对齐黄金会员效果图 #795228 / #f8dda8）", "src": "constants/memberLevel.js:15-27；member-benefit.vue:178", "onScreen": true },
+  { "label": "排序", "key": "sort", "limits": "新建默认取当前等级数", "src": "member-benefit.vue:205", "onScreen": false },
+  { "label": "删除等级", "key": "delete", "limits": "确认弹窗逐字「删除后，已绑定该等级的客户将变为未设等级，确认删除？」", "src": "member-benefit.vue:271", "onScreen": false },
+  { "label": "顾客指派", "key": "assign", "limits": "客户详情「客户资料」→「会员等级」，ActionSheet 首项「未设置」（value 0）；成功 toast「已更新会员等级」", "src": "pages_merchant/customer/detail.vue:152-166,273-296", "onScreen": true },
+  { "label": "会员权益海报", "key": "memberBenefitImage", "limits": "单张 ≤5MB（逐字「单张图片大小不能超过：5MB」）；提示原话「可用豆包制作本店的会员权益海报后上传」；**一张全店共用，不按等级区分**；接口 /seller/merchant/update/member-benefit-image", "src": "member-benefit.vue:32-47,133,191,290-291,339-356", "onScreen": true },
+  { "label": "按等级圈人", "key": "massByLevel", "limits": "「群发优惠券」的「群发对象」＝「全部客户」或某个等级（首项「全部客户」value 0），memberLevelId 传给 /seller/customer/list", "src": "pages_merchant/customer/mass_create.vue:14-18,87-103", "onScreen": true },
+  { "label": "顾客侧展示", "key": "userSide", "limits": "登录后首页昵称旁等级徽章（可点）；商家主页会员卡同样显示；「会员权益」页顶部固定「VIP」装饰字＋头像昵称＋徽章，无等级显示「暂未设置会员等级」，无海报显示「商家尚未上传会员权益海报」；页面可分享（标题「xx会员权益」）", "src": "pages/index/index.vue:68-75；pages_user/merchant/home.vue:62-69；pages_user/merchant/member-benefit.vue:7,23-30,40,127-131", "onScreen": true }
+ ],
+ "hardRules": [
+  "等级是纯标签：只有 名称 + 图标 + 颜色 + 排序 四个字段，**没有任何升级条件**",
+  "删除等级不删人：已绑定该等级的客户自动变为「未设置」",
+  "会员权益海报是一张整图，不是结构化权益清单，不能按等级配不同权益",
+  "等级与积分不联动：无积分倍率、无等级成长门槛"
+ ],
+ "notThis": [
+  "不是自动升降级：无成长值、无消费门槛、无有效期",
+  "不是等级折扣 / 会员价：全仓无会员价或按等级计价字段",
+  "不是按等级差异化权益：所有等级共用同一张海报",
+  "不是平台给商家评级：方向是 商家 → 自己的顾客",
+  "「客户码」仅用于身份识别，不得称为会员体系（forbidden_claims #7）"
+ ],
+ "unverified": [
+  { "item": "后端 /seller/member-level/* 的字段校验规则", "detail": "前端只做名称长度与色值校验；后端 model/member_level.go 不在本仓库（仅注释提及）。" },
+  { "item": "是否存在隐藏的自动指派逻辑", "detail": "前端未见到任何自动升级/自动指派路径，但服务端行为不可见。" }
+ ]
+}

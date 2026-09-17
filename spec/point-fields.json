@@ -1,0 +1,46 @@
+{
+ "_meta": {
+  "desc": "积分功能真值表：入口、字段、上限、提示语逐字。做积分类内容（视频/文章/教程）前必查本表；功能点上禁止猜测与推理，凡本表没有的表述一律不上屏不进口播。",
+  "source": "applet/pages_point/*（point/index.vue · point/increase.vue · point/decrease.vue · type/index.vue · staff/update_staff.vue · staff/list.vue · log/list.vue · stat/index.vue · about/index.vue）+ pages_user/point/list.vue + pages_merchant/customer/detail.vue（发/扣分入口）+ constants/permission.js",
+  "lastVerified": "2026-09-17",
+  "versionGate": "无版本门禁：constants/edition.js 的版本功能配置表无积分项，免费/标准/专业/企业四档功能一致，仅受 PERM_MODULE.POINT 权限控制 → 对外可讲，不会与「不提版本」口径冲突。",
+  "usage": "字段名与提示语逐字取用（可直接上屏）；讲法必须务实到「商家给单个顾客手动发/扣的记账」，不得演绎成积分商城、自动累计、抵现。"
+ },
+ "positioning": "商家给本店单个顾客手动发放/扣除积分，沉淀到店与消费激励。**不是**自动累计（无消费规则配置，纯人工操作）；**不是**积分商城（无兑换、无抵现）；**不是**可撤销账本（流水不可撤销，只能反向冲正）。",
+ "entry": "商户中心「功能菜单」宫格 → 「积分」（pages/merchant/index.vue:169-174）→ pages_point/point/index.vue。该页四个宫格：「发放员工」「积分类型」「积分明细」「发放统计」（point/index.vue:26-33）。发/扣入口：顾客出示客户码 → 商家微信扫一扫 → 客户详情；或 客户管理 → 客户详情（detail.vue:94-113，按钮「发放积分／奖励客户」「扣除积分／扣减积分」）。",
+ "fields": [
+  { "label": "发放数量", "key": "amount", "limits": "1~1000（校验原话「发放数量须在1-1000之间」，输入框 maxlength=4）", "defaults": "预设快捷值 1 / 5 / 10 / 20 / 50", "src": "pages_point/point/increase.vue:28,166,236", "onScreen": true },
+  { "label": "积分类型", "key": "pointTypeId", "limits": "单选，只列「发放积分」方向且启用中的类型", "defaults": "默认选中第一个", "src": "pages_point/point/increase.vue:197-201", "onScreen": true },
+  { "label": "客户备注（对外可见）", "key": "customerRemark", "limits": "≤200 字", "defaults": "placeholder 逐字「选填，商户与客户可见」", "src": "pages_point/point/increase.vue:84-86", "onScreen": true },
+  { "label": "内部备注（仅商户可见）", "key": "internalRemark", "limits": "≤200 字", "src": "pages_point/point/increase.vue:102-104", "onScreen": false },
+  { "label": "扣除数量", "key": "amount(decrease)", "limits": "输入框 maxlength=8；**无上限校验**，只校验「积分余额不足」（不能超过顾客当前余额）", "src": "pages_point/point/decrease.vue:28,207,239", "onScreen": true },
+  { "label": "类型名称", "key": "name", "limits": "≤6 字，报错原话「类型名称最多6个字」", "src": "pages_point/type/index.vue:40-46", "onScreen": true },
+  { "label": "类型方向", "key": "direction", "limits": "1 发放 / 2 扣除（两个 tab「发放积分」「扣除积分」，类型分开建，互不通用）", "src": "pages_point/type/index.vue", "onScreen": true },
+  { "label": "类型排序", "key": "sort", "limits": "数字越小越靠前，默认 0", "src": "pages_point/type/index.vue", "onScreen": false },
+  { "label": "类型状态", "key": "status", "limits": "1 启用 / 2 停用", "src": "pages_point/type/index.vue:79", "onScreen": false },
+  { "label": "系统类型", "key": "isSystem", "limits": "系统预置类型**不可改、不可删**", "src": "pages_point/type/index.vue:118-121,216-219", "onScreen": false },
+  { "label": "发放员工", "key": "staffIds", "limits": "多选，至少 1 人（报错原话「请至少选择一名发放员工」）；**名单为空时谁都不能发/扣**", "src": "pages_point/staff/update_staff.vue:50-55；point/index.vue:49", "onScreen": true },
+  { "label": "积分流水", "key": "log", "limits": "tab「全部／积分获取／积分消耗」+ 按操作员工筛选；展示：积分类型 / 变动值 / 变动后余额 / 门店 / 员工（空则「系统发放」）/ 客户备注；内部备注弹窗标题「商家备注」", "src": "pages_point/log/list.vue:55-84,130-141", "onScreen": true },
+  { "label": "发放统计", "key": "stat", "limits": "「今日发放／今日消耗／昨日发放／昨日消耗」＋「本月发放／本月消耗」＋「按类型」「按员工」", "src": "pages_point/stat/index.vue:7-27", "onScreen": true },
+  { "label": "顾客端", "key": "userPoint", "limits": "「当前积分」＋明细，筛选「全部类型／奖励／消费」", "src": "pages_user/point/list.vue:7,102-128", "onScreen": true }
+ ],
+ "hardRules": [
+  "流水不能撤销，发错请用反向操作冲正（point/index.vue:49、about/index.vue:20）",
+  "扣除不能超过顾客当前余额",
+  "单次发放 1~1000（前端校验；后端是否同限不可见，见 unverified）",
+  "只有「发放员工」名单内的员工可发/扣；名单为空则谁都不能发",
+  "系统预留类型名不可被商家占用：积分兑换、邀请奖励、转赠奖励、分享奖励",
+  "积分兑换「即将上线」未实现（point/index.vue:46）；券创建页发放方式里的「积分兑换」为置灰占位，点击 toast「此功能即将上线」（create.vue:662-672，constants/coupon.js:50 注「服务端尚未开放」）"
+ ],
+ "notThis": [
+  "不是自动累计：无消费规则配置，发/扣全是人工操作",
+  "不是积分商城：无兑换商品、无积分抵现、无积分支付",
+  "不是可撤销账本：只能反向冲正",
+  "无积分有效期、无单客户累计上限设置",
+  "与会员等级不联动：无积分倍率、无等级升降条件"
+ ],
+ "unverified": [
+  { "item": "单次 1~1000 上限是否后端同样校验", "detail": "前端 maxlength=4 + 校验原话可证；后端规则前端看不到。" },
+  { "item": "canChangePoint 的后端判定条件", "detail": "顾客详情页发/扣按钮受后端 canChangePoint + PERM_POINT.CHANGE 控制，具体条件前端不体现。" }
+ ]
+}
