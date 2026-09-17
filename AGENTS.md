@@ -10,7 +10,7 @@
 - 任何规则必须有明确落点；任何落点只能有一个 Owner。
 - 任何引用只能指向 Owner；非 Owner 只能解释、引用、导航或提供证据。
 - 任何替代必须清理旧阵：新口径进入唯一 Owner 后，旧口径必须删除或进入明确废止登记。
-- 任何历史必须退出当前指挥链：archive/changelog 只能提供证据与回顾，不得成为当前入口、当前规则或当前状态源。
+- 任何历史必须退出当前指挥链：`outputs/archive/` 只能提供证据与回顾，不得成为当前入口、当前规则或当前状态源。
 - **任何改动或产出之前，先做最小定位**：① 这在项目哪一层 ② Owner 是谁 ③ 会牵动谁 ④ 旧口径在哪。**定位的结论决定它是否需要升级为全局变更**；一旦判定为全局，必须先完成资源、Owner、入口、依赖、重复、冲突、断档、当前/历史边界与优先级侦察，再进入 Migration。**定位未完成，不得动手。**
 - 发现第二 Owner、第二入口、规则重复、历史越权、新旧并存、或检查器与真实语义冲突时立即 STOP，回到全局审计。
 
@@ -32,7 +32,7 @@
 | 整改前置侦察 | `docs/internal/整改作战总纲.md` | 全局整改前排兵布阵 |
 | 组合玩法视角 | `knowledge/玩法版图.md` | 功能原子 × 功能原子组合成生意打法 |
 | 传播研究资源 | `knowledge/爆款文案技能包/` / `knowledge/爆款整片解剖.md` / `knowledge/洞察库.md` | Hook、结构、信息增量、教学节奏、反模式、洞察 |
-| 历史证据 | `outputs/archive/` / `outputs/archive/changelog.md` | 回顾与审计证据 |
+| 历史证据 | `outputs/archive/` | 回顾与审计证据（2026-08 及更早的变更条目见 `outputs/archive/changelog-2026-08.md`） |
 
 **`docs/internal/内容资源调用协议.md` 不是第二视频流程；它只定义资源职责边界。**
 
@@ -143,7 +143,7 @@ SKILL 组织成完整视频
 
 1. `node scripts/gate-all.mjs`
 2. `node scripts/list-assets.mjs`
-3. 读 `outputs/archive/changelog.md` 顶部约 10 条
+3. 读 `docs/changes/active/` 与 `docs/changes/closed/` 的最新变更事务
 
 整改任务先执行“整改前置排兵布阵”，再做这三动作。
 
@@ -152,7 +152,7 @@ SKILL 组织成完整视频
 - 实时状态以脚本输出和当前产物为准。
 - `PROJECT-CONSISTENCY-MAP.md` 只用于恢复状态，不是入口。
 - `outputs/archive/` 只作历史证据。
-- `changelog` 只记录历史与变更事务，不承担当前规则。
+- 变更现状以 `docs/changes/{active,closed}/` 与脚本输出为准；`outputs/archive/` 只作历史证据，不承担当前规则。
 
 ## 十二、APPLET 协作
 

@@ -172,8 +172,8 @@ const constitutionScan = (rel, text) => {
   text.split('\n').forEach((line, i) => {
     if (/^\s*```/.test(line)) { inCodeBlock = !inCodeBlock; return; }
     if (inCodeBlock) return;
-    if (stampRe.test(line) && line.length > 120) hardFails.push({ file: rel, line: i + 1, ref: line.trim().slice(0, 48), why: '宪法铁律二：校验戳超 120 字——戳内复述改动摘要，改为「日期（变更史见 changelog）」' });
-    if (histRe.test(line) && !/changelog/.test(line)) hardFails.push({ file: rel, line: i + 1, ref: line.trim().slice(0, 48), why: '宪法铁律一：正文写了审计轮次叙事——改动史归 changelog，此处只留规则 +「详见 changelog」指针' });
+    if (stampRe.test(line) && line.length > 120) hardFails.push({ file: rel, line: i + 1, ref: line.trim().slice(0, 48), why: '宪法铁律二：校验戳超 120 字——戳内复述改动摘要，改为「日期（变更史见 docs/changes/）」' });
+    if (histRe.test(line) && !/changelog|docs\/changes/.test(line)) hardFails.push({ file: rel, line: i + 1, ref: line.trim().slice(0, 48), why: '宪法铁律一：正文写了审计轮次叙事——改动史归 docs/changes/，此处只留规则 +「详见对应变更事务」指针' });
   });
 };
 for (const [, p] of allDocs) constitutionScan(relative(ROOT, p), readFileSync(p, 'utf8'));

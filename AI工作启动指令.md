@@ -64,7 +64,7 @@
 - 当前规则：只认当前 Owner 的当前版本。
 - 当前状态：优先认当前脚本、当前文件、当前产物和当前 CI/Gate。
 - 历史：只用于知道过去发生过什么、为什么改过、检查重复和追溯证据。
-- `outputs/archive/` 和 `changelog` 不得成为当前规则入口，不得反向指挥当前方案。
+- `outputs/archive/` 不得成为当前规则入口，不得反向指挥当前方案。
 
 ## 三、Owner 路由
 
@@ -94,7 +94,7 @@ Gate / 真实产物 / 用户最终验收
 - 视觉导演：`R9`
 - 资源职责边界：`docs/internal/内容资源调用协议.md`
 - 整改前置侦察：`docs/internal/整改作战总纲.md`
-- 历史证据：`changelog / archive`
+- 历史证据：`outputs/archive/`（2026-08 及更早见 `changelog-2026-08.md`）
 
 如果同一个概念出现两个当前 Owner：**停止执行，先解决 Owner 冲突。**
 
