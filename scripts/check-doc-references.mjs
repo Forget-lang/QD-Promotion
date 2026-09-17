@@ -199,6 +199,29 @@ for (const [file, path] of allDocs) {
   });
 }
 
+// 旧话头（已登记废弃口径）回流拦截 —— 2026-09-17 CHANGE-20260917-021 接入。
+// 背景：deprecatedTerms 此前只登记、无消费端（CHANGE-020 §十三 实测记录），"清旧"名义上机器强制、实际靠自觉。
+// 匹配规则：term 字面匹配，前后不得紧邻拉丁字母/数字——防子串误伤，判例见 docs/internal/整改作战总纲.md
+// 「典型反例：合法 R10-产品事实源解析协议.md 被旧正则误识别为 10-...。此时应修检查器，而不是改掉合法文件名」。
+// 中文无字符级边界，故 term 必须足够精确（各条精确性要求见 ref-registry.json 对应 desc）。
+const deprecatedRules = (REGISTRY.deprecatedTerms || []).map((t) => ({
+  term: t.term,
+  desc: t.desc,
+  re: new RegExp(`(?<![A-Za-z0-9])${t.term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![A-Za-z0-9])`),
+}));
+for (const [file, path] of allDocs) {
+  const rel = relative(ROOT, path);
+  const lines = readFileSync(path, 'utf8').split('\n');
+  let inCodeBlock = false;
+  lines.forEach((line, i) => {
+    if (/^\s*```/.test(line)) { inCodeBlock = !inCodeBlock; return; }
+    if (inCodeBlock) return;
+    for (const d of deprecatedRules) {
+      if (d.re.test(line)) hardFails.push({ file: rel, line: i + 1, ref: d.term, why: `旧口径话头回流（已登记 deprecatedTerms）——改用当前口径；登记理由：${d.desc}` });
+    }
+  });
+}
+
 // 已退役文件名守门（2026-09-17 CHANGE-20260917-009 立，CHANGE-20260917-011 扩）：
 // 文件删除后若不显式登记，闸门会因「它不再是已知文件名」而对其引用静默放行——
 // 这正是本项目反复出现的失效模式（闸门失去检查对象即默认放行），故在此硬拦。
