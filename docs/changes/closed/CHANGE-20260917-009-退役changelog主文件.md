@@ -6,7 +6,7 @@
 - 标题：退役 changelog 主文件，变更史统一归 `docs/changes/`
 - 负责人：用户 + 本地 Agent
 - 范围：`global`
-- 状态：`VERIFYING`
+- 状态：`CLOSED`
 - 基线：`HEAD = 252b84e`
 - **定位说明**：触及 8 个对象（含 `AGENTS.md` 宪法 §十、`SKILL.md` 生产 Owner、检查器提示语、注册表），按 `AGENTS.md` §一 升级为全局变更走 R8。
 
@@ -117,7 +117,9 @@
 - 真图/成片：N/A（not-applicable，见 §十一）
 - 本次新增红：0 —— **首轮验收曾出现 1 处新增硬失败**（`docs/internal/R10:32` 仍指向已删文件），**已当场补修并复验回到基线 5 处**；最终 `gate-all` 与迁移前逐项一致
 
-**结论：NOT CLOSED**
+**结论：CLOSED**
+
+**关闭依据（2026-09-17 15:05，用户确认「都处理掉」）**：机械验证按 `CHANGE-20260917-012` 修定的口径执行——在候选状态 `f065a35` 的干净检出（工作树 0 改动、APPLET 快照 298 文件）上按两个工作流原样步骤重跑：`change-contract-gate` 全绿；`visual-shot-contract` 仅硬步骤 `gate-all` 红（2/15，两道红逐条归因 g11 线：文档引用 5 处断链 + 母题卡 g10 缺口），**本笔新增红 0**。移档后的最终状态另行复验一次（见当日日志）。
 
 **未完成事项与诚实披露**：
 1. `docs/changes/closed/CHANGE-20260916-004` 第 66 行仍写「`outputs/archive/changelog.md` … changelog 继续作为历史账本」——**属历史契约，按纪律不回填**，故其陈述已与当前事实不符（已知尾巴，留档）。
