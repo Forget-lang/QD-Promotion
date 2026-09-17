@@ -90,7 +90,7 @@ CHANGE-20260916-003 已完成并关闭：
 - 历史前身：`outputs/archive/AI启动提示词.md`
 - 当前事务已归档：`docs/changes/closed/CHANGE-20260916-003-全局治理阵型收口.md`
 - 本轮 Closure Report：CLOSED
-- fresh CI：`change-contract-gate` #75 PASS；`visual-shot-contract` #124 PASS
+- fresh CI：`change-contract-gate` #75 PASS；`visual-shot-contract` #124 PASS（**历史记录**；自 `CHANGE-20260917-012` 起，关闭证据改以候选状态上的等价重现为准，不要求 CI 记录）
 - 变更史：以 `docs/changes/`（变更事务库）为准；历史账本（主文件与 2026-08 分卷）均已全系退役，追溯走 git 历史
 
 ### 5. R9 / Visual Shot Contract
