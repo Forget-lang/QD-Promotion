@@ -71,7 +71,7 @@ docs/AI使用手册.md
 | `docs/internal/` | AI | 各自领域 Owner、方法、技术与治理协议 | 只能管自己的领域 |
 | `docs/internal/整改作战总纲.md` | AI | 全局整改前的资源/Owner/冲突/依赖侦察 | 不承担第二生产流程 |
 | `docs/internal/PROJECT-CONSISTENCY-MAP.md` | 人 / AI | 当前状态总账 | 不新增规则，不承担入口 |
-| `outputs/archive/` / `changelog` | 人 / AI | 历史证据、变更记录 | 不进入当前指挥链 |
+| `outputs/archive/` / `docs/changes/` | 人 / AI | 历史证据、变更记录 | 不进入当前指挥链 |
 
 你不需要记住每条规则在哪。
 
@@ -257,7 +257,7 @@ docs/internal/R8-变更收敛协议.md
 | 「给我整改对账单」 | 用真实文件、命令、退出码、负向测试证明落实情况 |
 | 「这个事实不对」 | 回 Product Truth / 对应 spec 真源取证 |
 | 「这种词不能出现」 | 回 `spec/redlines.json` 和检查器，必要时做负向测试 |
-| 「这条只记，不动文档」 | 记录到 changelog，不擅自升级成规则 |
+| 「这条只记，不动文档」 | 记录到当前变更事务，不擅自升级成规则 |
 | 「这条上闸门」 | 先做检查器 + 负向测试，再接入唯一真源 |
 | 「刚才那条撤了」 | 找全部写入点，清理旧口径并记录废止 |
 
@@ -307,7 +307,7 @@ docs/internal/R8-变更收敛协议.md
 | “我现在该怎么指挥 AI？” | `AI工作启动指令.md` |
 | “这个项目和 AI 到底怎么协作？” | `docs/AI使用手册.md` |
 | “这条规则到底是谁说了算？” | 让 AI 从 `AGENTS.md` 开始找当前 Owner |
-| “这个东西以前为什么这样？” | `outputs/archive/` / Git 历史 / changelog |
+| “这个东西以前为什么这样？” | `outputs/archive/` / Git 历史 / `docs/changes/` |
 | “这次到底有没有真正做完？” | 让 AI 给整改对账单 + Gate 证据 |
 
 **一句话：**

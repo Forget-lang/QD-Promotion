@@ -199,6 +199,19 @@ for (const [file, path] of allDocs) {
   });
 }
 
+// 已退役文件名守门（2026-09-17 CHANGE-20260917-009 补）：
+// 文件删除后若不显式登记，闸门会因「它不再是已知文件名」而对其引用静默放行——
+// 这正是本项目反复出现的失效模式（闸门失去检查对象即默认放行），故在此硬拦。
+// 注意：只拦 changelog.md 本体，不拦仍在用的 changelog-2026-08.md。
+const RETIRED_DOC_RE = /(?<![\w-])`?changelog\.md`?/;
+for (const [file, p] of allDocs) {
+  readFileSync(p, 'utf8').split('\n').forEach((line, i) => {
+    if (RETIRED_DOC_RE.test(line)) {
+      hardFails.push({ file: relative(ROOT, p), line: i + 1, ref: line.trim().slice(0, 48), why: '引用已退役的 changelog 主文件——变更史见 docs/changes/（2026-08 及更早见 changelog-2026-08.md）' });
+    }
+  });
+}
+
 console.log('\n══════════════ 文档引用守门扫描结果 ══════════════\n');
 if (hardFails.length) {
   console.log(`① 引用断链 / 资源路径失效 / 计数型复述  ❌ 硬失败 —— ${hardFails.length} 处`);

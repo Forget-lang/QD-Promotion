@@ -63,7 +63,8 @@
 | `AI工作启动指令.md`（2 处） | 用户侧协议 | REPLACE | 不再引用已删文件 | DONE |
 | 工作区记忆硬纪律 | 必然加载层 | REPLACE | 开工三步第 3 步改指 `docs/changes/` | DONE |
 | `docs/changes/active/CHANGE-20260917-009-*.md` | 本事务 | ADD | 本文件 | DONE |
-| **执行中追加（超出原计划）**：`docs/internal/R10-产品事实源解析协议.md:32`、`knowledge/爆款文案技能包/SKILL.md:3`、`outputs/g06/05-发布稿-搜狐.md:3`、`outputs/g07/g08/g09 的 00-交付说明.md`、`outputs/archive/内容方法论重构规划.md` | 残留引用（7 文件） | REPLACE | 全仓库不再有指向已删文件的引用 | DONE（首次验收时 `R10:32` 造成 **1 处新增硬失败**，已补修；7 处均为路径纠正、正文未动） |
+| **执行中追加（超出原计划）**：第一轮 —— `docs/internal/R10-产品事实源解析协议.md:32`、`knowledge/爆款文案技能包/SKILL.md:3`、`outputs/g06/05-发布稿-搜狐.md:3`、`outputs/g07/g08/g09 的 00-交付说明.md`、`outputs/archive/内容方法论重构规划.md`；**第二轮（补完，见 §十二 补完记录）—— 扫描面内 16 处裸 `changelog` 提及（`docs/internal` 6 文件 9 处、`docs/战略简报.md` 2、`docs/AI使用手册.md` 3、`spec/facts.json`、`spec/assets.json`）＋ `outputs/` 内 15 处** | 残留引用 | REPLACE | 全仓库不再有指向已删文件的引用，且**有机械拦阻兜底** | DONE（两轮合计 3 次 `check-doc-references` 新增硬失败均当场修回；第一轮 `R10:32` 报 6 处、第二轮 `R9:166` 报 6 处，均为**新拦阻抓出来的**） |
+| `scripts/check-doc-references.mjs` 新增**已退役文件名拦阻** | 闸门防漏（机制 A） | ADD | 引用 `changelog.md` 即硬失败；不误报仍在用的 `changelog-2026-08.md` | DONE（**天然负向测试**：加装后立刻抓出 `docs/internal/R9:166`，5→6 处；清理后回到基线 5 处，证明拦得住且不误报） |
 
 ## 八、Migration Plan
 
@@ -109,7 +110,7 @@
 - 已废止：`outputs/archive/changelog.md`（**已删除**）；`ref-registry.json` 中它的权威文档登记项
 - 已保留：`outputs/archive/changelog-2026-08.md` 全文（除头部 1 行）；`SKILL.md` 全部规则正文；`ref-registry.json` 的豁免数据本体（`approvedBy` / `metrics` / `reason` 主体）
 - 影响面：`0 / 0`
-- 旧口径扫描：PASS —— 全仓库（排除 `docs/changes/` 历史与本事务）已无任何指向 `outputs/archive/changelog.md` 的引用（`grep` 复查为空）
+- 旧口径扫描：PASS —— 全仓库（排除 `docs/changes/` 历史、本事务与仍在用的 `changelog-2026-08.md`）**仅剩 5 处刻意保留的提及**：`ref-registry.json` 4 处（本事务写入的"原条目已缺失"说明）＋ `check-doc-references.mjs` 1 处（新拦阻正则本身）。**订正**：本节初稿曾写"全仓库已无任何引用"，那只对**路径形态**成立；第二轮补完后才覆盖**裸提及**，范围已在 §七 与下方补完记录中更正。
 - 机械检查：PASS —— `check-change-contract` PASS；`check-doc-references` 5 处硬失败**＝基线**（g11 线，本事务新增 0）；`gate-all` 与迁移前逐项一致；`node -e "require('./scripts/ref-registry.json')"` 成功（顶层键 12）
 - 负向测试：PASS（**行数即判据**）—— `changelog-2026-08.md` 的 `git diff --stat` = **1 insertion / 1 deletion**，证明 132 条历史条目零改动（§十 反例 3 的判据）；`SKILL.md` 为 16/16（只增删引用字样，规则正文未减字）
 - 语义反例：PASS —— §十 三个反例均已在执行中被实际触发并处理：① 反例 1（先删后改）**未发生**（引用先改、文件后删，单次提交内可验）；② 反例 2（静默改写悬空指针）**未发生**——4 条豁免一律标注"原引用的 changelog 条目已缺失"，未伪造指向 `docs/changes/`；③ 反例 3（顺手删规则正文）**未发生**——`SKILL.md` diff 为 16 增 16 删
@@ -122,3 +123,13 @@
 1. `docs/changes/closed/CHANGE-20260916-004` 第 66 行仍写「`outputs/archive/changelog.md` … changelog 继续作为历史账本」——**属历史契约，按纪律不回填**，故其陈述已与当前事实不符（已知尾巴，留档）。
 2. 多份文件引用的 changelog 轮次/日期（如「第三十六轮」「2026-09-03」）**本就不存在于任何卷**（2026-09-01~09-14 缺口），本次只纠正了**路径**，未也无法纠正**轮次落点**——该内容缺失是不可恢复的既成事实。
 3. 等用户确认；未推送。
+
+**补完记录（第二轮，2026-09-17 12:0x）—— 本事务首轮交付不完整，此处如实登记**：
+
+- **缺陷**：首轮只清了**路径式引用**（`outputs/archive/changelog.md`），未清**裸 `changelog` 提及**；全仓库仍有 **37 行 / 24 文件**，其中扫描面内现行文档 **16 处**（含 `docs/internal/R9:166` 一处被漏掉的**路径式**引用）。
+- **为什么闸门没抓到**：文件删除后 `changelog.md` 不再是"已知文件名"，`check-doc-references` 便**不再解析其引用** → **又一次"闸门失去检查对象即默认放行"，且由本事务的删除动作直接造成**。首轮写在 §十二 的"已无任何引用"因此是**范围写窄了的断言**。
+- **补完动作**：① 清理扫描面内 16 处（`docs/internal` 6 文件、`docs/战略简报.md`、`docs/AI使用手册.md`、`spec/facts.json`、`spec/assets.json`）；② 清理 `outputs/` 内 15 处；③ 清理 2 处代码注释；④ **给闸门加装"已退役文件名"硬拦阻**（正则 `(?<![\w-])\`?changelog\.md\`?`，只拦本体不拦 `changelog-2026-08.md`）。
+- **补完的负向测试（机制 A：机械可拦）**：拦阻加装后立即复跑 → **抓出 `docs/internal/R9:166`**（5→6 处）；清理后回到基线 5 处。**验收：闸门既能抓、又不误报**。
+- **口径裁定（记入，避免成为悬空约定）**：多份文件原本把"一句话复盘结论"记进 changelog。`changelog` 退役后，该结论的落点统一为 **`outputs/archive/发布后验台账.json` 的片行**（与 `SKILL.md` 第 7 步已被本事务改成的口径一致）；台账原"不存结论、避免与 changelog 重复"的说明同步改为"本台账即复盘结论的唯一落点，不再另设重复台账"。
+- **仍不可恢复**：`2026-09-01`~`2026-09-14` 的 changelog 条目**从来不存在**；凡引用其轮次/日期的注脚（如"第三十六轮""补24/补25""第十九轮·补5"）只保留标识、**删除失效指针**，未伪造新指向。
+- **最终状态**：`check-doc-references` 5 处硬失败＝基线（本事务新增 0）；`gate-all` 2/15 与迁移前逐项一致。
