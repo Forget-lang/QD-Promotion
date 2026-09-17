@@ -26,7 +26,7 @@ function walk(dir) {
 
 const files = walk(outputs);
 if (!files.length) {
-  console.log('VISUAL-SHOT-CONTRACT PASS: no R9 visual decision ledgers found.');
+  console.log('VISUAL-SHOT-CONTRACT PASS: no R9 visual decision ledgers found.（空转提示：本闸门当前没有检查对象——若这非预期，说明 R9 视觉决策台账缺失）');
   process.exit(0);
 }
 

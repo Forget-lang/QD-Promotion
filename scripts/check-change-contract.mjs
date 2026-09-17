@@ -225,7 +225,7 @@ const transactions = [
 ];
 
 if (transactions.length === 0 && rootTransactionFiles.length === 0) {
-  console.log('CHANGE-CONTRACT PASS: no change transactions.');
+  console.log('CHANGE-CONTRACT PASS: no change transactions.（空转提示：active/ 与 closed/ 均无事务——若这非预期，说明事务库目录缺失）');
   process.exit(0);
 }
 

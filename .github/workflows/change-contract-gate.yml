@@ -9,6 +9,10 @@ on:
       - 'scripts/materialize-applet-truth.mjs'
       - 'spec/product-truth/applet-snapshot.json'
       - 'scripts/gate-all.mjs'
+      - 'AGENTS.md'
+      - 'SKILL.md'
+      - 'AI工作启动指令.md'
+      - 'docs/internal/**'
       - '.github/workflows/change-contract-gate.yml'
   pull_request:
     paths:
@@ -18,6 +22,10 @@ on:
       - 'scripts/materialize-applet-truth.mjs'
       - 'spec/product-truth/applet-snapshot.json'
       - 'scripts/gate-all.mjs'
+      - 'AGENTS.md'
+      - 'SKILL.md'
+      - 'AI工作启动指令.md'
+      - 'docs/internal/**'
 
 jobs:
   change-contract:
