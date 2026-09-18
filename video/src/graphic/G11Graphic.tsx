@@ -5,7 +5,6 @@
 import React from 'react';
 import { AbsoluteFill, staticFile } from 'remotion';
 import { FONT_BODY, FONT_IMPACT, FONT_ROUND } from '../palette';
-import { CoverBg, Hook, Payoff, SubLine } from '../covers/coverKit';
 
 const INK = '#1F2937';
 const INK2 = '#4B5563';
@@ -85,18 +84,25 @@ const Page: React.FC<{ tag: string; page: string; children: React.ReactNode }> =
   </AbsoluteFill>
 );
 
-// ════════════════ 图 1 · 首图（即封面 · 珊瑚橙大字）════════════════
+// ════════════════ 图 1 · 首图（即封面 · 与内页同一张纸）════════════════
+// 2026-09-18 16:2x 用户指令：首图背景与其余各屏**保持一致**（统一用点阵网格纸），不再单独用珊瑚橙底。
+// 配色随之改为深墨大字 ＋ 珊瑚橙强调（原 coverKit 的白/金字在白底上不可读）。
 export const G11Graphic1: React.FC = () => (
   <AbsoluteFill>
-    <CoverBg />
-    <div style={{ position: 'absolute', left: 60, right: 60, top: 420, textAlign: 'center' }}>
-      <Hook size={176}>周一没人？</Hook>
-      <div style={{ marginTop: 48 }}>
-        <Payoff size={66}>一张手气券，5 步<br />填满周一到周四</Payoff>
+    <PaperBg />
+    <div
+      style={{
+        position: 'absolute', inset: 0, padding: '120px 72px',
+        display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
+        textAlign: 'center', boxSizing: 'border-box',
+      }}
+    >
+      <div style={{ fontFamily: FONT_ROUND, fontSize: 32, color: EMBER, letterSpacing: 6, marginBottom: 36 }}>烧烤店 · 周中填场</div>
+      <div style={{ fontFamily: FONT_IMPACT, fontSize: 168, color: INK, lineHeight: 1.12 }}>周一没人？</div>
+      <div style={{ marginTop: 36, fontFamily: FONT_IMPACT, fontSize: 62, color: EMBER, lineHeight: 1.42 }}>
+        一张手气券，5 步<br />填满周一到周四
       </div>
-      <div style={{ marginTop: 72 }}>
-        <SubLine size={44}>烧烤店 · 照着设就行</SubLine>
-      </div>
+      <div style={{ marginTop: 54, fontFamily: FONT_ROUND, fontSize: 40, color: INK2, letterSpacing: 4 }}>照着设就行</div>
     </div>
   </AbsoluteFill>
 );
