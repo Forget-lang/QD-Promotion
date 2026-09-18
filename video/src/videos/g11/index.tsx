@@ -207,33 +207,53 @@ const G11Hook: React.FC<SceneRenderProps> = ({ scene, style }) => {
   );
 };
 
-/* ══ S2 · 理解段：上下算账块 ═════════════════════════════ */
+/* ══ S2 · 理解段：上下算账块（旧办法 → 被否掉 → 新机制）══
+ *  2026-09-18 人眼对账后局部强化（用户拍板：只有 S2 偏闷）：不加内容、不加装饰，
+ *  把「上块 → 下块」的切换本身做成一次看得见的板面状态变化——粉笔划掉上块并压暗 + 分隔线划开，
+ *  同时重排写入时点，消掉「写一句 → 大面积等 → 再写一句」的空档。 */
 const G11Idea: React.FC<SceneRenderProps> = ({ scene, style }) => {
   const p = scene.payload as unknown as IdeaPayload;
   const sp = cfgOf(style);
+  const f = useCurrentFrame();
+  // 划掉上块（对齐 sub2「喊了等于没喊」起点 180）：横扫 190→235，上块同时压暗
+  const strike = interpolate(f, [190, 235], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
+  const dim = interpolate(f, [190, 235], [1, 0.42], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  // 分隔线划开 245→270（承接划掉，标记板面换段）
+  const ruleP = interpolate(f, [245, 270], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
   return (
     <AbsoluteFill>
       <EmberParticles count={16} />
       <Board gap={26} rotate={0.5} sp={sp}>
-        <WriteIn start={6}>
-          <div style={{ fontFamily: FONT_BODY, fontSize: 30, color: CHALK_DIM, fontWeight: 700 }}>{p.topTitle}</div>
-        </WriteIn>
-        {p.topRows.map((r, i) => (
-          <WriteIn key={i} start={26 + i * 16}>
-            <div style={{ fontFamily: FONT_BODY, fontSize: 32, color: i === 1 ? 'rgba(198,189,181,.95)' : 'rgba(198,189,181,.72)', padding: '12px 0' }}>{r}</div>
+        <div style={{ opacity: dim, position: 'relative' }}>
+          <WriteIn start={6}>
+            <div style={{ fontFamily: FONT_BODY, fontSize: 30, color: CHALK_DIM, fontWeight: 700 }}>{p.topTitle}</div>
           </WriteIn>
-        ))}
-        <div style={{ height: 2, background: `linear-gradient(90deg, transparent, ${EMBER} 30%, ${EMBER} 70%, transparent)`, margin: '20px 0', opacity: 0.75 }} />
-        <WriteIn start={190}>
+          {p.topRows.map((r, i) => (
+            <WriteIn key={i} start={60 + i * 90}>
+              <div style={{ fontFamily: FONT_BODY, fontSize: 32, color: i === 1 ? 'rgba(198,189,181,.95)' : 'rgba(198,189,181,.72)', padding: '12px 0' }}>{r}</div>
+            </WriteIn>
+          ))}
+          {/* 粉笔划掉：一道横扫过整块旧办法（语义＝这个做法被否掉），非装饰 */}
+          <div
+            style={{
+              position: 'absolute', left: -6, right: -6, top: '46%', height: 6, borderRadius: 3,
+              background: EMBER_LT, transformOrigin: 'left center',
+              transform: `rotate(-1.6deg) scaleX(${strike})`,
+              opacity: 0.92, boxShadow: '0 0 14px rgba(240,106,36,.55)',
+            }}
+          />
+        </div>
+        <div style={{ height: 2, background: `linear-gradient(90deg, transparent, ${EMBER} 30%, ${EMBER} 70%, transparent)`, transformOrigin: 'left center', transform: `scaleX(${ruleP})`, opacity: 0.75 }} />
+        <WriteIn start={285}>
           <div style={{ fontFamily: FONT_BODY, fontSize: 30, color: EMBER_LT, fontWeight: 700 }}>{p.bottomTitle}</div>
         </WriteIn>
         {p.bottomRows.map((r, i) => (
-          <WriteIn key={i} start={210 + i * 18}>
+          <WriteIn key={i} start={310 + i * 40}>
             <div style={{ fontFamily: FONT_BODY, fontSize: 33, color: CHALK, padding: '12px 0', textShadow: CHALK_SHADOW }}>{r}</div>
           </WriteIn>
         ))}
         <div style={{ textAlign: 'center' }}>
-          <BigChalk text={p.seam} start={370} size={54} color={GOLD} sp={sp} />
+          <BigChalk text={p.seam} start={450} size={54} color={GOLD} sp={sp} />
         </div>
       </Board>
     </AbsoluteFill>
