@@ -62,8 +62,21 @@ export interface FormTermPayload {
   note?: string;
 }
 
+/** S6 · 顾客侧：手机卡包屏 + 右侧三拍
+ *  ⚠️ phone.rows 的 k: 为**产品字段名**（须逐字回源码取证）；券码只出**数字**，不出任何二维码/图形码（三平台禁小程序码及微信系二维码）。 */
 export interface FlowPayload {
-  steps: { kind: 'timer' | 'coupon' | 'verify'; title: string; value?: string; note?: string }[];
+  phone: {
+    /** 屏内标题（源码取证：pages.json「我的卡包」） */
+    statusBar: string;
+    couponName: string;
+    big: string;
+    unit: string;
+    bigLabel: string;
+    rows: FormRow[];
+    codeLabel: string;
+    code: string;
+  };
+  steps: { kind: 'timer' | 'coupon' | 'verify'; title: string; detail: string }[];
   tailNote: string;
 }
 

@@ -126,7 +126,7 @@ export const g11: VideoData = {
           { k: '有效期', v: '7 天' },
         ],
         band: { label: '可用时段', weekdays: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'], activeCount: 4, value: '晚五点到十一点' },
-        note: '时段最多 2 段，本片用 1 段',
+        note: '周末用不了，留着高峰，先填周一至周四的空桌',
       },
     },
 
@@ -139,12 +139,25 @@ export const g11: VideoData = {
         { text: '手气最差也不亏，六块钱的运气也是运气。', startFrame: 260, endFrame: 320 },
       ],
       payload: {
+        phone: {
+          statusBar: '我的卡包',
+          couponName: '夜宵手气券',
+          big: '88',
+          unit: '元',
+          bigLabel: '面额当场揭晓',
+          rows: [
+            { k: '消费门槛', v: '满 68 元可用' },
+            { k: '有效期', v: '7 天' },
+          ],
+          codeLabel: '券码',
+          code: '8823 1145',
+        },
         steps: [
-          { kind: 'timer', title: '到晚八点', value: '倒计时归零' },
-          { kind: 'coupon', title: '抢到手气', value: '88 元', note: '进我的卡包' },
-          { kind: 'verify', title: '到店核销', value: '满 68 直接减', note: '扫码一下' },
+          { kind: 'timer', title: '到晚八点', detail: '八点之前，谁都点不进来' },
+          { kind: 'coupon', title: '面额揭晓', detail: '抢到的那张，才有分量' },
+          { kind: 'verify', title: '到店用掉', detail: '一桌结账，当场减掉' },
         ],
-        tailNote: '手气最差也不亏',
+        tailNote: '手气最差也不亏，六块钱的运气也是运气',
       },
     },
 

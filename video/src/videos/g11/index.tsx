@@ -30,16 +30,16 @@ type SpringCfg = (typeof SPRING_CONFIG)[keyof typeof SPRING_CONFIG];
 const cfgOf = (style: StyleConfig): SpringCfg => SPRING_CONFIG[style.motion];
 
 /* ── 零件 · 黑板牌 ──────────────────────────────────────── */
-const Board: React.FC<{ w?: number; h: number; top: number; rotate?: number; delay?: number; sp: SpringCfg; children: React.ReactNode }> = ({ w = BOARD_W, h, top, rotate = -0.6, delay = 0, sp, children }) => {
+const Board: React.FC<{ w?: number; h?: number; top?: number; rotate?: number; delay?: number; gap?: number; sp: SpringCfg; children: React.ReactNode }> = ({ w = BOARD_W, h, top, rotate = -0.6, delay = 0, gap = 30, sp, children }) => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
   const s = spring({ frame: f - delay, fps, config: sp, durationInFrames: 26 });
-  return (
+  /** fit 模式（不给 h）：板高随内容、垂直居中于 y150~1710；给了 h：固定高 + space-between（S3 标杆沿用） */
+  const fit = h == null;
+  const panel = (
     <div
       style={{
-        position: 'absolute',
-        left: BOARD_LEFT,
-        top,
+        ...(fit ? { position: 'relative' } : { position: 'absolute', left: BOARD_LEFT, top }),
         width: w,
         height: h,
         transform: `translateY(${interpolate(s, [0, 1], [-40, 0])}px) rotate(${rotate * s}deg)`,
@@ -54,7 +54,13 @@ const Board: React.FC<{ w?: number; h: number; top: number; rotate?: number; del
       }}
     >
       <div style={{ position: 'absolute', inset: 14, border: '2px dashed rgba(247,241,234,.13)', borderRadius: 5, pointerEvents: 'none' }} />
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>{children}</div>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: fit ? 'flex-start' : 'space-between', gap: fit ? gap : undefined, height: fit ? undefined : '100%' }}>{children}</div>
+    </div>
+  );
+  if (!fit) return panel;
+  return (
+    <div style={{ position: 'absolute', left: 0, right: 0, top: 150, height: 1560, display: 'flex', alignItems: 'center', paddingLeft: BOARD_LEFT, pointerEvents: 'none' }}>
+      {panel}
     </div>
   );
 };
@@ -120,7 +126,7 @@ const BigChalk: React.FC<{ text: string; start: number; size?: number; color?: s
   const { fps } = useVideoConfig();
   const s = spring({ frame: f - start, fps, config: sp, durationInFrames: 20 });
   return (
-    <span style={{ fontFamily: FONT_IMPACT, fontSize: size, lineHeight: 1, color, display: 'inline-block', transform: `scale(${interpolate(s, [0, 1], [0.72, 1])})`, opacity: interpolate(s, [0, 1], [0, 1]), textShadow: CHALK_SHADOW, filter: 'contrast(1.04)' }}>
+    <span style={{ fontFamily: FONT_IMPACT, fontSize: size, lineHeight: 1, color, display: 'inline-block', whiteSpace: 'nowrap', transform: `scale(${interpolate(s, [0, 1], [0.72, 1])})`, opacity: interpolate(s, [0, 1], [0, 1]), textShadow: CHALK_SHADOW, filter: 'contrast(1.04)' }}>
       {text}
     </span>
   );
@@ -172,26 +178,26 @@ const G11Hook: React.FC<SceneRenderProps> = ({ scene, style }) => {
   return (
     <AbsoluteFill>
       <EmberParticles />
-      <Board h={1120} top={330} sp={sp}>
+      <Board gap={34} sp={sp}>
         <BoardHeading text={p.title} tone={CHALK} />
-        <div style={{ display: 'flex', marginTop: 36, gap: 24 }}>
+        <div style={{ display: 'flex', gap: 24, alignItems: 'stretch' }}>
           {cols.map((c, i) => (
-            <div key={i} style={{ flex: 1, padding: '24px 20px', borderRadius: 6, background: c.hot ? 'rgba(240,106,36,.14)' : 'rgba(0,0,0,.28)', border: `1px solid ${c.hot ? 'rgba(255,139,56,.5)' : 'rgba(198,189,181,.2)'}` }}>
+            <div key={i} style={{ flex: 1, minHeight: 232, padding: '30px 22px', borderRadius: 6, background: c.hot ? 'rgba(240,106,36,.14)' : 'rgba(0,0,0,.28)', border: `1px solid ${c.hot ? 'rgba(255,139,56,.5)' : 'rgba(198,189,181,.2)'}` }}>
               <WriteIn start={30 + i * 14}>
-                <div style={{ fontFamily: FONT_BODY, fontSize: 28, color: c.hot ? EMBER_LT : CHALK_DIM, fontWeight: 700 }}>{c.label}</div>
+                <div style={{ fontFamily: FONT_BODY, fontSize: 30, color: c.hot ? EMBER_LT : CHALK_DIM, fontWeight: 700 }}>{c.label}</div>
               </WriteIn>
               <div style={{ marginTop: 12 }}>
-                <BigChalk text={c.value} start={44 + i * 18} size={78} color={c.hot ? GOLD : CHALK} sp={sp} />
+                <BigChalk text={c.value} start={44 + i * 18} size={82} color={c.hot ? GOLD : CHALK} sp={sp} />
               </div>
               <WriteIn start={58 + i * 16}>
-                <div style={{ fontFamily: FONT_BODY, fontSize: 25, color: CHALK_DIM, marginTop: 8 }}>{c.note}</div>
+                <div style={{ fontFamily: FONT_BODY, fontSize: 27, color: CHALK_DIM, marginTop: 8 }}>{c.note}</div>
               </WriteIn>
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 44 }}>
+        <div>
           <WriteIn start={150}>
-            <div style={{ fontFamily: FONT_BODY, fontSize: 34, color: CHALK, lineHeight: 1.5 }}>{p.subHook}</div>
+            <div style={{ fontFamily: FONT_BODY, fontSize: 36, color: CHALK, lineHeight: 1.5, textShadow: CHALK_SHADOW }}>{p.subHook}</div>
           </WriteIn>
           <ChalkUnderline start={166} width={600} color={EMBER_LT} />
         </div>
@@ -207,13 +213,13 @@ const G11Idea: React.FC<SceneRenderProps> = ({ scene, style }) => {
   return (
     <AbsoluteFill>
       <EmberParticles count={16} />
-      <Board h={1180} top={320} rotate={0.5} sp={sp}>
+      <Board gap={26} rotate={0.5} sp={sp}>
         <WriteIn start={6}>
           <div style={{ fontFamily: FONT_BODY, fontSize: 30, color: CHALK_DIM, fontWeight: 700 }}>{p.topTitle}</div>
         </WriteIn>
         {p.topRows.map((r, i) => (
           <WriteIn key={i} start={26 + i * 16}>
-            <div style={{ fontFamily: FONT_BODY, fontSize: 32, color: i === 1 ? CHALK : CHALK_DIM, padding: '11px 0' }}>{r}</div>
+            <div style={{ fontFamily: FONT_BODY, fontSize: 32, color: i === 1 ? 'rgba(198,189,181,.95)' : 'rgba(198,189,181,.72)', padding: '12px 0' }}>{r}</div>
           </WriteIn>
         ))}
         <div style={{ height: 2, background: `linear-gradient(90deg, transparent, ${EMBER} 30%, ${EMBER} 70%, transparent)`, margin: '20px 0', opacity: 0.75 }} />
@@ -222,11 +228,11 @@ const G11Idea: React.FC<SceneRenderProps> = ({ scene, style }) => {
         </WriteIn>
         {p.bottomRows.map((r, i) => (
           <WriteIn key={i} start={210 + i * 18}>
-            <div style={{ fontFamily: FONT_BODY, fontSize: 32, color: CHALK, padding: '11px 0' }}>{r}</div>
+            <div style={{ fontFamily: FONT_BODY, fontSize: 33, color: CHALK, padding: '12px 0', textShadow: CHALK_SHADOW }}>{r}</div>
           </WriteIn>
         ))}
-        <div style={{ marginTop: 30, textAlign: 'center' }}>
-          <BigChalk text={p.seam} start={370} size={48} color={GOLD} sp={sp} />
+        <div style={{ textAlign: 'center' }}>
+          <BigChalk text={p.seam} start={370} size={54} color={GOLD} sp={sp} />
         </div>
       </Board>
     </AbsoluteFill>
@@ -290,15 +296,15 @@ const G11FormIssue: React.FC<SceneRenderProps> = ({ scene, style }) => {
   return (
     <AbsoluteFill>
       <EmberParticles count={18} />
-      <Board h={1250} top={300} rotate={0.4} sp={sp}>
+      <Board gap={28} rotate={0.4} sp={sp}>
         <BoardHeading text={p.head} />
-        <div style={{ marginTop: 10 }}>
+        <div>
           {p.rows.map((r, i) => (
             <RowLine key={r.k} row={r} start={44 + i * 24} />
           ))}
         </div>
         <WriteIn start={140}>
-          <div style={{ marginTop: 18, fontFamily: FONT_BODY, fontSize: 28, color: EMBER_LT, fontWeight: 700 }}>{p.group.head}</div>
+          <div style={{ fontFamily: FONT_BODY, fontSize: 28, color: EMBER_LT, fontWeight: 700 }}>{p.group.head}</div>
           <ChalkUnderline start={148} width={210} color={EMBER_LT} />
         </WriteIn>
         <div>
@@ -306,11 +312,13 @@ const G11FormIssue: React.FC<SceneRenderProps> = ({ scene, style }) => {
             <RowLine key={r.k} row={r} start={166 + i * 24} />
           ))}
         </div>
-        <div style={{ marginTop: 30, display: 'flex', alignItems: 'center', gap: 24 }}>
+        <div style={{ padding: '20px 26px', borderRadius: 6, background: 'rgba(240,106,36,.10)', border: '1px solid rgba(255,139,56,.38)', textAlign: 'center' }}>
           <WriteIn start={330}>
             <div style={{ fontFamily: FONT_BODY, fontSize: 26, color: CHALK_DIM }}>{p.countdown.label}</div>
           </WriteIn>
-          <BigChalk text={cd > 0 ? `00:0${cd}` : p.countdown.unlock} start={340} size={96} color={cd > 0 ? CHALK : GOLD} sp={sp} />
+          <div style={{ marginTop: 2 }}>
+            <BigChalk text={cd > 0 ? `00:0${cd}` : p.countdown.unlock} start={340} size={112} color={cd > 0 ? CHALK : GOLD} sp={sp} />
+          </div>
         </div>
       </Board>
     </AbsoluteFill>
@@ -326,7 +334,7 @@ const G11FormTerm: React.FC<SceneRenderProps> = ({ scene, style }) => {
   return (
     <AbsoluteFill>
       <EmberParticles count={16} />
-      <Board h={1130} top={330} sp={sp}>
+      <Board gap={26} sp={sp}>
         <BoardHeading text={p.head} />
         <div style={{ marginTop: 10 }}>
           {p.rows.map((r, i) => (
@@ -334,20 +342,20 @@ const G11FormTerm: React.FC<SceneRenderProps> = ({ scene, style }) => {
           ))}
         </div>
         <WriteIn start={104}>
-          <div style={{ marginTop: 24, fontFamily: FONT_BODY, fontSize: 30, color: EMBER_LT, fontWeight: 700 }}>{p.band.label}</div>
+          <div style={{ fontFamily: FONT_BODY, fontSize: 30, color: EMBER_LT, fontWeight: 700 }}>{p.band.label}</div>
           <ChalkUnderline start={112} width={190} color={EMBER_LT} />
         </WriteIn>
-        <div style={{ display: 'flex', gap: 8, marginTop: 18, clipPath: `inset(0 ${(1 - grow) * 100}% 0 0)` }}>
+        <div style={{ display: 'flex', gap: 10, clipPath: `inset(0 ${(1 - grow) * 100}% 0 0)` }}>
           {p.band.weekdays.map((d, i) => (
-            <div key={d} style={{ flex: 1, textAlign: 'center', padding: '14px 0', borderRadius: 5, fontFamily: FONT_BODY, fontSize: 24, color: i < p.band.activeCount ? CHALK : 'rgba(198,189,181,.45)', background: i < p.band.activeCount ? 'rgba(240,106,36,.18)' : 'rgba(0,0,0,.35)', border: `1px solid ${i < p.band.activeCount ? 'rgba(255,139,56,.55)' : 'rgba(198,189,181,.16)'}` }}>{d}</div>
+            <div key={d} style={{ flex: 1, textAlign: 'center', padding: '26px 0', borderRadius: 6, fontFamily: FONT_BODY, fontSize: 30, fontWeight: i < p.band.activeCount ? 700 : 500, color: i < p.band.activeCount ? CHALK : 'rgba(198,189,181,.36)', background: i < p.band.activeCount ? 'rgba(240,106,36,.26)' : 'rgba(0,0,0,.45)', border: `1px solid ${i < p.band.activeCount ? 'rgba(255,139,56,.7)' : 'rgba(198,189,181,.14)'}` }}>{d}</div>
           ))}
         </div>
         <WriteIn start={240}>
-          <div style={{ fontFamily: FONT_BODY, fontSize: 30, color: GOLD, marginTop: 16 }}>{p.band.value}</div>
+          <div style={{ fontFamily: FONT_BODY, fontSize: 32, color: GOLD }}>{p.band.value}</div>
         </WriteIn>
         {p.note && (
           <WriteIn start={300}>
-            <div style={{ fontFamily: FONT_BODY, fontSize: 25, color: CHALK_DIM, marginTop: 20 }}>— {p.note}</div>
+            <div style={{ fontFamily: FONT_BODY, fontSize: 26, color: CHALK_DIM }}>— {p.note}</div>
           </WriteIn>
         )}
       </Board>
@@ -355,39 +363,76 @@ const G11FormTerm: React.FC<SceneRenderProps> = ({ scene, style }) => {
   );
 };
 
-/* ══ S6 · 顾客侧 / 核销侧接力链 ══════════════════════════ */
+/* ══ S6 · 顾客侧：开奖 → 卡包 → 核销（手机屏 + 右侧三拍）══ */
 const G11Flow: React.FC<SceneRenderProps> = ({ scene, style }) => {
   const p = scene.payload as unknown as FlowPayload;
   const sp = cfgOf(style);
   const f = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const phoneIn = spring({ frame: f - 8, fps, config: sp, durationInFrames: 26 });
   return (
     <AbsoluteFill>
       <EmberParticles count={18} />
-      <Board h={900} top={420} rotate={-0.4} sp={sp}>
-        <div style={{ display: 'flex', alignItems: 'stretch', gap: 12 }}>
-          {p.steps.map((s, i) => {
-            const o = interpolate(f, [20 + i * 30, 44 + i * 30], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
-            return (
-              <React.Fragment key={s.title}>
-                <div style={{ flex: 1, opacity: o, padding: '18px 16px', borderRadius: 6, background: 'rgba(0,0,0,.28)', border: '1px solid rgba(198,189,181,.2)', textAlign: 'center' }}>
-                  <div style={{ fontFamily: FONT_BODY, fontSize: 26, color: s.kind === 'coupon' ? EMBER_LT : CHALK_DIM, fontWeight: 700 }}>{s.title}</div>
-                  {s.value && (
-                    <div style={{ marginTop: 10 }}>
-                      <BigChalk text={s.value} start={40 + i * 30} size={s.kind === 'coupon' ? 74 : 50} color={s.kind === 'verify' ? GOLD : CHALK} sp={sp} />
-                    </div>
-                  )}
-                  {s.note && <div style={{ fontFamily: FONT_BODY, fontSize: 23, color: CHALK_DIM, marginTop: 8 }}>{s.note}</div>}
+      <Board gap={30} rotate={-0.4} sp={sp}>
+        <div style={{ display: 'flex', gap: 34, alignItems: 'center' }}>
+          {/* 手机卡包屏（本片内联件；不上任何二维码/图形码，只出数字券码） */}
+          <div
+            style={{
+              flex: '0 0 336px',
+              width: 336,
+              padding: '16px 14px 20px',
+              borderRadius: 34,
+              border: '11px solid #341d0f',
+              background: 'linear-gradient(180deg, #1b1109 0%, #0c0705 100%)',
+              boxShadow: 'inset 0 0 34px rgba(0,0,0,.65), 0 16px 38px rgba(0,0,0,.5)',
+              transform: `translateY(${(1 - phoneIn) * 26}px)`,
+              opacity: interpolate(phoneIn, [0, 1], [0, 1]),
+              boxSizing: 'border-box',
+            }}
+          >
+            <div style={{ width: 104, height: 9, borderRadius: 6, background: 'rgba(198,189,181,.22)', margin: '0 auto 14px' }} />
+            <div style={{ fontFamily: FONT_BODY, fontSize: 24, color: CHALK_DIM, fontWeight: 700, textAlign: 'center', letterSpacing: 1 }}>{p.phone.statusBar}</div>
+            <div style={{ marginTop: 14, padding: '16px 14px', borderRadius: 10, background: 'rgba(240,106,36,.13)', border: '1px solid rgba(255,139,56,.45)' }}>
+              <div style={{ fontFamily: FONT_TITLE, fontSize: 30, color: CHALK, fontWeight: 700, textAlign: 'center', textShadow: CHALK_SHADOW }}>{p.phone.couponName}</div>
+              <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 6, marginTop: 4 }}>
+                <BigChalk text={p.phone.big} start={56} size={118} sp={sp} />
+                <span style={{ fontFamily: FONT_BODY, fontSize: 30, color: CHALK_DIM }}>{p.phone.unit}</span>
+              </div>
+              <WriteIn start={74}>
+                <div style={{ fontFamily: FONT_BODY, fontSize: 23, color: GOLD, textAlign: 'center', marginTop: 2 }}>{p.phone.bigLabel}</div>
+              </WriteIn>
+              <div style={{ marginTop: 12 }}>
+                {p.phone.rows.map((r, i) => (
+                  <div key={r.k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '7px 0', borderTop: i === 0 ? '1px dashed rgba(198,189,181,.22)' : undefined, borderBottom: '1px dashed rgba(198,189,181,.22)' }}>
+                    <span style={{ fontFamily: FONT_BODY, fontSize: 22, color: CHALK_DIM }}>{r.k}</span>
+                    <span style={{ fontFamily: FONT_BODY, fontSize: 24, color: CHALK, fontWeight: 700 }}>{r.v}</span>
+                  </div>
+                ))}
+              </div>
+              <WriteIn start={150}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 12 }}>
+                  <span style={{ fontFamily: FONT_BODY, fontSize: 22, color: CHALK_DIM }}>{p.phone.codeLabel}</span>
+                  <span style={{ fontFamily: FONT_IMPACT, fontSize: 30, color: GOLD, letterSpacing: 2 }}>{p.phone.code}</span>
                 </div>
-                {i < p.steps.length - 1 && <div style={{ alignSelf: 'center', opacity: o, fontFamily: FONT_BODY, fontSize: 38, color: EMBER }}>›</div>}
-              </React.Fragment>
-            );
-          })}
+              </WriteIn>
+            </div>
+          </div>
+          {/* 右侧三拍：到点 → 开奖 → 到店用掉 */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {p.steps.map((s, i) => {
+              const o = interpolate(f, [70 + i * 26, 94 + i * 26], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+              return (
+                <div key={s.title} style={{ opacity: o, transform: `translateX(${(1 - o) * -14}px)`, paddingLeft: 16, borderLeft: `4px solid ${s.kind === 'coupon' ? EMBER_LT : 'rgba(198,189,181,.28)'}` }}>
+                  <div style={{ fontFamily: FONT_TITLE, fontSize: 33, color: s.kind === 'coupon' ? GOLD : CHALK, fontWeight: 700, textShadow: CHALK_SHADOW }}>{s.title}</div>
+                  <div style={{ fontFamily: FONT_BODY, fontSize: 25, color: CHALK_DIM, marginTop: 4 }}>{s.detail}</div>
+                </div>
+              );
+            })}
+          </div>
         </div>
-        <div style={{ marginTop: 30, textAlign: 'center' }}>
-          <WriteIn start={140}>
-            <div style={{ fontFamily: FONT_BODY, fontSize: 26, color: CHALK_DIM }}>{p.tailNote}</div>
-          </WriteIn>
-        </div>
+        <WriteIn start={170}>
+          <div style={{ fontFamily: FONT_BODY, fontSize: 28, color: CHALK_DIM, textAlign: 'center' }}>{p.tailNote}</div>
+        </WriteIn>
       </Board>
     </AbsoluteFill>
   );
@@ -400,16 +445,16 @@ const G11Cta: React.FC<SceneRenderProps> = ({ scene, style }) => {
   return (
     <AbsoluteFill>
       <EmberParticles count={14} />
-      <Board h={860} top={450} rotate={0} sp={sp}>
+      <Board gap={30} rotate={0} sp={sp}>
         {p.lines.map((l, i) => (
-          <div key={i} style={{ marginTop: i === 0 ? 56 : 24 }}>
+          <div key={i}>
             <WriteIn start={20 + i * 26}>
-              <div style={{ fontFamily: FONT_IMPACT, fontSize: 72, color: i === 0 ? CHALK : GOLD, lineHeight: 1.25 }}>{l}</div>
+              <div style={{ fontFamily: FONT_IMPACT, fontSize: 86, color: i === 0 ? CHALK : GOLD, lineHeight: 1.3, textShadow: CHALK_SHADOW }}>{l}</div>
             </WriteIn>
           </div>
         ))}
         <WriteIn start={130}>
-          <div style={{ marginTop: 50, fontFamily: FONT_BODY, fontSize: 28, color: CHALK_DIM }}>{p.action}</div>
+          <div style={{ borderTop: '1px dashed rgba(198,189,181,.24)', paddingTop: 18, fontFamily: FONT_BODY, fontSize: 32, color: CHALK, textShadow: CHALK_SHADOW }}>{p.action}</div>
         </WriteIn>
       </Board>
     </AbsoluteFill>
