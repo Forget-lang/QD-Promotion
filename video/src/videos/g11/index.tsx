@@ -23,8 +23,9 @@ const FRAME = '#4a2612';
 /** 粉笔质感：多重描边 + 极轻外发光（模拟粉笔边缘毛糙，不伤可读性） */
 const CHALK_SHADOW = '0 0 2px rgba(247,241,234,.55), 0 0 18px rgba(240,106,36,.22)';
 
-const BOARD_W = 880;
-const BOARD_LEFT = 100;
+/** 板宽/左边距：旋转 ±0.6° 会让角点外扩约 6px → 取 130/820，使板恒定落在 x120..960（R3 §7.3 安全线）内 */
+const BOARD_W = 820;
+const BOARD_LEFT = 130;
 
 type SpringCfg = (typeof SPRING_CONFIG)[keyof typeof SPRING_CONFIG];
 const cfgOf = (style: StyleConfig): SpringCfg => SPRING_CONFIG[style.motion];

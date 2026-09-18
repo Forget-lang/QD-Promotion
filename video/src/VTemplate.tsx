@@ -184,8 +184,9 @@ type VTemplateProps = {
 export const VTemplate: React.FC<VTemplateProps> = ({ video, safeAreaProbe = false }) => {
   const p = PALETTES[video.style.palette];
   const presentation = getPresentation(video.style.transition, p.accent);
-  // g11 生产值固定 0.76；安全区取证通过独立 Composition 显式传 safeAreaProbe=true，而不是继续缩小场景。
-  const sceneScale = video.id === 'g11' ? 0.76 : 1;
+  // 场景缩放：自 2026-09-18 起全片一律 1（g11 曾用 0.76 只为把越界板拉回安全区，副作用是把字幕层一起缩放、
+  // 字幕被拉离 R3 §7.3 规格带 y1760-1920 → CHANGE-20260918-023 改为「板自身落进 x120..960」，不再缩放场景）。
+  const sceneScale = 1;
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#0f1115' }}>
