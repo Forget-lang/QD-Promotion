@@ -1,4 +1,6 @@
-// g11 · 烧烤夜宵 · 片1 · 数据（无声版）
+// g11 · 烧烤夜宵 · 片1 · 数据（有声版 · 7 屏 · 2026-09-18 实测回填）
+// 音频 = TTS（seed-tts 2.0 原速）→ loudnorm -16 LUFS → atempo 1.2，实测见 audio/g11/（raw 在 audio/g11raw/）；
+// dur = voiceOffset 0.27 + voiceDur + 尾读缓冲（制券/数据/CTA 0.9s、其余 0.5s）；字幕句界 = 实测时长 × 字数占比（句间留 3 帧）。
 // 母题：深夜黑板牌（Board）＋ 炭火虚焦深底；色彩取 SKILL §4.5 纯 Remotion 烧烤基准。
 // 字段真值来源：spec/coupon-fields.json（k: = 产品真实字段名，逐字回 applet 源码；head: = 页面原生组名）
 // 口播：outputs/g11-烧烤/02-口播文案.md（Legacy Baseline）；分镜：07-片1-分镜稿.md；Shot 表：08-R9视觉决策卡.md
@@ -6,7 +8,7 @@ import type { VideoData } from '../types';
 
 export const g11: VideoData = {
   id: 'g11',
-  hasAudio: false,
+  hasAudio: true,
   style: {
     palette: 'warm-orange',
     motion: 'snappy',
@@ -18,10 +20,12 @@ export const g11: VideoData = {
   scenes: [
     // ── S1 · 钩子：同店两态对照 ────────────────────────────────
     {
-      type: 'hook', ui: 'g11-hook', layoutKind: 'layered-stage', dur: 9,
+      type: 'hook', ui: 'g11-hook', layoutKind: 'layered-stage', dur: 10.963,
+      voiceOffset: 0.27,
+      voiceDur: 10.193427,
       subtitles: [
-        { text: '开烧烤店的，周五夜里翻台三轮，周一晚上一半桌子空着。', startFrame: 0, endFrame: 140 },
-        { text: '串还是那个串，炉子还是那个炉子——缺的是给客人一个周一晚上出门的理由。', startFrame: 150, endFrame: 260 },
+        { text: '开烧烤店的，周五夜里翻台三轮，周一晚上一半桌子空着。', startFrame: 8, endFrame: 135 },
+        { text: '串还是那个串，炉子还是那个炉子——缺的是给客人一个周一晚上出门的理由。', startFrame: 138, endFrame: 314 },
       ],
       payload: {
         title: '同一个店，两种晚上',
@@ -37,11 +41,13 @@ export const g11: VideoData = {
 
     // ── S2 · 理解段：上下算账块（旧办法 / 新机制）────────────────
     {
-      type: 'idea', ui: 'g11-idea', layoutKind: 'layered-stage', dur: 17,
+      type: 'idea', ui: 'g11-idea', layoutKind: 'layered-stage', dur: 17.632,
+      voiceOffset: 0.27,
+      voiceDur: 16.861552,
       subtitles: [
-        { text: '碰上这事，多数老板的反应是打折：群里喊一句，周一到周四便宜点。', startFrame: 0, endFrame: 170 },
-        { text: '喊了等于没喊——客人只会把你归成"打折才值得来"的那家店。', startFrame: 180, endFrame: 350 },
-        { text: '券这东西，随手能领就随手划走；到点才开抢、过了时段用不了，它才从一张"通知"变成一个"机会"。', startFrame: 360, endFrame: 500 },
+        { text: '碰上这事，多数老板的反应是打折：群里喊一句，周一到周四便宜点。', startFrame: 8, endFrame: 152 },
+        { text: '喊了等于没喊——客人只会把你归成"打折才值得来"的那家店。', startFrame: 155, endFrame: 289 },
+        { text: '券这东西，随手能领就随手划走；到点才开抢、过了时段用不了，它才从一张"通知"变成一个"机会"。', startFrame: 292, endFrame: 514 },
       ],
       payload: {
         topTitle: '打折喊群',
@@ -54,12 +60,14 @@ export const g11: VideoData = {
 
     // ── S3 · 制券① 手气券（一屏标杆）────────────────────────────
     {
-      type: 'fields', ui: 'g11-form-face', layoutKind: 'layered-stage', dur: 20,
+      type: 'fields', ui: 'g11-form-face', layoutKind: 'layered-stage', dur: 19.837,
+      voiceOffset: 0.27,
+      voiceDur: 18.666667,
       subtitles: [
-        { text: '打开券到卡包，券类型选"手气券"——面额随机的券，像开奖。', startFrame: 0, endFrame: 140 },
-        { text: '区间你定：六块到八十八块。', startFrame: 150, endFrame: 300 },
-        { text: '顶上为什么是八十八？抢到八十八那张的人，觉得这券值得到店一趟。', startFrame: 310, endFrame: 460 },
-        { text: '底下为什么是六块？手气最差那位，也够串个素菜，不寒碜。提醒一句：顶格九十九，别把区间拉满。', startFrame: 470, endFrame: 590 },
+        { text: '打开券到卡包，券类型选"手气券"——面额随机的券，像开奖。', startFrame: 8, endFrame: 143 },
+        { text: '区间你定：六块到八十八块。', startFrame: 146, endFrame: 204 },
+        { text: '顶上为什么是八十八？抢到八十八那张的人，觉得这券值得到店一趟。', startFrame: 207, endFrame: 351 },
+        { text: '底下为什么是六块？手气最差那位，也够串个素菜，不寒碜。提醒一句：顶格九十九，别把区间拉满。', startFrame: 354, endFrame: 568 },
       ],
       payload: {
         head: '① 券面',
@@ -84,12 +92,14 @@ export const g11: VideoData = {
 
     // ── S4 · 制券② 公开领取 + 限领一张 + 到点开抢 ────────────────
     {
-      type: 'fields', ui: 'g11-form-issue', layoutKind: 'layered-stage', dur: 18,
+      type: 'fields', ui: 'g11-form-issue', layoutKind: 'layered-stage', dur: 19.692,
+      voiceOffset: 0.27,
+      voiceDur: 18.522182,
       subtitles: [
-        { text: '发放方式选"公开领取"——建了就改不了，选之前想清楚。', startFrame: 0, endFrame: 160 },
-        { text: '每人限领，填一张：一个人囤五张，"抢"的味道就没了。', startFrame: 170, endFrame: 300 },
-        { text: '再打开自定义领取时间，开始时间定在周一晚上八点。', startFrame: 310, endFrame: 430 },
-        { text: '八点前，领取页挂着倒计时，谁都点不进来；八点一到，群里一声"开抢"，两百张券，抢完就没。', startFrame: 440, endFrame: 530 },
+        { text: '发放方式选"公开领取"——建了就改不了，选之前想清楚。', startFrame: 8, endFrame: 129 },
+        { text: '每人限领，填一张：一个人囤五张，"抢"的味道就没了。', startFrame: 132, endFrame: 249 },
+        { text: '再打开自定义领取时间，开始时间定在周一晚上八点。', startFrame: 252, endFrame: 359 },
+        { text: '八点前，领取页挂着倒计时，谁都点不进来；八点一到，群里一声"开抢"，两百张券，抢完就没。', startFrame: 362, endFrame: 564 },
       ],
       payload: {
         head: '② 发放',
@@ -112,12 +122,14 @@ export const g11: VideoData = {
 
     // ── S5 · 制券③ 期限与时段（时段写死）────────────────────────
     {
-      type: 'fields', ui: 'g11-form-term', layoutKind: 'layered-stage', dur: 13,
+      type: 'fields', ui: 'g11-form-term', layoutKind: 'layered-stage', dur: 16.03,
+      voiceOffset: 0.27,
+      voiceDur: 14.860406,
       subtitles: [
-        { text: '最关键的一步：可用时段，千万别选全天。', startFrame: 0, endFrame: 110 },
-        { text: '定制成周一到周四，晚上五点到十一点。', startFrame: 120, endFrame: 210 },
-        { text: '时段写死，这张券周末用不了——想吃这口，只能工作日来。', startFrame: 220, endFrame: 300 },
-        { text: '周末的火没浇灭，周一到周四的炭火，点上了。', startFrame: 310, endFrame: 380 },
+        { text: '最关键的一步：可用时段，千万别选全天。', startFrame: 8, endFrame: 105 },
+        { text: '定制成周一到周四，晚上五点到十一点。', startFrame: 108, endFrame: 199 },
+        { text: '时段写死，这张券周末用不了——想吃这口，只能工作日来。', startFrame: 202, endFrame: 341 },
+        { text: '周末的火没浇灭，周一到周四的炭火，点上了。', startFrame: 344, endFrame: 454 },
       ],
       payload: {
         head: '③ 期限',
@@ -132,11 +144,13 @@ export const g11: VideoData = {
 
     // ── S6 · 顾客侧 / 核销侧接力链 ───────────────────────────────
     {
-      type: 'advance', ui: 'g11-flow', layoutKind: 'layered-stage', dur: 11,
+      type: 'advance', ui: 'g11-flow', layoutKind: 'layered-stage', dur: 13.65,
+      voiceOffset: 0.27,
+      voiceDur: 12.879776,
       subtitles: [
-        { text: '客人那边：周一晚八点整，面额当场揭晓——八十八，进卡包，当晚就能用。', startFrame: 0, endFrame: 120 },
-        { text: '到店坐下，出示券码，店员一扫，满六十八直接减。', startFrame: 130, endFrame: 250 },
-        { text: '手气最差也不亏，六块钱的运气也是运气。', startFrame: 260, endFrame: 320 },
+        { text: '客人那边：周一晚八点整，面额当场揭晓——八十八，进卡包，当晚就能用。', startFrame: 8, endFrame: 178 },
+        { text: '到店坐下，出示券码，店员一扫，满六十八直接减。', startFrame: 181, endFrame: 295 },
+        { text: '手气最差也不亏，六块钱的运气也是运气。', startFrame: 298, endFrame: 394 },
       ],
       payload: {
         phone: {
@@ -163,11 +177,13 @@ export const g11: VideoData = {
 
     // ── S7 · 金句收口 ────────────────────────────────────────────
     {
-      type: 'cta', ui: 'g11-cta', layoutKind: 'layered-stage', dur: 11,
+      type: 'cta', ui: 'g11-cta', layoutKind: 'layered-stage', dur: 11.012,
+      voiceOffset: 0.27,
+      voiceDur: 9.842172,
       subtitles: [
-        { text: '周末的生意靠味道，空着的桌子要自己造。', startFrame: 0, endFrame: 120 },
-        { text: '被抢到手的券，才会被用掉。', startFrame: 130, endFrame: 220 },
-        { text: '有免费版，打开就能做——这个周一晚上八点，造第一波。', startFrame: 230, endFrame: 320 },
+        { text: '周末的生意靠味道，空着的桌子要自己造。', startFrame: 8, endFrame: 102 },
+        { text: '被抢到手的券，才会被用掉。', startFrame: 105, endFrame: 168 },
+        { text: '有免费版，打开就能做——这个周一晚上八点，造第一波。', startFrame: 171, endFrame: 303 },
       ],
       payload: {
         lines: ['周末的生意靠味道', '空着的桌子要自己造'],
