@@ -14,6 +14,7 @@ import { G07CoverDy, G07CoverDy43, G07CoverXhs, G07CoverSohu } from './covers/G0
 import { G08CoverDy, G08CoverDy43, G08CoverXhs, G08CoverSohu } from './covers/G08Cover';
 import { G09CoverDy, G09CoverDy43, G09CoverXhs, G09CoverSohu } from './covers/G09Cover';
 import { G10CoverDy, G10CoverDy43, G10CoverXhs, G10CoverSohu } from './covers/G10Cover';
+import { G11CoverDy, G11CoverDy43, G11CoverXhs, G11CoverSohu } from './covers/G11Cover';
 import type { VideoData } from './types';
 
 // ── 注入项目商用字体（@font-face，Remotion 渲染前自动等待 document.fonts.ready）──
@@ -95,6 +96,11 @@ const RemotionRoot: React.FC = () => {
       <Composition id="g10-cover-dy43" component={G10CoverDy43} fps={FPS} width={1440} height={1080} durationInFrames={1} />
       <Composition id="g10-cover-xhs" component={G10CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
       <Composition id="g10-cover-sohu" component={G10CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
+      {/* g11 四平台封面（大字压屏系统） */}
+      <Composition id="g11-cover-dy" component={G11CoverDy} fps={FPS} width={1080} height={1920} durationInFrames={1} />
+      <Composition id="g11-cover-dy43" component={G11CoverDy43} fps={FPS} width={1440} height={1080} durationInFrames={1} />
+      <Composition id="g11-cover-xhs" component={G11CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
+      <Composition id="g11-cover-sohu" component={G11CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
       {/* 一屏标杆（质感验证用，非交付片） */}
       <Composition id="BENCH-bundle-open" component={BundleOpenBench} fps={FPS} width={1080} height={1920} durationInFrames={150} />
       <Composition id="BENCH-pain" component={BenchPain} fps={FPS} width={1080} height={1920} durationInFrames={150} />
