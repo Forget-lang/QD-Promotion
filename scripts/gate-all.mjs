@@ -19,6 +19,13 @@ const motionWaiver = (vidPath) => {
   const key = m ? m[0].toLowerCase() : null;
   return key ? (list.find((w) => String(w.video).toLowerCase() === key) || null) : null;
 };
+const safeAreaWaiver = (framePaths) => {   // CHANGE-20260918-029：与 motionWaiver 同构；豁免在汇总层，probe-safe-area 本体不动
+  const list = REGISTRY.safeAreaWaivers || [];
+  if (!list.length) return null;
+  const m = /g\d{2}/i.exec(framePaths.join('/'));
+  const key = m ? m[0].toLowerCase() : null;
+  return key ? (list.find((w) => String(w.video).toLowerCase() === key) || null) : null;
+};
 const GATES = [
   { key: 'changecontract', label: '变更收敛闸门（Change Contract）', args: ['scripts/check-change-contract.mjs'] },
   { key: 'visualshot', label: '视觉导演闸门（R9 Shot Contract）', args: ['scripts/check-visual-shot-contract.mjs'] },
@@ -97,7 +104,10 @@ const safeFrames = newestFrames();
 if (safeFrames.length) {
   const { code, out } = run('node', ['scripts/probe-safe-area.mjs', ...safeFrames], ROOT);
   const lastLine = out.trim().split('\n').filter(Boolean).pop() || '(无输出)';
-  rows.push({ ok: code === 0, label: '文字安全区探针（最新静帧）', msg: lastLine.replace(/^[\s✅❌⚠️]+/, '').trim().slice(0, 96), warns: [] });
+  const prow = { ok: code === 0, label: '文字安全区探针（最新静帧）', msg: lastLine.replace(/^[\s✅❌⚠️]+/, '').trim().slice(0, 96), warns: [] };
+  const swv = safeAreaWaiver(safeFrames);
+  if (!prow.ok && swv) { prow.ok = true; prow.skipped = true; prow.label = '文字安全区探针（最新静帧·已裁）'; prow.msg = `已裁放行（${swv.approvedBy || '未记批准人'}）· 原判照旧显示 ｜${prow.msg}｜理由：${swv.reason || '已登记例外'}`; }
+  rows.push(prow);
 } else {
   rows.push({ ok: true, skipped: true, label: '文字安全区探针', msg: '跳过（outputs 下暂无静帧 png；出静帧后必跑）' });
 }
