@@ -154,6 +154,29 @@ const RowLine: React.FC<{ row: FormRow; start: number }> = ({ row, start }) => {
   );
 };
 
+/* ── 零件 · 时段格（逐格点亮；on=可用格）────────────────── */
+const WeekChip: React.FC<{ label: string; on: boolean; start: number; sp: SpringCfg }> = ({ label, on, start, sp }) => {
+  const f = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const s = spring({ frame: f - start, fps, config: sp, durationInFrames: 16 });
+  return (
+    <div
+      style={{
+        flex: 1, textAlign: 'center', padding: '26px 0', borderRadius: 6,
+        fontFamily: FONT_BODY, fontSize: 30, fontWeight: on ? 700 : 500,
+        color: on ? CHALK : 'rgba(198,189,181,.36)',
+        background: on ? `rgba(240,106,36,${0.10 + 0.16 * s})` : 'rgba(0,0,0,.45)',
+        border: `1px solid ${on ? `rgba(255,139,56,${0.25 + 0.45 * s})` : 'rgba(198,189,181,.14)'}`,
+        boxShadow: on && s > 0.6 ? '0 0 14px rgba(240,106,36,.35)' : 'none',
+        transform: `scale(${0.92 + 0.08 * s})`,
+        opacity: interpolate(s, [0, 1], [0.25, 1]),
+      }}
+    >
+      {label}
+    </div>
+  );
+};
+
 /* ── 零件 · 批注带 ─────────────────────────────────────── */
 const NoteBand: React.FC<{ notes: string[]; start: number }> = ({ notes, start }) => (
   <div style={{ marginTop: 16 }}>
@@ -269,35 +292,35 @@ const G11FormFace: React.FC<SceneRenderProps> = ({ scene, style }) => {
       <EmberParticles count={20} />
       <Board h={1150} top={300} sp={sp}>
         <BoardHeading text={p.head} />
-        <WriteIn start={30}>
+        <WriteIn start={18}>
           <div style={{ fontFamily: FONT_BODY, fontSize: 32, color: CHALK_DIM, marginTop: 16 }}>券类型：{p.typeLabel}</div>
         </WriteIn>
         <div style={{ marginTop: 8 }}>
           {p.rows.map((r, i) => (
-            <RowLine key={r.k} row={r} start={64 + i * 22} />
+            <RowLine key={r.k} row={r} start={240 + i * 32} />
           ))}
         </div>
         <div style={{ marginTop: 34, padding: '26px 28px', borderRadius: 6, background: 'rgba(240,106,36,.12)', border: '1px solid rgba(255,139,56,.4)' }}>
-          <WriteIn start={180}>
+          <WriteIn start={60}>
             <div style={{ fontFamily: FONT_BODY, fontSize: 26, color: CHALK_DIM }}>{p.face.label}</div>
           </WriteIn>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginTop: 6 }}>
             {p.face.rows.map((r, i) => (
               <React.Fragment key={r.big}>
                 {i > 0 && <span style={{ fontFamily: FONT_BODY, fontSize: 40, color: CHALK_DIM }}>~</span>}
-                <BigChalk text={r.big} start={196 + i * 18} size={162} sp={sp} />
+                <BigChalk text={r.big} start={78 + i * 26} size={162} sp={sp} />
                 <span style={{ fontFamily: FONT_BODY, fontSize: 34, color: CHALK_DIM }}>{r.unit}</span>
               </React.Fragment>
             ))}
           </div>
-          <ChalkUnderline start={224} width={280} />
-          <WriteIn start={232}>
+          <ChalkUnderline start={126} width={280} />
+          <WriteIn start={142}>
             <div style={{ fontFamily: FONT_BODY, fontSize: 25, color: CHALK_DIM, marginTop: 4 }}>{p.face.note}</div>
           </WriteIn>
         </div>
-        <NoteBand notes={p.notes} start={330} />
+        <NoteBand notes={p.notes} start={400} />
         {p.tip && (
-          <WriteIn start={470}>
+          <WriteIn start={520}>
             <div style={{ marginTop: 30, fontFamily: FONT_TITLE, fontSize: 36, color: GOLD, border: `2px solid ${GOLD}`, borderRadius: 6, padding: '14px 22px', display: 'inline-block', textShadow: CHALK_SHADOW }}>{p.tip}</div>
           </WriteIn>
         )}
@@ -313,7 +336,10 @@ const G11FormIssue: React.FC<SceneRenderProps> = ({ scene, style }) => {
   const p = scene.payload as unknown as FormIssuePayload;
   const sp = cfgOf(style);
   const f = useCurrentFrame();
-  const cd = Math.max(0, 3 - Math.floor(Math.max(0, f - 330) / 26));
+  // 倒计时 5 拍：00:03 → 00:02 → 00:01 → 00:00 → 开抢；每拍重起 spring（数字弹入反馈），归零与解锁用金色
+  const tick = Math.max(0, Math.min(4, Math.floor(Math.max(0, f - 330) / 26)));
+  const cdText = tick <= 3 ? `00:0${3 - tick}` : p.countdown.unlock;
+  const unlocked = tick >= 4;
   return (
     <AbsoluteFill>
       <EmberParticles count={18} />
@@ -333,13 +359,18 @@ const G11FormIssue: React.FC<SceneRenderProps> = ({ scene, style }) => {
             <RowLine key={r.k} row={r} start={166 + i * 24} />
           ))}
         </div>
-        <div style={{ padding: '20px 26px', borderRadius: 6, background: 'rgba(240,106,36,.10)', border: '1px solid rgba(255,139,56,.38)', textAlign: 'center' }}>
+        <div style={{ padding: '20px 26px', borderRadius: 6, background: unlocked ? 'rgba(240,106,36,.22)' : 'rgba(240,106,36,.10)', border: `1px solid rgba(255,139,56,${unlocked ? .75 : .38})`, textAlign: 'center' }}>
           <WriteIn start={330}>
             <div style={{ fontFamily: FONT_BODY, fontSize: 26, color: CHALK_DIM }}>{p.countdown.label}</div>
           </WriteIn>
           <div style={{ marginTop: 2 }}>
-            <BigChalk text={cd > 0 ? `00:0${cd}` : p.countdown.unlock} start={340} size={112} color={cd > 0 ? CHALK : GOLD} sp={sp} />
+            <BigChalk text={cdText} start={330 + tick * 26} size={unlocked ? 122 : 112} color={tick >= 3 ? GOLD : CHALK} sp={sp} />
           </div>
+          {unlocked && (
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <ChalkUnderline start={330 + 4 * 26} width={260} color={GOLD} />
+            </div>
+          )}
         </div>
       </Board>
     </AbsoluteFill>
@@ -351,7 +382,6 @@ const G11FormTerm: React.FC<SceneRenderProps> = ({ scene, style }) => {
   const p = scene.payload as unknown as FormTermPayload;
   const sp = cfgOf(style);
   const f = useCurrentFrame();
-  const grow = interpolate(f, [130, 230], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE_OUT });
   return (
     <AbsoluteFill>
       <EmberParticles count={16} />
@@ -366,10 +396,12 @@ const G11FormTerm: React.FC<SceneRenderProps> = ({ scene, style }) => {
           <div style={{ fontFamily: FONT_BODY, fontSize: 30, color: EMBER_LT, fontWeight: 700 }}>{p.band.label}</div>
           <ChalkUnderline start={112} width={190} color={EMBER_LT} />
         </WriteIn>
-        <div style={{ display: 'flex', gap: 10, clipPath: `inset(0 ${(1 - grow) * 100}% 0 0)` }}>
-          {p.band.weekdays.map((d, i) => (
-            <div key={d} style={{ flex: 1, textAlign: 'center', padding: '26px 0', borderRadius: 6, fontFamily: FONT_BODY, fontSize: 30, fontWeight: i < p.band.activeCount ? 700 : 500, color: i < p.band.activeCount ? CHALK : 'rgba(198,189,181,.36)', background: i < p.band.activeCount ? 'rgba(240,106,36,.26)' : 'rgba(0,0,0,.45)', border: `1px solid ${i < p.band.activeCount ? 'rgba(255,139,56,.7)' : 'rgba(198,189,181,.14)'}` }}>{d}</div>
-          ))}
+        <div style={{ display: 'flex', gap: 10 }}>
+          {p.band.weekdays.map((d, i) =>
+            i < p.band.activeCount
+              ? <WeekChip key={d} label={d} on start={140 + i * 20} sp={sp} />
+              : <WeekChip key={d} label={d} on={false} start={150} sp={sp} />,
+          )}
         </div>
         <WriteIn start={240}>
           <div style={{ fontFamily: FONT_BODY, fontSize: 32, color: GOLD }}>{p.band.value}</div>
