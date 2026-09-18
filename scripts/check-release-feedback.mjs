@@ -9,7 +9,10 @@
  * 判据：
  *  - 状态=历史豁免 → ⏭️ 跳过（协议生效前已发布片，不回改）
  *  - 状态=已发布-待回填 → ⚠️ 提示列出（刚发布、正等 24h/7d 数据属正常，不锁死开工；见下「已回填必红」）
- *  - 状态=已回填 → 四数【播放量/封面CTR/2秒跳出/完播】+ 变量假设齐全 → ✅；缺任一项 → ❌（这是真正的硬拦）
+ *  - 状态=已回填 → 按「类型」取指标组校验 + 变量假设齐全 → ✅；缺任一项 → ❌（这是真正的硬拦）：
+ *      视频[缺省] = 四数【播放量/封面CTR/2秒跳出/完播】（SKILL 第 7 步）；
+ *      图文 = 三指标【进入率/翻完率/赞藏评】（SKILL 图文线后验口径，2026-09-18 CHANGE-20260918-028 接入）
+ *  - 「类型」非法值 → ❌；历史行无「类型」字段按视频处理（零改动向后兼容）
  *  - 台账空 → ✅（尚未有协议内发布，发布即启用）
  *  - 状态非法 / 台账文件缺失 / JSON 损坏 → ❌（闸门不假装通过）
  */
@@ -19,7 +22,11 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const LEDGER = join(ROOT, 'outputs', 'archive', '发布后验台账.json');
-const DATA_FIELDS = ['播放量', '封面CTR', '2秒跳出', '完播'];
+/** 指标字段按行「类型」分支（CHANGE-20260918-028）：视频四数｜图文三指标（键名与 SKILL 图文线口径逐字一致） */
+const METRIC_FIELDS = {
+  '视频': ['播放量', '封面CTR', '2秒跳出', '完播'],
+  '图文': ['进入率', '翻完率', '赞藏评'],
+};
 const print = (mark, m) => console.log(`${mark} ${m}`);
 const fail = (m) => { print('❌', m); return false; };
 
@@ -40,13 +47,15 @@ for (const r of rows) {
   const id = r.片号 || '(无片号)';
   const st = r.状态;
   if (!allowed.includes(st)) { bad.push(`《${id}》状态非法「${st}」，只能是 ${allowed.join('/')}`); continue; }
+  const type = r.类型 === undefined || r.类型 === '' ? '视频' : r.类型;   // 缺省=视频：仅兼容 028 之前的历史行，新行必须显式写
+  if (!METRIC_FIELDS[type]) { bad.push(`《${id}》类型非法「${type}」，只能是 视频/图文`); continue; }
   if (st === '历史豁免') { exempt++; continue; }
   if (st === '已发布-待回填') {
     pending.push(`《${id}》已发布待回填${r.变量假设 ? `，单变量假设「${r.变量假设}」` : ''}`);
     continue;
   }
   // st === '已回填'
-  const empty = DATA_FIELDS.filter((f) => r[f] === null || r[f] === undefined || r[f] === '');
+  const empty = METRIC_FIELDS[type].filter((f) => r[f] === null || r[f] === undefined || r[f] === '');
   if (!r.变量假设) empty.push('变量假设');
   if (empty.length) bad.push(`《${id}》状态已回填但缺：${empty.join('/')}`);
   else okFilled++;
