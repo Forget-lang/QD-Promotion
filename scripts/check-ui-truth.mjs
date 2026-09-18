@@ -10,7 +10,7 @@
  *   其它键（act/desc/res/mark/title/sub…）是本片文案，不参与硬检。
  *   文案里用「」引起来、声称是产品界面说法的词，列入"需人工确认"层（不计失败，但必须看过）。
  *
- * 六层：
+ * 七层（⑦ 为 CHANGE-20260918-030 新增）：
  *   ① 字段名逐字取证 —— `k:` 必须在 applet 源码出现（硬失败）
  *   ② 「」声称是界面说法但源码查不到（⚠️ 人工确认）
  *   ③ 分组归属 —— 组标题若照抄页面原生组名，其下每一行必须真在那一组里（硬失败）。
@@ -27,6 +27,9 @@
  *      （原价/券面额/优惠金额/折扣/兑换内容/随机最小·最大金额）全属该券种的 `couponTypes[key].faceFields`，
  *      且该券种要求的面额字段都在（硬失败）。为什么单独立一层：2026-09-03 g07 把满减券的"减 X"挂到代金券名下——
  *      "券面额"是真名、① 全过，但券种与字段集配错，①③⑤ 都拦不住。未声明 couponType 却用了面额字段的屏 → ❌ 硬失败（补上 couponType 才能过关）。
+ *   ⑦ 图文机检（CHANGE-20260918-030）—— video/src/graphic/*.ts 的图内字段名（images[].k / k: 单值）必须逐字命中
+ *      spec 四表字段名/组行名、券种名，或 applet 源码原话（非 spec 表内条目类，如「券码」）；onScreen:false 的字段名
+ *      出现在图内 = 硬失败（「行名不上屏」对图文同样生效）。019 §三.5「机检覆盖随首篇落地」的落点。
  *
  * 用法：node scripts/check-ui-truth.mjs
  * 退出码：0 = 通过；1 = 有硬失败（① 未取证的字段名 / ③ 分组归属错误 / ⑤ 真值表行名源码全局查无 / ⑥ 券种↔字段配对错或未声明 couponType）。
@@ -382,6 +385,41 @@ if (!couponTypeMap.size) {
   }
 }
 
+console.log('');
+
+/* ── ⑦ 图文机检（CHANGE-20260918-030）：video/src/graphic/*.ts 图内字段名逐字回源 ── */
+const GRAPHIC_DIR = join(ROOT, 'video', 'src', 'graphic');
+const graphicFiles = existsSync(GRAPHIC_DIR) ? readdirSync(GRAPHIC_DIR).filter((f) => f.endsWith('.ts')) : [];
+const extractGraphicNames = (text) => {
+  const names = new Set();
+  for (const m of text.matchAll(/k:\s*\[([^\]]*)\]/g)) for (const s of m[1].matchAll(/'([^']+)'/g)) names.add(s[1]);
+  for (const m of text.matchAll(/(?:^|[{,\s])k:\s*'([^']+)'/g)) names.add(m[1]);
+  return [...names];
+};
+const graphicBad = [];
+const graphicHidden = [];
+let graphicNameTotal = 0;
+for (const f of graphicFiles) {
+  const text = readFileSync(join(GRAPHIC_DIR, f), 'utf8');
+  for (const name of extractGraphicNames(text)) {
+    graphicNameTotal++;
+    if (retiredRows.has(name)) { graphicHidden.push({ file: f, name }); continue; }
+    if (allRows.has(name) || couponTypeMap.has(name)) continue;
+    if (corpus.some((c) => c.text.includes(norm(name)))) continue;
+    graphicBad.push({ file: f, name });
+  }
+}
+if (!graphicFiles.length) {
+  console.log('⑦ 图文机检  ⏭ 跳过 —— video/src/graphic 下暂无数据文件');
+} else if (graphicHidden.length || graphicBad.length) {
+  console.log(`⑦ 图文机检  ❌ 硬失败 —— ${graphicHidden.length + graphicBad.length} 处：`);
+  for (const x of graphicHidden) console.log(`   ${x.file}  图内出现 onScreen:false 字段名 «${x.name}» —— 「行名不上屏」对图文同样生效，改用数值或界面原话`);
+  for (const x of graphicBad) console.log(`   ${x.file}  «${x.name}» —— spec 四表与 applet 源码都查无，疑似编造字段名`);
+  console.log('   修法：字段名逐字取自 spec/*-fields.json 或回 ../applet/ 取界面原话；实在是我方描述名就不上屏。');
+} else {
+  console.log(`⑦ 图文机检  ✅ 通过 —— ${graphicFiles.length} 个图文数据文件、${graphicNameTotal} 个图内字段名，逐字命中 spec/券种/applet 源码，无 onScreen:false 名上屏`);
+}
+
 console.log('\n────────────────────────────────────────────');
 if (missing.length) {
   console.log(`❌ 存在 ${missing.length} 个未取证字段名。商家在后台找不到它，这一屏就等于没教。修完再声明通过。`);
@@ -399,5 +437,9 @@ if (typeMismatch.length || typeMissing.length || undeclared.length) {
   console.log(`❌ 存在 ${typeMismatch.length + typeMissing.length + undeclared.length} 处券种↔面额字段配对错误（见 ⑥）。券种选错或没声明，商家在后台找不到对应的金额栏，这一屏白教。修完再声明通过。`);
   process.exit(1);
 }
-console.log(`✅ 通过：上屏字段名全部回源码取到原话、分组归属对得上制券页、真值表自证 ${tableTotal} 个有效名字逐字命中目标源码文件、券种↔面额字段配对无误。`);
+if (graphicBad.length || graphicHidden.length) {
+  console.log(`❌ 图文机检存在 ${graphicBad.length + graphicHidden.length} 处问题（见 ⑦）。图内字段名直接印给商家看，错一个名字就等于教错。修完再声明通过。`);
+  process.exit(1);
+}
+console.log(`✅ 通过：上屏字段名全部回源码取到原话、分组归属对得上制券页、真值表自证 ${tableTotal} 个有效名字逐字命中目标源码文件、券种↔面额字段配对无误、图文机检 ${graphicNameTotal} 个图内字段名全过。`);
 process.exit(0);

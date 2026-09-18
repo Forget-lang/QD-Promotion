@@ -13,16 +13,36 @@
  *   3. outputsReview — 文案层需确认（outputs/*.md），命中 = 列出人工确认
  *   4. docsInfo      — 文档层仅提示（docs/** + skill），命中 = 信息提示
  *
+ * 豁免（CHANGE-20260918-030）：video/src/data/** 扫描前先剥离 spec 四表登记的功能级字段名（用户 2026-09-18 声明
+ *   「手气券的最大/最小金额是功能级的，使用没问题」）——字段名不构成极限词违规；outputs 对外文案不豁免。
  * 注意：本脚本只读取文件、不删除任何东西，不受 WorkBuddy safe-delete 拦截影响。
  */
 
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 const CONFIG = JSON.parse(readFileSync(join(__dirname, '..', 'spec', 'redlines.json'), 'utf8'));
+
+// CHANGE-20260918-030 · 功能级字段名剥离：用户 2026-09-18 声明「手气券的最大/最小金额是功能级的，使用没问题」——
+// spec 四表登记的产品字段名属功能级命名，不构成极限词违规。剥离清单从 spec 自动派生（单一真源，不手维护白名单），
+// 仅作用于 video/src/data/**（⑥ 配对规则强制写真名的唯一位置）；outputs 对外文案不豁免。
+const FUNC_LABELS = (() => {
+  const out = new Set();
+  for (const name of ['coupon-fields.json', 'card-fields.json', 'point-fields.json', 'member-fields.json']) {
+    const p = join(__dirname, '..', 'spec', name);
+    if (!existsSync(p)) continue;
+    try {
+      const j = JSON.parse(readFileSync(p, 'utf8'));
+      for (const f of j.fields || []) if (typeof f.label === 'string' && f.label) out.add(f.label);
+      for (const g of j.createGroups || []) for (const r of g.rows || []) if (r) out.add(r);
+    } catch { /* spec 损坏由 check-ui-truth ⑤ 负责报错，这里不假装通过 */ }
+  }
+  return [...out];
+})();
+const IS_DATA_FILE = (f) => f.replace(/\\/g, '/').includes('/video/src/data/');
 
 // 把 scope 里的 glob（**/*.tsx 等）展开成具体文件
 function expand(scopeList, excludeList = []) {
@@ -114,10 +134,14 @@ function scan(files, tokens, skipChecklists = false) {
     let text = isCode ? stripComments(content) : content;
     if (skipChecklists && !isCode && f.endsWith('.md')) text = filterChecklistSections(text);
     const rel = f.replace(ROOT + '/', '');
+    // CHANGE-20260918-030：data 文件先剥离功能字段名再匹配（outputs 不剥离）
+    const scanText = IS_DATA_FILE(f) && FUNC_LABELS.length
+      ? FUNC_LABELS.reduce((s, w) => s.split(w).join('▇'), text)
+      : text;
     for (const tok of tokens) {
-      if (text.includes(tok)) {
+      if (scanText.includes(tok)) {
         // 记录命中行号（仅首个）
-        const idx = text.indexOf(tok);
+        const idx = scanText.indexOf(tok);
         const lineNo = text.slice(0, idx).split('\n').length;
         hits.push({ file: rel, line: lineNo, token: tok });
       }
