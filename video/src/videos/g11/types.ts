@@ -1,63 +1,72 @@
 // g11 烧烤夜宵 · 专属屏 payload 类型
-// 约定：k: = 产品真实字段名（check-ui-truth 硬检逐字命中源码）；head: = 组标题；其余键 = 本片文案。
+// 约定：k: = 产品真实字段名（check-ui-truth ①/③ 硬检逐字命中源码）；v: = 画面值；
+//       head: = 页面原生组名（③ 层校验归属）；①②③ 起头的是我方自述分步标题（不参与原生组判定）。
+// 母题：深夜黑板牌（Board）＋ 粉笔字；本片专属——不被跨片 import，也不 import 他片。
+
+/** 制券屏通用字段行 */
+export interface FormRow {
+  k: string;
+  v?: string;
+  /** 大数字强调（如面额区间 6 / 88），逐个大数字起拍 */
+  bigs?: string[];
+  note?: string;
+  hero?: boolean;
+}
 
 export interface HookPayload {
-  titleMain: string;     // 主标题大字
-  titleHi: string;       // 主标题里染强调色的子串
-  subTitle: string;      // 副标题/认知缺口副钩
-  painLead: string;      // 痛点引言（首字抓 2 秒钩子）
-  miniPoints?: string[]; // 痛点小票条（可读信息）
-  cardName: string;      // 手气券卡的券名
-  cardMin: string;       // 随机最小金额（产品字段：随机最小金额）
-  cardMax: string;       // 随机最大金额（产品字段：随机最大金额）
-  cardTag: string;       // 券卡标签（手气券·随机金额）
-  cardSlogan: string;    // 券卡点题语（为什么随手气券）
-  cardThreshold: string; // 消费门槛（产品字段：消费门槛）
-  cardValid: string;     // 有效期提示（值）
-  cardTime: string;      // 可用时段
-  actionHint: string;    // 引导动作补充
+  title: string;
+  leftLabel: string;
+  leftValue: string;
+  leftNote: string;
+  rightLabel: string;
+  rightValue: string;
+  rightNote: string;
+  subHook: string;
 }
 
 export interface IdeaPayload {
-  title: string;
-  wrongItems: string[];  // 老办法·打叉项
-  rightItems: string[];  // 真锁客·打勾项
-  conclusion: string;    // 底部结论条
+  topTitle: string;
+  topRows: string[];
+  bottomTitle: string;
+  bottomRows: string[];
+  seam: string;
 }
 
-export interface ProofPayload {
-  bigNumber: string;     // 大数字
-  bigUnit: string;       // 单位
-  subTitle: string;      // 副标题说明
-  caseSource: string;    // 案例来源
+/** S3 · 券面（含面额区间 hero 块）
+ *  ⚠️ face.rows 的 k: 是**必填的产品字段名**——⑥ 层要求声明 couponType 后必须带该券种 faceFields；
+ *  而真值表登记这两行 onScreen:false（行名不上屏）→ 数据层登记、**画面只渲染 big/unit**。 */
+export interface FormFacePayload {
+  head: string;
+  couponType: string;
+  rows: FormRow[];
+  face: { label: string; note: string; rows: { k: string; big: string; unit: string }[] };
+  notes: string[];
+  tip?: string;
 }
 
-export interface FieldPair {
-  label: string;  // 字段名
-  value: string;  // 字段值
+/** S4 · 发放（含原生组与倒计时） */
+export interface FormIssuePayload {
+  head: string;
+  rows: FormRow[];
+  group: { head: string; rows: FormRow[] };
+  countdown: { label: string; to: string; unlock: string };
+  linkageNote?: string;
 }
 
-export interface FieldsPayload {
-  tag: string;      // 牌数标签
-  title: string;    // 标题
-  fields: FieldPair[];  // 字段列表
-  tip: string;      // 底部 tip
+/** S5 · 期限与时段（含时段带） */
+export interface FormTermPayload {
+  head: string;
+  rows: FormRow[];
+  band: { label: string; weekdays: string[]; activeCount: number; value: string };
+  note?: string;
 }
 
-export interface MechanismStep {
-  num: string;       // 序号
-  text: string;      // 步骤文字
-  icon?: string;     // 可选图标 emoji
-  highlight?: boolean; // 是否高亮
-}
-
-export interface MechanismPayload {
-  tag: string;
-  title: string;
-  steps: MechanismStep[];
+export interface FlowPayload {
+  steps: { kind: 'timer' | 'coupon' | 'verify'; title: string; value?: string; note?: string }[];
+  tailNote: string;
 }
 
 export interface CtaPayload {
-  sentence: string;   // 金句整句
-  highlight: string;  // 高亮部分
+  lines: string[];
+  action: string;
 }
