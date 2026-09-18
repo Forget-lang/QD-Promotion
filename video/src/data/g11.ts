@@ -1,5 +1,7 @@
 // g11 · 烧烤夜宵 · 片1 · 数据（无声版）
-// 字段真值来源：spec/coupon-fields.json · 类型：手气券（RANDOM）
+// 母题：深夜黑板牌（Board）＋ 炭火虚焦深底；色彩取 SKILL §4.5 纯 Remotion 烧烤基准。
+// 字段真值来源：spec/coupon-fields.json（k: = 产品真实字段名，逐字回 applet 源码；head: = 页面原生组名）
+// 口播：outputs/g11-烧烤/02-口播文案.md（Legacy Baseline）；分镜：07-片1-分镜稿.md；Shot 表：08-R9视觉决策卡.md
 import type { VideoData } from '../types';
 
 export const g11: VideoData = {
@@ -8,86 +10,156 @@ export const g11: VideoData = {
   style: {
     palette: 'warm-orange',
     motion: 'snappy',
-    transition: 'dissolve',
-    hookStyle: 'question',
+    transition: 'wipe',
+    hookStyle: 'contrast',
     bgImage: 'backgrounds/g11/bg.png',
-    bgBlur: 0,
+    bgBlur: 3,
   },
   scenes: [
+    // ── S1 · 钩子：同店两态对照 ────────────────────────────────
     {
-      type: 'hook', ui: 'g11-hook', layoutKind: 'layered-stage', dur: 12,
+      type: 'hook', ui: 'g11-hook', layoutKind: 'layered-stage', dur: 9,
       subtitles: [
-        { text: '烧烤一条街都是，凭什么有的店开半年就倒、有的天天排队到马路对面？', startFrame: 20, endFrame: 200 },
-        { text: '不是味道差——你家客人吃完抹嘴就走，下次再也想不起你。', startFrame: 220, endFrame: 340 },
+        { text: '开烧烤店的，周五夜里翻台三轮，周一晚上一半桌子空着。', startFrame: 0, endFrame: 140 },
+        { text: '串还是那个串，炉子还是那个炉子——缺的是给客人一个周一晚上出门的理由。', startFrame: 150, endFrame: 260 },
       ],
       payload: {
-        titleMain: '凭什么有的店天天排队？', titleHi: '天天排队', painLead: '留不住客，是烧烤店的死穴',
-        miniPoints: ['客人吃完就走，下次想不起你', '客人下次来，又不知道去哪里吃了'],
-        subTitle: '不是味道差——是客人吃完抹嘴就走，下次再也想不起你', cardName: '夜宵手气券', cardMin: '3', cardMax: '30',
-        cardTag: '手气券 · 随机金额', cardSlogan: '刮奖感更抓夜宵冲动', cardThreshold: '无门槛', cardValid: '3 天内有效', cardTime: '17:00 – 02:00', actionHint: '人人不落空',
+        title: '同一个店，两种晚上',
+        leftLabel: '周五',
+        leftValue: '翻台三轮',
+        leftNote: '排队等位',
+        rightLabel: '周一',
+        rightValue: '半店空桌',
+        rightNote: '炭火照点',
+        subHook: '缺的不是味道，是给客人一个出门的理由',
       },
     },
+
+    // ── S2 · 理解段：上下算账块（旧办法 / 新机制）────────────────
     {
-      type: 'idea', ui: 'g11-idea', layoutKind: 'layered-stage', dur: 18,
+      type: 'idea', ui: 'g11-idea', layoutKind: 'layered-stage', dur: 17,
       subtitles: [
-        { text: '老板们最常干的三件事：打折、送啤酒、充两百送一百。', startFrame: 10, endFrame: 180 },
-        { text: '有用吗？没用——客人一看就知道你要套路他。', startFrame: 190, endFrame: 340 },
-        { text: '真正能留人的，是让他觉得自己在你这儿"有点东西没花完"。', startFrame: 350, endFrame: 540 },
-      ],
-      payload: { title: '老办法没用，真正能留人的是这个', wrongItems: ['打折促销', '送啤酒饮料', '充值办卡'], rightItems: ['让他觉得"有点东西没花完"', '损失厌恶比便宜更抓人心'], conclusion: '一张快过期的券，比十句"欢迎再来"都管用' },
-    },
-    {
-      type: 'fields', ui: 'g11-proof', layoutKind: 'layered-stage', dur: 20,
-      subtitles: [
-        { text: '真正能把人留住的，是把"核销"变成下一单的开始。', startFrame: 10, endFrame: 150 },
-        { text: '客人吃完，拿出手机一扫，券核销成功。', startFrame: 160, endFrame: 280 },
-        { text: '手机里自动又生出一张一模一样的券，领取当日起，三天内有效。', startFrame: 290, endFrame: 460 },
-        { text: '客人手机里永远躺着一张你家的券。', startFrame: 470, endFrame: 590 },
-      ],
-      payload: { bigNumber: '3', bigUnit: '天 有效', subTitle: '核销一张、送一张——永远有一张你家的券', caseSource: '到店核销后可再得本券一张' },
-    },
-    {
-      type: 'fields', ui: 'g11-basic', layoutKind: 'layered-stage', dur: 22,
-      subtitles: [
-        { text: '用券到卡包做这套玩法，其实就三张牌。', startFrame: 10, endFrame: 150 },
-        { text: '第一张，手气券——就是金额随机的券，像刮奖一样。', startFrame: 160, endFrame: 300 },
-        { text: '金额三块到三十块随机，这个区间正好。', startFrame: 310, endFrame: 430 },
-        { text: '有效期三天，可用时段晚五点到凌晨两点。', startFrame: 440, endFrame: 560 },
-        { text: '发放方式选公开领取——桌角贴个码，坐下扫一下就领。', startFrame: 570, endFrame: 660 },
+        { text: '碰上这事，多数老板的反应是打折：群里喊一句，周一到周四便宜点。', startFrame: 0, endFrame: 170 },
+        { text: '喊了等于没喊——客人只会把你归成"打折才值得来"的那家店。', startFrame: 180, endFrame: 350 },
+        { text: '券这东西，随手能领就随手划走；到点才开抢、过了时段用不了，它才从一张"通知"变成一个"机会"。', startFrame: 360, endFrame: 500 },
       ],
       payload: {
-        tag: '第一张牌', title: '手气券怎么设',
-        fields: [
-          { label: '金额区间', value: '3 元 ~ 30 元' }, { label: '消费门槛', value: '0（无门槛）' },
-          { label: '有效期', value: '领取当日起 3 天' }, { label: '可用时段', value: '17:00 – 02:00' },
-          { label: '发放方式', value: '公开领取（桌码即领）' },
+        topTitle: '打折喊群',
+        topRows: ['群里喊一句：周一到周四便宜点', '客人把你归成「打折才值得来」'],
+        bottomTitle: '到点开抢',
+        bottomRows: ['时间没到，点不到', '抢到手的，才当回事', '只有工作日晚上能用'],
+        seam: '一张通知  →  一个机会',
+      },
+    },
+
+    // ── S3 · 制券① 手气券（一屏标杆）────────────────────────────
+    {
+      type: 'fields', ui: 'g11-form-face', layoutKind: 'layered-stage', dur: 20,
+      subtitles: [
+        { text: '打开券到卡包，券类型选"手气券"——面额随机的券，像开奖。', startFrame: 0, endFrame: 140 },
+        { text: '区间你定：六块到八十八块。', startFrame: 150, endFrame: 300 },
+        { text: '顶上为什么是八十八？抢到八十八那张的人，觉得这券值得到店一趟。', startFrame: 310, endFrame: 460 },
+        { text: '底下为什么是六块？手气最差那位，也够串个素菜，不寒碜。提醒一句：顶格九十九，别把区间拉满。', startFrame: 470, endFrame: 590 },
+      ],
+      payload: {
+        head: '① 券面',
+        typeLabel: '手气券',
+        rows: [
+          { k: '优惠券名称', v: '夜宵手气券' },
+          { k: '制作数量', v: '200 张' },
+          { k: '消费门槛', v: '满 68 元可用' },
         ],
-        tip: '手气券 = 刮奖感，比固定金额的满减券更抓夜宵的冲动消费',
+        face: {
+          label: '面额区间',
+          note: '领取时随机，整数',
+          rows: [
+            { big: '6', unit: '元' },
+            { big: '88', unit: '元' },
+          ],
+        },
+        notes: ['顶格八十八：值得到店一趟', '起步六块：最差那张也不寒碜'],
+        tip: '顶格 99，别把区间拉满',
       },
     },
+
+    // ── S4 · 制券② 公开领取 + 限领一张 + 到点开抢 ────────────────
     {
-      type: 'mechanism', ui: 'g11-mechanism', layoutKind: 'layered-stage', dur: 20,
+      type: 'fields', ui: 'g11-form-issue', layoutKind: 'layered-stage', dur: 18,
       subtitles: [
-        { text: '第二张牌更狠——核销后赠券，一开，核销完自动再得一张。', startFrame: 10, endFrame: 220 },
-        { text: '第三张牌，转赠奖励——朋友核销了，你也得一张奖励券。', startFrame: 230, endFrame: 440 },
-        { text: '奖励用兑换券，比如"招牌烤串一把"——实打实的东西，当然愿意转。', startFrame: 450, endFrame: 580 },
+        { text: '发放方式选"公开领取"——建了就改不了，选之前想清楚。', startFrame: 0, endFrame: 160 },
+        { text: '每人限领，填一张：一个人囤五张，"抢"的味道就没了。', startFrame: 170, endFrame: 300 },
+        { text: '再打开自定义领取时间，开始时间定在周一晚上八点。', startFrame: 310, endFrame: 430 },
+        { text: '八点前，领取页挂着倒计时，谁都点不进来；八点一到，群里一声"开抢"，两百张券，抢完就没。', startFrame: 440, endFrame: 530 },
       ],
       payload: {
-        tag: '第二张 + 第三张牌', title: '锁客 + 裂变，一次打通',
+        head: '② 发放',
+        rows: [
+          { k: '发放方式', v: '公开领取', hero: true, note: '创建后不可修改' },
+          { k: '限领总量', v: '开' },
+          { k: '每人限领总量', v: '1 张' },
+        ],
+        group: {
+          head: '公开领取设置',
+          rows: [
+            { k: '自定义领取时间', v: '开' },
+            { k: '领取开始时间', v: '周一 20:00' },
+          ],
+        },
+        countdown: { label: '领取开始', to: '00:03', unlock: '开抢' },
+        linkageNote: '每人限领总量＝1 → 每次领取数量 / 领取周期 两行不出现（真值表 visibleWhen）',
+      },
+    },
+
+    // ── S5 · 制券③ 期限与时段（时段写死）────────────────────────
+    {
+      type: 'fields', ui: 'g11-form-term', layoutKind: 'layered-stage', dur: 13,
+      subtitles: [
+        { text: '最关键的一步：可用时段，千万别选全天。', startFrame: 0, endFrame: 110 },
+        { text: '定制成周一到周四，晚上五点到十一点。', startFrame: 120, endFrame: 210 },
+        { text: '时段写死，这张券周末用不了——想吃这口，只能工作日来。', startFrame: 220, endFrame: 300 },
+        { text: '周末的火没浇灭，周一到周四的炭火，点上了。', startFrame: 310, endFrame: 380 },
+      ],
+      payload: {
+        head: '③ 期限',
+        rows: [
+          { k: '有效期类型', v: '自领取日起 N 天内有效' },
+          { k: '有效期', v: '7 天' },
+        ],
+        band: { label: '可用时段', weekdays: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'], activeCount: 4, value: '晚五点到十一点' },
+        note: '时段最多 2 段，本片用 1 段',
+      },
+    },
+
+    // ── S6 · 顾客侧 / 核销侧接力链 ───────────────────────────────
+    {
+      type: 'advance', ui: 'g11-flow', layoutKind: 'layered-stage', dur: 11,
+      subtitles: [
+        { text: '客人那边：周一晚八点整，面额当场揭晓——八十八，进卡包，当晚就能用。', startFrame: 0, endFrame: 120 },
+        { text: '到店坐下，出示券码，店员一扫，满六十八直接减。', startFrame: 130, endFrame: 250 },
+        { text: '手气最差也不亏，六块钱的运气也是运气。', startFrame: 260, endFrame: 320 },
+      ],
+      payload: {
         steps: [
-          { num: '1', text: '老客到店核销手气券', icon: '🍢' }, { num: '2', text: '核销后自动再得一张新手气券', icon: '🎁' },
-          { num: '3', text: '把券转给朋友一起吃', icon: '📤' }, { num: '4', text: '朋友到店核销使用', icon: '👥' },
-          { num: '5', text: '老客自动得奖励券 · 招牌烤串一把', icon: '🏆', highlight: true },
+          { kind: 'timer', title: '到晚八点', value: '倒计时归零' },
+          { kind: 'coupon', title: '抢到手气', value: '88 元', note: '进我的卡包' },
+          { kind: 'verify', title: '到店核销', value: '满 68 直接减', note: '扫码一下' },
         ],
+        tailNote: '手气最差也不亏',
       },
     },
+
+    // ── S7 · 金句收口 ────────────────────────────────────────────
     {
-      type: 'cta', ui: 'g11-cta', layoutKind: 'layered-stage', dur: 8,
+      type: 'cta', ui: 'g11-cta', layoutKind: 'layered-stage', dur: 11,
       subtitles: [
-        { text: '烧烤店拼的不是谁烤得香——是谁家客人吃完了，', startFrame: 20, endFrame: 150 },
-        { text: '手机里还躺着一张你家的券。', startFrame: 160, endFrame: 230 },
+        { text: '周末的生意靠味道，空着的桌子要自己造。', startFrame: 0, endFrame: 120 },
+        { text: '被抢到手的券，才会被用掉。', startFrame: 130, endFrame: 220 },
+        { text: '有免费版，打开就能做——这个周一晚上八点，造第一波。', startFrame: 230, endFrame: 320 },
       ],
-      payload: { sentence: '烧烤店拼的不是谁烤得香——是谁家客人吃完了，手机里还躺着一张你家的券', highlight: '手机里还躺着一张你家的券' },
+      payload: {
+        lines: ['周末的生意靠味道', '空着的桌子要自己造'],
+        action: '有免费版，打开就能做',
+      },
     },
   ],
 };
