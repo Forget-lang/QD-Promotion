@@ -15,6 +15,7 @@ import { G08CoverDy, G08CoverDy43, G08CoverXhs, G08CoverSohu } from './covers/G0
 import { G09CoverDy, G09CoverDy43, G09CoverXhs, G09CoverSohu } from './covers/G09Cover';
 import { G10CoverDy, G10CoverDy43, G10CoverXhs, G10CoverSohu } from './covers/G10Cover';
 import { G11CoverDy, G11CoverDy43, G11CoverXhs, G11CoverSohu } from './covers/G11Cover';
+import { G11Graphic1, G11Graphic2, G11Graphic3, G11Graphic4, G11Graphic5 } from './graphic/G11Graphic';
 import type { VideoData } from './types';
 
 // ── 注入项目商用字体（@font-face，Remotion 渲染前自动等待 document.fonts.ready）──
@@ -101,6 +102,12 @@ const RemotionRoot: React.FC = () => {
       <Composition id="g11-cover-dy43" component={G11CoverDy43} fps={FPS} width={1440} height={1080} durationInFrames={1} />
       <Composition id="g11-cover-xhs" component={G11CoverXhs} fps={FPS} width={1080} height={1440} durationInFrames={1} />
       <Composition id="g11-cover-sohu" component={G11CoverSohu} fps={FPS} width={1920} height={1080} durationInFrames={1} />
+      {/* g11 抖音图文首篇（5 图 · 3:4 · 1080×1440；首图即封面）——CHANGE-20260918-027 */}
+      <Composition id="g11-graphic-1" component={G11Graphic1} fps={FPS} width={1080} height={1440} durationInFrames={1} />
+      <Composition id="g11-graphic-2" component={G11Graphic2} fps={FPS} width={1080} height={1440} durationInFrames={1} />
+      <Composition id="g11-graphic-3" component={G11Graphic3} fps={FPS} width={1080} height={1440} durationInFrames={1} />
+      <Composition id="g11-graphic-4" component={G11Graphic4} fps={FPS} width={1080} height={1440} durationInFrames={1} />
+      <Composition id="g11-graphic-5" component={G11Graphic5} fps={FPS} width={1080} height={1440} durationInFrames={1} />
       {/* 一屏标杆（质感验证用，非交付片） */}
       <Composition id="BENCH-bundle-open" component={BundleOpenBench} fps={FPS} width={1080} height={1920} durationInFrames={150} />
       <Composition id="BENCH-pain" component={BenchPain} fps={FPS} width={1080} height={1920} durationInFrames={150} />
