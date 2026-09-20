@@ -25,9 +25,10 @@
   "gateApplicability": {
     "version": 1,
     "values": {
-      "APPLY": "按现行判据执行",
-      "N/A": "不适用本线，须输出 N/A 加理由",
-      "OWNER_PENDING": "该线权威 Owner 未建立，显式失败并要求先立 Owner"
+      "APPLY": "按该闸门现行判据执行",
+      "OBSERVE": "照测照出读数，但不判红（仅用于教程线 motion；不得借用 motionWaivers 通道）",
+      "N/A": "不适用本线；必须显式输出 N/A 加声明源，不得 filter 掉目标",
+      "OWNER_PENDING": "该线权威 Owner 未建立 → 命中即显式硬失败，不放行也不静默跳过"
     },
     "gateOverrides": {
       "check-bg": {
@@ -61,7 +62,11 @@
         "tutorial": "OBSERVE"
       }
     },
-    "note": null
+    "note": null,
+    "nonDeclaredFailureStates": {
+      "UNKNOWN_TARGET": "目标无法判定内容线（不在 contentLines 声明内）→ 运行时硬失败；它不是声明值，故不入 values 枚举"
+    },
+    "valueValidation": "content-lines.mjs 对 defaultApplicability 与 gateOverrides 取值做枚举校验；写入 OBSERVE2/PENDING/OPTIONAL 等非法值即报错，不静默当作合法态"
   },
   "docsDir": "docs/internal",
   "extraDocs": [

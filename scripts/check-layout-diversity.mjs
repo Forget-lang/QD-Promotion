@@ -51,18 +51,26 @@ for (const v of classified) {
   if (v.line) continue;
   lineProblems.push(`${v.file}｜无法判定内容线（ref-registry.contentLines 未覆盖该片号形态）—— 拒绝静默过滤，请补声明或改名`);
 }
-for (const l of LINES) {
-  if (l.id === industryLine.id) continue;
-  const items = classified.filter((v) => v.line && v.line.id === l.id);
-  if (!items.length) continue;
-  const applies = gateAppliesFor(REGISTRY, 'check-layout-diversity', l);
-  if (applies === 'OWNER_PENDING') {
-    lineProblems.push(`${items.map((i) => i.file).join('、')}｜内容线「${l.label}」在本闸门为 OWNER_PENDING —— 该线布局判据的权威 Owner 尚未建立，先立 Owner 再产出（不放行、不过滤、不静默跳过）`);
-  } else if (applies === 'N/A') {
-    lineSkips.push(`${items.map((i) => i.file).join('、')}｜N/A（声明源：ref-registry.gateApplicability.gateOverrides['check-layout-diversity']['${l.id}']）`);
-  } else if (applies === 'APPLY') {
-    lineProblems.push(`${items.map((i) => i.file).join('、')}｜内容线「${l.label}」被声明为 APPLY，但本闸门现行判据只实现于行业线 —— 拒绝假装跨线通用，请补该线判据或改判 OWNER_PENDING`);
+// 声明本身写错（非法态、缺 defaultApplicability）时：响亮报错并 exit 1，
+// 但不抛未捕获堆栈——让 gate-all 与人都能读到一句可诊断的话（配置错 ≠ 代码崩）。
+try {
+  for (const l of LINES) {
+    if (l.id === industryLine.id) continue;
+    const items = classified.filter((v) => v.line && v.line.id === l.id);
+    if (!items.length) continue;
+    const applies = gateAppliesFor(REGISTRY, 'check-layout-diversity', l);
+    if (applies === 'OWNER_PENDING') {
+      lineProblems.push(`${items.map((i) => i.file).join('、')}｜内容线「${l.label}」在本闸门为 OWNER_PENDING —— 该线布局判据的权威 Owner 尚未建立，先立 Owner 再产出（不放行、不过滤、不静默跳过）`);
+    } else if (applies === 'N/A') {
+      lineSkips.push(`${items.map((i) => i.file).join('、')}｜N/A（声明源：ref-registry.gateApplicability.gateOverrides['check-layout-diversity']['${l.id}']）`);
+    } else if (applies === 'APPLY') {
+      lineProblems.push(`${items.map((i) => i.file).join('、')}｜内容线「${l.label}」被声明为 APPLY，但本闸门现行判据只实现于行业线 —— 拒绝假装跨线通用，请补该线判据或改判 OWNER_PENDING`);
+    }
   }
+} catch (e) {
+  console.error(`❌ check-layout-diversity：内容线声明非法 —— ${e.message}`);
+  console.error('   修法：校正 ref-registry.gateApplicability / contentLines，取值须在 gateApplicability.values 已注册枚举内。');
+  process.exit(1);
 }
 
 const vids = classified

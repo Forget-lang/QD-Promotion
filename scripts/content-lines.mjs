@@ -19,14 +19,38 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const loadRegistry = () =>
   JSON.parse(readFileSync(join(ROOT, 'scripts', 'ref-registry.json'), 'utf8'));
 
+/** 合法 applicability 声明值（枚举真源仍是 ref-registry.gateApplicability.values；这里只作兜底） */
+export const BUILTIN_APPLICABILITY = ['APPLY', 'OBSERVE', 'N/A', 'OWNER_PENDING'];
+
+function applicabilityEnum(reg) {
+  const declared = reg?.gateApplicability?.values;
+  const keys = declared && Object.keys(declared).length ? Object.keys(declared) : BUILTIN_APPLICABILITY;
+  return new Set(keys);
+}
+
+/**
+ * 校验一个 applicability 取值。未注册值（OBSERVE2 / PENDING / OPTIONAL / 拼写错的 apply）
+ * 一律硬失败——配置写错必须显眼，不能悄悄退化成某种合法态。
+ * 注意：这与 gateAppliesFor 的"不猜默认值"是同一条纪律的两半。
+ */
+export function assertApplicability(value, where, reg = loadRegistry()) {
+  const enumSet = applicabilityEnum(reg);
+  if (value && enumSet.has(value)) return value;
+  const key = value == null ? '(缺失或为空)' : `"${value}"`;
+  throw new Error(
+    `content-lines：${where} 的 applicability 取值 ${key} 不在已注册枚举内 —— 合法值：${[...enumSet].join(' / ')}；` +
+      `新增态必须先登记进 ref-registry.gateApplicability.values`,
+  );
+}
+
 /** 取内容线声明；缺失时返回 null，由调用方显式失败——禁止静默回退到"行业线" */
 export function getContentLines(reg = loadRegistry()) {
   const lines = Array.isArray(reg.contentLines) ? reg.contentLines : null;
   if (!lines || !lines.length) return null;
-  return lines.map((l) => ({
-    ...l,
-    idPattern: l.idPattern ? new RegExp(l.idPattern, 'i') : null,
-  }));
+  return lines.map((l) => {
+    assertApplicability(l.defaultApplicability, `contentLines[${l.id}].defaultApplicability`, reg);
+    return { ...l, idPattern: l.idPattern ? new RegExp(l.idPattern, 'i') : null };
+  });
 }
 
 /** 从任意标识（片号 / 文件名 / 相对路径 / 绝对路径）解析所属内容线；无法归属返回 null，不猜 */
@@ -84,13 +108,15 @@ export function gateAppliesFor(reg, gateKey, line) {
       `content-lines：闸门 ${gateKey} 拿到一个无法归属内容线的目标 —— 判线声明缺失或目标命名不在声明内，拒绝默认放行（见 CHANGE-20260920-031 §3.2）`,
     );
   }
-  const override = reg?.gateApplicability?.gateOverrides?.[gateKey]?.[line.id];
-  if (override) return override;
+  const overrides = reg?.gateApplicability?.gateOverrides?.[gateKey];
+  if (overrides && Object.prototype.hasOwnProperty.call(overrides, line.id)) {
+    return assertApplicability(overrides[line.id], `gateApplicability.gateOverrides['${gateKey}']['${line.id}']`, reg);
+  }
   const fallback = line.defaultApplicability;
   if (!fallback) {
     throw new Error(`content-lines：内容线 ${line.id} 未声明 defaultApplicability，拒绝猜默认值`);
   }
-  return fallback;
+  return assertApplicability(fallback, `contentLines[${line.id}].defaultApplicability`, reg);
 }
 
 export const describeLine = (line) => `${line?.label || line?.id || '未知线'}(${line?.id || '-'})`;
