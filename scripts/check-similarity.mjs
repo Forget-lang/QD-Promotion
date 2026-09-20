@@ -27,11 +27,14 @@ import { readFileSync } from 'node:fs';
 import { readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { initContentLines, lineOf, gateAppliesFor } from './content-lines.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DATA_DIR = join(ROOT, 'video/src/data');
-const REGISTRY = JSON.parse(readFileSync(join(ROOT, 'scripts/ref-registry.json'), 'utf8'));
 const SHOW_ALL = process.argv.includes('--all');
+// 统一诊断边界（CHANGE-20260920-031 §3.2.1）：本脚本不再自行解析 ref-registry，
+// 声明源不可用/非法一律由 initContentLines 给可读报错 + exit=1。
+const { reg: REGISTRY, lines: LINES, industry: industryLine } = initContentLines({ label: 'check-similarity' });
 
 /** 按 data/index.ts 的导出顺序返回 [{ key, file, id, screens[] }] —— 最后一个 = 最新一条 */
 function loadVideos() {
@@ -86,16 +89,56 @@ if (SHOW_ALL) {
   process.exit(0);
 }
 
-const newest = videos[videos.length - 1];
-const others = videos.slice(0, -1);
-const exemptions = new Map((REGISTRY.similarityExemptions || [])
-  .filter((e) => e.video === newest.id).map((e) => [e.fingerprint, e]));
+/** 按 ref-registry.contentLines 给每条视频判线；判不了 = 硬失败（拒绝"猜成行业线"或静默排除） */
+function classifyLine(v) {
+  return lineOf(v.id, LINES) || lineOf(v.key, LINES);
+}
+function applySimCheck(vs) {
+  const newest = vs[vs.length - 1];
+  const others = vs.slice(0, -1);
+  const exemptions = new Map((REGISTRY.similarityExemptions || [])
+    .filter((e) => e.video === newest.id).map((e) => [e.fingerprint, e]));
 
-const seen = new Map();
-others.forEach((v) => v.screens.forEach((s) => {
-  if (!seen.has(s.fp)) seen.set(s.fp, []);
-  seen.get(s.fp).push(`${v.id}`);
-}));
+  const seen = new Map();
+  others.forEach((v) => v.screens.forEach((s) => {
+    if (!seen.has(s.fp)) seen.set(s.fp, []);
+    seen.get(s.fp).push(`${v.id}`);
+  }));
+  return { newest, others, exemptions, seen };
+}
+
+// CHANGE-20260920-031 B3.3：现行指纹（`type + #ui`）、"index 最后一个导出 = 最新一条"、
+// 防伪组件层与 similarityExemptions 全部长在**行业线生产方法**上（一条视频一套专属 UI 语言）。
+// 因此：只对声明为 APPLY 的内容线执行；其他线一律显式暴露状态，
+// 既不得被 filter 静默丢弃（等于把教程片放进比对却不吭声），
+// 也不得机械套用行业判据去裁教程内容。
+const gateFailures = [];
+for (const v of videos) {
+  if (!classifyLine(v)) {
+    gateFailures.push(`${v.id}（导出名 ${v.key}）｜无法判定内容线 —— ref-registry.contentLines 未覆盖该片号形态，拒绝猜线`);
+  }
+}
+for (const l of LINES) {
+  if (!industryLine || l.id === industryLine.id) continue;
+  const items = videos.filter((v) => { const c = classifyLine(v); return c && c.id === l.id; });
+  if (!items.length) continue;
+  const applies = gateAppliesFor(REGISTRY, 'check-similarity', l);
+  if (applies === 'APPLY') {
+    gateFailures.push(`${items.map((i) => i.id).join('、')}｜内容线「${l.label}」被声明为 APPLY，但本闸门的跨片指纹约定（ui 必须带 gXX- 前缀）与防伪层只实现于行业线 —— 拒绝假装跨线通用，请为该线定义自己的结构判据`);
+  } else if (applies === 'OWNER_PENDING') {
+    gateFailures.push(`${items.map((i) => i.id).join('、')}｜内容线「${l.label}」在本闸门为 OWNER_PENDING —— 该线防换皮判据的权威 Owner 尚未建立，先立 Owner 再产出（不放行、不静默跳过）`);
+  } else {
+    console.log(`📤 ${items.map((i) => i.id).join('、')}｜${applies}（声明源：ref-registry.gateApplicability.gateOverrides['check-similarity']['${l.id}']）`);
+  }
+}
+if (gateFailures.length) {
+  console.log(`\n══════════════ 整屏结构相似度机检（SKILL 第 2 步）══════════════`);
+  console.log(`\n④ 内容线适用性  ❌ 硬失败 —— ${gateFailures.length} 处：`);
+  for (const x of gateFailures) console.log(`   ❌ ${x}`);
+  console.log('   依据：CHANGE-20260920-031 §3.2.1 五态与硬顺序（先立 Owner，再出现该线数据文件）。');
+  process.exit(1);
+}
+if (!industryLine) { console.error('❌ check-similarity：ref-registry 未声明 industry 内容线'); process.exit(1); }
 
 /** 防伪：声明了 ui 就必须有真组件（只改 ui 名仍指回共享组件 = 绕过闸门） */
 function checkBespoke(video) {
@@ -108,6 +151,14 @@ function checkBespoke(video) {
   return { missing: needs.filter((s) => !new RegExp(`\\b${s.ui.replaceAll('-', '\\-')}\\b`).test(idx)), noDir: false };
 }
 
+// 行业线内部语义保持不变：仍按 data/index.ts 的导出顺序取"本线最新一条"（registry 已声明
+// dataIndexOrderIsLineOrder=true for industry），基线 = 同线其余全部 → 与 Stage A 基线逐字一致。
+const industryVideos = videos.filter((v) => { const c = classifyLine(v); return c && c.id === industryLine.id; });
+if (!industryVideos.length) {
+  console.log('✅ 行业线暂无已产出视频（2026-08-29 清零重启），结构重复基线为空——新视频之间自当比对');
+  process.exit(0);
+}
+const { newest, others, exemptions, seen } = applySimCheck(industryVideos);
 const dups = newest.screens.map((s, i) => ({ ...s, n: i + 1 })).filter((s) => seen.has(s.fp));
 const unexempted = dups.filter((d) => !exemptions.has(d.fp));
 
