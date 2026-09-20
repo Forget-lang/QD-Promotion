@@ -13,25 +13,45 @@
  *
  * 用法（项目根运行）：node scripts/check-motif-card.mjs
  */
-import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { initContentLines, lineOf, gateAppliesFor } from './content-lines.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUTROOT = join(ROOT, 'outputs');
 const MUST_FIELDS = ['核心痛点', '情绪关键词', '视觉关键词', '禁止出现'];
 const ASSET_MARK = '背景素材张数';
+// 统一诊断边界 + 早置守卫（CHANGE-20260920-031 §3.2.1、负向 18）
+const { reg: REGISTRY, lines: LINES, industry: industryLine } = initContentLines({ label: 'check-motif-card' });
+if (!industryLine) {
+  console.error('❌ check-motif-card：ref-registry 未声明 industry 内容线 —— 拒绝把"无本线目录"误判为"基线为空"');
+  process.exit(1);
+}
+// 非产物目录白名单同样来自声明源，缺失即失败（不写死在脚本里造成第二口径）
+const NON_PIECE = (REGISTRY.pieceDirs && Array.isArray(REGISTRY.pieceDirs.nonPiecePatterns))
+  ? REGISTRY.pieceDirs.nonPiecePatterns.map((p) => new RegExp(p, 'i'))
+  : (() => {
+      console.error('❌ check-motif-card：ref-registry 未声明 pieceDirs.nonPiecePatterns —— 拒绝猜哪些目录不是产物目录');
+      process.exit(1);
+    })();
+const isNonPiece = (name) => NON_PIECE.some((re) => re.test(name));
 
-/** outputs 下的 gXX 目录（编号最大者 = 当前片） */
-function newestGammaDir() {
-  let best = null;
+/** outputs 下按内容线归类的产物目录 */
+function classifyDirs() {
+  const byLine = new Map();
+  const unknown = [];
   for (const d of readdirSync(OUTROOT)) {
     const p = join(OUTROOT, d);
     if (!statSync(p).isDirectory()) continue;
-    const m = /^g(\d+)/i.exec(d);
-    if (m && (!best || Number(m[1]) > best.n)) best = { n: Number(m[1]), path: p, name: d };
+    if (isNonPiece(d)) continue;
+    const l = lineOf(d, LINES);
+    if (!l) { unknown.push(d); continue; }
+    if (!byLine.has(l.id)) byLine.set(l.id, { line: l, dirs: [] });
+    byLine.get(l.id).dirs.push({ name: d, path: p, n: Number((d.match(new RegExp(`^${l.outputPrefix}(\\d+)`, 'i')) || [])[1] || 0) });
   }
-  return best;
+  for (const v of byLine.values()) v.dirs.sort((a, b) => a.n - b.n);
+  return { byLine, unknown };
 }
 
 function findMotif(dir) {
@@ -43,17 +63,46 @@ function findMotif(dir) {
 
 console.log('\n══════════════ 母题卡强制闸门（SKILL 第 2 步：视觉定位卡四栏 + 素材张数）══════════════\n');
 
-const gg = newestGammaDir();
+const { byLine, unknown } = classifyDirs();
+
+// B3.5 三防线之 1/3：非产物目录之外的未知目录不得静默忽略
+const gateFailures = [];
+for (const d of unknown) {
+  gateFailures.push(`${d}/｜outputs 下的目录无法判定内容线，且不在 pieceDirs.nonPiecePatterns 白名单 —— 拒绝静默忽略（是产物目录请补内容线声明，是工具目录请登记白名单）`);
+}
+// B3.5 三防线之 2：只对 APPLY 线执行判据；不可适用线输出带声明源的显式状态，不进入判据
+for (const [lineId, group] of byLine) {
+  if (lineId === industryLine.id) continue;
+  const applies = gateAppliesFor(REGISTRY, 'check-motif-card', group.line);
+  const names = group.dirs.map((x) => x.name).join('、');
+  if (applies === 'APPLY') {
+    gateFailures.push(`${names}｜内容线「${group.line.label}」被声明为 APPLY，但「视觉定位卡四栏 + 背景素材张数」是行业线第 2 步条款 —— 拒绝机械继承，请为该线定义自己的视觉卡判据`);
+  } else if (applies === 'OWNER_PENDING') {
+    gateFailures.push(`${names}｜内容线「${group.line.label}」在本闸门为 OWNER_PENDING —— 先立 Owner 再产出（不放行、不静默跳过）`);
+  } else {
+    console.log(`📤 ${names}｜${applies}（声明源：ref-registry.gateApplicability.gateOverrides['check-motif-card']['${lineId}']）—— 不进入本闸门判据`);
+  }
+}
+if (gateFailures.length) {
+  console.log(`\n④ 内容线适用性 / 目录归因  ❌ 硬失败 —— ${gateFailures.length} 处（未执行任何母题卡判据）：`);
+  for (const x of gateFailures) console.log(`   ❌ ${x}`);
+  console.log('   依据：CHANGE-20260920-031 §3.2.1 门状态即执行边界与硬顺序。');
+  process.exit(1);
+}
+
+const industryGroup = byLine.get(industryLine.id);
+const gg = industryGroup && industryGroup.dirs.length
+  ? industryGroup.dirs[industryGroup.dirs.length - 1]
+  : null;
 if (!gg) {
-  console.log('✅ outputs 下暂无 gXX 目录，母题卡基线为空——新片建母题一页时必含四栏 + 素材张数。');
+  console.log(`✅ ${industryLine.label}暂无 gXX 产物目录，母题卡基线为空——新片建母题一页时必含四栏 + 素材张数。`);
   process.exit(0);
 }
-if (!existsSync(join(gg.path, '03-母题一页.md')) && !findMotif(gg.path)) {
+const motif = findMotif(gg.path);
+if (!motif) {
   console.log(`⏭️ ${gg.name} 暂无母题一页，跳过（未到第 2 步产出；到产出时必含四栏 + 背景素材张数，否则本闸转红）。`);
   process.exit(0);
 }
-
-const motif = findMotif(gg.path);
 const src = readFileSync(motif, 'utf8');
 const missing = MUST_FIELDS.filter((f) => !src.includes(f));
 const hasAsset = src.includes(ASSET_MARK);

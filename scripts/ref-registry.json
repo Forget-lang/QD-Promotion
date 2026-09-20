@@ -68,6 +68,17 @@
     },
     "valueValidation": "content-lines.mjs 对 defaultApplicability 与 gateOverrides 取值做枚举校验；写入 OBSERVE2/PENDING/OPTIONAL 等非法值即报错，不静默当作合法态"
   },
+  "pieceDirs": {
+    "root": "outputs/",
+    "nonPiecePatterns": [
+      "^archive$",
+      "^bench$",
+      "^头像$",
+      "^样本库$"
+    ],
+    "rule": "nonPiecePatterns 只用于登记「不是任何内容线产物」的工具/素材目录；判定仍优先来自 contentLines。加新线请补 contentLines，不要用白名单掩盖未归因的产物目录。",
+    "source": "CHANGE-20260920-031 B3.5"
+  },
   "docsDir": "docs/internal",
   "extraDocs": [
     "AGENTS.md",
