@@ -187,6 +187,22 @@ if (existsSync(assetsFile)) {
   out(`- **C 级字体**（已 bundle）：${assets.C.map((f) => f.font).join('、')}`);
   const dTotal = assets.D.categories.reduce((n, c) => n + c.files.length, 0) + assets.D.banned.wecom.files.length + assets.D.banned.wechatSearch.files.length;
   out(`- **D 级截图**（${assets.D.dir}${dTotal} 张登记）：配图先查分类表；🚫 企微系 ${assets.D.banned.wecom.files.length} 张 + 微信搜索 ${assets.D.banned.wechatSearch.files.length} 张三平台禁用`);
+  // D-1 取证账本（CHANGE-20260920-031 §3.5）：与分类表分开计数，重复登记须显形而非静默相加
+  const ledger = Array.isArray(assets.D.screenshotLedger) ? assets.D.screenshotLedger : [];
+  if (ledger.length) {
+    const catFiles = new Set([
+      ...assets.D.categories.flatMap((c) => c.files),
+      ...assets.D.banned.wecom.files,
+      ...assets.D.banned.wechatSearch.files,
+    ]);
+    const only = ledger.filter((s) => s?.localFileName && !catFiles.has(s.localFileName)).length;
+    const dup = ledger.filter((s) => s?.localFileName && catFiles.has(s.localFileName));
+    const verified = ledger.filter((s) => s?.verificationStatus === 'current-verified').length;
+    const reference = ledger.filter((s) => s?.verificationStatus === 'reference-only').length;
+    out(`- **D-1 取证账本**：${ledger.length} 条（current-verified ${verified} 可教学 / reference-only ${reference} 仅参考；仅账本 ${only} 条）${dup.length ? `；❌ 与分类表重复登记 ${dup.length} 条（双登记，check-facts 判失败）` : ''}`);
+  } else {
+    out('- **D-1 取证账本**：0 条（未启用；教程线上屏截图须登记后使用）');
+  }
 } else {
   out('（spec/assets.json 未建）');
 }
