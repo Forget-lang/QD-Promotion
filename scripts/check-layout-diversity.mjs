@@ -17,24 +17,22 @@
  * 用法：node scripts/check-layout-diversity.mjs
  * 退出码：0 = 通过；1 = 有硬失败（缺标注 / 未豁免的同布局碰撞）。
  */
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { getContentLines, lineOf, lineNumericId, loadRegistry, gateAppliesFor } from './content-lines.mjs';
+import { initContentLines, lineOf, lineNumericId, gateAppliesFor } from './content-lines.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DATA = join(ROOT, 'video', 'src', 'data');
-const REGFILE = join(ROOT, 'scripts', 'ref-registry.json');
-const REGISTRY = loadRegistry();
 
-const waivers = existsSync(REGFILE) ? (JSON.parse(readFileSync(REGFILE, 'utf8')).layoutWaivers || []) : [];
+// CHANGE-20260920-031：registry 只解析一次（由 initContentLines 负责读盘与失败诊断），
+// 本脚本不再自行 readFileSync + JSON.parse —— 否则声明源损坏时会从这里抛出未捕获堆栈。
+const { reg: REGISTRY, lines: LINES, industry: industryLine } = initContentLines({
+  label: 'check-layout-diversity',
+});
+const waivers = REGISTRY.layoutWaivers || [];
 
-// CHANGE-20260920-031：片号身份改由 ref-registry 的内容线声明决定，不再各脚本自写 /^g\d+\.ts$/。
-// 原写法有两个后果：非行业内容线被静默排除，且"上一条"依赖数组顺序而非线内数字序。
-// 本闸门现行判据（同 type 屏不得同 layoutKind）只在行业线内成立；
-// 其他内容线**不得再次被 filter 掉**——那等于把刚消灭的静默跳过换个写法留下。
-const LINES = getContentLines();
-const industryLine = (LINES || []).find((l) => l.id === 'industry') || null;
+// 片号身份由声明决定，不写死 g 前缀；非本线目标不得被 filter 抹掉（详见契约 §3.2.1 五态）。
 if (!industryLine) {
   console.error('❌ check-layout-diversity：ref-registry 未声明 industry 内容线 —— 拒绝退回硬编码 g 前缀');
   process.exit(1);

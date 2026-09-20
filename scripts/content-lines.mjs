@@ -43,6 +43,51 @@ export function assertApplicability(value, where, reg = loadRegistry()) {
   );
 }
 
+/** 兜底枚举（registry 可读时以 gateApplicability.values 为真源） */
+const FALLBACK_ENUM = BUILTIN_APPLICABILITY;
+function enumKeysOf(text, reg) {
+  if (reg?.gateApplicability?.values) return Object.keys(reg.gateApplicability.values);
+  const m = text && text.match(/"gateApplicability"\s*:\s*\{\s*"values"\s*:\s*\{([^}]*)\}/);
+  if (m) {
+    const keys = [...m[1].matchAll(/"([A-Z_]+)"\s*:/g)].map((x) => x[1]);
+    if (keys.length) return keys;
+  }
+  return FALLBACK_ENUM;
+}
+
+/**
+ * 消费者统一入口：一次完成"读 registry → 解析 contentLines → 枚举校验"。
+ * 契约 CHANGE-20260920-031 §3.2.1 要求：无论非法值出现在 defaultApplicability 还是
+ * gateOverrides，所有闸门都必须得到**同一种可读诊断 ＋ exit=1**，不得抛未捕获堆栈。
+ * 本函数因此自带 try/catch（含 registry JSON 本身损坏、contentLines 缺失等更早的失败点）。
+ */
+export function initContentLines({ label = 'content-lines', root = ROOT } = {}) {
+  let reg;
+  let raw;
+  try {
+    raw = readFileSync(join(root, 'scripts', 'ref-registry.json'), 'utf8');
+    reg = JSON.parse(raw);
+  } catch (e) {
+    console.error(`❌ ${label}：无法读取或解析 scripts/ref-registry.json —— ${e.message}`);
+    console.error('   判线声明源不可用，拒绝退回硬编码 g 前缀。');
+    process.exit(1);
+  }
+  try {
+    const lines = getContentLines(reg);
+    if (!lines) {
+      console.error(`❌ ${label}：ref-registry 未声明 contentLines —— 判线声明缺失，拒绝退回硬编码 g 前缀`);
+      process.exit(1);
+    }
+    return { reg, lines, industry: lines.find((l) => l.id === 'industry') || null };
+  } catch (e) {
+    console.error(`❌ ${label}：内容线声明非法 —— ${e.message}`);
+    console.error(
+      `   合法值：${enumKeysOf(raw, reg).join(' / ')}；修法：校正 ref-registry.contentLines / gateApplicability。`,
+    );
+    process.exit(1);
+  }
+}
+
 /** 取内容线声明；缺失时返回 null，由调用方显式失败——禁止静默回退到"行业线" */
 export function getContentLines(reg = loadRegistry()) {
   const lines = Array.isArray(reg.contentLines) ? reg.contentLines : null;

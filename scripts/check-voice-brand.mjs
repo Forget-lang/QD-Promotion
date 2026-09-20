@@ -16,14 +16,14 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { getContentLines, lineOf, loadRegistry, gateAppliesFor } from './content-lines.mjs';
+import { initContentLines, lineOf, gateAppliesFor } from './content-lines.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dataDir = join(ROOT, 'video', 'src', 'data');
 const BRAND = '券到卡包';
 const EXEMPT = new Set(['g06', 'g07', 'g08', 'g09']);
-const LINES = getContentLines();
-const REG = loadRegistry();
+// 统一诊断边界（CHANGE-20260920-031 §3.2.1）：声明源不可用/非法 → 可读报错 + exit=1，不抛裸堆栈
+const { reg: REG, lines: LINES } = initContentLines({ label: 'check-voice-brand' });
 
 const files = readdirSync(dataDir)
   .filter((f) => f.endsWith('.ts') && f !== 'index.ts')
