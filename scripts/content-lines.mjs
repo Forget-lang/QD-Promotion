@@ -19,8 +19,12 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const loadRegistry = () =>
   JSON.parse(readFileSync(join(ROOT, 'scripts', 'ref-registry.json'), 'utf8'));
 
-/** 合法 applicability 声明值（枚举真源仍是 ref-registry.gateApplicability.values；这里只作兜底） */
-export const BUILTIN_APPLICABILITY = ['APPLY', 'OBSERVE', 'N/A', 'OWNER_PENDING'];
+/**
+ * 合法 applicability 声明值（枚举真源仍是 ref-registry.gateApplicability.values；这里只作兜底）。
+ * 注意：`EXPLICIT_REQUIRED` 是 **defaultApplicability 专用策略值**（"该线不设默认、逐闸必须显式声明"），
+ * **不是闸门结果态**——出现在 gateOverrides 一律拒绝（CHANGE-20260920-032 §3.5.1）。
+ */
+export const BUILTIN_APPLICABILITY = ['APPLY', 'OBSERVE', 'N/A', 'OWNER_PENDING', 'EXPLICIT_REQUIRED'];
 
 function applicabilityEnum(reg) {
   const declared = reg?.gateApplicability?.values;
@@ -84,6 +88,12 @@ export function initContentLines({ label = 'content-lines', root = ROOT } = {}) 
     for (const [gate, byLine] of Object.entries(overrides)) {
       for (const [lineId, value] of Object.entries(byLine || {})) {
         assertApplicability(value, `gateApplicability.gateOverrides['${gate}']['${lineId}']`, reg);
+        // 作用域校验（CHANGE-20260920-032 §3.5.1）：EXPLICIT_REQUIRED 只允许出现在 defaultApplicability。
+        if (value === 'EXPLICIT_REQUIRED') {
+          throw new Error(
+            `content-lines：gateApplicability.gateOverrides['${gate}']['${lineId}'] 不允许使用 EXPLICIT_REQUIRED —— 它是 defaultApplicability 专用策略值（该线不设默认、逐闸必须声明），不是闸门结果态；请改为 APPLY / OBSERVE / N/A`,
+          );
+        }
       }
     }
     return { reg, lines, industry: lines.find((l) => l.id === 'industry') || null };
@@ -154,6 +164,9 @@ export function sortByLineNumeric(items, keyOf = (x) => x) {
 /**
  * 某个闸门对某条内容线是否适用 —— 声明优先，缺失即报错（拒绝隐式 applicability）。
  * 查找顺序：gateOverrides[gateKey] → 该线 defaultApplicability。
+ * 特例（CHANGE-20260920-032 §3.5.1）：默认位为 `EXPLICIT_REQUIRED` 时**抛硬错误、不返回任何状态**——
+ * 它表示"该线不设默认、逐闸必须显式声明"，未登记的新闸门绝不能因此静默得到 N/A。
+ * 于是闸门只可能收到 APPLY / OBSERVE / N/A / OWNER_PENDING 四种结果。
  */
 export function gateAppliesFor(reg, gateKey, line) {
   if (!line) {
@@ -168,6 +181,11 @@ export function gateAppliesFor(reg, gateKey, line) {
   const fallback = line.defaultApplicability;
   if (!fallback) {
     throw new Error(`content-lines：内容线 ${line.id} 未声明 defaultApplicability，拒绝猜默认值`);
+  }
+  if (fallback === 'EXPLICIT_REQUIRED') {
+    throw new Error(
+      `content-lines：闸门「${gateKey}」尚未对内容线「${line.label || line.id}」声明适用性 —— 该线不设默认（EXPLICIT_REQUIRED）；请在 ref-registry.gateApplicability.gateOverrides['${gateKey}']['${line.id}'] 登记 APPLY / OBSERVE / N/A 后再运行（见 CHANGE-20260920-032 §3.5.1）`,
+    );
   }
   return assertApplicability(fallback, `contentLines[${line.id}].defaultApplicability`, reg);
 }

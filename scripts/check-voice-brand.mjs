@@ -50,8 +50,8 @@ for (const f of files) {
     applies = gateAppliesFor(REG, 'check-voice-brand', line);
   } catch (e) {
     // 声明非法（枚举外取值等）：报可读错误并停，不抛未捕获堆栈——让 gate-all 能显示可诊断的一行
-    console.error(`❌ check-voice-brand：内容线声明非法 —— ${e.message}`);
-    console.error('   修法：校正 ref-registry.gateApplicability / contentLines，取值须在 gateApplicability.values 已注册枚举内。');
+    console.error(`❌ check-voice-brand：内容线适用性声明问题 —— ${e.message}`);
+    console.error('   修法：核对 ref-registry.gateApplicability —— 每个闸门对每条线须显式声明（APPLY/OBSERVE/N/A）；取值须在已注册枚举内。');
     process.exit(1);
   }
   if (applies === 'OWNER_PENDING') {

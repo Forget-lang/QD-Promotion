@@ -73,7 +73,13 @@ for (const d of unknown) {
 // B3.5 三防线之 2：只对 APPLY 线执行判据；不可适用线输出带声明源的显式状态，不进入判据
 for (const [lineId, group] of byLine) {
   if (lineId === industryLine.id) continue;
-  const applies = gateAppliesFor(REGISTRY, 'check-motif-card', group.line);
+  let applies;
+  try { applies = gateAppliesFor(REGISTRY, 'check-motif-card', group.line); }
+  catch (e) {
+    console.error(`❌ check-motif-card：内容线适用性声明问题 —— ${e.message}`);
+    console.error('   修法：核对 ref-registry.gateApplicability —— 每个闸门对每条线须显式声明（APPLY/OBSERVE/N/A）；取值须在已注册枚举内。');
+    process.exit(1);
+  }
   const names = group.dirs.map((x) => x.name).join('、');
   if (applies === 'APPLY') {
     gateFailures.push(`${names}｜内容线「${group.line.label}」被声明为 APPLY，但「视觉定位卡四栏 + 背景素材张数」是行业线第 2 步条款 —— 拒绝机械继承，请为该线定义自己的视觉卡判据`);

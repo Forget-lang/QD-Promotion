@@ -36,6 +36,16 @@ const SHOW_ALL = process.argv.includes('--all');
 // 声明源不可用/非法一律由 initContentLines 给可读报错 + exit=1。
 const { reg: REGISTRY, lines: LINES, industry: industryLine } = initContentLines({ label: 'check-similarity' });
 
+// 未声明（EXPLICIT_REQUIRED 命中）与声明非法同走可读报错 + exit 1，不抛裸堆栈（CHANGE-20260920-032 §3.5.1）
+const appliesOrExit = (line) => {
+  try { return gateAppliesFor(REGISTRY, 'check-similarity', line); }
+  catch (e) {
+    console.error(`❌ check-similarity：内容线适用性声明问题 —— ${e.message}`);
+    console.error('   修法：核对 ref-registry.gateApplicability —— 每个闸门对每条线须显式声明（APPLY/OBSERVE/N/A）；取值须在已注册枚举内。');
+    process.exit(1);
+  }
+};
+
 /**
  * 返回 { registered, unregistered }
  *  - registered：按 data/index.ts 的导出顺序（行业线"最新一条"仍以这里最后一个为准）
@@ -125,7 +135,7 @@ function collectGateFailures(items) {
     traversed.add(l.id);
     const group = items.filter((v) => { const c = classifyLine(v); return c && c.id === l.id; });
     if (!group.length) continue;
-    const applies = gateAppliesFor(REGISTRY, 'check-similarity', l);
+    const applies = appliesOrExit(l);
     if (applies === 'APPLY') {
       failures.push(`${group.map((i) => i.id).join('、')}｜内容线「${l.label}」被声明为 APPLY，但本闸门的跨片指纹约定（ui 必须带 gXX- 前缀）与防伪层只实现于行业线 —— 拒绝假装跨线通用，请为该线定义自己的结构判据`);
     } else if (applies === 'OWNER_PENDING') {
@@ -169,7 +179,7 @@ if (SHOW_ALL) {
   for (const v of videos) {
     const l = classifyLine(v);
     if (!l) continue;
-    if (gateAppliesFor(REGISTRY, 'check-similarity', l) !== 'APPLY') continue;
+    if (appliesOrExit(l) !== 'APPLY') continue;
     if (!groups.has(l.id)) groups.set(l.id, { label: l.label, items: [] });
     groups.get(l.id).items.push(v);
   }

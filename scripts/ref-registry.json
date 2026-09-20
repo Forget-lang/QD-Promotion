@@ -18,17 +18,18 @@
       "idPattern": "^f\\d+$",
       "legacyNoPrefixMeans": false,
       "dataIndexOrderIsLineOrder": false,
-      "defaultApplicability": "OWNER_PENDING",
-      "source": "CHANGE-20260920-031；教程 Owner 由后继事务建立，未建立前命中即显式失败，不得静默跳过"
+      "defaultApplicability": "EXPLICIT_REQUIRED",
+      "source": "CHANGE-20260920-032：教程 Owner 已建立（docs/internal/产品功能教程作业规范.md）；本线不设默认适用性——逐闸必须显式声明，未登记即硬失败（不得静默落 N/A）"
     }
   ],
   "gateApplicability": {
     "version": 1,
     "values": {
       "APPLY": "按该闸门现行判据执行",
-      "OBSERVE": "照测照出读数，但不判红（仅用于教程线 motion；不得借用 motionWaivers 通道）",
+      "OBSERVE": "照测照出读数，但不判红（教程线 motion 与安全区探针）；不得借用 motionWaivers／safeAreaWaivers 通道",
       "N/A": "不适用本线；必须显式输出 N/A 加声明源，不得 filter 掉目标",
-      "OWNER_PENDING": "该线权威 Owner 未建立 → 命中即显式硬失败，不放行也不静默跳过"
+      "OWNER_PENDING": "该线权威 Owner 未建立 → 命中即显式硬失败，不放行也不静默跳过",
+      "EXPLICIT_REQUIRED": "仅作内容线的 defaultApplicability 使用：该线不设默认适用性，每个闸门必须显式登记 APPLY/OBSERVE/N/A；未登记即硬失败，不得当作 N/A"
     },
     "gateOverrides": {
       "check-bg": {
@@ -38,13 +39,13 @@
         "tutorial": "N/A"
       },
       "check-layout-diversity": {
-        "tutorial": "OWNER_PENDING"
+        "tutorial": "N/A"
       },
       "check-voice-brand": {
-        "tutorial": "OWNER_PENDING"
+        "tutorial": "N/A"
       },
       "check-similarity": {
-        "tutorial": "OWNER_PENDING"
+        "tutorial": "N/A"
       },
       "check-ui-truth": {
         "tutorial": "APPLY"
@@ -60,13 +61,16 @@
       },
       "gate-all-motion-observation": {
         "tutorial": "OBSERVE"
+      },
+      "gate-all-safearea-observation": {
+        "tutorial": "OBSERVE"
       }
     },
     "note": null,
     "nonDeclaredFailureStates": {
       "UNKNOWN_TARGET": "目标无法判定内容线（不在 contentLines 声明内）→ 运行时硬失败；它不是声明值，故不入 values 枚举"
     },
-    "valueValidation": "content-lines.mjs 对 defaultApplicability 与 gateOverrides 取值做枚举校验；写入 OBSERVE2/PENDING/OPTIONAL 等非法值即报错，不静默当作合法态"
+    "valueValidation": "content-lines.mjs 对 defaultApplicability 与 gateOverrides 取值做枚举校验；写入 OBSERVE2/PENDING/OPTIONAL 等非法值即报错，不静默当作合法态；并拒绝 EXPLICIT_REQUIRED 出现在 gateOverrides（默认位专用策略值，见 CHANGE-20260920-032 §3.5.1）"
   },
   "pieceDirs": {
     "root": "outputs/",

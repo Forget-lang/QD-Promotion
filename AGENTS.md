@@ -20,7 +20,7 @@
 |---|---|---|
 | AI 自动入口 / 项目治理 | `AGENTS.md` | 路由、边界、全局纪律 |
 | 行业场景视频生产 | `SKILL.md` | 行业线一条视频从开工到发布的完整工作流 |
-| 产品功能教程生产 | 产品功能教程作业规范（拟落 docs/internal/，**由后继事务建立**） | 教程线方法 Owner；建立前该线数据/产物一律 OWNER_PENDING 硬失败 |
+| 产品功能教程生产 | `docs/internal/产品功能教程作业规范.md` | 教程线方法 Owner（判线与闸门适用性声明源在 `scripts/ref-registry.json`） |
 | 产品能力/字段/数字/限制 | `APPLET / spec/` | Product Truth |
 | 产品事实源解析 | `docs/internal/R10-产品事实源解析协议.md` | 如何定位 Product Truth |
 | 内容资源职责边界 | `docs/internal/内容资源调用协议.md` | 官网、爆款、玩法版图、Product Truth 的职责边界 |
@@ -46,7 +46,7 @@
 ```text
 AGENTS（唯一入口）
 → 行业场景视频：SKILL.md
-   产品功能教程：产品功能教程作业规范（后继事务建立）
+   产品功能教程：docs/internal/产品功能教程作业规范.md
 → 当前产物
 → Gate / 人工验收
 ```

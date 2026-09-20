@@ -78,7 +78,13 @@ for (const l of LINES) {
   traversed.add(l.id);
   const group = videos.filter((v) => { const c = classifyLine(v); return c && c.id === l.id; });
   if (!group.length) continue;
-  const applies = gateAppliesFor(REGISTRY, 'check-bg', l);
+  let applies;
+  try { applies = gateAppliesFor(REGISTRY, 'check-bg', l); }
+  catch (e) {
+    console.error(`❌ check-bg：内容线适用性声明问题 —— ${e.message}`);
+    console.error('   修法：核对 ref-registry.gateApplicability —— 每个闸门对每条线须显式声明（APPLY/OBSERVE/N/A）；取值须在已注册枚举内。');
+    process.exit(1);
+  }
   if (applies === 'APPLY') {
     gateFailures.push(`${group.map((i) => i.id).join('、')}｜内容线「${l.label}」被声明为 APPLY，但「每片必设 bgImage」是行业线视觉条款 —— 拒绝机械继承，请为该线显式判定（APPLY 需先补该线判据，否则改 N/A/OWNER_PENDING）`);
   } else if (applies === 'OWNER_PENDING') {

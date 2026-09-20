@@ -168,7 +168,7 @@ const lineArg = (() => {
 })();
 const applicabilityOf = (gateKey, line) => {
   try { return gateAppliesFor(REGISTRY, gateKey, line); }
-  catch (e) { console.error(`❌ gate-all：内容线声明非法 —— ${e.message}`); process.exit(1); }
+  catch (e) { console.error(`❌ gate-all：内容线适用性声明问题 —— ${e.message}`); process.exit(1); }
 };
 
 const { byLine, unknown } = collectOutputDirs();
