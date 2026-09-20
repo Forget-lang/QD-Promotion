@@ -78,6 +78,14 @@ export function initContentLines({ label = 'content-lines', root = ROOT } = {}) 
       console.error(`❌ ${label}：ref-registry 未声明 contentLines —— 判线声明缺失，拒绝退回硬编码 g 前缀`);
       process.exit(1);
     }
+    // 统一入口预检：gateOverrides **全量**校验，不等某个消费者用到那条线才发现。
+    // 否则"非法值只在被消费时炸"会让一个只有别的闸门用到的坏账安静躺着（CHANGE-20260920-031 §3.2.1）。
+    const overrides = reg?.gateApplicability?.gateOverrides || {};
+    for (const [gate, byLine] of Object.entries(overrides)) {
+      for (const [lineId, value] of Object.entries(byLine || {})) {
+        assertApplicability(value, `gateApplicability.gateOverrides['${gate}']['${lineId}']`, reg);
+      }
+    }
     return { reg, lines, industry: lines.find((l) => l.id === 'industry') || null };
   } catch (e) {
     console.error(`❌ ${label}：内容线声明非法 —— ${e.message}`);
