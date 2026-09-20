@@ -113,6 +113,7 @@ function applySimCheck(vs) {
  */
 function collectGateFailures(items) {
   const failures = [];
+  const notes = [];
   for (const v of items) {
     if (!classifyLine(v)) {
       failures.push(`${v.id}（导出名 ${v.key || v.file}）｜无法判定内容线 —— ref-registry.contentLines 未覆盖该片号形态，拒绝猜线`);
@@ -128,26 +129,39 @@ function collectGateFailures(items) {
     } else if (applies === 'OWNER_PENDING') {
       failures.push(`${group.map((i) => i.id).join('、')}｜内容线「${l.label}」在本闸门为 OWNER_PENDING —— 该线防换皮判据的权威 Owner 尚未建立，先立 Owner 再产出（不放行、不静默跳过）`);
     } else {
-      console.log(`📤 ${group.map((i) => i.id).join('、')}｜${applies}（声明源：ref-registry.gateApplicability.gateOverrides['check-similarity']['${l.id}']）`);
+      notes.push(`📤 ${group.map((i) => i.id).join('、')}｜${applies}（声明源：ref-registry.gateApplicability.gateOverrides['check-similarity']['${l.id}']）`);
     }
   }
   for (const u of unregistered) {
     const l = lineOf(u.id, LINES);
     failures.push(`${u.file}｜存在于 data/ 但未注册进 data/index.ts（线：${l ? l.label : '无法判定'}）—— 拒绝让它对本闸门静默不可见；要么完成注册链，要么移走该文件`);
   }
-  return failures;
+  return { failures, notes };
 }
 
-const gateFailures = collectGateFailures(videos);
+const gateCheck = collectGateFailures(videos);
+const gateFailures = gateCheck.failures;
 
 // --all 是基线取证模式，但同样不得跨内容线比较（返修点 1）：按线分组输出。
 if (SHOW_ALL) {
-  console.log('=== 全部已产出视频的整屏结构指纹（按内容线分组） ===');
-  for (const v of videos) console.log(`${v.id.padEnd(24)} ${v.screens.length} 屏: ${v.screens.map(s => s.fp).join(' → ')}`);
+  // 取证输出同样不跨线混列：只列本线（行业）指纹，他线指纹不进本闸门的证据面。
+  const industryForShow = videos.filter((v) => { const c = classifyLine(v); return c && c.id === industryLine?.id; });
+  console.log('=== 整屏结构指纹｜内容线：行业场景攻略（industry）===');
+  for (const v of industryForShow) console.log(`${v.id.padEnd(24)} ${v.screens.length} 屏: ${v.screens.map(s => s.fp).join(' → ')}`);
+  // B3.3 返修点 3：门状态一旦判为不可适用，**不得继续执行行业判据**——
+  // 旧写法是"照样两两比较、最后才 exit 1"，等于一边宣布 OWNER_PENDING 一边用行业尺子裁教程内容。
+  if (gateFailures.length) {
+    console.log('\n④ 内容线适用性 / 注册链  ❌ 硬失败（已停止任何两两比较）：');
+    for (const x of gateFailures) console.log(`   ❌ ${x}`);
+    process.exit(1);
+  }
+  // 只对声明为 APPLY 的内容线分组比较（结构上排除"对 OWNER_PENDING 线跑判据"）
+  for (const n of gateCheck.notes) console.log(n);
   const groups = new Map();
   for (const v of videos) {
     const l = classifyLine(v);
-    if (!l) continue;                       // 判不了线由 gateFailures 报告
+    if (!l) continue;
+    if (gateAppliesFor(REGISTRY, 'check-similarity', l) !== 'APPLY') continue;
     if (!groups.has(l.id)) groups.set(l.id, { label: l.label, items: [] });
     groups.get(l.id).items.push(v);
   }
@@ -162,11 +176,7 @@ if (SHOW_ALL) {
           console.log(`${vs[j].id} vs ${vs[i].id}: ${hits.map(([fp, n, p]) => `S${n}=${fp}(对 ${vs[i].id} S${p.join('/')})`).join('; ')}`);
       }
   }
-  if (gateFailures.length) {
-    console.log('\n④ 内容线适用性 / 注册链  ❌ 硬失败：');
-    for (const x of gateFailures) console.log(`   ❌ ${x}`);
-  }
-  process.exit(gateFailures.length ? 1 : 0);
+  process.exit(0);
 }
 
 if (gateFailures.length) {
@@ -177,6 +187,7 @@ if (gateFailures.length) {
   process.exit(1);
 }
 if (!industryLine) { console.error('❌ check-similarity：ref-registry 未声明 industry 内容线'); process.exit(1); }
+for (const n of gateCheck.notes) console.log(n);
 
 /** 防伪：声明了 ui 就必须有真组件（只改 ui 名仍指回共享组件 = 绕过闸门） */
 function checkBespoke(video) {
