@@ -20,18 +20,19 @@
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { getContentLines, lineOf, lineNumericId } from './content-lines.mjs';
+import { getContentLines, lineOf, lineNumericId, loadRegistry, gateAppliesFor } from './content-lines.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DATA = join(ROOT, 'video', 'src', 'data');
-const REG = join(ROOT, 'scripts', 'ref-registry.json');
+const REGFILE = join(ROOT, 'scripts', 'ref-registry.json');
+const REGISTRY = loadRegistry();
 
-const waivers = existsSync(REG) ? (JSON.parse(readFileSync(REG, 'utf8')).layoutWaivers || []) : [];
+const waivers = existsSync(REGFILE) ? (JSON.parse(readFileSync(REGFILE, 'utf8')).layoutWaivers || []) : [];
 
 // CHANGE-20260920-031：片号身份改由 ref-registry 的内容线声明决定，不再各脚本自写 /^g\d+\.ts$/。
 // 原写法有两个后果：非行业内容线被静默排除，且"上一条"依赖数组顺序而非线内数字序。
-// 本闸门现行判据只在行业线内成立（同 type 屏不得同 layoutKind），
-// 教程线的布局判据待其 Owner 建立后另定 —— 见 031 §八 阶段 B 与后继事务。
+// 本闸门现行判据（同 type 屏不得同 layoutKind）只在行业线内成立；
+// 其他内容线**不得再次被 filter 掉**——那等于把刚消灭的静默跳过换个写法留下。
 const LINES = getContentLines();
 const industryLine = (LINES || []).find((l) => l.id === 'industry') || null;
 if (!industryLine) {
@@ -39,20 +40,48 @@ if (!industryLine) {
   process.exit(1);
 }
 
-const vids = readdirSync(DATA)
+const lineProblems = [];   // 硬失败：判不了线 / Owner 未建立
+const lineSkips = [];      // 显式声明：N/A（带声明源，不是静默跳过）
+const classified = readdirSync(DATA)
   .filter((f) => f.endsWith('.ts') && f !== 'index.ts')
   .map((f) => ({ file: f, id: f.replace(/\.ts$/, '') }))
-  .filter((v) => {
-    const l = lineOf(v.id, LINES);
-    return !!l && l.id === industryLine.id;
-  })
+  .map((v) => ({ ...v, line: lineOf(v.id, LINES) }));
+
+for (const v of classified) {
+  if (v.line) continue;
+  lineProblems.push(`${v.file}｜无法判定内容线（ref-registry.contentLines 未覆盖该片号形态）—— 拒绝静默过滤，请补声明或改名`);
+}
+for (const l of LINES) {
+  if (l.id === industryLine.id) continue;
+  const items = classified.filter((v) => v.line && v.line.id === l.id);
+  if (!items.length) continue;
+  const applies = gateAppliesFor(REGISTRY, 'check-layout-diversity', l);
+  if (applies === 'OWNER_PENDING') {
+    lineProblems.push(`${items.map((i) => i.file).join('、')}｜内容线「${l.label}」在本闸门为 OWNER_PENDING —— 该线布局判据的权威 Owner 尚未建立，先立 Owner 再产出（不放行、不过滤、不静默跳过）`);
+  } else if (applies === 'N/A') {
+    lineSkips.push(`${items.map((i) => i.file).join('、')}｜N/A（声明源：ref-registry.gateApplicability.gateOverrides['check-layout-diversity']['${l.id}']）`);
+  } else if (applies === 'APPLY') {
+    lineProblems.push(`${items.map((i) => i.file).join('、')}｜内容线「${l.label}」被声明为 APPLY，但本闸门现行判据只实现于行业线 —— 拒绝假装跨线通用，请补该线判据或改判 OWNER_PENDING`);
+  }
+}
+
+const vids = classified
+  .filter((v) => v.line && v.line.id === industryLine.id)
   .map((v) => ({ ...v, n: lineNumericId(v.file, LINES), line: industryLine.id }))
   .sort((a, b) => a.n - b.n);
 
+if (lineProblems.length) {
+  console.log(`③ 内容线适用性  ❌ 硬失败 —— ${lineProblems.length} 处：`);
+  for (const x of lineProblems) console.log(`   ❌ ${x}`);
+}
+if (lineSkips.length) {
+  console.log(`③′ 内容线显式声明不适用（非静默跳过）：`);
+  for (const x of lineSkips) console.log(`   📤 ${x}`);
+}
+
 if (vids.length < 2) {
-  console.log('\n══════════════ 布局指纹闸门（check-layout-diversity）══════════════\n');
-  console.log('⏭️ 跳过 —— 不足两条已产出视频，无上一条可比（首片开工时正常）。');
-  process.exit(0);
+  console.log('⏭️ 行业线不足两条已产出视频，无上一条可比（首片开工时正常）。');
+  process.exit(lineProblems.length ? 1 : 0);
 }
 const newest = vids[vids.length - 1];
 const prev = vids[vids.length - 2];
@@ -105,7 +134,7 @@ for (const s of newScenes) {
   }
 }
 
-let fail = false;
+let fail = lineProblems.length > 0;   // ③ 内容线适用性问题同样计入硬失败
 if (missing.length) {
   fail = true;
   console.log(`\n① 新片缺布局标注  ❌ 硬失败 —— ${missing.length} 处：`);
