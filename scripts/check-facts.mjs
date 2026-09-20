@@ -52,11 +52,45 @@ for (const r of registered) {
 // D 级截图是外部速查库；仓库只保存登记表，不把截图库复制进 CI checkout。
 const dDir = join(ROOT, ASSETS.D.dir);
 const diskFiles = existsSync(dDir) ? readdirSync(dDir).filter((f) => !f.startsWith('.')) : [];
+// CHANGE-20260920-031：D.screenshotLedger 与 categories/banned 同属"已登记"集合，
+// 否则教程用的每张当前截图会被下面判成"磁盘有但未登记"，且台账会变成第二份登记面。
+const ledger = Array.isArray(ASSETS.D.screenshotLedger) ? ASSETS.D.screenshotLedger : [];
+const ledgerFiles = ledger.map((s) => String(s?.localFileName ?? ''));
 const registeredD = new Set([
   ...ASSETS.D.categories.flatMap((c) => c.files),
   ...ASSETS.D.banned.wecom.files,
   ...ASSETS.D.banned.wechatSearch.files,
+  ...ledgerFiles.filter(Boolean),
 ]);
+
+// ── D-1 截图取证账本结构校验（真值语义迁移，见 CHANGE-20260920-031 §3.5）──
+// 证据链主锚：screenshotId → sha256 → appletSnapshot → truthRef → sourceLocation；
+// capturedAt 只是采集时间元数据，不能单独证明截图对应的源码状态，故不计入主锚必填项。
+const LEDGER_REQUIRED = ['screenshotId', 'localFileName', 'sha256', 'appletSnapshot', 'truthRef', 'sourceLocation', 'verificationStatus'];
+const LEDGER_STATUS = new Set(['reference-only', 'current-verified']);
+const ledgerProblems = [];
+const seenIds = new Set();
+ledger.forEach((s, i) => {
+  const at = `screenshotLedger[${i}]`;
+  for (const k of LEDGER_REQUIRED) {
+    if (s?.[k] === undefined || String(s[k]).trim() === '') ledgerProblems.push(`${at}.${k} 缺失或为空`);
+  }
+  if (s?.screenshotId) {
+    if (seenIds.has(s.screenshotId)) ledgerProblems.push(`${at}.screenshotId 重复：${s.screenshotId}`);
+    seenIds.add(s.screenshotId);
+  }
+  if (s?.verificationStatus && !LEDGER_STATUS.has(s.verificationStatus)) {
+    ledgerProblems.push(`${at}.verificationStatus 取值非法：${s.verificationStatus}（只允许 reference-only / current-verified）`);
+  }
+  if (s?.sha256 && !/^[0-9a-f]{64}$/i.test(String(s.sha256))) ledgerProblems.push(`${at}.sha256 不是 64 位十六进制`);
+  if (s?.localFileName && String(s.localFileName).includes('/')) ledgerProblems.push(`${at}.localFileName 不得含目录前缀（应为裸文件名，目录由 D.dir 承载）`);
+  if (s?.localFileName && existsSync(dDir) && !diskFiles.includes(s.localFileName)) ledgerProblems.push(`${at}.localFileName 在本地素材库中不存在：${s.localFileName}`);
+});
+// 同一张图同时进 categories 与 ledger = 双登记面，会造成展示与统计口径分叉
+const dupLedger = ledgerFiles.filter((f) => f && ASSETS.D.categories.some((c) => c.files.includes(f)));
+if (dupLedger.length) for (const f of new Set(dupLedger)) ledgerProblems.push(`screenshotLedger 与 D.categories 重复登记同一文件：${f}`);
+for (const p of ledgerProblems) console.log(`   ❌ D-1 取证账本：${p}`);
+if (ledgerProblems.length) fails.push({ desc: `D-1 取证账本（${ledgerProblems.length} 项问题）`, path: 'spec/assets.json', stage: '②' });
 if (!existsSync(dDir)) {
   external.push({ desc: `D 级截图速查库（${registeredD.size} 项登记）`, path: ASSETS.D.dir, stage: '②', reason: 'external screenshot library' });
 } else {

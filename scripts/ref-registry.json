@@ -1,5 +1,67 @@
 {
   "description": "权威文档注册表 + 检查器登记表：**读者面以实际代码为准，勿在此写死条数**（除文档引用与事实闸门外，背景、布局多样性、相似度与总闸门等脚本同样读取本文件）。维护规则：新增权威文档时在此登记；文档清单变化时更新 aliases；高危口径改值或新踩漂移坑时维护 caliberOwners（pattern+owner，属主外复述=硬失败）。本文件另承载各闸门的历史豁免与废止话头登记（背景 / 布局 / 相似度 / 动作豁免、deprecatedTerms 等）。**不承载变更事务状态**（依 `R10` 第 67 行）。（2026-09-15 文档最终收口：R7/R8/R9/R10 纳入权威别名，安全区属主口径同步为左右信息安全边界。）",
+  "contentLines": [
+    {
+      "id": "industry",
+      "label": "行业场景攻略",
+      "outputPrefix": "g",
+      "idPattern": "^g\\d+$",
+      "legacyNoPrefixMeans": true,
+      "dataIndexOrderIsLineOrder": true,
+      "defaultApplicability": "APPLY",
+      "source": "CHANGE-20260920-031 §3.2 判线唯一声明源"
+    },
+    {
+      "id": "tutorial",
+      "label": "产品功能教程",
+      "outputPrefix": "f",
+      "idPattern": "^f\\d+$",
+      "legacyNoPrefixMeans": false,
+      "dataIndexOrderIsLineOrder": false,
+      "defaultApplicability": "OWNER_PENDING",
+      "source": "CHANGE-20260920-031；教程 Owner 由后继事务建立，未建立前命中即显式失败，不得静默跳过"
+    }
+  ],
+  "gateApplicability": {
+    "version": 1,
+    "values": {
+      "APPLY": "按现行判据执行",
+      "N/A": "不适用本线，须输出 N/A 加理由",
+      "OWNER_PENDING": "该线权威 Owner 未建立，显式失败并要求先立 Owner"
+    },
+    "gateOverrides": {
+      "check-bg": {
+        "tutorial": "N/A"
+      },
+      "check-motif-card": {
+        "tutorial": "N/A"
+      },
+      "check-layout-diversity": {
+        "tutorial": "OWNER_PENDING"
+      },
+      "check-voice-brand": {
+        "tutorial": "APPLY"
+      },
+      "check-similarity": {
+        "tutorial": "OWNER_PENDING"
+      },
+      "check-ui-truth": {
+        "tutorial": "APPLY"
+      },
+      "check-voice-discipline": {
+        "tutorial": "APPLY"
+      },
+      "check-redlines": {
+        "tutorial": "APPLY"
+      },
+      "check-facts": {
+        "tutorial": "APPLY"
+      },
+      "gate-all-motion-observation": {
+        "tutorial": "OBSERVE"
+      }
+    }
+  },
   "docsDir": "docs/internal",
   "extraDocs": [
     "AGENTS.md",
