@@ -16,11 +16,14 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getContentLines, lineOf, loadRegistry, gateAppliesFor } from './content-lines.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dataDir = join(ROOT, 'video', 'src', 'data');
 const BRAND = '券到卡包';
 const EXEMPT = new Set(['g06', 'g07', 'g08', 'g09']);
+const LINES = getContentLines();
+const REG = loadRegistry();
 
 const files = readdirSync(dataDir)
   .filter((f) => f.endsWith('.ts') && f !== 'index.ts')
@@ -29,11 +32,29 @@ const files = readdirSync(dataDir)
 const hardFails = [];
 const softNotes = [];
 const exemptLogs = [];
+const declared = [];
 let checked = 0;
 
 for (const f of files) {
-  const key = (f.match(/g\d{2}/i) || [])[0]?.toLowerCase();
-  if (!key) continue;
+  // CHANGE-20260920-031：原写法 `key = /g\d{2}/.exec(f); if (!key) continue;`
+  // 会把非行业内容线**静默排除**出本闸门——现改为按声明判线：
+  // 判不了线 = 硬失败（不再猜成"不归我管"）；未建立 Owner 的线 = 显式 OWNER_PENDING。
+  const base = f.replace(/\.ts$/i, '');
+  const line = lineOf(base, LINES);
+  if (!line) {
+    hardFails.push(`${f}｜无法判定内容线（ref-registry.contentLines 未覆盖该片号形态）—— 拒绝静默跳过，请补声明或改名`);
+    continue;
+  }
+  const applies = gateAppliesFor(REG, 'check-voice-brand', line);
+  if (applies === 'OWNER_PENDING') {
+    hardFails.push(`${f}｜本闸门对内容线「${line.label}」为 OWNER_PENDING —— 该线画面/口播品牌口径的权威 Owner 尚未建立，先立 Owner 再产出，不放行也不静默跳过`);
+    continue;
+  }
+  if (applies === 'N/A') {
+    declared.push(`${f}｜N/A（声明源：ref-registry.gateApplicability.gateOverrides['check-voice-brand']['${line.id}']）`);
+    continue;
+  }
+  const key = base.toLowerCase();  // 片号即文件名去扩展名；不再用 /g\d{2}/ 在文件名里"捞"编号
 
   const src = readFileSync(join(dataDir, f), 'utf8');
   // 剥离注释，避免注释里的引文误判画面层
@@ -77,6 +98,10 @@ if (hardFails.length) {
 if (softNotes.length) {
   console.log('⚠️ 口播品牌点检软提示（不计硬失败）：');
   for (const x of softNotes) console.log(`   ${x}`);
+}
+if (declared.length) {
+  console.log('📤 显式声明不适用于本闸门的内容线（非静默跳过）：');
+  for (const x of declared) console.log(`   ${x}`);
 }
 if (exemptLogs.length) {
   console.log('⏭️ 历史片豁免（不回改）：');

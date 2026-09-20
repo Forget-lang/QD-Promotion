@@ -40,7 +40,7 @@
         "tutorial": "OWNER_PENDING"
       },
       "check-voice-brand": {
-        "tutorial": "APPLY"
+        "tutorial": "OWNER_PENDING"
       },
       "check-similarity": {
         "tutorial": "OWNER_PENDING"
@@ -60,7 +60,8 @@
       "gate-all-motion-observation": {
         "tutorial": "OBSERVE"
       }
-    }
+    },
+    "note": null
   },
   "docsDir": "docs/internal",
   "extraDocs": [

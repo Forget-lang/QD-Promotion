@@ -44,13 +44,32 @@ export function lineOf(token, lines = getContentLines()) {
   return null;
 }
 
-/** 线内数字编号（字符串序不可当线序用：`f90` 会排在 `g11` 之后）；解析失败返回 -1 */
-export function lineNumericId(token) {
-  const m = String(token ?? '').match(/(\d+)/g);
+/**
+ * 线内数字编号（字符串序不可当线序用：`f90` 会排在 `g11` 之后）。
+ * 边界（AI-A 在 B3 评审中提出，已固化为代码约束而非口头纪律）：
+ * 只接受**裸片号或裸文件名**（g11 / g11.ts / f90.ts）。传入含路径分隔符的完整路径
+ * （如 outputs/g11-烧烤/scene-02/x.png）会被拒——否则对"最后一个数字"取值会得到 02 而不是 11，
+ * 排序键就悄悄错了。调用方必须先 lineOf 判线、再传片号身份来排序。
+ */
+export function lineNumericId(token, lines = getContentLines()) {
+  const s = String(token ?? '');
+  if (/[/\\]/.test(s)) {
+    throw new Error(
+      `content-lines：lineNumericId 不接受完整路径（收到 ${s}）—— 请先判线、再传裸片号/文件名作排序键`,
+    );
+  }
+  let cand = s.replace(/\.(ts|tsx)$/i, '');
+  if (lines) {
+    const ok = lines.some((l) => l.idPattern && l.idPattern.test(cand));
+    if (!ok) {
+      throw new Error(`content-lines：排序键 ${token} 不是任何内容线的片号身份，拒绝用任意数字排序`);
+    }
+  }
+  const m = cand.match(/(\d+)/g);
   return m ? Number(m[m.length - 1]) : -1;
 }
 
-/** 按线内数字编号升序排序（原地排序，返回同数组） */
+/** 按 (内容线, 线内数字编号) 排序 —— 跨线顺序不由本函数决定，调用方必须先分线再各自排序 */
 export function sortByLineNumeric(items, keyOf = (x) => x) {
   return items.sort((a, b) => lineNumericId(keyOf(a)) - lineNumericId(keyOf(b)));
 }

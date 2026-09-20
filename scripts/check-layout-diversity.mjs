@@ -20,6 +20,7 @@
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getContentLines, lineOf, lineNumericId } from './content-lines.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DATA = join(ROOT, 'video', 'src', 'data');
@@ -27,10 +28,25 @@ const REG = join(ROOT, 'scripts', 'ref-registry.json');
 
 const waivers = existsSync(REG) ? (JSON.parse(readFileSync(REG, 'utf8')).layoutWaivers || []) : [];
 
-// 只认 gNN.ts 数据文件，按编号排序，取最新一片 + 紧邻上一条
+// CHANGE-20260920-031：片号身份改由 ref-registry 的内容线声明决定，不再各脚本自写 /^g\d+\.ts$/。
+// 原写法有两个后果：非行业内容线被静默排除，且"上一条"依赖数组顺序而非线内数字序。
+// 本闸门现行判据只在行业线内成立（同 type 屏不得同 layoutKind），
+// 教程线的布局判据待其 Owner 建立后另定 —— 见 031 §八 阶段 B 与后继事务。
+const LINES = getContentLines();
+const industryLine = (LINES || []).find((l) => l.id === 'industry') || null;
+if (!industryLine) {
+  console.error('❌ check-layout-diversity：ref-registry 未声明 industry 内容线 —— 拒绝退回硬编码 g 前缀');
+  process.exit(1);
+}
+
 const vids = readdirSync(DATA)
-  .filter((f) => /^g\d+\.ts$/.test(f))
-  .map((f) => ({ id: f.replace(/\.ts$/, ''), n: parseInt(f.match(/\d+/)[0], 10), file: f }))
+  .filter((f) => f.endsWith('.ts') && f !== 'index.ts')
+  .map((f) => ({ file: f, id: f.replace(/\.ts$/, '') }))
+  .filter((v) => {
+    const l = lineOf(v.id, LINES);
+    return !!l && l.id === industryLine.id;
+  })
+  .map((v) => ({ ...v, n: lineNumericId(v.file, LINES), line: industryLine.id }))
   .sort((a, b) => a.n - b.n);
 
 if (vids.length < 2) {
