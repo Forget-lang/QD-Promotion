@@ -114,6 +114,7 @@ function applySimCheck(vs) {
 function collectGateFailures(items) {
   const failures = [];
   const notes = [];
+  const traversed = new Set();
   for (const v of items) {
     if (!classifyLine(v)) {
       failures.push(`${v.id}（导出名 ${v.key || v.file}）｜无法判定内容线 —— ref-registry.contentLines 未覆盖该片号形态，拒绝猜线`);
@@ -121,6 +122,7 @@ function collectGateFailures(items) {
   }
   for (const l of LINES) {
     if (!industryLine || l.id === industryLine.id) continue;
+    traversed.add(l.id);
     const group = items.filter((v) => { const c = classifyLine(v); return c && c.id === l.id; });
     if (!group.length) continue;
     const applies = gateAppliesFor(REGISTRY, 'check-similarity', l);
@@ -135,6 +137,12 @@ function collectGateFailures(items) {
   for (const u of unregistered) {
     const l = lineOf(u.id, LINES);
     failures.push(`${u.file}｜存在于 data/ 但未注册进 data/index.ts（线：${l ? l.label : '无法判定'}）—— 拒绝让它对本闸门静默不可见；要么完成注册链，要么移走该文件`);
+  }
+  // 兜底（B3.4 同型）：判得了线、但该线未被遍历（如 contentLines 被删成只剩 industry）→ 不得静默放过
+  for (const v of items) {
+    const l = classifyLine(v);
+    if (!l || (industryLine && l.id === industryLine.id) || traversed.has(l.id)) continue;
+    failures.push(`${v.id}｜已判为内容线「${l.label}」，但该线未被本闸门遍历（contentLines 声明不完整或被删）—— 拒绝静默放过`);
   }
   return { failures, notes };
 }

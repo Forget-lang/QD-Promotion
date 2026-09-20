@@ -56,16 +56,26 @@ const classifyLine = (v) => lineOf(v.id, LINES) || lineOf(v.key, LINES);
 
 console.log('\n══════════════ 背景底强制闸门（SKILL 第 2 步 / §五）══════════════\n');
 
+// B3.4 返修：industry 声明缺失必须在**任何判定之前**硬失败。
+// 它原先被放在后面，且当 industry 被删时 `l.id === industryLine?.id` 恒不成立、
+// 非行业线循环又被整体跳过 → 教程文件也不再被归因 → 可能给出"基线为空"的假绿。
+if (!industryLine) {
+  console.error('❌ check-bg：ref-registry 未声明 industry 内容线 —— 拒绝把行业数据误判为"基线为空"');
+  process.exit(1);
+}
+
 // B3.4 三防线之 1/2：判线在前 → 只对 APPLY 线执行判据；不可适用即停，不跑判据。
 const gateFailures = [];
 const gateNotes = [];
+const traversed = new Set();
 for (const v of videos) {
   if (!classifyLine(v)) {
     gateFailures.push(`${v.id}（导出名 ${v.key}）｜无法判定内容线 —— ref-registry.contentLines 未覆盖该片号形态，拒绝猜线`);
   }
 }
 for (const l of LINES) {
-  if (!l || l.id === industryLine?.id) continue;
+  if (!l || l.id === industryLine.id) continue;
+  traversed.add(l.id);
   const group = videos.filter((v) => { const c = classifyLine(v); return c && c.id === l.id; });
   if (!group.length) continue;
   const applies = gateAppliesFor(REGISTRY, 'check-bg', l);
@@ -80,6 +90,12 @@ for (const l of LINES) {
 for (const u of unregistered) {
   const l = lineOf(u.id, LINES);
   gateFailures.push(`${u.file}｜存在于 data/ 但未注册进 data/index.ts（线：${l ? l.label : '无法判定'}）—— 拒绝静默不可见；完成注册链或移走该文件`);
+}
+// 兜底：能判线、但该线未被本闸门遍历过（例如 LINES 被删成只剩 industry）→ 也不得静默放过
+for (const v of videos) {
+  const l = classifyLine(v);
+  if (!l || l.id === industryLine.id || traversed.has(l.id)) continue;
+  gateFailures.push(`${v.id}｜已判为内容线「${l.label}」，但该线未被本闸门遍历（contentLines 声明不完整或被删）—— 拒绝静默放过`);
 }
 // 防线 3 的极端形态：index 为空但 data/ 有文件 —— 不能当成"基线为空"直接绿
 if (!videos.length && unregistered.length) {
