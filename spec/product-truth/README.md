@@ -8,6 +8,7 @@
 - 原始 archive SHA-256：`afb1b0385cf167392eb78b2031d104b714134d72697a1e735d6d4313e6ca1ad7`
 - Snapshot 文件数：**298**
 - Snapshot archive SHA-256：`d1248732f77a38c362844e242d3383fce46517f88b3ff75b2c6069694e7bd6d5`
+- Snapshot Git Blob SHA（`spec/product-truth/applet/source.tar.xz` 的 Git 对象身份）：`ee34f4c2ecf397a6a43e7ecb7aa5eeb9a8f3804a`
 - Snapshot 范围：仅 `.vue` / `.js` / `.json`；排除 `node_modules`、`unpackage`、`uni_modules`、`.git` 及 macOS `._*` 元数据。
 
 本次重建专门修正了先前归档中误纳入的 `.git` 与生成物目录；当前 298 个文件才是可作为产品源码事实源的干净范围。

@@ -70,7 +70,7 @@ docs/AI使用手册.md
 | `spec/` | AI / Gate | 产品事实、红线、字段等机器真源 | 只管对应真源 |
 | `docs/internal/` | AI | 各自领域 Owner、方法、技术与治理协议 | 只能管自己的领域 |
 | `docs/internal/整改作战总纲.md` | AI | 全局整改前的资源/Owner/冲突/依赖侦察 | 不承担第二生产流程 |
-| `docs/internal/PROJECT-CONSISTENCY-MAP.md` | 人 / AI | 当前状态总账 | 不新增规则，不承担入口 |
+| `docs/internal/PROJECT-CONSISTENCY-MAP.md` | 人 / AI | 稳定架构恢复索引（权威层级与主链） | 不新增规则，不承担入口，**不提供实时状态** |
 | `outputs/archive/` / `docs/changes/` | 人 / AI | 历史证据、变更记录 | 不进入当前指挥链 |
 
 你不需要记住每条规则在哪。
