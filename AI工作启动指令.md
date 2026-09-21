@@ -1,7 +1,7 @@
 # 券到卡包 · AI 工作启动指令
 
 > **这是用户侧工作控制台，不是项目规则 Owner，也不是 AI 自动入口。**
-> 项目自动入口是 `AGENTS.md`；视频生产唯一作业流程是 `SKILL.md`；其他领域由对应 Owner 负责。
+> 项目自动入口是 `AGENTS.md`；生产类任务先判内容线（唯一声明源：`scripts/ref-registry.json` 的 `contentLines`），再进入该线唯一 Owner——行业场景视频 → `SKILL.md`；产品功能教程 → `docs/internal/产品功能教程作业规范.md`；其他领域同样只认对应 Owner 的当前版本。
 > 本文件只规定：**用户如何让 AI 进入正确工作模式，以及 AI 如何开始、执行、停线、证明完成。**
 > **本文件不得复制具体业务规则，不得复制 Owner 的具体工作流。**
 
@@ -84,7 +84,7 @@ Gate / 真实产物 / 用户最终验收
 
 主要 Owner：
 
-- 视频生产：`SKILL.md`
+- 生产类任务：先判内容线（唯一声明源：`scripts/ref-registry.json` 的 `contentLines`），再进入该线唯一 Owner——行业场景视频 → `SKILL.md`；产品功能教程 → `docs/internal/产品功能教程作业规范.md`
 - 产品事实：`APPLET / spec / R10`
 - 业务流程解释：`R2`
 - Remotion 技术：`R3`
@@ -502,7 +502,7 @@ SKILL.md / R3 / R7 / R9 / 当前分镜 / 当前 R9 产物。
 1. 读取 AGENTS.md，确认项目级治理规则与当前入口。
 2. 判断本次范围属于哪一类，并读取对应 Owner 当前的侦察 / 前置要求：
    - 整改 / 治理 / 收口 / 清理 / 架构整理 / 全局一致性 → docs/internal/整改作战总纲.md
-   - 视频生产 → SKILL.md
+   - 生产类任务：先判内容线（唯一声明源：`scripts/ref-registry.json` 的 `contentLines`），再进入该线唯一 Owner——行业场景视频 → `SKILL.md`；产品功能教程 → `docs/internal/产品功能教程作业规范.md`
    - 规则替代 / 跨对象变更 → docs/internal/R8-变更收敛协议.md
    - 其他 → 该领域当前 Owner
 3. 如果当前 Owner 没有定义侦察要求 → 明确报告“当前 Owner 未定义侦察要求”，再按第二步执行；不要自行发明长期规则。
