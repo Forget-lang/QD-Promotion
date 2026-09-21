@@ -1,0 +1,2 @@
+占位文件：使 active/ 在没有进行中事务时仍然存在。
+原因：AGENTS.md:151、SKILL.md:30、PROJECT-CONSISTENCY-MAP.md:42 按目录路径引用 docs/changes/active/，而 git 不跟踪空目录——目录消失会让 check-doc-references 报 3 处断链（干净检出必现）。
