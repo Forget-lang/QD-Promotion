@@ -31,6 +31,12 @@ for (const f of REGISTRY.extraDocs || []) {
   const p = join(ROOT, f);
   if (existsSync(p)) allDocs.set(f, p);
 }
+// 风格包扫描面由注册表派生（CHANGE-20260923-039 批 4）：新增风格 = 注册表一行 → 自动进扫描面，不需第二处登记
+for (const st of (REGISTRY.styles && REGISTRY.styles.items) || []) {
+  if (!st || !st.packPath) continue;
+  const p = join(ROOT, st.packPath, 'SKILL.md');
+  if (existsSync(p)) allDocs.set(join(st.packPath, 'SKILL.md'), p);
+}
 
 const aliasMap = new Map();
 for (const [alias, file] of Object.entries(REGISTRY.aliases || {})) {

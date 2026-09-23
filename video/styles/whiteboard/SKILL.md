@@ -63,7 +63,7 @@
 | check-bg | N/A | 纸底由本包 ③ 定义，不使用背景素材库 |
 | check-motif-card | N/A | "母题一页"属 Remotion 类风格概念 |
 | check-layout-diversity | N/A | 屏级布局指纹属 Remotion 类；本包以场景为单元 |
-| check-similarity | APPLY（**同风格内**基准） | 与上一条同为 whiteboard 的片比；跨风格不比较 |
+| check-similarity | **N/A（机检）＋人判替代** | 该闸门按屏级指纹比对，读的是 Remotion 片的数据文件，**读不到本风格产物**（本风格以场景为单元、无屏级指纹）⇒ 声明 N/A；**替代机制**：本片与上一条同风格片做「画面结构人判对比」（见 ⑩），并逐帧对账 |
 | check-facts／check-doc-references | APPLY | 素材与引用纪律 |
 | gate-all-safearea-observation | APPLY | 字幕／板书不得侵入安全边带 |
 | gate-all-motion-observation | OBSERVE | 只出读数不判红（笔迹连续运动，旧尺子口径需重定标——不借豁免通道） |
@@ -99,4 +99,5 @@
 
 - **同风格不得连续复用**：下一片应换风格；若当前只有本包、必须连用，须在片首显式声明"连续复用例外＋理由"，交人判。
 - **视觉隔离基准＝同风格内**：比较对象是上一条同为 whiteboard 的片；跨风格不比较。
+- **同风格重复的人判替代（因机检读不到本风格产物）**：新片交验时，须与上一条同风格片并排对比「场景结构／元素组织／笔迹节奏」，并逐帧对账；写不出差异＝回炉。
 - **扩展判据（本包自证）**：本包不引用其它包的实现；不要求 R9／`SKILL.md`／`AGENTS.md`／核心 Gate 为本包增改规则——新增本包＝一个目录 ＋ 注册表一行。
