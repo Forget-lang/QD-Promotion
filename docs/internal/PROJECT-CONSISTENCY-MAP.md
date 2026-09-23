@@ -4,7 +4,7 @@
 > 用途：**稳定架构恢复索引**——只索引权威层级与主链关系，不新增业务规则。
 > 文档引用纪律：本账只引用当前有效路径；不保留已删除文件名、历史错误路径或“旧名→新名”的废弃话头。
 > 实时状态边界：本账**不提供实时状态**，也不兼任实时状态账本；取值处见 `AGENTS.md` §十一。本文件任何一节都不得写入片号级或事务级的波动状态。
-> 接班纪律：新会话统一从 `AGENTS.md` 开始，再按当前任务读取 `SKILL.md` 与对应 Owner。
+> 接班纪律：新会话统一从 `AGENTS.md` 开始，再按当前任务**先判内容线、取该线唯一 Owner**（行业线＝`SKILL.md`／教程线＝`docs/internal/产品功能教程作业规范.md`）或对应领域 Owner。
 
 ## 1. 唯一主链
 
@@ -13,15 +13,15 @@
   ↓
 产品事实真源 APPLET / Product Truth
   ↓
-内容策略与内容包
+内容策略与内容包（内容层：五拍骨架）
   ↓
-R9 视觉导演方法
+导演层（R9 通用导演判据 ＋ 逐片《导演稿》）
   ↓
-R9 视觉映射表
+风格层（所选风格包：视觉语言；R9 视觉映射表＝通用默认起手式，风格可覆盖）
   ↓
 Visual Shot Contract
   ↓
-分镜 / Remotion 实现
+实现（Remotion／风格化引擎／后期——按所选风格包）
   ↓
 真实渲染帧 / 成片
   ↓
@@ -41,10 +41,11 @@ CLOSED
 | 整改排兵布阵 | `docs/internal/整改作战总纲.md` | 整改前资源/Owner/冲突/依赖/能力/优先级审计 | 生效；不是第二生产流程 |
 | 变更事务 | `docs/changes/*` | 实际变更的影响、迁移、验证、关闭状态 | **不在此硬编码当前事务**：以 `docs/changes/active/` 与 `docs/changes/closed/` 目录为准；实时状态以脚本输出与当前产物为准（`AGENTS.md` §十一） |
 | 产品事实 | `APPLET` + Product Truth | 产品字段、UI、流程事实 | 真源在 APPLET；仓库内快照基准与校验见 `spec/product-truth/README.md`，本行不填读数 |
-| 字段登记 | `spec/coupon-fields.json` / `spec/card-fields.json` | promotion 内可消费的字段真值登记 | 在位；必须可追溯到 APPLET |
+| 字段登记 | `spec/coupon-fields.json` / `spec/card-fields.json` / `spec/point-fields.json` / `spec/member-fields.json` | promotion 内可消费的字段真值登记 | 在位；必须可追溯到 APPLET |
 | 红线 | `spec/redlines.json` + `scripts/check-redlines.mjs` | 画面/口播硬禁及人工确认层 | 词/元素级硬禁与人工确认层以脚本输出为准，本行不填读数 |
-| 视觉方法 | `docs/internal/R9-视觉导演与审美决策.md` | 镜头级视觉决策原则 | 生效 |
-| 视觉映射 | `docs/internal/R9-视觉映射表.md` | 叙事关系 → Remotion 视觉关系/组件 | 生效 |
+| 导演层 | `docs/internal/R9-视觉导演与审美决策.md` | 为什么这样讲（叙事六项）＋镜头级视觉决策原则 | 生效；通用导演原则 Owner，不拥有具体导演方法 |
+| 视觉映射 | `docs/internal/R9-视觉映射表.md` | 叙事关系 → 表达方式默认起手式（工具无关；构件名为 `remotion-components` 举例） | 生效；风格包可覆盖实现，不得改写叙事判断 |
+| 风格层 | `video/styles/` 下每风格一个自包含目录（清单与逐闸门适用性＝`scripts/ref-registry.json` 的 `styles`） | 用什么视觉语言表达（镜头表现方式／空间／素材／动效／声音） | 生效；不拥有流程／叙事／观看路径，不构成入口 |
 | 镜头契约 | `scripts/check-visual-shot-contract.mjs` + R9 ledger | 关键镜头的视觉主体、隐喻、Peak Frame、State Change、Exit | 机制生效；逐片收口与否以脚本与当前产物为准 |
 | 成片验证 | `scripts/gate-all.mjs` | 统一总闸门 | 逐片红绿以 `gate-all` 输出为准，本行不填读数 |
 
@@ -91,6 +92,6 @@ CHANGE-20260916-003 已完成并关闭：
 
 固定接班链：
 
-`用户 → AI工作启动指令.md → AGENTS.md → 当前 Owner / SKILL.md → outputs → Gate`
+`用户 → AI工作启动指令.md → AGENTS.md → 该线唯一 Owner（行业线＝SKILL.md）→ outputs → Gate`
 
 任何局部任务若发现第二 Owner、第二入口、新旧规则并存、历史重新进入当前链，必须先按 R8 做全局侦察与影响面布阵。

@@ -18,7 +18,7 @@ import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { initContentLines, lineOf, gateAppliesFor } from './content-lines.mjs';
+import { initContentLines, lineOf, gateAppliesFor, pieceKeyOf } from './content-lines.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const { reg: REGISTRY, lines: LINES, industry: industryLine } = initContentLines({ label: 'gate-all' });
@@ -32,18 +32,16 @@ const NON_PIECE = (REGISTRY.pieceDirs && Array.isArray(REGISTRY.pieceDirs.nonPie
       console.error('❌ gate-all：ref-registry 未声明 pieceDirs.nonPiecePatterns —— 拒绝猜哪些目录不是产物目录');
       process.exit(1);
     })();
-const motionWaiver = (vidPath) => {
+const motionWaiver = (vidPath) => {   // CHANGE-20260923-042：片号 key 按 contentLines 声明提取（不写死 g，f 线同样可挂豁免）
   const list = REGISTRY.motionWaivers || [];
   if (!list.length) return null;
-  const m = /g\d{2}/i.exec(String(vidPath));
-  const key = m ? m[0].toLowerCase() : null;
+  const key = pieceKeyOf(vidPath, LINES);
   return key ? (list.find((w) => String(w.video).toLowerCase() === key) || null) : null;
 };
 const safeAreaWaiver = (framePaths) => {   // CHANGE-20260918-029：与 motionWaiver 同构；豁免在汇总层，probe-safe-area 本体不动
   const list = REGISTRY.safeAreaWaivers || [];
   if (!list.length) return null;
-  const m = /g\d{2}/i.exec(framePaths.join('/'));
-  const key = m ? m[0].toLowerCase() : null;
+  const key = pieceKeyOf(framePaths.join('/'), LINES);
   return key ? (list.find((w) => String(w.video).toLowerCase() === key) || null) : null;
 };
 const GATES = [

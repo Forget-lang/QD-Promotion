@@ -249,6 +249,22 @@ export function outputsDirsOf(pieceId, root = ROOT) {
 }
 
 /**
+ * 从任意路径/标识提取「片号身份」（如 …/outputs/g11-烧烤/x.mp4 → g11）——豁免表查找等按内容线声明取，
+ * **不写死 g/f 前缀**。匹配要求前缀前是路径分隔或串首（防 `config2` 被裸子串匹配成 `g2`）；
+ * 未命中返回 null（调用方保持"无豁免"的行为，不得放宽成任意 `\w+\d+`）。
+ */
+export function pieceKeyOf(token, lines = getContentLines()) {
+  const s = String(token ?? '');
+  if (!lines) return null;
+  for (const l of lines) {
+    if (!l.outputPrefix) continue;
+    const m = new RegExp(`(?:^|[/\\\\])${l.outputPrefix}\\d+`, 'i').exec(s);
+    if (m) return m[0].replace(/^[/\\]/, '').toLowerCase();
+  }
+  return null;
+}
+
+/**
  * 片 → 风格认领（方案 C，2026-09-23 用户拍板）：
  *   ① 有风格以 `piecePatterns` 命中该片（模板 `{id}`＝片号、`{dir}`＝outputs 下该片目录名）
  *      → 命中 1 个：该风格（专属声明优先于缺省）；命中 ≥2 个：硬失败（拒绝猜）。
