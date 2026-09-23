@@ -4,7 +4,7 @@
  *
  * 为什么：SKILL 第 7 步「发布后验闭环」的「必回填台账」升级前是自觉条款（只能靠 AI 打勾、
  * 无机检、无真图可判）——新会话一漏就永远漏。本闸门把「已发布片必须有后验回填」钉成开工必拦：
- * 数据源是 outputs/archive/发布后验台账.json（片进「已发布」由 AI 连机加行）。
+ * 数据源是 outputs/发布后验台账.json（片进「已发布」由 AI 连机加行；2026-09-23 CHANGE-043 自 outputs/archive/ 迁出——archive 只作历史证据，不承担当前状态源，见 AGENTS.md §十一）。
  *
  * 判据：
  *  - 状态=历史豁免 → ⏭️ 跳过（协议生效前已发布片，不回改）
@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 import { existsSync, readFileSync } from 'node:fs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const LEDGER = join(ROOT, 'outputs', 'archive', '发布后验台账.json');
+const LEDGER = join(ROOT, 'outputs', '发布后验台账.json');
 /** 指标字段按行「类型」分支（CHANGE-20260918-028）：视频四数｜图文三指标（键名与 SKILL 图文线口径逐字一致） */
 const METRIC_FIELDS = {
   '视频': ['播放量', '封面CTR', '2秒跳出', '完播'],
