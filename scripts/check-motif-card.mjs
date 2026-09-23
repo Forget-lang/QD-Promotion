@@ -6,9 +6,11 @@
  * 两条规则吸收进 SKILL 第 2 步，但它们都是软尺——只改规则文档、没有机检承接，新会话大概率不填、又滑回"一张卡片堆字段"。
  * 本闸把"母题一页必须把情绪契约 + 素材纪律落回产出物"变成可计算的硬判据：缺栏 / 缺张数 = 红灯，交不了母题页。
  *
- * 判据（对 outputs 下**最新一个** gXX 的 `03-母题一页.md`）：
+ * 判据（对 outputs 下**最新一个「本闸门声明为 APPLY」的风格片**的 `03-母题一页.md`）：
  *   ① 必须同时含四栏字段：`核心痛点` / `情绪关键词` / `视觉关键词` / `禁止出现`；
  *   ② 必须含一行 `背景素材张数`。
+ * 目标片按风格声明认领（CHANGE-20260923-039 批 4-2 / A2 方案 C）：片→风格见 `ref-registry.styles.items[].piecePatterns`；
+ * 风格位声明 N/A 的片显式列出（带声明源）、不进入判据；未声明该闸门 = 硬错误。
  * 任一不满足 = 硬失败。历史片（gXX < 最新）按 old 口径渲过、不回改，不扫描（与 check-bg 豁免思路一致）；最新片暂无母题一页 = 提示需补、不算红灯（可能还没到第 2 步）。
  *
  * 用法（项目根运行）：node scripts/check-motif-card.mjs
@@ -16,7 +18,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { initContentLines, lineOf, gateAppliesFor } from './content-lines.mjs';
+import { initContentLines, lineOf, gateAppliesFor, claimStyleOfPiece, styleAppliesFor } from './content-lines.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUTROOT = join(ROOT, 'outputs');
@@ -97,16 +99,50 @@ if (gateFailures.length) {
 }
 
 const industryGroup = byLine.get(industryLine.id);
-const gg = industryGroup && industryGroup.dirs.length
-  ? industryGroup.dirs[industryGroup.dirs.length - 1]
-  : null;
-if (!gg) {
+const dirs = industryGroup ? industryGroup.dirs : [];
+if (!dirs.length) {
   console.log(`✅ ${industryLine.label}暂无 gXX 产物目录，母题卡基线为空——新片建母题一页时必含四栏 + 素材张数。`);
+  process.exit(0);
+}
+
+// 片→风格认领（方案 C）：目标 = 最新一个「本闸门声明为 APPLY」的风格片。
+// N/A 的风格片显式列出（带声明源）、不进入判据；OWNER_PENDING 与未声明该闸门 = 硬失败。
+const pieceIdOf = (name) => (name.match(new RegExp(`^${industryLine.outputPrefix}\\d+`, 'i')) || [])[0] || name;
+const styleSkips = [];
+let gg = null;
+let ggStyle = null;
+for (let i = dirs.length - 1; i >= 0; i--) {
+  const d = dirs[i];
+  let claimed;
+  try {
+    claimed = claimStyleOfPiece(REGISTRY, { id: pieceIdOf(d.name), dirNames: [d.name] });
+  } catch (e) {
+    console.error(`❌ check-motif-card：片风格认领失败 —— ${e.message}`);
+    process.exit(1);
+  }
+  let applies;
+  try {
+    applies = styleAppliesFor(REGISTRY, 'check-motif-card', claimed.style);
+  } catch (e) {
+    console.error(`❌ check-motif-card：风格适用性声明问题 —— ${e.message}`);
+    process.exit(1);
+  }
+  const declSrc = `ref-registry.styles.items[id=${claimed.style.id}].gateApplicability['check-motif-card']`;
+  if (applies === 'APPLY') { gg = d; ggStyle = claimed.style; break; }
+  if (applies === 'OWNER_PENDING') {
+    console.log(`\n❌ 风格适用性 硬失败 —— ${d.name}｜风格「${claimed.style.label}」在本闸门为 OWNER_PENDING —— 先立 Owner 再产出（不放行、不静默跳过）。`);
+    process.exit(1);
+  }
+  styleSkips.push(`📤 ${d.name}｜风格「${claimed.style.label}」在本闸门为 ${applies}（声明源：${declSrc}）—— 不进入本闸门判据`);
+}
+for (const n of styleSkips) console.log(n);
+if (!gg) {
+  console.log(`\n✅ 所有 gXX 产物均为非 APPLY 风格片，母题卡闸门对当前无适用目标——N/A（声明源见上方 📤 行）。`);
   process.exit(0);
 }
 const motif = findMotif(gg.path);
 if (!motif) {
-  console.log(`⏭️ ${gg.name} 暂无母题一页，跳过（未到第 2 步产出；到产出时必含四栏 + 背景素材张数，否则本闸转红）。`);
+  console.log(`⏭️ ${gg.name}（风格：${ggStyle.label}）暂无母题一页，跳过（未到第 2 步产出；到产出时必含四栏 + 背景素材张数，否则本闸转红）。`);
   process.exit(0);
 }
 const src = readFileSync(motif, 'utf8');

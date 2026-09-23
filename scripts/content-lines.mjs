@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * scripts/content-lines.mjs · 内容线判定的唯一声明源
+ * scripts/content-lines.mjs · 内容线判定 ＋ 片→风格认领的唯一声明消费者
  *
  * 为什么要有它：CHANGE-20260920-031 实测发现"当前片"在本仓库有四套互不相同的机制
  * （index 导出顺序 / 文件名字符串排序 / `/^g\d+/` 正则 / 全局 mtime），
@@ -8,9 +8,13 @@
  * 本模块把判线与顺序收敛为一处，脚本只读 `ref-registry.json` 的声明，
  * 不得自行写前缀正则，也不得在声明缺失时猜一个默认值。
  *
- * 契约：CHANGE-20260920-031 §3.2（namespace + applicability）、§十 反例 1/2。
+ * 风格层（CHANGE-20260923-039 批 4-2 / A2 方案 C）：片→风格认领同样只读 `ref-registry.styles`
+ * 声明（`items[].piecePatterns` ＋ `defaultStyleId`），不在这里写死任何风格 id 或路径形态。
+ *
+ * 契约：CHANGE-20260920-031 §3.2（namespace + applicability）、§十 反例 1/2；
+ *       CHANGE-20260923-039 §八.5、§二十五 25.1、§三十一 方案 C。
  */
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -193,3 +197,88 @@ export function gateAppliesFor(reg, gateKey, line) {
 export const describeLine = (line) => `${line?.label || line?.id || '未知线'}(${line?.id || '-'})`;
 
 export const basenameOf = (p) => basename(String(p ?? ''));
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 风格层：片 → 风格认领（CHANGE-20260923-039 批 4-2 / A2 方案 C）
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * 严格读取 `ref-registry.styles`：缺失或任一条目畸形即返回 null（调用方显式失败）。
+ * 畸形＝缺 id / packPath / status / piecePatterns（空数组也算缺）/ gateApplicability。
+ */
+export function getStyles(reg = loadRegistry()) {
+  const items = reg?.styles?.items;
+  if (!Array.isArray(items) || !items.length) return null;
+  for (const s of items) {
+    if (!s || typeof s.id !== 'string' || !s.id) return null;
+    if (typeof s.packPath !== 'string' || !s.packPath) return null;
+    if (typeof s.status !== 'string' || !s.status) return null;
+    if (!Array.isArray(s.piecePatterns) || !s.piecePatterns.length) return null;
+    if (s.piecePatterns.some((p) => typeof p !== 'string' || !p)) return null;
+    if (!s.gateApplicability || typeof s.gateApplicability !== 'object') return null;
+  }
+  return items;
+}
+
+/**
+ * 一个风格的某闸门适用性；**未声明该闸门 = 硬错误**（沿用 EXPLICIT_REQUIRED 机制），
+ * 不得静默当作 N/A，也不得继承别的风格（如 Remotion 帧设计）的判据。
+ */
+export function styleAppliesFor(reg, gateKey, style) {
+  if (!style) throw new Error(`content-lines：闸门 ${gateKey} 拿到一个无法认领风格的片 —— 拒绝默认放行`);
+  const v = style.gateApplicability?.[gateKey];
+  if (v == null) {
+    throw new Error(
+      `content-lines：风格「${style.label || style.id}」尚未对本闸门声明适用性（风格不设默认适用性）——` +
+        `请在 ref-registry.styles.items[id=${style.id}].gateApplicability 登记 APPLY / OBSERVE / N/A 后再运行（见 CHANGE-20260923-039 §三.7）`,
+    );
+  }
+  return assertApplicability(v, `styles.items[id=${style.id}].gateApplicability['${gateKey}']`, reg);
+}
+
+/** outputs/ 下属于该片号的目录名（如 g11 → g11-烧烤）——供 piecePatterns 的 `{dir}` 解析 */
+export function outputsDirsOf(pieceId, root = ROOT) {
+  const out = [];
+  let names = [];
+  try { names = readdirSync(join(root, 'outputs')); } catch { return out; }
+  for (const n of names) {
+    if (!new RegExp(`^${String(pieceId)}(-|$)`, 'i').test(n)) continue;
+    try { if (statSync(join(root, 'outputs', n)).isDirectory()) out.push(n); } catch { /* 忽略不可读项 */ }
+  }
+  return out;
+}
+
+/**
+ * 片 → 风格认领（方案 C，2026-09-23 用户拍板）：
+ *   ① 有风格以 `piecePatterns` 命中该片（模板 `{id}`＝片号、`{dir}`＝outputs 下该片目录名）
+ *      → 命中 1 个：该风格（专属声明优先于缺省）；命中 ≥2 个：硬失败（拒绝猜）。
+ *   ② 无命中 → 缺省 `styles.defaultStyleId`（缺省由声明给定，不靠推断；缺声明即硬失败）。
+ * 返回 `{ style, matched, isDefault }`；`matched` ＝命中的声明路径（缺省时为 null）。
+ */
+export function claimStyleOfPiece(reg, { id, dirNames = [], root = ROOT } = {}) {
+  const styles = getStyles(reg);
+  if (!styles) throw new Error('content-lines：ref-registry.styles 缺失或条目畸形 —— 无法认领片风格，拒绝猜');
+  const defaultId = reg?.styles?.defaultStyleId;
+  if (!defaultId) throw new Error('content-lines：ref-registry.styles 未声明 defaultStyleId —— 拒绝为无专属声明的片猜一个风格');
+  const fallback = styles.find((s) => s.id === defaultId);
+  if (!fallback) throw new Error(`content-lines：styles.defaultStyleId=${defaultId} 不在 items 内 —— 声明自相矛盾`);
+  const hits = [];
+  for (const s of styles) {
+    if (s.id === defaultId) continue;
+    for (const tpl of s.piecePatterns) {
+      const cands = tpl.includes('{dir}')
+        ? dirNames.map((d) => tpl.replaceAll('{id}', String(id)).replaceAll('{dir}', d))
+        : [tpl.replaceAll('{id}', String(id))];
+      const hit = cands.find((c) => existsSync(join(root, c)));
+      if (hit) { hits.push({ style: s, matched: hit }); break; }
+    }
+  }
+  if (hits.length > 1) {
+    throw new Error(
+      `content-lines：片 ${id} 同时被多个风格声明命中（拒绝猜）——${hits.map((h) => `${h.style.id}（${h.matched}）`).join(' / ')}；` +
+        '修法：一个片只能有一个风格身份，请厘清 piecePatterns（风格化片不得同时在 video/src/data 建屏级数据文件）',
+    );
+  }
+  if (hits.length === 1) return { style: hits[0].style, matched: hits[0].matched, isDefault: false };
+  return { style: fallback, matched: null, isDefault: true };
+}

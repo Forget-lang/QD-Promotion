@@ -27,7 +27,7 @@ import { readFileSync } from 'node:fs';
 import { readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { initContentLines, lineOf, gateAppliesFor } from './content-lines.mjs';
+import { initContentLines, lineOf, gateAppliesFor, claimStyleOfPiece, styleAppliesFor, outputsDirsOf } from './content-lines.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DATA_DIR = join(ROOT, 'video/src/data');
@@ -161,11 +161,22 @@ const gateCheck = collectGateFailures(videos);
 const gateFailures = gateCheck.failures;
 
 // --all 是基线取证模式，但同样不得跨内容线比较（返修点 1）：按线分组输出。
+// CHANGE-20260923-039 批 4-2 / A2：取证输出同样按「片→风格认领」分风格组，跨风格不比较。
 if (SHOW_ALL) {
   // 取证输出同样不跨线混列：只列本线（行业）指纹，他线指纹不进本闸门的证据面。
   const industryForShow = videos.filter((v) => { const c = classifyLine(v); return c && c.id === industryLine?.id; });
-  console.log('=== 整屏结构指纹｜内容线：行业场景攻略（industry）===');
-  for (const v of industryForShow) console.log(`${v.id.padEnd(24)} ${v.screens.length} 屏: ${v.screens.map(s => s.fp).join(' → ')}`);
+  const showGroups = new Map();
+  for (const v of industryForShow) {
+    let claimed;
+    try {
+      claimed = claimStyleOfPiece(REGISTRY, { id: v.id, dirNames: outputsDirsOf(v.id) });
+    } catch (e) {
+      console.error(`❌ check-similarity：片风格认领失败 —— ${e.message}`);
+      process.exit(1);
+    }
+    if (!showGroups.has(claimed.style.id)) showGroups.set(claimed.style.id, { style: claimed.style, items: [] });
+    showGroups.get(claimed.style.id).items.push(v);
+  }
   // B3.3 返修点 3：门状态一旦判为不可适用，**不得继续执行行业判据**——
   // 旧写法是"照样两两比较、最后才 exit 1"，等于一边宣布 OWNER_PENDING 一边用行业尺子裁教程内容。
   if (gateFailures.length) {
@@ -194,6 +205,20 @@ if (SHOW_ALL) {
           console.log(`${vs[j].id} vs ${vs[i].id}: ${hits.map(([fp, n, p]) => `S${n}=${fp}(对 ${vs[i].id} S${p.join('/')})`).join('; ')}`);
       }
   }
+  for (const { style, items } of showGroups.values()) {
+    const declSrc = `ref-registry.styles.items[id=${style.id}].gateApplicability['check-similarity']`;
+    let applies;
+    try { applies = styleAppliesFor(REGISTRY, 'check-similarity', style); } catch (e) {
+      console.error(`❌ check-similarity：风格适用性声明问题 —— ${e.message}`);
+      process.exit(1);
+    }
+    if (applies !== 'APPLY') {
+      console.log(`\n📤 ${items.map((i) => i.id).join('、')}｜风格「${style.label}」在本闸门为 ${applies}（声明源：${declSrc}）—— 指纹不进本闸门取证面`);
+      continue;
+    }
+    console.log(`\n=== 整屏结构指纹｜风格：${style.label}（${style.id}）—— 跨风格不比较 ===`);
+    for (const v of items) console.log(`${v.id.padEnd(24)} ${v.screens.length} 屏: ${v.screens.map(s => s.fp).join(' → ')}`);
+  }
   process.exit(0);
 }
 
@@ -220,46 +245,92 @@ function checkBespoke(video) {
 
 // 行业线内部语义保持不变：仍按 data/index.ts 的导出顺序取"本线最新一条"（registry 已声明
 // dataIndexOrderIsLineOrder=true for industry），基线 = 同线其余全部 → 与 Stage A 基线逐字一致。
+// CHANGE-20260923-039 批 4-2 / A2 方案 C：进一步按「片→风格认领」（ref-registry.styles.items[].piecePatterns）
+// 分风格组——**组内比较、跨风格不比较**；风格位声明非 APPLY 的片显式列出（带声明源）、不进入判据。
 const industryVideos = videos.filter((v) => { const c = classifyLine(v); return c && c.id === industryLine.id; });
 if (!industryVideos.length) {
   console.log('✅ 行业线暂无已产出视频（2026-08-29 清零重启），结构重复基线为空——新视频之间自当比对');
   process.exit(0);
 }
-const { newest, others, exemptions, seen } = applySimCheck(industryVideos);
-const dups = newest.screens.map((s, i) => ({ ...s, n: i + 1 })).filter((s) => seen.has(s.fp));
-const unexempted = dups.filter((d) => !exemptions.has(d.fp));
+const styleGroups = new Map();
+for (const v of industryVideos) {
+  let claimed;
+  try {
+    claimed = claimStyleOfPiece(REGISTRY, { id: v.id, dirNames: outputsDirsOf(v.id) });
+  } catch (e) {
+    console.error(`❌ check-similarity：片风格认领失败 —— ${e.message}`);
+    process.exit(1);
+  }
+  if (!styleGroups.has(claimed.style.id)) styleGroups.set(claimed.style.id, { style: claimed.style, items: [] });
+  styleGroups.get(claimed.style.id).items.push(v);
+}
 
-console.log(`\n══════════════ 整屏结构相似度机检（SKILL 第 2 步）══════════════`);
-console.log(`待检: ${newest.id}（${newest.screens.length} 屏）｜基线: ${others.map((v) => v.id).join(' / ') || '无'}`);
-console.log(`结构指纹: ${newest.screens.map((s, i) => `S${i + 1} ${s.fp}`).join('  ')}`);
-console.log(`\n同结构屏（与任一已产出视频）: ${dups.length} / ${newest.screens.length}`);
-for (const d of dups) {
-  const ex = exemptions.get(d.fp);
-  console.log(`  S${d.n}  ${d.fp.padEnd(26)} 与 ${[...new Set(seen.get(d.fp))].join(' / ')}` +
-    (ex ? `  ⚠️ 已登记例外（${ex.approvedBy || '未记批准人'}：${ex.reason}）` : '  ❌ 未批例外'));
+console.log('\n══════════════ 整屏结构相似度机检（SKILL 第 2 步）══════════════');
+let anyFail = false;
+const verdicts = [];
+for (const { style, items } of styleGroups.values()) {
+  const declSrc = `ref-registry.styles.items[id=${style.id}].gateApplicability['check-similarity']`;
+  let applies;
+  try { applies = styleAppliesFor(REGISTRY, 'check-similarity', style); } catch (e) {
+    console.error(`❌ check-similarity：风格适用性声明问题 —— ${e.message}`);
+    process.exit(1);
+  }
+  if (applies === 'OWNER_PENDING') {
+    anyFail = true;
+    console.log(`\n❌ 风格「${style.label}」在本闸门为 OWNER_PENDING（声明源：${declSrc}）—— 先立 Owner 再产出（不放行、不静默跳过）`);
+    continue;
+  }
+  if (applies !== 'APPLY') {
+    console.log(`\n📤 ${items.map((i) => i.id).join('、')}｜风格「${style.label}」在本闸门为 ${applies}（声明源：${declSrc}）—— 不进入本闸门判据`);
+    continue;
+  }
+  const { newest, others, exemptions, seen } = applySimCheck(items);
+  const dups = newest.screens.map((s, i) => ({ ...s, n: i + 1 })).filter((s) => seen.has(s.fp));
+  const unexempted = dups.filter((d) => !exemptions.has(d.fp));
+
+  console.log(`\n── 风格「${style.label}」（${style.id}）｜组内比较、跨风格不比较 ──`);
+  console.log(`待检: ${newest.id}（${newest.screens.length} 屏）｜基线: ${others.map((v) => v.id).join(' / ') || '无'}`);
+  console.log(`结构指纹: ${newest.screens.map((s, i) => `S${i + 1} ${s.fp}`).join('  ')}`);
+  console.log(`\n同结构屏（与同风格任一已产出视频）: ${dups.length} / ${newest.screens.length}`);
+  for (const d of dups) {
+    const ex = exemptions.get(d.fp);
+    console.log(`  S${d.n}  ${d.fp.padEnd(26)} 与 ${[...new Set(seen.get(d.fp))].join(' / ')}` +
+      (ex ? `  ⚠️ 已登记例外（${ex.approvedBy || '未记批准人'}：${ex.reason}）` : '  ❌ 未批例外'));
+  }
+  console.log('\n────────────────────────────────────────────');
+  const bespoke = checkBespoke(newest);
+  if (newest.screens.some((s) => s.ui)) {
+    if (bespoke.noDir) console.log(`❌ 防伪：${newest.screens.filter((s) => s.ui).length} 屏声明了 ui，但 video/src/videos/${newest.key}/index.tsx 不存在（只写 ui 名没有真组件 = 绕过闸门）`);
+    else if (bespoke.missing.length) console.log(`❌ 防伪：ui 名在 video/src/videos/${newest.key}/index.tsx 中找不到 → ${bespoke.missing.join(', ')}`);
+    else console.log(`✅ 防伪：${newest.screens.filter((s) => s.ui).length} 个 ui 渲染器均有实组件（videos/${newest.key}/）`);
+  } else {
+    console.log(`❌ 本片有数据但一屏都没写 ui——ui 必填（2026-08-29 起共享场景已删、无回退）；每屏写 ui:'gXX-名字' 并在 scenes/index.tsx 的 VIDEO_RENDERERS 注册`);
+  }
+  const noUiFail = newest.screens.length > 0 && !newest.screens.some((s) => s.ui);
+  const bespokeFail = bespoke.noDir || bespoke.missing.length > 0;
+  if (unexempted.length || bespokeFail || noUiFail) {
+    anyFail = true;
+    if (unexempted.length) {
+      console.log(`❌ 不通过：${unexempted.length} 屏复用了已有视频的结构。`);
+      console.log('   处理：回 SKILL 第 2 步定本片视觉基线 → 新建本片专属场景组件（videos/gXX/ + 屏上 ui）重做这些屏；');
+    }
+    if (bespokeFail) console.log('❌ 不通过：声明了 ui 却没有对应实组件（见上）。');
+    console.log('   确实不可替代的，在 scripts/ref-registry.json similarityExemptions 逐条登记理由并经用户批准。');
+    verdicts.push(`❌ ${newest.id}（风格 ${style.id}）未通过`);
+  } else {
+    verdicts.push(dups.length
+      ? `✅ ${newest.id}（风格 ${style.id}）通过（${dups.length} 处重复均已登记例外批准）`
+      : others.length
+        ? `✅ ${newest.id}（风格 ${style.id}）通过：与全部同风格已产出视频零同结构屏`
+        : `✅ ${newest.id}（风格 ${style.id}）通过（注意：基线只有本片一支，无对照物，此绿不证明跨片不雷同——结构像不像按一屏标杆逐张看真图判，见 SKILL §三）`);
+  }
 }
 console.log('\n────────────────────────────────────────────');
-const bespoke = checkBespoke(newest);
-if (newest.screens.some((s) => s.ui)) {
-  if (bespoke.noDir) console.log(`❌ 防伪：${newest.screens.filter((s) => s.ui).length} 屏声明了 ui，但 video/src/videos/${newest.key}/index.tsx 不存在（只写 ui 名没有真组件 = 绕过闸门）`);
-  else if (bespoke.missing.length) console.log(`❌ 防伪：ui 名在 video/src/videos/${newest.key}/index.tsx 中找不到 → ${bespoke.missing.join(', ')}`);
-  else console.log(`✅ 防伪：${newest.screens.filter((s) => s.ui).length} 个 ui 渲染器均有实组件（videos/${newest.key}/）`);
-} else {
-  console.log(`❌ 本片有数据但一屏都没写 ui——ui 必填（2026-08-29 起共享场景已删、无回退）；每屏写 ui:'gXX-名字' 并在 scenes/index.tsx 的 VIDEO_RENDERERS 注册`);
-}
-const noUiFail = newest.screens.length > 0 && !newest.screens.some((s) => s.ui);
-const bespokeFail = bespoke.noDir || bespoke.missing.length > 0;
-if (unexempted.length || bespokeFail || noUiFail) {
-  if (unexempted.length) {
-    console.log(`❌ 不通过：${unexempted.length} 屏复用了已有视频的结构。`);
-    console.log('   处理：回 SKILL 第 2 步定本片视觉基线 → 新建本片专属场景组件（videos/gXX/ + 屏上 ui）重做这些屏；');
-  }
-  if (bespokeFail) console.log('❌ 不通过：声明了 ui 却没有对应实组件（见上）。');
-  console.log('   确实不可替代的，在 scripts/ref-registry.json similarityExemptions 逐条登记理由并经用户批准。');
+for (const v of verdicts) console.log(v);
+if (anyFail) {
+  console.log('❌ 整屏结构相似度机检未通过（见上）。');
   process.exit(1);
 }
-console.log(dups.length
-  ? `✅ 通过（${dups.length} 处重复均已登记例外批准）`
-  : others.length
-    ? '✅ 通过：与全部已产出视频零同结构屏'
-    : '✅ 通过（注意：基线只有本片一支，无对照物，此绿不证明跨片不雷同——结构像不像按一屏标杆逐张看真图判，见 SKILL §三）');
+console.log(verdicts.length
+  ? '✅ 整屏结构相似度机检通过（各风格组组内已检，跨风格不比较）。'
+  : '✅ 全部风格组均声明本闸门非 APPLY / 无适用组——N/A（声明源见上方 📤 行）。');

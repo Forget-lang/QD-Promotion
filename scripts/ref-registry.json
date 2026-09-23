@@ -73,13 +73,15 @@
     "valueValidation": "content-lines.mjs 对 defaultApplicability 与 gateOverrides 取值做枚举校验；写入 OBSERVE2/PENDING/OPTIONAL 等非法值即报错，不静默当作合法态；并拒绝 EXPLICIT_REQUIRED 出现在 gateOverrides（默认位专用策略值，见 CHANGE-20260920-032 §3.5.1）"
   },
   "styles": {
-    "_说明": "视频风格包声明源（CHANGE-20260923-039）。新增一种风格 = video/styles/<id>/ 一个目录 + 本表登记一行；未声明闸门适用性即硬错误（EXPLICIT_REQUIRED），不得静默继承为 Remotion 帧设计的判据。风格包只是表达能力声明，不拥有内容流程/审核流程/状态来源/Owner 权限。首个风格由 039 批 2a 四候选（白板/商业漫画/动态设计/商业电影感）评估、经用户选定后再登记；whiteboard 以 experimental 登记（039 批 2b）；remotion-components 以 active 登记（039 批 5a：旧链归位）；机检接线与扫描面派生在 039 批 4。**跨风格验收＝导演稿替换测试（同一份《导演稿》换包不得要求改写叙事结构／信息释放／观看路径／情绪曲线；长期有效）**。",
-    "version": 1,
+    "_说明": "视频风格包声明源（CHANGE-20260923-039）。新增一种风格 = video/styles/<id>/ 一个目录 + 本表登记一行；未声明闸门适用性即硬错误（EXPLICIT_REQUIRED），不得静默继承为 Remotion 帧设计的判据。风格包只是表达能力声明，不拥有内容流程/审核流程/状态来源/Owner 权限。首个风格由 039 批 2a 四候选（白板/商业漫画/动态设计/商业电影感）评估、经用户选定后再登记；whiteboard 以 experimental 登记（039 批 2b）；remotion-components 以 active 登记（039 批 5a：旧链归位）；扫描面派生（批 4-1）与三闸门按风格认领（批 4-2/A2）已接线。**跨风格验收＝导演稿替换测试（同一份《导演稿》换包不得要求改写叙事结构／信息释放／观看路径／情绪曲线；长期有效）**。**片→风格认领（方案 C，2026-09-23）**：闸门按 items[].piecePatterns 认领片归属——模板 `{id}`＝片号（如 g11）、`{dir}`＝该片在 outputs/ 下的目录名（如 g11-烧烤）；命中 ≥2 个非缺省风格＝硬失败（拒绝猜）；无专属命中＝缺省 defaultStyleId。新增风格仍＝一个目录＋本表一行（piecePatterns 就登记在这一行里）。",
+    "version": 2,
+    "defaultStyleId": "remotion-components",
     "itemSchema": [
       "id",
       "label",
       "packPath",
       "status",
+      "piecePatterns",
       "gateApplicability"
     ],
     "items": [
@@ -89,6 +91,9 @@
         "packPath": "video/styles/whiteboard/",
         "status": "experimental",
         "source": "CHANGE-20260923-039 批 2b：六维初评 28 分居首；AI-A 架构复核支持为首个验证风格（理由＝最能验证「导演稿独立→风格负责表达→实现可替换」）",
+        "piecePatterns": [
+          "outputs/{dir}/whiteboard/"
+        ],
         "gateApplicability": {
           "check-redlines": "APPLY",
           "check-ui-truth": "APPLY",
@@ -98,14 +103,14 @@
           "check-voice-brand": "APPLY",
           "check-release-feedback": "APPLY",
           "check-visual-shot-contract": "APPLY",
-          "check-similarity": "APPLY",
+          "check-similarity": "N/A",
           "check-bg": "N/A",
           "check-motif-card": "N/A",
           "check-layout-diversity": "N/A",
           "gate-all-safearea-observation": "APPLY",
           "gate-all-motion-observation": "OBSERVE"
         },
-        "applicabilityNote": "声明＝『本风格应当适用什么』；机检接线与扫描面派生在 039 批 4 完成前存在时差。check-similarity 基准＝同风格内比较、跨风格不比较。check-voice-* 在无声产出时须显式声明 N/A，不得静默跳过。gate-all-motion-observation 只出读数不判红，不得借用 motionWaivers 通道。"
+        "applicabilityNote": "声明＝『本风格应当适用什么』。片身份＝`outputs/{dir}/whiteboard/`（本包 ⑨ 专属产物；本风格无屏级数据文件）。check-similarity＝**N/A（机检）＋人判替代**——该闸门按屏级指纹比对、读 `video/src/data/*.ts`，读不到本风格产物（以场景为单元）；替代机制＝新片与上一条同风格片做画面结构与笔迹节奏的人判对比＋逐帧对账（本包 ⑩），2026-09-23 批 4-1 判定、A2 同步进本表（此前本行误留 APPLY 与包 ⑦ 不一致）。check-voice-* 在无声产出时须显式声明 N/A，不得静默跳过。gate-all-motion-observation 只出读数不判红，不得借用 motionWaivers 通道。"
       },
       {
         "id": "remotion-components",
@@ -113,6 +118,9 @@
         "packPath": "video/styles/remotion-components/",
         "status": "active",
         "source": "CHANGE-20260923-039 批 5a：旧链归位（2026-09-23 用户裁定）——g06–g11 使用的既有行业线风格，唯一有正式片战绩；当前为『登记＋指针』式，正文下沉为 5b",
+        "piecePatterns": [
+          "video/src/data/{id}.ts"
+        ],
         "gateApplicability": {
           "check-redlines": "APPLY",
           "check-ui-truth": "APPLY",
@@ -129,7 +137,7 @@
           "gate-all-safearea-observation": "APPLY",
           "gate-all-motion-observation": "APPLY"
         },
-        "applicabilityNote": "本包即上述闸门的设计对象（现行判据不变）。同风格不得连续复用自本包登记起向前生效，历史片 g06–g11 不回溯。"
+        "applicabilityNote": "本包即上述闸门的设计对象（现行判据不变）。片身份＝`video/src/data/{id}.ts`（屏级数据文件）；本包同时是 `defaultStyleId`——无专属命中（即未被其它风格的 piecePatterns 认领）的行业片按缺省归本包。同风格不得连续复用自本包登记起向前生效，历史片 g06–g11 不回溯。"
       }
     ]
   },
