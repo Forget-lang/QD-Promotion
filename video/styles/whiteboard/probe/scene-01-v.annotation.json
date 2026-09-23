@@ -1,0 +1,203 @@
+{
+  "sceneId": "demo-30s-vertical",
+  "canvas": {
+    "width": 1080,
+    "height": 1920
+  },
+  "storyBasis": "烧烤店周中闲时（竖版）：周五满座 vs 周一空桌 → 老板诊断 → 机制（到点开抢＋工作日限定）→ 回暖。内容蒸馏自 g11 同题；批 2.5 验证用，非交付。",
+  "sceneDurationMs": 28000,
+  "elements": [
+    {
+      "id": "e1_shop",
+      "label": "店面与时钟",
+      "sequence": 1,
+      "narrativeRole": "场景铺垫（导演稿节点1）",
+      "subtitle": "",
+      "type": "structure",
+      "region": {
+        "x": 76,
+        "y": 76,
+        "width": 436,
+        "height": 520
+      },
+      "reveal": {
+        "direction": "top_to_bottom",
+        "startMs": 600,
+        "durationMs": 3400,
+        "maskPaddingPx": 26,
+        "protectedRegions": []
+      },
+      "handPath": {
+        "start": [
+          294,
+          120
+        ],
+        "end": [
+          294,
+          760
+        ],
+        "easing": "easeInOut"
+      }
+    },
+    {
+      "id": "e2_friday",
+      "label": "周五满座",
+      "sequence": 2,
+      "narrativeRole": "对比高点（导演稿节点2）",
+      "subtitle": "",
+      "type": "character",
+      "region": {
+        "x": 616,
+        "y": 76,
+        "width": 436,
+        "height": 520
+      },
+      "reveal": {
+        "direction": "top_to_bottom",
+        "startMs": 4200,
+        "durationMs": 4300,
+        "maskPaddingPx": 26,
+        "protectedRegions": []
+      },
+      "handPath": {
+        "start": [
+          834,
+          120
+        ],
+        "end": [
+          834,
+          760
+        ],
+        "easing": "easeInOut"
+      }
+    },
+    {
+      "id": "e3_monday",
+      "label": "周一空桌",
+      "sequence": 3,
+      "narrativeRole": "对比低点（导演稿节点3）",
+      "subtitle": "",
+      "type": "structure",
+      "region": {
+        "x": 76,
+        "y": 700,
+        "width": 436,
+        "height": 520
+      },
+      "reveal": {
+        "direction": "top_to_bottom",
+        "startMs": 8700,
+        "durationMs": 4300,
+        "maskPaddingPx": 26,
+        "protectedRegions": []
+      },
+      "handPath": {
+        "start": [
+          294,
+          740
+        ],
+        "end": [
+          294,
+          1380
+        ],
+        "easing": "easeInOut"
+      }
+    },
+    {
+      "id": "e4_boss",
+      "label": "老板挠头与灯泡",
+      "sequence": 4,
+      "narrativeRole": "转折（导演稿节点4）",
+      "subtitle": "",
+      "type": "character",
+      "region": {
+        "x": 616,
+        "y": 700,
+        "width": 436,
+        "height": 520
+      },
+      "reveal": {
+        "direction": "top_to_bottom",
+        "startMs": 13200,
+        "durationMs": 3800,
+        "maskPaddingPx": 26,
+        "protectedRegions": []
+      },
+      "handPath": {
+        "start": [
+          834,
+          740
+        ],
+        "end": [
+          834,
+          1380
+        ],
+        "easing": "easeInOut"
+      }
+    },
+    {
+      "id": "e5_mechanism",
+      "label": "券·到点·领取",
+      "sequence": 5,
+      "narrativeRole": "机制兑现（导演稿节点5）",
+      "subtitle": "",
+      "type": "object",
+      "region": {
+        "x": 76,
+        "y": 1324,
+        "width": 436,
+        "height": 520
+      },
+      "reveal": {
+        "direction": "top_to_bottom",
+        "startMs": 17200,
+        "durationMs": 5300,
+        "maskPaddingPx": 26,
+        "protectedRegions": []
+      },
+      "handPath": {
+        "start": [
+          294,
+          1360
+        ],
+        "end": [
+          294,
+          1900
+        ],
+        "easing": "easeInOut"
+      }
+    },
+    {
+      "id": "e6_recover",
+      "label": "回暖满座",
+      "sequence": 6,
+      "narrativeRole": "结果与收口（导演稿节点6）",
+      "subtitle": "",
+      "type": "character",
+      "region": {
+        "x": 616,
+        "y": 1324,
+        "width": 436,
+        "height": 520
+      },
+      "reveal": {
+        "direction": "top_to_bottom",
+        "startMs": 22700,
+        "durationMs": 4600,
+        "maskPaddingPx": 26,
+        "protectedRegions": []
+      },
+      "handPath": {
+        "start": [
+          834,
+          1360
+        ],
+        "end": [
+          834,
+          1900
+        ],
+        "easing": "easeInOut"
+      }
+    }
+  ]
+}
