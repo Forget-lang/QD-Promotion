@@ -73,7 +73,7 @@
     "valueValidation": "content-lines.mjs 对 defaultApplicability 与 gateOverrides 取值做枚举校验；写入 OBSERVE2/PENDING/OPTIONAL 等非法值即报错，不静默当作合法态；并拒绝 EXPLICIT_REQUIRED 出现在 gateOverrides（默认位专用策略值，见 CHANGE-20260920-032 §3.5.1）"
   },
   "styles": {
-    "_说明": "视频风格包声明源（CHANGE-20260923-039）。新增一种风格 = video/styles/<id>/ 一个目录 + 本表登记一行；未声明闸门适用性即硬错误（EXPLICIT_REQUIRED），不得静默继承为 Remotion 帧设计的判据。风格包只是表达能力声明，不拥有内容流程/审核流程/状态来源/Owner 权限。首个风格由 039 批 2a 四候选（白板/商业漫画/动态设计/商业电影感）评估、经用户选定后再登记；首个风格 whiteboard 已以 experimental 状态登记（039 批 2b）；机检接线与扫描面派生在 039 批 4。",
+    "_说明": "视频风格包声明源（CHANGE-20260923-039）。新增一种风格 = video/styles/<id>/ 一个目录 + 本表登记一行；未声明闸门适用性即硬错误（EXPLICIT_REQUIRED），不得静默继承为 Remotion 帧设计的判据。风格包只是表达能力声明，不拥有内容流程/审核流程/状态来源/Owner 权限。首个风格由 039 批 2a 四候选（白板/商业漫画/动态设计/商业电影感）评估、经用户选定后再登记；whiteboard 以 experimental 登记（039 批 2b）；remotion-components 以 active 登记（039 批 5a：旧链归位）；机检接线与扫描面派生在 039 批 4。",
     "version": 1,
     "itemSchema": [
       "id",
@@ -106,6 +106,30 @@
           "gate-all-motion-observation": "OBSERVE"
         },
         "applicabilityNote": "声明＝『本风格应当适用什么』；机检接线与扫描面派生在 039 批 4 完成前存在时差。check-similarity 基准＝同风格内比较、跨风格不比较。check-voice-* 在无声产出时须显式声明 N/A，不得静默跳过。gate-all-motion-observation 只出读数不判红，不得借用 motionWaivers 通道。"
+      },
+      {
+        "id": "remotion-components",
+        "label": "信息卡·组件驱动（Remotion 实现）",
+        "packPath": "video/styles/remotion-components/",
+        "status": "active",
+        "source": "CHANGE-20260923-039 批 5a：旧链归位（2026-09-23 用户裁定）——g06–g11 使用的既有行业线风格，唯一有正式片战绩；当前为『登记＋指针』式，正文下沉为 5b",
+        "gateApplicability": {
+          "check-redlines": "APPLY",
+          "check-ui-truth": "APPLY",
+          "check-facts": "APPLY",
+          "check-doc-references": "APPLY",
+          "check-voice-discipline": "APPLY",
+          "check-voice-brand": "APPLY",
+          "check-release-feedback": "APPLY",
+          "check-visual-shot-contract": "APPLY",
+          "check-similarity": "APPLY",
+          "check-bg": "APPLY",
+          "check-motif-card": "APPLY",
+          "check-layout-diversity": "APPLY",
+          "gate-all-safearea-observation": "APPLY",
+          "gate-all-motion-observation": "APPLY"
+        },
+        "applicabilityNote": "本包即上述闸门的设计对象（现行判据不变）。同风格不得连续复用自本包登记起向前生效，历史片 g06–g11 不回溯。"
       }
     ]
   },
