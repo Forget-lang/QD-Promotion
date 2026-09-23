@@ -6,7 +6,7 @@
 
 > **使用说明（建包时删除本节；本目录是骨架模板——不是风格包、不进注册表、不参与闸门认领）**
 > 新建一个风格 ＝ ① 把本目录复制为 `video/styles/{styleId}/` 并填满全部十栏；② 在 `scripts/ref-registry.json` 的 `styles.items` 登记一行（`id／label／packPath／status／piecePatterns／gateApplicability`）——`piecePatterns` 声明本风格片的产物身份（模板 `{id}`＝片号、`{dir}`＝该片在 outputs 下的目录名），闸门据此认领（见该表 `_说明`）。
-> 建包纪律：**先做出能跑的产出、再登记**（不提前塞空壳包）；每包须过「导演稿替换测试」；风格意向以用户原话为准（`docs/changes/active/` 039 契约 §二十九／§二十九附）。
+> 建包纪律：**先做出能跑的产出、再登记**（不提前塞空壳包）；每包须过「导演稿替换测试」；风格意向以用户原话为准（`CHANGE-20260923-039` 契约 §二十九／§二十九附，文件在 `docs/changes/`）。
 
 ## ① 身份
 

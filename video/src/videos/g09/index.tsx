@@ -2,7 +2,7 @@
 // 母题「洗护次卡磁条卡 + 泡泡计数」。背景 = bgImage（蓝绿光斑底 BG-ABS-004，由 VTemplate 的 KenBurnsBg 垫底），
 // 本组件 AbsoluteFill 透明、不写 backgroundColor（背景底强制闸门）。
 // 视觉语言（与 g08 桌号牌/牌匾/金钉/椒红彻底两套）：磁条次卡卡面（真实产品形态）+ 泡泡=次数计数
-//   + 白卡清单（水蓝/薄荷）。图形全抽象几何（圆泡/磁条带/圆角卡），无 AI 自绘具象插画（C-01）。
+//   + 白卡清单（水蓝/薄荷）。图形全抽象几何（圆泡/磁条带/圆角卡）。
 // 红线（g08 补29/30/31）：主体元素入场 spring 收敛后停留期静止，禁持续 transform；含文字层禁缩放；
 //   无 Drift/PushIn/useVoiceEnergy（已删）。停留期镜头感只由 VTemplate KenBurnsBg 背景缓推承担。
 import React from 'react';

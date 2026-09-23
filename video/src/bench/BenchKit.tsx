@@ -1,6 +1,6 @@
 // BenchKit · 参考图公共骨架件（17 个屏型样张共用）
 // 来源：outputs/样本库/ref-01~19 共性提炼——页码角标 / 双色大标题 / 胶囊提示条 / 底部结论条 / 网格纸底
-// 红线：3D 插画与卡通形象一律不抄（禁自绘具象插画），统一用 emoji + 几何形替位
+// 红线：3D 插画与卡通形象一律不抄（抄骨架与质感线，不抄图案），统一用 emoji + 几何形替位
 import React from 'react';
 import { AbsoluteFill, Img, staticFile } from 'remotion';
 import { FONT_BODY, FONT_TITLE } from '../palette';
