@@ -55,7 +55,7 @@ const GATES = [
   { key: 'similarity', label: '相似度闸门（整屏结构不得复用）', args: ['scripts/check-similarity.mjs'] },
   { key: 'layout', label: '布局指纹闸门（新片不得复用上一条布局）', args: ['scripts/check-layout-diversity.mjs'] },
   { key: 'bg', label: '背景底闸门（每片必用背景图）', args: ['scripts/check-bg.mjs'] },
-  { key: 'motifcard', label: '母题卡闸门（视觉定位卡四栏+素材张数）', args: ['scripts/check-motif-card.mjs'] },
+  { key: 'motifcard', label: '母题卡闸门（按风格声明取值：视觉定位卡四栏+素材张数）', args: ['scripts/check-motif-card.mjs'] },
   { key: 'uitruth', label: '上屏真实性闸门（字段名回源码）', args: ['scripts/check-ui-truth.mjs'] },
   { key: 'voicediscipline', label: '口播纪律闸门（数字中文）', args: ['scripts/check-voice-discipline.mjs'] },
   { key: 'voicebrand', label: '口播品牌点检（画面零品牌·口播必提一次）', args: ['scripts/check-voice-brand.mjs'] },

@@ -81,7 +81,7 @@ CHANGE-20260916-003 已完成并关闭：
 
 ### 5. R9 / Visual Shot Contract
 
-- R9 视觉导演与视觉映射表为现行视觉决策层。
+- R9 为**导演决策 Owner（视觉导演＋叙事导演）**（2026-09-23 `CHANGE-20260923-039` 起；通用导演原则的 Owner）；视觉映射表随其归属。
 - `scripts/check-visual-shot-contract.mjs` 是关键镜头契约机检 Owner。
 - 逐片是否已进入 Visual Shot Contract 与成片 Gate，属波动状态，本账不记（取值处见 `AGENTS.md` §十一）。
 

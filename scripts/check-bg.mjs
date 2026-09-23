@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * scripts/check-bg.mjs · 背景底强制闸门（SKILL 第 2 步 / §五：每条视频必须真用一张背景图打底）
+ * scripts/check-bg.mjs · 背景底强制闸门（`remotion-components` 包 §③A「背景底必选」＋ `SKILL.md` §五 入库流程：
+ * 每条**采用背景底片**的片必须真用一张背景图打底；本闸门按风格「验收位图」声明取值，N/A 的风格不进入判据）
  *
  * 为什么要它（2026-09-04 用户拍板）：g07/g08 都跳过了 §五「选背景底」——没设 style.bgImage、
  * 各自手写同系深棕程序化 Ambient，导致跨片视觉重复；而「换语言五轴」与 check-similarity 只查结构、
@@ -54,7 +55,7 @@ const exemptions = new Map((REGISTRY.bgExemptions || []).map((e) => [String(e.vi
 /** 判线：id 优先，退化到导出名 */
 const classifyLine = (v) => lineOf(v.id, LINES) || lineOf(v.key, LINES);
 
-console.log('\n══════════════ 背景底强制闸门（SKILL 第 2 步 / §五）══════════════\n');
+console.log('\n══════════════ 背景底强制闸门（按风格声明取值；`remotion-components` 包 §③A / SKILL §五）══════════════\n');
 
 // B3.4 返修：industry 声明缺失必须在**任何判定之前**硬失败。
 // 它原先被放在后面，且当 industry 被删时 `l.id === industryLine?.id` 恒不成立、
@@ -147,7 +148,7 @@ for (const v of industryVideos) {
 
 console.log('\n────────────────────────────────────────────');
 if (hardFail) {
-  console.log(`❌ ${hardFail} 条视频背景底不合规。处理：回 SKILL 第 2 步/§五 选一张背景底入库并写 bgImage；`);
+  console.log(`❌ ${hardFail} 条视频背景底不合规。处理：回所选风格包（remotion-components＝其 §③A「背景底必选」）与 SKILL.md §五 选一张背景底入库并写 bgImage；`);
   console.log('   仅已交付/已裁的历史片可在 scripts/ref-registry.json 的 bgExemptions 登记豁免（须用户批准），新片不得走豁免。');
   process.exit(1);
 } else {

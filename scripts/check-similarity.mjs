@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * scripts/check-similarity.mjs · 整屏结构相似度机检（SKILL 第 2 步主判据：一条视频一套专属 UI 语言）
+ * scripts/check-similarity.mjs · 整屏结构相似度机检（按风格分组、组内比较；`remotion-components` 包 §③A/§⑧A 主判据：一条视频一套专属 UI 语言）
  *
  * 为什么要有这个脚本：G05 首版设计稿 9 屏里 4 屏复刻上一条 G04 的组件+变体，
  * 而当时 §2.2 的四类指标全是"下限式"（≥3 处不同 / ≤ 屏数−4 / ≥2 屏不同 / "多数屏"才判雷同），
@@ -73,7 +73,7 @@ function loadVideos() {
       const cardVariant = cardVariantRaw === 'border-left' ? undefined : cardVariantRaw;
       const ui = (b.match(/\bui:\s*'([\w-]+)'/) || [])[1];
       const t = mk.type === 'hook' && hookStyle ? `hook:${hookStyle}` : mk.type;
-      // ui = 本片专属渲染器名（SKILL §三工程约定）：有 ui 时画面结构由它决定，type 只是叙事槽位 → 参与指纹
+      // ui = 本片专属渲染器名（`remotion-components` 包 §⑧A 工程约定）：有 ui 时画面结构由它决定，type 只是叙事槽位 → 参与指纹
       const fp = [t, ui ? `#${ui}` : null, layout, cardVariant].filter(Boolean).join('/');
       return { fp, type: mk.type, ui };
     });
@@ -223,7 +223,7 @@ if (SHOW_ALL) {
 }
 
 if (gateFailures.length) {
-  console.log(`\n══════════════ 整屏结构相似度机检（SKILL 第 2 步）══════════════`);
+  console.log(`\n══════════════ 整屏结构相似度机检（按风格分组、组内比较）══════════════`);
   console.log(`\n④ 内容线适用性  ❌ 硬失败 —— ${gateFailures.length} 处：`);
   for (const x of gateFailures) console.log(`   ❌ ${x}`);
   console.log('   依据：CHANGE-20260920-031 §3.2.1 五态与硬顺序（先立 Owner，再出现该线数据文件）。');
@@ -265,7 +265,7 @@ for (const v of industryVideos) {
   styleGroups.get(claimed.style.id).items.push(v);
 }
 
-console.log('\n══════════════ 整屏结构相似度机检（SKILL 第 2 步）══════════════');
+console.log('\n══════════════ 整屏结构相似度机检（按风格分组、组内比较）══════════════');
 let anyFail = false;
 const verdicts = [];
 for (const { style, items } of styleGroups.values()) {
@@ -312,7 +312,7 @@ for (const { style, items } of styleGroups.values()) {
     anyFail = true;
     if (unexempted.length) {
       console.log(`❌ 不通过：${unexempted.length} 屏复用了已有视频的结构。`);
-      console.log('   处理：回 SKILL 第 2 步定本片视觉基线 → 新建本片专属场景组件（videos/gXX/ + 屏上 ui）重做这些屏；');
+      console.log('   处理：回所选风格包定本片视觉基线（remotion-components＝包 §③A）→ 新建本片专属场景组件（videos/gXX/ + 屏上 ui）重做这些屏；');
     }
     if (bespokeFail) console.log('❌ 不通过：声明了 ui 却没有对应实组件（见上）。');
     console.log('   确实不可替代的，在 scripts/ref-registry.json similarityExemptions 逐条登记理由并经用户批准。');
@@ -322,7 +322,7 @@ for (const { style, items } of styleGroups.values()) {
       ? `✅ ${newest.id}（风格 ${style.id}）通过（${dups.length} 处重复均已登记例外批准）`
       : others.length
         ? `✅ ${newest.id}（风格 ${style.id}）通过：与全部同风格已产出视频零同结构屏`
-        : `✅ ${newest.id}（风格 ${style.id}）通过（注意：基线只有本片一支，无对照物，此绿不证明跨片不雷同——结构像不像按一屏标杆逐张看真图判，见 SKILL §三）`);
+        : `✅ ${newest.id}（风格 ${style.id}）通过（注意：基线只有本片一支，无对照物，此绿不证明跨片不雷同——结构像不像按一屏标杆逐张看真图判，见 \`remotion-components\` 包 §⑧A）`);
   }
 }
 console.log('\n────────────────────────────────────────────');

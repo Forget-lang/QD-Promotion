@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
- * scripts/check-motif-card.mjs · 母题卡强制闸门（SKILL 第 2 步：新片母题一页必须含「视觉定位卡四栏 + 背景素材张数」）
+ * scripts/check-motif-card.mjs · 母题卡强制闸门（目标＝最新一个**声明本闸门 APPLY 的风格片**；
+ * 母题一页定义属主＝`remotion-components` 包 §③A：新片母题一页必须含「视觉定位卡四栏 + 背景素材张数」）
  *
  * 为什么要它（2026-09-14 用户拍板，防"改了文档、新会话仍漏执行"）：今天把「视觉定位卡」「素材最小化+程序化质感」
- * 两条规则吸收进 SKILL 第 2 步，但它们都是软尺——只改规则文档、没有机检承接，新会话大概率不填、又滑回"一张卡片堆字段"。
+ * 两条规则吸收进行业线方法（2026-09-23 CHANGE-039 起正文属主＝`remotion-components` 包 §③A），但它们都是软尺——只改规则文档、没有机检承接，新会话大概率不填、又滑回"一张卡片堆字段"。
  * 本闸把"母题一页必须把情绪契约 + 素材纪律落回产出物"变成可计算的硬判据：缺栏 / 缺张数 = 红灯，交不了母题页。
  *
  * 判据（对 outputs 下**最新一个「本闸门声明为 APPLY」的风格片**的 `03-母题一页.md`）：
@@ -11,7 +12,7 @@
  *   ② 必须含一行 `背景素材张数`。
  * 目标片按风格声明认领（CHANGE-20260923-039 批 4-2 / A2 方案 C）：片→风格见 `ref-registry.styles.items[].piecePatterns`；
  * 风格位声明 N/A 的片显式列出（带声明源）、不进入判据；未声明该闸门 = 硬错误。
- * 任一不满足 = 硬失败。历史片（gXX < 最新）按 old 口径渲过、不回改，不扫描（与 check-bg 豁免思路一致）；最新片暂无母题一页 = 提示需补、不算红灯（可能还没到第 2 步）。
+ * 任一不满足 = 硬失败。历史片（gXX < 最新）按 old 口径渲过、不回改，不扫描（与 check-bg 豁免思路一致）；最新片暂无母题一页 = 提示需补、不算红灯（可能还没到该风格的视觉语言产出步）。
  *
  * 用法（项目根运行）：node scripts/check-motif-card.mjs
  */
@@ -63,7 +64,7 @@ function findMotif(dir) {
   return null;
 }
 
-console.log('\n══════════════ 母题卡强制闸门（SKILL 第 2 步：视觉定位卡四栏 + 素材张数）══════════════\n');
+console.log('\n══════════════ 母题卡强制闸门（按风格声明取值：视觉定位卡四栏 + 素材张数）══════════════\n');
 
 const { byLine, unknown } = classifyDirs();
 
@@ -84,7 +85,7 @@ for (const [lineId, group] of byLine) {
   }
   const names = group.dirs.map((x) => x.name).join('、');
   if (applies === 'APPLY') {
-    gateFailures.push(`${names}｜内容线「${group.line.label}」被声明为 APPLY，但「视觉定位卡四栏 + 背景素材张数」是行业线第 2 步条款 —— 拒绝机械继承，请为该线定义自己的视觉卡判据`);
+    gateFailures.push(`${names}｜内容线「${group.line.label}」被声明为 APPLY，但「视觉定位卡四栏 + 背景素材张数」是行业线 remotion-components 风格的条款（包 §③A）—— 拒绝机械继承，请为该线定义自己的视觉卡判据`);
   } else if (applies === 'OWNER_PENDING') {
     gateFailures.push(`${names}｜内容线「${group.line.label}」在本闸门为 OWNER_PENDING —— 先立 Owner 再产出（不放行、不静默跳过）`);
   } else {
@@ -142,7 +143,7 @@ if (!gg) {
 }
 const motif = findMotif(gg.path);
 if (!motif) {
-  console.log(`⏭️ ${gg.name}（风格：${ggStyle.label}）暂无母题一页，跳过（未到第 2 步产出；到产出时必含四栏 + 背景素材张数，否则本闸转红）。`);
+  console.log(`⏭️ ${gg.name}（风格：${ggStyle.label}）暂无母题一页，跳过（未到该风格视觉语言产出步；到产出时必含四栏 + 背景素材张数，否则本闸转红）。`);
   process.exit(0);
 }
 const src = readFileSync(motif, 'utf8');
@@ -153,15 +154,15 @@ let hardFail = 0;
 console.log(`扫描 ${gg.name} → ${motif.split('/').slice(-2).join('/')}`);
 for (const f of MUST_FIELDS) {
   const ok = src.includes(f);
-  console.log(`${ok ? '✅' : '❌'} 栏位「${f}」 ${ok ? '已写回' : '缺失——母题一页必须把视觉定位卡四栏原样写回（SKILL 第 2 步）'}`);
+  console.log(`${ok ? '✅' : '❌'} 栏位「${f}」 ${ok ? '已写回' : '缺失——母题一页必须把视觉定位卡四栏原样写回（remotion-components 包 §③A）'}`);
   if (!ok) hardFail++;
 }
-console.log(`${hasAsset ? '✅' : '❌'} 字段「${ASSET_MARK}」 ${hasAsset ? '已写回' : '缺失——母题一页必须写一行「背景素材张数」承接素材最小化纪律（SKILL 第 2 步）'}`);
+console.log(`${hasAsset ? '✅' : '❌'} 字段「${ASSET_MARK}」 ${hasAsset ? '已写回' : '缺失——母题一页必须写一行「背景素材张数」承接素材最小化纪律（remotion-components 包 §③A）'}`);
 if (!hasAsset) hardFail++;
 
 console.log('\n────────────────────────────────────────────');
 if (hardFail) {
-  console.log(`❌ 母题一页缺 ${hardFail} 处（缺栏 / 缺素材张数）——按 SKILL 第 2 步把「视觉定位卡」四栏 + 「背景素材张数」写回 ${motif}，写不出=素材/情绪契约没定，禁止带着缺口进第 3 步。`);
+  console.log(`❌ 母题一页缺 ${hardFail} 处（缺栏 / 缺素材张数）——按 remotion-components 包 §③A 把「视觉定位卡」四栏 + 「背景素材张数」写回 ${motif}，写不出=素材/情绪契约没定，禁止带着缺口进第 3 步。`);
   process.exit(1);
 } else {
   console.log(`✅ ${gg.name} 母题一页含视觉定位卡四栏 + 背景素材张数，情绪契约已落产出物，可进第 3 步。`);

@@ -44,7 +44,7 @@ export type LayoutKind =
   | 'hero-focus'     // 单一焦点大数字 / 大对象居中
   | 'mechanism-diagram' // 机制图解（连线/象限/因果）
   | 'cta-statement'   // 主张大字 + 品牌落章
-  | 'layered-stage';  // 三层视觉结构：氛围层(背景/粒子) + 排版层(大数字/大字) + 产品层(手机/券/QR)（g11 起纯 Remotion 片）
+  | 'layered-stage';  // 三层视觉结构：氛围层(背景/粒子) + 排版层(大数字/大字) + 产品层(手机/券/QR)（g11 起 remotion-components 风格）
 
 export interface SubtitleLine {
   /** 字幕文本（单行，建议 10-20 字） */

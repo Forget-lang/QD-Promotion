@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * scripts/check-layout-diversity.mjs · 布局指纹闸门（SKILL 第2步 C-16 / §三 布局指纹）
+ * scripts/check-layout-diversity.mjs · 布局指纹闸门（按风格分组、组内比较；`remotion-components` 包 §③A 的 C-16）
  *
  * 为什么要有它：`check-similarity` 的结构指纹 = type+ui，只防"照抄上一片的 ui 名"——
  *   换掉 gXX- 前缀、把牌匾换成磁条卡、把暖色换成冷色，重做一副一模一样的"顶部大卡+下方大圆角清单卡"，
@@ -159,7 +159,7 @@ for (const { style, items } of styleGroups.values()) {
 
   // ① 最新一片每屏必须标注 layoutKind
   if (newScenes.length < newTypeCount) {
-    missing.push(`${newest.id} 有 ${newTypeCount - newScenes.length} 屏未标 layoutKind（新片每屏必填，见 SKILL C-16）`);
+    missing.push(`${newest.id} 有 ${newTypeCount - newScenes.length} 屏未标 layoutKind（新片每屏必填，见 remotion-components 包 §③A 的 C-16）`);
   }
 
   // 上一条：type → Set(layoutKind)
