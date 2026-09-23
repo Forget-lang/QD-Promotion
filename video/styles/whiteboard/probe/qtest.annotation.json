@@ -1,0 +1,43 @@
+{
+  "sceneId": "qtest",
+  "canvas": {
+    "width": 1080,
+    "height": 1920
+  },
+  "storyBasis": "画稿质量对照：同引擎同参数，仅换画稿精度。",
+  "sceneDurationMs": 6000,
+  "elements": [
+    {
+      "id": "shop",
+      "label": "店面（含钟）",
+      "sequence": 1,
+      "narrativeRole": "对照样本",
+      "subtitle": "",
+      "type": "structure",
+      "region": {
+        "x": 100,
+        "y": 270,
+        "width": 900,
+        "height": 1000
+      },
+      "reveal": {
+        "direction": "top_to_bottom",
+        "startMs": 300,
+        "durationMs": 4700,
+        "maskPaddingPx": 30,
+        "protectedRegions": []
+      },
+      "handPath": {
+        "start": [
+          540,
+          300
+        ],
+        "end": [
+          540,
+          1250
+        ],
+        "easing": "easeInOut"
+      }
+    }
+  ]
+}
