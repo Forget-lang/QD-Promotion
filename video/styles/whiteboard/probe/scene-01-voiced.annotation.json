@@ -5,7 +5,7 @@
     "height": 1920
   },
   "storyBasis": "烧烤店周中闲时（竖版）：周五满座 vs 周一空桌 → 老板诊断 → 机制（到点开抢＋工作日限定）→ 回暖。内容蒸馏自 g11 同题；批 2.5 验证用，非交付。",
-  "sceneDurationMs": 31385,
+  "sceneDurationMs": 31951,
   "elements": [
     {
       "id": "e1_shop",
@@ -23,7 +23,7 @@
       "reveal": {
         "direction": "top_to_bottom",
         "startMs": 400,
-        "durationMs": 5010,
+        "durationMs": 4786,
         "maskPaddingPx": 26,
         "protectedRegions": []
       },
@@ -54,8 +54,8 @@
       },
       "reveal": {
         "direction": "top_to_bottom",
-        "startMs": 5410,
-        "durationMs": 3977,
+        "startMs": 5186,
+        "durationMs": 4204,
         "maskPaddingPx": 26,
         "protectedRegions": []
       },
@@ -86,8 +86,8 @@
       },
       "reveal": {
         "direction": "top_to_bottom",
-        "startMs": 9388,
-        "durationMs": 5003,
+        "startMs": 9390,
+        "durationMs": 5175,
         "maskPaddingPx": 26,
         "protectedRegions": []
       },
@@ -118,8 +118,8 @@
       },
       "reveal": {
         "direction": "top_to_bottom",
-        "startMs": 14392,
-        "durationMs": 4219,
+        "startMs": 14565,
+        "durationMs": 4388,
         "maskPaddingPx": 26,
         "protectedRegions": []
       },
@@ -150,8 +150,8 @@
       },
       "reveal": {
         "direction": "top_to_bottom",
-        "startMs": 18611,
-        "durationMs": 5994,
+        "startMs": 18953,
+        "durationMs": 6214,
         "maskPaddingPx": 26,
         "protectedRegions": []
       },
@@ -182,8 +182,8 @@
       },
       "reveal": {
         "direction": "top_to_bottom",
-        "startMs": 24605,
-        "durationMs": 5980,
+        "startMs": 25168,
+        "durationMs": 5982,
         "maskPaddingPx": 26,
         "protectedRegions": []
       },

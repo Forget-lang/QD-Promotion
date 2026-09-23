@@ -1,0 +1,43 @@
+{
+  "sceneId": "demo-voiced",
+  "scenePng": "scene-01-v.png",
+  "baseAnnotation": "scene-01-v.annotation.json",
+  "outAnnotation": "scene-01-voiced.annotation.json",
+  "outTrack": "voiced-track.wav",
+  "outSilent": "demo-voiced-silent.mp4",
+  "outFinal": "demo-30s-voiced.mp4",
+  "leadMs": 400,
+  "tailMs": 800,
+  "lines": [
+    {
+      "element": "e1_shop",
+      "text": "晚上八点，街角的烧烤店，灯亮着，人却不多。",
+      "wav": "../../../public/audio/wb-demo/e1.wav"
+    },
+    {
+      "element": "e2_friday",
+      "text": "周五晚上，翻台三轮，排队排到门口。",
+      "wav": "../../../public/audio/wb-demo/e2.wav"
+    },
+    {
+      "element": "e3_monday",
+      "text": "可一到周一，同样的店，同样的味道，桌子却空了一半。",
+      "wav": "../../../public/audio/wb-demo/e3.wav"
+    },
+    {
+      "element": "e4_boss",
+      "text": "老板想不明白，缺的是客人，还是来的理由。",
+      "wav": "../../../public/audio/wb-demo/e4.wav"
+    },
+    {
+      "element": "e5_mechanism",
+      "text": "他在券到卡包里设了一张手气券，只有周一到周四能用，到点才开抢。",
+      "wav": "../../../public/audio/wb-demo/e5.wav"
+    },
+    {
+      "element": "e6_recover",
+      "text": "周二晚上，桌子重新坐满。留下的不是折扣，是那一个来的理由。",
+      "wav": "../../../public/audio/wb-demo/e6.wav"
+    }
+  ]
+}
