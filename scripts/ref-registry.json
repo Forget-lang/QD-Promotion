@@ -73,7 +73,7 @@
     "valueValidation": "content-lines.mjs 对 defaultApplicability 与 gateOverrides 取值做枚举校验；写入 OBSERVE2/PENDING/OPTIONAL 等非法值即报错，不静默当作合法态；并拒绝 EXPLICIT_REQUIRED 出现在 gateOverrides（默认位专用策略值，见 CHANGE-20260920-032 §3.5.1）"
   },
   "styles": {
-    "_说明": "视频风格包声明源（CHANGE-20260923-039）。新增一种风格 = video/styles/<id>/ 一个目录 + 本表登记一行；未声明闸门适用性即硬错误（EXPLICIT_REQUIRED），不得静默继承为 Remotion 帧设计的判据。风格包只是表达能力声明，不拥有内容流程/审核流程/状态来源/Owner 权限。首个风格由 039 批 2a 四候选（白板/商业漫画/动态设计/商业电影感）评估、经用户选定后再登记；whiteboard 以 experimental 登记（039 批 2b）；remotion-components 以 active 登记（039 批 5a：旧链归位）；机检接线与扫描面派生在 039 批 4。",
+    "_说明": "视频风格包声明源（CHANGE-20260923-039）。新增一种风格 = video/styles/<id>/ 一个目录 + 本表登记一行；未声明闸门适用性即硬错误（EXPLICIT_REQUIRED），不得静默继承为 Remotion 帧设计的判据。风格包只是表达能力声明，不拥有内容流程/审核流程/状态来源/Owner 权限。首个风格由 039 批 2a 四候选（白板/商业漫画/动态设计/商业电影感）评估、经用户选定后再登记；whiteboard 以 experimental 登记（039 批 2b）；remotion-components 以 active 登记（039 批 5a：旧链归位）；机检接线与扫描面派生在 039 批 4。**跨风格验收＝导演稿替换测试（同一份《导演稿》换包不得要求改写叙事结构／信息释放／观看路径／情绪曲线；长期有效）**。",
     "version": 1,
     "itemSchema": [
       "id",
