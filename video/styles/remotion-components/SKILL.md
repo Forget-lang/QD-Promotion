@@ -152,9 +152,7 @@
 
 ## ⑧A 工程约定（自 `SKILL.md` 「三、工程约定」迁入 · 2026-09-23 批 5b 第二波）
 
-> 迁入说明：原文逐字搬移。
-
-## 三、工程约定
+> 迁入说明：原文逐字搬移。原 `SKILL.md`「三、工程约定」整节下沉至此，**旧章节号不再保留**（保留会在本包内造出一个与 ①~⑩ 并列的假顶层节）——本节即 §⑧A 正文。
 
 - **一行业一套专属屏**：`video/src/videos/gXX/`（屏组件 + 本片零件 + payload 类型）。屏组件**不得跨行业 import**；共享层已冻结——只含原子件与 `VTemplate`。旧共享层已废止：12 个共享场景 + "不写 ui 按 type 回退"旁路 → **ui 必填，缺了直接抛错**；9 个"统一外观"业务组件（CouponCard/PhoneMockup/StepFlow/CompareCard/StatCounter / StatCard/IconBadge/SectionTitle/HighLightText）→ 禁止预建/复用外观件，每片照锚稿手写。**共享件现行消费者状态**以 `node scripts/list-assets.mjs` + grep 实时为准（文档宪法铁律三，本文不复述快照；提醒一句：**零引用 ≠ 已删除**，能调用没人用的原子件仍在）。规则恒定：共享层只有原子件与 `VTemplate`，**没有任何现成的券面/手机壳/步骤条外观**——要上屏照锚稿手写，别以为 import 一下就有。
 - 数据文件每屏写 `ui: 'gXX-名字'`，业务数据进 `payload`（形状由本片 `videos/gXX/types.ts` 定义，通用 `Scene` 只留分发/时长/字幕/语音偏移字段）；在 `scenes/index.tsx` 的 `VIDEO_RENDERERS[视频id]` 注册；`ui` 名拼错运行即抛错，不会静默回退旧组件；数据文件的**导出名必须与视频 id 一致**（check-similarity 防伪按该名找 `videos/<key>/index.tsx`）。
