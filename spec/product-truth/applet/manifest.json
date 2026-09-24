@@ -1,14 +1,1509 @@
 {
-  "source_archive": "applet.zip",
-  "archive_sha256": "afb1b0385cf167392eb78b2031d104b714134d72697a1e735d6d4313e6ca1ad7",
+  "source_archive": "本机 live source（../applet）",
+  "archive_sha256": null,
+  "source_tree_sha256": "e99fe68ce1cba67ee071f4f172a0c11f1f4803939bfe1fb42adfad84d6c02dd0",
+  "provenance_note": "本次输入＝本机 live source（无来源 archive）：source_tree_sha256＝对「相对路径＋内容 SHA-256」排序串取 SHA-256 的源集摘要，作来源身份；archive_sha256 留空（R10 §4 的 archive 位仅 archive 模式使用）",
   "snapshot_archive": "source.tar.xz",
-  "snapshot_sha256": "d1248732f77a38c362844e242d3383fce46517f88b3ff75b2c6069694e7bd6d5",
+  "snapshot_sha256": "795a9c2a4535b7a457f0071b266d6a3042752c9434c849376d97954f736481b9",
   "file_count": 298,
   "scope": "all .vue/.js/.json source files, excluding node_modules, unpackage, uni_modules, .git and macOS metadata",
-  "generated_at": "2026-09-15",
+  "generated_at": "2026-09-24",
   "verification": [
-    "snapshot sha256 verified locally",
+    "snapshot sha256 recorded above",
     "snapshot contains exactly 298 source files",
-    "snapshot excludes .git and generated dependency/build directories"
+    "snapshot excludes .git and generated dependency/build directories",
+    "per-file path/sha256/bytes listed below (R10 §4)"
+  ],
+  "files": [
+    {
+      "path": "App.vue",
+      "sha256": "01eaa87e438eadc083ad1f1e12601ed02d18b564e1fca6cd442b78925f608ad5",
+      "bytes": 4235
+    },
+    {
+      "path": "components/m/m-activity-coupon-select/m-activity-coupon-select.vue",
+      "sha256": "ebb14c33934ffa48a21a17487eb178654de06e3d09ad55a2bc48abb7be26329b",
+      "bytes": 10921
+    },
+    {
+      "path": "components/m/m-area-picker/m-area-picker.vue",
+      "sha256": "b8f8292b2b33442ce57e8013acf76459a83fe11f1e5a8c050ad13fea4316100d",
+      "bytes": 2436
+    },
+    {
+      "path": "components/m/m-bundle-coupon-select/m-bundle-coupon-select.vue",
+      "sha256": "618892c7d9833cc89475f21a56aaa1e59f649206cbba054d89ccb0794384b82d",
+      "bytes": 15254
+    },
+    {
+      "path": "components/m/m-captcha/m-captcha.vue",
+      "sha256": "8efd273fac4f121118334e9883abe1130155c34201998050547eb35bd3382b50",
+      "bytes": 11119
+    },
+    {
+      "path": "components/m/m-card-benefit-list/m-card-benefit-list.vue",
+      "sha256": "4bff5e38f2588bc2627501e1a2e2003857932e0f1dda98243a4f30cde07b2e42",
+      "bytes": 12448
+    },
+    {
+      "path": "components/m/m-card-item-editor/m-card-item-editor.vue",
+      "sha256": "73fb8dcb0b3a8025e86c7788947a61e74ed489e02302a27a3940b5f56cb99a30",
+      "bytes": 10299
+    },
+    {
+      "path": "components/m/m-card-magnetic-face/m-card-magnetic-face.vue",
+      "sha256": "17e573e0f5e899099ce6203e71a4b1599816dafa142feca8946e00750e869aeb",
+      "bytes": 7832
+    },
+    {
+      "path": "components/m/m-card-progress-preview/m-card-progress-preview.vue",
+      "sha256": "759ea1ce503e0ca74922849040ddac6d111c2b7fe9d6da0cf0a64c90524a7b75",
+      "bytes": 5703
+    },
+    {
+      "path": "components/m/m-card-stores/m-card-stores.vue",
+      "sha256": "62f1b004e075d54fdb0ca4a4d62919fa6457f8f92a4c287625ce719656983073",
+      "bytes": 7476
+    },
+    {
+      "path": "components/m/m-compress/m-compress.vue",
+      "sha256": "77cba061cbe5f097b80cdf210bffbdc06d2cc2461058ba60dd21fd573f980aa0",
+      "bytes": 4679
+    },
+    {
+      "path": "components/m/m-confirm/m-confirm.vue",
+      "sha256": "4f363ced805171a00a4bd21ec357b0b992b00485685a899a12641147ed14e2ac",
+      "bytes": 1380
+    },
+    {
+      "path": "components/m/m-coupon-allow-mobile-panel/m-coupon-allow-mobile-panel.vue",
+      "sha256": "a9f13ddcd2508c1bcd214f533a4c5472e2bf550fa38c625e2c6af19deb567300",
+      "bytes": 5224
+    },
+    {
+      "path": "components/m/m-coupon-cipher-panel/m-coupon-cipher-panel.vue",
+      "sha256": "7178e43e8ac378a16a885179257e97286bbf1a2a8541e7a54b966b5669180bd8",
+      "bytes": 12185
+    },
+    {
+      "path": "components/m/m-coupon-combo/m-coupon-combo.vue",
+      "sha256": "a419b941c2de1c99ab795afd8fbcdb19d158907ab8322bb59e0ccb675831bdde",
+      "bytes": 15257
+    },
+    {
+      "path": "components/m/m-coupon-flash/m-coupon-flash.vue",
+      "sha256": "94e1b756a391fdbd6d80fd4b56694479abb296eefc2f5fcf92c8b64a68de9ee0",
+      "bytes": 4161
+    },
+    {
+      "path": "components/m/m-coupon-intro/m-coupon-intro.vue",
+      "sha256": "3b43810c5a68de7a7e0c755654ffaeba423cfe3fdece814f52af394f30d4c864",
+      "bytes": 6083
+    },
+    {
+      "path": "components/m/m-coupon-receive-profile/m-coupon-receive-profile.vue",
+      "sha256": "5d3e806c83744c8efa89df4024d2c5758c5835ac90affa310c20d35cdffdef25",
+      "bytes": 18691
+    },
+    {
+      "path": "components/m/m-coupon-select/m-coupon-select.vue",
+      "sha256": "58b569824d5203d718fb1949324ecb070fc661da7b7b43b0c0c0fce1d9769f7c",
+      "bytes": 6821
+    },
+    {
+      "path": "components/m/m-coupon-stores/m-coupon-stores.vue",
+      "sha256": "58a335e39536b34cdf375ea7916e15a6ee0e2090ffd3b0e58714e0aeead3ccf9",
+      "bytes": 7356
+    },
+    {
+      "path": "components/m/m-coupon-tpl/m-coupon-tpl.vue",
+      "sha256": "6ac9dd4a9385ccbdf8e4c78e8da03c41bf0044015d42b94898987fa864e77cb2",
+      "bytes": 4661
+    },
+    {
+      "path": "components/m/m-coupon-usage/m-coupon-usage.vue",
+      "sha256": "d705b76c0bd78e2f7f21a6645807ac5f10e47c616b767ce94f8d7c40fb6aca46",
+      "bytes": 6058
+    },
+    {
+      "path": "components/m/m-cover-uploader/m-cover-uploader.vue",
+      "sha256": "ed739791d944753d1588b17670cbe83d2888a457ec9411a562cd38287af82652",
+      "bytes": 16811
+    },
+    {
+      "path": "components/m/m-cover/m-cover.vue",
+      "sha256": "5d271d426afc181141f1af763dc899eaba047725156a9f51df55358e0c680cdc",
+      "bytes": 5980
+    },
+    {
+      "path": "components/m/m-date/m-date.vue",
+      "sha256": "434c1b0dc9e2530665c36218a2da9674ac1a73bebbc65be343a03569980ab4d2",
+      "bytes": 951
+    },
+    {
+      "path": "components/m/m-datetime-picker/m-datetime-picker.vue",
+      "sha256": "70711e1307bb898dbbed637f11b4f48f80aaf6fba40dba5915c91b445dc24146",
+      "bytes": 2387
+    },
+    {
+      "path": "components/m/m-edition-badge/m-edition-badge.vue",
+      "sha256": "16930e4fb5b39b7fac358a0c0ed888f6e74b1bd533c566c691835350cbdf0144",
+      "bytes": 1171
+    },
+    {
+      "path": "components/m/m-empty/m-empty.vue",
+      "sha256": "658a353f0b75860c323c3c9644bedc026cd7a13f2db340a4040c835040683a77",
+      "bytes": 569
+    },
+    {
+      "path": "components/m/m-footer/m-footer.vue",
+      "sha256": "7b8a58f5d515ee82c694981dda1fadf68cda322e3b8c366f0b196ede063d3d5a",
+      "bytes": 6748
+    },
+    {
+      "path": "components/m/m-gender-picker/m-gender-picker.vue",
+      "sha256": "a912b39170bbc26a8cc3b1f325300a072a0898ae5ee03c58dc42478a3c4d488d",
+      "bytes": 1047
+    },
+    {
+      "path": "components/m/m-help-link/m-help-link.vue",
+      "sha256": "9405405154d3449e288cf239f1e6915ed51940491aca137c6601457e97c17f8d",
+      "bytes": 921
+    },
+    {
+      "path": "components/m/m-industry-picker/m-industry-picker.vue",
+      "sha256": "525660be2df26ac428a7260b34003062f07db2187974bec05f4ec848e8e3920d",
+      "bytes": 2195
+    },
+    {
+      "path": "components/m/m-landscape/m-landscape.vue",
+      "sha256": "4e7589f76f78cb044f8ca7becaf3da1bfba722aa4c223324e732f05f516ea1a0",
+      "bytes": 3907
+    },
+    {
+      "path": "components/m/m-loading/m-loading.vue",
+      "sha256": "00ba1f92cb1448dd176c3baadc784a54d20fb2a9eafde8092b09a7505b1ac2e2",
+      "bytes": 544
+    },
+    {
+      "path": "components/m/m-logo/m-logo.vue",
+      "sha256": "ba5659a0556102f8dd668f786d47ba5081b47275bdff8e426c3d9c144d9541df",
+      "bytes": 5365
+    },
+    {
+      "path": "components/m/m-major-select/m-major-select.vue",
+      "sha256": "a6f8d5dc9927d919c8d9060ed19ea78df1a9971832e35562bb21a732996995ef",
+      "bytes": 1177
+    },
+    {
+      "path": "components/m/m-member-level-badge/m-member-level-badge.vue",
+      "sha256": "df913063938b6ae1465639d7ac3396d771fb1235f096f1bb987533c6e8712394",
+      "bytes": 1999
+    },
+    {
+      "path": "components/m/m-merchant-card/m-merchant-card.vue",
+      "sha256": "6ed0d72ecfcf497e58d55de5bb07d46a3b4943ede39abc53e83c155bf7cd819f",
+      "bytes": 4877
+    },
+    {
+      "path": "components/m/m-navigation-bar/m-navigation-bar.vue",
+      "sha256": "7f37b61f9224e5681167c47694435ad638e8ecd78393102464e6144aea84d0dd",
+      "bytes": 4541
+    },
+    {
+      "path": "components/m/m-nomore/m-nomore.vue",
+      "sha256": "b1a6a78faa3e4d82340aa5df9962ba8da20a696f4ab0f08ccc666ea9877665e1",
+      "bytes": 225
+    },
+    {
+      "path": "components/m/m-notification/m-notification.vue",
+      "sha256": "f205c8f0533648f8d8dd39c7453ccb53ac92c7dfeee69ce4f0f78add6e480d02",
+      "bytes": 939
+    },
+    {
+      "path": "components/m/m-openhour-picker/m-openhour-picker.vue",
+      "sha256": "c4ccc62d938b9d0b39777b38b8ed9b047b0334d47843f5823b400c674fc55dab",
+      "bytes": 4191
+    },
+    {
+      "path": "components/m/m-picture-cropper/m-picture-cropper.vue",
+      "sha256": "289c8ab94ae5f0abb194d0cbcae2a3864764e38aeac570b55e8ccb9bbba59303",
+      "bytes": 18266
+    },
+    {
+      "path": "components/m/m-position/m-position.vue",
+      "sha256": "1ef6688a42d026f04d0146c0bef3c0342ca06e31ff743b9cd8c9b779dc2dcaa3",
+      "bytes": 5572
+    },
+    {
+      "path": "components/m/m-poster/m-poster.vue",
+      "sha256": "734cb338fbffdc43e216c24e933a72dcd1659006621b76115c356e11c28dfe13",
+      "bytes": 18093
+    },
+    {
+      "path": "components/m/m-result/m-result.vue",
+      "sha256": "62276e9360c665fcc65633ed80e1c2f27865c8433beecf7f04c9a236e3344b90",
+      "bytes": 3822
+    },
+    {
+      "path": "components/m/m-role-select/m-role-select.vue",
+      "sha256": "67a2d84c86275da55fc383540a515c5a9a5456b76f5cc6747347bcdbf8137edc",
+      "bytes": 2219
+    },
+    {
+      "path": "components/m/m-select/m-select.vue",
+      "sha256": "0de94d2eb929ec6cde35b5ad0a25fd1541a4763f01e15aca899c45aee2b858dd",
+      "bytes": 2043
+    },
+    {
+      "path": "components/m/m-sms-code/m-sms-code.vue",
+      "sha256": "560a9a50be866718602808b0bf8942ca2eef1ed803c596bfce897098d905f720",
+      "bytes": 2764
+    },
+    {
+      "path": "components/m/m-staff-select/m-staff-select.vue",
+      "sha256": "c3e91149806641c8bb3a01dbccc53ce8c08b5e6ea483e25865af9e15f421e0ff",
+      "bytes": 8161
+    },
+    {
+      "path": "components/m/m-store-select/m-store-select.vue",
+      "sha256": "c3b88a4047868e357ca2b8600b067631167855fc9523001f21269f02fe40a23f",
+      "bytes": 9514
+    },
+    {
+      "path": "components/m/m-submit/m-submit.vue",
+      "sha256": "4d9d058099a5cdeca4e8d5083fc9855f9432bdd7051cc1680d52aa4f400fadf2",
+      "bytes": 829
+    },
+    {
+      "path": "components/m/m-subscribe-message-guide/m-subscribe-message-guide.vue",
+      "sha256": "e1b3d16fe115feb3e54eb7c05474a0f987e21a706a82007ed33aec6aa67d5fc5",
+      "bytes": 3838
+    },
+    {
+      "path": "components/m/m-tag-select/m-tag-select.vue",
+      "sha256": "4c42417dddf3a737d6916e04e663910a3d508c4902d5e4762954a0879fdd9302",
+      "bytes": 1280
+    },
+    {
+      "path": "components/m/m-theme-select/m-theme-select.vue",
+      "sha256": "a1be7dd11b7acd27b636bc40a97a366f0958cdb386f16ac080f77beb7bd21563",
+      "bytes": 2889
+    },
+    {
+      "path": "components/m/m-upload/m-upload.vue",
+      "sha256": "a26d97c6a4c55986a3f0ee79e73cf38e3f7fad25459e210446534972d9a0b94b",
+      "bytes": 2993
+    },
+    {
+      "path": "components/m/m-usage-stores/m-usage-stores.vue",
+      "sha256": "59a2ba6c1c6785d43cb8f04e0be3bfae16e6f0bb14777a4707f341f3f8454f16",
+      "bytes": 5134
+    },
+    {
+      "path": "components/m/m-vip-upgrade/m-vip-upgrade.vue",
+      "sha256": "5643b4779e98e41c8f8a776b30f29f15670626c469dfbe815650d9d282c0bb31",
+      "bytes": 26538
+    },
+    {
+      "path": "components/m/m-week-picker/m-week-picker.vue",
+      "sha256": "40a781a31c250d01ce592b971987d7bf86404461f84a80acdc070a1e637b02b2",
+      "bytes": 4306
+    },
+    {
+      "path": "config.js",
+      "sha256": "dd6b50014bac223b1c2f26314b32a7174a2f28b0b9c6223b79712549c644a0a0",
+      "bytes": 172
+    },
+    {
+      "path": "config.prod.js",
+      "sha256": "ce4a8ad0ade88a27f6caa85aaa42229ec95dad6822d7ee509d4d75033350c3ec",
+      "bytes": 2131
+    },
+    {
+      "path": "config.test.js",
+      "sha256": "3d7e86d02ae38eb28a5b8494b4e6fb8515e814eddeb6a1c9ce7d4e21e7764076",
+      "bytes": 2055
+    },
+    {
+      "path": "constants/activity.js",
+      "sha256": "15852cb2d99705d624e2fca2167f568dc0d4b77a94dbcc1a90388773daa69559",
+      "bytes": 355
+    },
+    {
+      "path": "constants/bundle.js",
+      "sha256": "ef9cb9f945042682aa04f98588bbf495cdbad3c066c186b6559ab8369e4b7c27",
+      "bytes": 2002
+    },
+    {
+      "path": "constants/card.js",
+      "sha256": "6689e80ae42cfe8db2bb5947c1b0ee059dce9cbddba428d31b5396a69a582eeb",
+      "bytes": 2105
+    },
+    {
+      "path": "constants/code.js",
+      "sha256": "1585d205cfb368fdbe8e6a245c6fc16e77b17c72c860a3539d0bf6925627ebc0",
+      "bytes": 613
+    },
+    {
+      "path": "constants/common.js",
+      "sha256": "ea9e4c3ffcc9a5d4e4d5fcf373990ced16ec0b44f4eaba692a44bddf9ffe58c8",
+      "bytes": 1953
+    },
+    {
+      "path": "constants/coupon.js",
+      "sha256": "19847c867697ce1caf3280e4fd8600c009e6784919c290a15fcd7e5732f01298",
+      "bytes": 3221
+    },
+    {
+      "path": "constants/edition.js",
+      "sha256": "efa8aac4516088e716be8584440a69b38e91804f04b1f8a1bc1d54eefaa08ee4",
+      "bytes": 11594
+    },
+    {
+      "path": "constants/media.js",
+      "sha256": "b7ae166a1356cc43ec09a2d06a80c5f6bac7aa0141daacdc072fe442f9c3abc3",
+      "bytes": 464
+    },
+    {
+      "path": "constants/memberLevel.js",
+      "sha256": "6fbb50e410c6217b51433c3a7bdef79cd99329f42ce902a8174f94742d3a4e65",
+      "bytes": 2222
+    },
+    {
+      "path": "constants/merchant.js",
+      "sha256": "ff663cd6a2137a25856a14d85ef99d15d204c957eaac25f192db821610486f03",
+      "bytes": 1546
+    },
+    {
+      "path": "constants/permission.js",
+      "sha256": "e41037ad4e1e7ef0c8c7ee8e52d49dd3274765bc62783205e0fde155d4678cfe",
+      "bytes": 5189
+    },
+    {
+      "path": "constants/product.js",
+      "sha256": "50609866f163d64012f749308af6d4dcdd695e2faf7984eb4bc234d615993de0",
+      "bytes": 307
+    },
+    {
+      "path": "constants/vipUpgrade.js",
+      "sha256": "5522e1cf5c740a7ff12388dd011e1a010d166331d56226ffb45ae9fbc70383e9",
+      "bytes": 324
+    },
+    {
+      "path": "constants/wecom.js",
+      "sha256": "2702f99a863deb0a622cb07f1fdb56e321991d8134cb4882dbc90024f24e2f8e",
+      "bytes": 300
+    },
+    {
+      "path": "hooks/is.js",
+      "sha256": "9fd6ad935ba813a13a96117e5c729ecc42796e11525fa6f952a789420058a12b",
+      "bytes": 1502
+    },
+    {
+      "path": "hooks/request.js",
+      "sha256": "cd080cf117823499fc42968a19a6c5f7e6eaceb4f6ef683f35826863e054b82c",
+      "bytes": 6124
+    },
+    {
+      "path": "hooks/to.js",
+      "sha256": "bcde2e13be7db84a871176648f34c0d99d5815114964c5b66dff801410b9c6fc",
+      "bytes": 2387
+    },
+    {
+      "path": "hooks/useAuth.js",
+      "sha256": "ec714e781c32cfefc63d7b72adaab4940ac8995bf655ea34ebc0d9e49f1e15db",
+      "bytes": 5433
+    },
+    {
+      "path": "hooks/useFile.js",
+      "sha256": "4322b22b0300d9515bba887a722726c9f9777d912e5cea3662ac60843e49f5fe",
+      "bytes": 10359
+    },
+    {
+      "path": "hooks/useLink.js",
+      "sha256": "c5d2129d2f1a5d74c9098cf4a06fdb27f0d8a6860324a53bacf0e2d5b6d0800d",
+      "bytes": 2331
+    },
+    {
+      "path": "hooks/useVipGuard.js",
+      "sha256": "298635d8917ed404a1ba542118e8f1b19d6b806aca6b924ce67fc52992305bca",
+      "bytes": 2223
+    },
+    {
+      "path": "main.js",
+      "sha256": "a84c1c7c28b631ab3cf121d275413741f9bcf4c6719cd991bc5290e5ae9024da",
+      "bytes": 401
+    },
+    {
+      "path": "manifest.json",
+      "sha256": "4822cecb36f3dbe2a704a68590d1732858b54abddedb2747dea03ec6bdf08d8f",
+      "bytes": 4036
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "dee1ac784a238faf17d45506682ce1bc11b9ef9b4b1f67ff59077f7a56495784",
+      "bytes": 720
+    },
+    {
+      "path": "package.json",
+      "sha256": "69899116db6d094ab2a2d0beb7e2234366aa1be30f93541fd01c0dd1f53959af",
+      "bytes": 72
+    },
+    {
+      "path": "pages.json",
+      "sha256": "8e52ae428398be01be2ec21f5d3fdc3941ec7bdfda4a26718af409310ba17189",
+      "bytes": 61420
+    },
+    {
+      "path": "pages/index/index.vue",
+      "sha256": "30820fed4f1d932b1529d87418b762e11bfd649340a0e90cebb621f90ddeefea",
+      "bytes": 48027
+    },
+    {
+      "path": "pages/merchant/create.vue",
+      "sha256": "b06d41183ad5d5339dc9fc7b433cd1c10a079c5398c086ec6fb70ebc6c8036b6",
+      "bytes": 10098
+    },
+    {
+      "path": "pages/merchant/index.vue",
+      "sha256": "a58a6fde43cd8ab8e6a1dfc70453a221882a49296358d8eec694847dfabcb0a5",
+      "bytes": 30452
+    },
+    {
+      "path": "pages/merchant/select.vue",
+      "sha256": "3699c9ca1b75e060084dfe6bf7e76817f683330c4b470f5dc9303125889f3043",
+      "bytes": 5098
+    },
+    {
+      "path": "pages_activity/activity/create.vue",
+      "sha256": "f9a202fcc2133b0e372b52ec88f59ecf04e96bae2dd07f16c62752265ec78a19",
+      "bytes": 4675
+    },
+    {
+      "path": "pages_activity/activity/detail.vue",
+      "sha256": "6886b36183cb2f1da97a782595a88fb6ba76fac9286afbfd087dd0cf48541ff5",
+      "bytes": 14732
+    },
+    {
+      "path": "pages_activity/activity/index.vue",
+      "sha256": "274c3764895c7a1698b704f6153e22a31809bf4143143e44669baa6dc02d0e97",
+      "bytes": 9586
+    },
+    {
+      "path": "pages_activity/activity/update.vue",
+      "sha256": "c8353d8a8d57f9e11dfd87eeb17093783c3ec75cc1c3bdff4935154a26e59e73",
+      "bytes": 5250
+    },
+    {
+      "path": "pages_activity/issue/official.vue",
+      "sha256": "643c88ef3432317db5ce3a57feeb9b42d7fb7fdc081dbebbd1c3156cf008c132",
+      "bytes": 3925
+    },
+    {
+      "path": "pages_activity/issue/poster.vue",
+      "sha256": "74f684e654e6d23713a0bdc1a1d90c95d026d4d7d1660df1317448ab633475c9",
+      "bytes": 12832
+    },
+    {
+      "path": "pages_activity/issue/qrcode.vue",
+      "sha256": "2d3246df08426e3c51605796d852dc0829611ed982ea1634f7dc9191792586c3",
+      "bytes": 1621
+    },
+    {
+      "path": "pages_activity/issue/wechat.vue",
+      "sha256": "dae44887156c98f7829744d1569420ee106ae3dcdc208864876170f08ff04652",
+      "bytes": 2303
+    },
+    {
+      "path": "pages_assist/agreement/agreement.vue",
+      "sha256": "b14727699dfb2a848967b4e456ac5976f24195087af744e0b03474be1109bb31",
+      "bytes": 22496
+    },
+    {
+      "path": "pages_assist/agreement/privacy.vue",
+      "sha256": "86b3d5217287baa8783ab56fecd08c42cb15ca4c23f5713ea8ce488c8e973e57",
+      "bytes": 9954
+    },
+    {
+      "path": "pages_assist/help/article.vue",
+      "sha256": "0a0ae4a99ab0fe1b76c8335e34efde8b8be6d20302abc254f34e0947b5da039d",
+      "bytes": 2532
+    },
+    {
+      "path": "pages_assist/help/category.vue",
+      "sha256": "4551043e3f26fc528b30b33fc2bbd462229f481db424c6100bc815defa2c7265",
+      "bytes": 2484
+    },
+    {
+      "path": "pages_assist/help/index.vue",
+      "sha256": "111d3f88962562ed012e18f4f88411ceaadb54d97301a5573a6735af889e477a",
+      "bytes": 4151
+    },
+    {
+      "path": "pages_assist/position/play.vue",
+      "sha256": "adf25ceea9100a5f1ee63d847815c4c58461f17902dbe15b268106e555d5a640",
+      "bytes": 1070
+    },
+    {
+      "path": "pages_bundle/bundle/create.vue",
+      "sha256": "c02931c13b44421a001308b0882d892126665e29b858ed89a1c8bd1578a25463",
+      "bytes": 13662
+    },
+    {
+      "path": "pages_bundle/bundle/delete.vue",
+      "sha256": "c719a2abfb37c9c1d404bbbfda40eef02f4f76287e42c85e6e318ac1da67e212",
+      "bytes": 3628
+    },
+    {
+      "path": "pages_bundle/bundle/detail.vue",
+      "sha256": "e62664341e49075b218ea6eef154a87441b6e109075f58305104f4729f0e13c7",
+      "bytes": 24754
+    },
+    {
+      "path": "pages_bundle/bundle/discard.vue",
+      "sha256": "794607dea2d845a0e21661177bd72e045fc9148ad95a2bd2da601515ebbf60bc",
+      "bytes": 3199
+    },
+    {
+      "path": "pages_bundle/bundle/index.vue",
+      "sha256": "55f641e0eeb185e2dcac9348e38ba28083a22c12166e982879d9a036cccc35e7",
+      "bytes": 9837
+    },
+    {
+      "path": "pages_bundle/bundle/update.vue",
+      "sha256": "37553c64fd2f538e4625714ff1c5b54487ea9d21af758cbbe368082225c3b839",
+      "bytes": 14637
+    },
+    {
+      "path": "pages_bundle/bundle/update_stock.vue",
+      "sha256": "be64b8684c35f996f6bbef3b2cf447622caadffa79f12b2eb60c1e76869685fb",
+      "bytes": 2739
+    },
+    {
+      "path": "pages_bundle/issue/private.vue",
+      "sha256": "2ca88775854dbddc8e060c81c85c9e67e02db6e53cf4e5f223e82bfefde56f49",
+      "bytes": 7979
+    },
+    {
+      "path": "pages_bundle/issue/staff.vue",
+      "sha256": "9ec578ced9f5e0c8a1706bbdc7600376eba1e5880a532543a153eba7dc6d4666",
+      "bytes": 2964
+    },
+    {
+      "path": "pages_bundle/issue/update_staff.vue",
+      "sha256": "1269514bb12b474ca46ff9d8e79925c1a964c260a7fb40b440bfdf5948207982",
+      "bytes": 2477
+    },
+    {
+      "path": "pages_bundle/receive/detail.vue",
+      "sha256": "ee1086f7a658d9ca05d42cf4a9ba69cc8be8653eb83a085ea32fee705fe611ee",
+      "bytes": 19404
+    },
+    {
+      "path": "pages_bundle/receive/list.vue",
+      "sha256": "b3e73f1cd7dcc35b53d63dd9aec81723ca602f8b3661f249eabb1546d729c862",
+      "bytes": 17649
+    },
+    {
+      "path": "pages_bundle/stat/channel_issue_rank.vue",
+      "sha256": "9164db83f51406586458575b51ad02815d52294159430fa8b3aeaf14b28a5716",
+      "bytes": 4908
+    },
+    {
+      "path": "pages_bundle/stat/home.vue",
+      "sha256": "c14e7b9a5bd77068d50e8db08ca3f141f427cfaa690f5bf78560d4d35a1bbfca",
+      "bytes": 1477
+    },
+    {
+      "path": "pages_bundle/stat/staff_issue_rank.vue",
+      "sha256": "ffa7cf284565c8c049355e813f5e8e7933b2a24ffc07ecc1043dc4ec0aead358",
+      "bytes": 5836
+    },
+    {
+      "path": "pages_bundle/stat/staff_overview.vue",
+      "sha256": "c91790cad3b67f93d7506f5cef7614e3b46ee895e3c63aa29b3abd2d0cd81166",
+      "bytes": 3368
+    },
+    {
+      "path": "pages_bundle/stat/staff_verify_rank.vue",
+      "sha256": "43caa086b6feaf49928b5a1c2d9426eaf029890c11e9aa88f03390c45edd769e",
+      "bytes": 5494
+    },
+    {
+      "path": "pages_bundle/stat/store_issue_rank.vue",
+      "sha256": "21a10ae1e55c7a2d1c43898d5f472dbc834424ce31246021591f1ca460ba49cf",
+      "bytes": 4964
+    },
+    {
+      "path": "pages_bundle/stat/store_verify_rank.vue",
+      "sha256": "0dce67e4d5c29666b4d4f48a94e61f1594d0227a2cd444025be13a0d66cea66f",
+      "bytes": 4494
+    },
+    {
+      "path": "pages_card/card/choose_type.vue",
+      "sha256": "e181a3ec8c914275b97e3609ca76402abfa47172800441c8e059425eb3c7c8bf",
+      "bytes": 3040
+    },
+    {
+      "path": "pages_card/card/create.vue",
+      "sha256": "09d3e640b3947356e685708dd2b2b699e604001967034d56df37c1c89480a787",
+      "bytes": 16701
+    },
+    {
+      "path": "pages_card/card/delete.vue",
+      "sha256": "a17de307ea3ebeac9606946ae716929304878faae4fb491c483ffde7487ebfb1",
+      "bytes": 3151
+    },
+    {
+      "path": "pages_card/card/detail.vue",
+      "sha256": "9581f3763e88c0626357721aa7637c59b4c60a8534fa69ef949815fb5a9f862d",
+      "bytes": 14740
+    },
+    {
+      "path": "pages_card/card/index.vue",
+      "sha256": "5072f5928a9da7f615d0b4b36b46e4a0f126673f07df612ec4685207bdc46641",
+      "bytes": 6223
+    },
+    {
+      "path": "pages_card/card/store_list.vue",
+      "sha256": "393de4bedf42aa626348e463cef4adb19df2902cc616ebb2ecbf3a111407681f",
+      "bytes": 3283
+    },
+    {
+      "path": "pages_card/card/update.vue",
+      "sha256": "3369ad0f2aaa2c9d1b2a4d494d6c0d26a42bca72a3851a6edc220cb49cf863de",
+      "bytes": 17429
+    },
+    {
+      "path": "pages_card/card/update_stock.vue",
+      "sha256": "ddff0cc60fee298e8e244c366be337f411cda85e7be5b76a3a2089197ecd9523",
+      "bytes": 2719
+    },
+    {
+      "path": "pages_card/card/update_stores.vue",
+      "sha256": "7670ae983f573fec9e6907ed4c7d6e58c41d74710ffd69f17420aea1706b6acc",
+      "bytes": 2386
+    },
+    {
+      "path": "pages_card/discard/discard.vue",
+      "sha256": "83a56acaacbe845af38421ae4c99c105de7f7bde2a9a257c1f273afa89037331",
+      "bytes": 2682
+    },
+    {
+      "path": "pages_card/issue/private.vue",
+      "sha256": "e0392409d226ceb36f3d18096428942f3bd0230159654accfa6db759f99399b5",
+      "bytes": 8231
+    },
+    {
+      "path": "pages_card/issue/staff.vue",
+      "sha256": "7eec7b7807eb2d191c80d1ee2e320860bf9596314f3216932fc78e2dc595dbea",
+      "bytes": 2897
+    },
+    {
+      "path": "pages_card/issue/update_staff.vue",
+      "sha256": "c36536b8c81c478842316a028ac46907fd2d42c8078abf466952c4362e546f92",
+      "bytes": 2364
+    },
+    {
+      "path": "pages_card/receive/detail.vue",
+      "sha256": "9d06a08bd5deed7486883ce38864b7ed8c218081935eaf0e1c4f7af7f6aa7b3b",
+      "bytes": 11116
+    },
+    {
+      "path": "pages_card/receive/list.vue",
+      "sha256": "c698d6ab58931b9cc3de5f15ed23e4c0e06cd4fd1b3762e5ed8c84b0bf4dfb43",
+      "bytes": 21495
+    },
+    {
+      "path": "pages_card/receive/verify_list.vue",
+      "sha256": "12e0076e73463c975c866fdf9718649a71387dd88e0e6b7b2eb00286d0fb2a5e",
+      "bytes": 5928
+    },
+    {
+      "path": "pages_card/stat/channel_issue_rank.vue",
+      "sha256": "b07ddc558f8e1e819245a1f47c7c55740176e77076366c7f7fb1b5d7294b8132",
+      "bytes": 4674
+    },
+    {
+      "path": "pages_card/stat/home.vue",
+      "sha256": "5a986b368bd512abbc4efefbb6888b342ca68ae575e06672bf0f7388a0fb7656",
+      "bytes": 1782
+    },
+    {
+      "path": "pages_card/stat/staff_issue_rank.vue",
+      "sha256": "fb286fc28ce0bffb8727e1055c44d50da280c7fbc2666fdfd5c41c27bdb7785c",
+      "bytes": 5602
+    },
+    {
+      "path": "pages_card/stat/staff_overview.vue",
+      "sha256": "b21559b815ba043348b112c7632d264b8baf9f9c5472e3eacce01ecc4d8ffb1d",
+      "bytes": 3744
+    },
+    {
+      "path": "pages_card/stat/staff_verify_rank.vue",
+      "sha256": "442a39ebebd8ae08bc192d3f308ccdfbb480faada61564e1872adf0b905a77fc",
+      "bytes": 5482
+    },
+    {
+      "path": "pages_card/stat/store_issue_rank.vue",
+      "sha256": "6fe95ba723f0bc71525664c4fe7e606922d9d2f01cad83b922c981c8af84619a",
+      "bytes": 5339
+    },
+    {
+      "path": "pages_card/stat/store_overview.vue",
+      "sha256": "5cf60bf46d7706db3c5ee0aa2a81f1fa9f80a31ae33f436398a88d893a2b7dc2",
+      "bytes": 3981
+    },
+    {
+      "path": "pages_card/stat/store_verify_rank.vue",
+      "sha256": "df9b8047692374f5e0f356ea195aab24091c07f276ee6475ec67b559c44bd01a",
+      "bytes": 4482
+    },
+    {
+      "path": "pages_card/stat/user_transfer_rank.vue",
+      "sha256": "f68760e2cbffa35e62c807f3495d9e8c82798ee1747956c9528a3f8c5ddcc234",
+      "bytes": 6856
+    },
+    {
+      "path": "pages_card/stat/user_verify_rank.vue",
+      "sha256": "917e7931f98ea847669c6ec7f8cea083255441c989f805319ed312fb5ef12157",
+      "bytes": 6289
+    },
+    {
+      "path": "pages_card/verify/detail.vue",
+      "sha256": "e3d569dee3f52131ba3b5248ff94075211033c7e1474ded22b3e83873eeb1086",
+      "bytes": 7168
+    },
+    {
+      "path": "pages_card/verify/list.vue",
+      "sha256": "c4a13b4fd5ae8fa6743f8814532e87b8b462b620881e02cc304046b698c3f493",
+      "bytes": 18066
+    },
+    {
+      "path": "pages_card/verify/verify.vue",
+      "sha256": "40e450a484b88fe4918681e28573994f93331dd9807c836bba2235ed2edebf03",
+      "bytes": 22902
+    },
+    {
+      "path": "pages_coupon/coupon/choose_type.vue",
+      "sha256": "f3bb4a35b0ff2758e929b02cda29261fc049e8facd4a206b4005776635cdf9ae",
+      "bytes": 9426
+    },
+    {
+      "path": "pages_coupon/coupon/create.vue",
+      "sha256": "91f4912bce8ee2d3093e264ab49776aa539362420984a556233449c08615f12d",
+      "bytes": 46656
+    },
+    {
+      "path": "pages_coupon/coupon/delete.vue",
+      "sha256": "799ada38932e799012809650601e984776a80399a562af3d32425b19c0d91fef",
+      "bytes": 3458
+    },
+    {
+      "path": "pages_coupon/coupon/detail.vue",
+      "sha256": "0e8e7973b39c1536cc106f36cc0f5c906b49760bb231d7b6b46c4f137d403ef2",
+      "bytes": 24946
+    },
+    {
+      "path": "pages_coupon/coupon/index.vue",
+      "sha256": "b900b03bb7a38dc19da463115e50ce1ecb0d0dd9e84227e2b84d5c6d67eb61c5",
+      "bytes": 9565
+    },
+    {
+      "path": "pages_coupon/coupon/info.vue",
+      "sha256": "558df607c4289e9112cd5dafba74b597962abe69b88546d38d67ba78d523895c",
+      "bytes": 13992
+    },
+    {
+      "path": "pages_coupon/coupon/store_list.vue",
+      "sha256": "3a96450d4f569b29d1c50386ccf6ea58eaa49d5c8ddbf85bad98cef39c74dc06",
+      "bytes": 3495
+    },
+    {
+      "path": "pages_coupon/coupon/update.vue",
+      "sha256": "23a9421af085d438f1416ded33a5a03e4ec2322faf40be9dd9686eefc5a1cac9",
+      "bytes": 44148
+    },
+    {
+      "path": "pages_coupon/coupon/update_stock.vue",
+      "sha256": "2ac8b271cf1adafec2780f000d5fb27acb8b962451ccee90d93576e0336dd3a5",
+      "bytes": 2977
+    },
+    {
+      "path": "pages_coupon/coupon/update_stores.vue",
+      "sha256": "adb80f546fdad1a2a6ab06d05913821ee74ddf1df29f0f221239f1839caaec0c",
+      "bytes": 2408
+    },
+    {
+      "path": "pages_coupon/discard/discard.vue",
+      "sha256": "0dd853da24c85b306241a2ee40886bde25aec0ee941362eb148f2d669bc1c2f1",
+      "bytes": 2638
+    },
+    {
+      "path": "pages_coupon/discard/list.vue",
+      "sha256": "075c194c6638b003d99d7800ddbbfcef513a9b8cd03199bc38f2221a4dba196e",
+      "bytes": 17000
+    },
+    {
+      "path": "pages_coupon/issue/official.vue",
+      "sha256": "543f922dcdfb6efaa75a42bf975b1127d6afcdb774752ddc1b56b3fbfbcd45de",
+      "bytes": 4767
+    },
+    {
+      "path": "pages_coupon/issue/poster.vue",
+      "sha256": "d7d240b0d46e74061b498ccb2e82b5274e2d4da74566bfa30a7a4e7be0e7a8c1",
+      "bytes": 22500
+    },
+    {
+      "path": "pages_coupon/issue/private.vue",
+      "sha256": "fc10ea071cdd6cf0c4b4163bbc43cd0e6e492e3ed1ca9e51492e9e53b3f1b54c",
+      "bytes": 10369
+    },
+    {
+      "path": "pages_coupon/issue/qrcode.vue",
+      "sha256": "46258a92ca5a87a71c2c8479ceccd841c9a9a91ce43590b1c31ff1f074be12d4",
+      "bytes": 2138
+    },
+    {
+      "path": "pages_coupon/issue/staff.vue",
+      "sha256": "2fafdef46628d22643b7b28246705bfc754b9ad094781839c4567c13c08a5c1a",
+      "bytes": 2942
+    },
+    {
+      "path": "pages_coupon/issue/update_staff.vue",
+      "sha256": "1d819a84f232e7ff39cec4d9cc381bbb5a2253e89eaf8616bb29e2b081736cc7",
+      "bytes": 2508
+    },
+    {
+      "path": "pages_coupon/issue/wechat.vue",
+      "sha256": "050d3edf3721192c871b009279e16635204e09373002e12fe6374e226f3330cf",
+      "bytes": 4011
+    },
+    {
+      "path": "pages_coupon/issue/wecom_batch.vue",
+      "sha256": "08e95d5fa88050f91e518076a1dbacf8ca2c4a1d9d64a387c075dc8c6b3327a0",
+      "bytes": 11641
+    },
+    {
+      "path": "pages_coupon/issue/wecom_bot.vue",
+      "sha256": "f291a18f393cc727831336bd9a965a95ef0cf3b424e0009652c8a0a4e832fce4",
+      "bytes": 5405
+    },
+    {
+      "path": "pages_coupon/receive/detail.vue",
+      "sha256": "d6a8b1d70f8de82c406e829bcd304e0845e24a87edec7c7a126c0c0e247683d9",
+      "bytes": 11944
+    },
+    {
+      "path": "pages_coupon/receive/list.vue",
+      "sha256": "0e80051becb3c019b7b5dc4ff33868291e9d2ba8856e707709747744063e9805",
+      "bytes": 21156
+    },
+    {
+      "path": "pages_coupon/stat/channel_issue_rank.vue",
+      "sha256": "7b128c7a2b3ebaa8e4082343a87f9e787ad1e44402e733b4eb53ee9962bfcb25",
+      "bytes": 4778
+    },
+    {
+      "path": "pages_coupon/stat/home.vue",
+      "sha256": "9cccdadcd1a2d5bebf21e013e6f9de75758ce8f325ae9d97d65bde42286c47bc",
+      "bytes": 1740
+    },
+    {
+      "path": "pages_coupon/stat/staff_issue_rank.vue",
+      "sha256": "02595c7f27da08109189d23f7c62f0cd3626e71ce6c30747f9db59c465640e9c",
+      "bytes": 5706
+    },
+    {
+      "path": "pages_coupon/stat/staff_overview.vue",
+      "sha256": "31c410256ebf076e2fa2116dbca0cc850e8cdd8d8a3e23ae21ca9fcb27b1d4bc",
+      "bytes": 3952
+    },
+    {
+      "path": "pages_coupon/stat/staff_verify_rank.vue",
+      "sha256": "00edfa4ee2c608f10514710d98f432bc07d21f9268abac04c517390d710c82e0",
+      "bytes": 5494
+    },
+    {
+      "path": "pages_coupon/stat/store_issue_rank.vue",
+      "sha256": "9653eebb4698c8fed5ebebe7bf0f878e75761d6ecb43240abecd05fdcb0a0d17",
+      "bytes": 5443
+    },
+    {
+      "path": "pages_coupon/stat/store_overview.vue",
+      "sha256": "adb8fae23d9b6901c1c80734a4f9b4ec7f497c041651a5f952231dc6d1de849e",
+      "bytes": 4188
+    },
+    {
+      "path": "pages_coupon/stat/store_verify_rank.vue",
+      "sha256": "8a66f3bfb509fbf883bd2609c4dc5399a41d9909fc8a98135d974272fdb8ef34",
+      "bytes": 4494
+    },
+    {
+      "path": "pages_coupon/stat/user_transfer_rank.vue",
+      "sha256": "5c4f9de39ebaf168b8c513f49827722562cfeaf939d2462df1b017a5b5285ae7",
+      "bytes": 6872
+    },
+    {
+      "path": "pages_coupon/stat/user_verify_rank.vue",
+      "sha256": "ccb800daf681c520addc6f9f5f2ef8d87420a28f0e75654288addc59abcc35bc",
+      "bytes": 6301
+    },
+    {
+      "path": "pages_coupon/verify/detail.vue",
+      "sha256": "3409a702ac2a807f4c33a6eff95facea2904ddfabdd32a1d5f7199270048f54e",
+      "bytes": 9790
+    },
+    {
+      "path": "pages_coupon/verify/list.vue",
+      "sha256": "f8d723ad0b2dd78615d391e1ffabd02ff8ef24c0cd9d320204a8645dfb61fd20",
+      "bytes": 20419
+    },
+    {
+      "path": "pages_coupon/verify/verify.vue",
+      "sha256": "1978a18e56bf5b1cdab9843d507122c22bb157ee6a666a83e58300ab3f0a46fc",
+      "bytes": 27837
+    },
+    {
+      "path": "pages_merchant/customer/detail.vue",
+      "sha256": "e8a6f6a32f5d434dc94891aeac3ae283de857755ed4f933abe3c22fc14e179b5",
+      "bytes": 23320
+    },
+    {
+      "path": "pages_merchant/customer/index.vue",
+      "sha256": "92c5177b75403352eed2070271f4df7244e06b06b3994dd55ea1c9410b54176b",
+      "bytes": 3206
+    },
+    {
+      "path": "pages_merchant/customer/list.vue",
+      "sha256": "12bf2beea911ab9e75c1c46fc757bf68012272c77ece70d7c218212f3602a2cb",
+      "bytes": 16152
+    },
+    {
+      "path": "pages_merchant/customer/mass_create.vue",
+      "sha256": "cc3147f8fad3d84dcec089e6fb13c66ba45ed3cd4172f7c8e470e02a5c192f85",
+      "bytes": 6158
+    },
+    {
+      "path": "pages_merchant/customer/mass_detail.vue",
+      "sha256": "5c2348d109bf4c8ea22e57e1fbb71b597d096aae03a95e2133c4da42901a4e16",
+      "bytes": 9405
+    },
+    {
+      "path": "pages_merchant/customer/mass_list.vue",
+      "sha256": "c7758540da726e7b2d51472f75db725cfcb2e235bb319020d19ddb1992b4eaae",
+      "bytes": 3630
+    },
+    {
+      "path": "pages_merchant/customer/member-benefit.vue",
+      "sha256": "e6c9543026ca8943bd92a29397d9507828da68e6e2327f1b0de7af364d761b66",
+      "bytes": 14547
+    },
+    {
+      "path": "pages_merchant/homepage/coupon.vue",
+      "sha256": "e5dbf05c2c82be49ff209bac24616013424a4b8fbc26545f1b0d30f8cada68f6",
+      "bytes": 7127
+    },
+    {
+      "path": "pages_merchant/homepage/index.vue",
+      "sha256": "b2b7754d0637efcfe8981a0a8f62a081a58c4e2efdf11f55c3a90ec0dda05939",
+      "bytes": 1220
+    },
+    {
+      "path": "pages_merchant/homepage/qrcode.vue",
+      "sha256": "fc559e8cd680d81610624d12a6f5ec71548fff826a6e9678f1f5c6e98827e819",
+      "bytes": 1861
+    },
+    {
+      "path": "pages_merchant/homepage/setting.vue",
+      "sha256": "d5eb6d40f14f33c450f89310eff15dd6cb82340145a2e1ca10725372605f8944",
+      "bytes": 2245
+    },
+    {
+      "path": "pages_merchant/invoice/create.vue",
+      "sha256": "e6e1aaa68d8e2bca89948365930f1b49e6dace842136aafc657eccecf559d3ef",
+      "bytes": 4229
+    },
+    {
+      "path": "pages_merchant/invoice/detail.vue",
+      "sha256": "aa0d4a74efdd3bd2effa13935161cbad93f55a902820d83348bffd82a01361ed",
+      "bytes": 2000
+    },
+    {
+      "path": "pages_merchant/invoice/index.vue",
+      "sha256": "2c2ca20dfc2199cd5603588f66802cb93b3b1cf9dbbd79b79c53f5cd711197b2",
+      "bytes": 2248
+    },
+    {
+      "path": "pages_merchant/invoice/info.vue",
+      "sha256": "189fbb0cf17106cafdf0b88612ce682af5ad7e45d69d4b2d671e30cd53ee49c9",
+      "bytes": 2907
+    },
+    {
+      "path": "pages_merchant/invoice/list.vue",
+      "sha256": "8da8a0dfe53923304711446039761d36e9dcce6910101dbbc41bb1e0d24bb393",
+      "bytes": 1152
+    },
+    {
+      "path": "pages_merchant/media/cropper.vue",
+      "sha256": "bb6f4122cc8ca81a75291581acd907dd9ba014ed004a496d09a171bc0f9d9ecc",
+      "bytes": 3267
+    },
+    {
+      "path": "pages_merchant/order/detail.vue",
+      "sha256": "bb0e4f185dce0a3a97ff3d62aa49d7f7e0c14ad4a06cc67a70eb6c97563d8545",
+      "bytes": 1141
+    },
+    {
+      "path": "pages_merchant/order/list.vue",
+      "sha256": "1189d11cc2da18dc102e7a5fe315568985434ec8225fc64ae071dd520dfd37eb",
+      "bytes": 1146
+    },
+    {
+      "path": "pages_merchant/order/success.vue",
+      "sha256": "76aced80747c93de9a53e4b8574f307dfc68794ee323092fe38ee2ecc7a53bf7",
+      "bytes": 9465
+    },
+    {
+      "path": "pages_merchant/setting/address.vue",
+      "sha256": "b1f8c9e15330a2f317ab2a699399a67173ef78baa7caf4d9c174e2a93c580021",
+      "bytes": 2948
+    },
+    {
+      "path": "pages_merchant/setting/auth.vue",
+      "sha256": "0d05fa465de47270d188b28702f1b2bcae7b6804b27f58945451a15407f29a87",
+      "bytes": 17553
+    },
+    {
+      "path": "pages_merchant/setting/cancel.vue",
+      "sha256": "6ff97fa9c7c36c39c4a7751b874e0b567c358a1e3ac22da528a5ac36c5ad810e",
+      "bytes": 4699
+    },
+    {
+      "path": "pages_merchant/setting/cover.vue",
+      "sha256": "d38f1380a4ade63a9e74b4649590ad84d4aee8a0121ce89b944812084efaa511",
+      "bytes": 1671
+    },
+    {
+      "path": "pages_merchant/setting/index.vue",
+      "sha256": "1e51b7c742ffe5b5dedd4870915ec6711a6d2ecde1d17ee0417c8b61cf687045",
+      "bytes": 7930
+    },
+    {
+      "path": "pages_merchant/setting/industry.vue",
+      "sha256": "415a2e44c7432eec3dcd6b0d1a0ef1af4baf45ef0d12e1167dc854579dd62f78",
+      "bytes": 1431
+    },
+    {
+      "path": "pages_merchant/setting/logo.vue",
+      "sha256": "9e91a488a9b7d68519ff2e6d658a25326872bb4fac8cfbffebe2b0ac3d23acba",
+      "bytes": 4623
+    },
+    {
+      "path": "pages_merchant/setting/name.vue",
+      "sha256": "116cd770f0b46413cc72cea76ca6d5673586d4c97493d44c3a133a648371d546",
+      "bytes": 1564
+    },
+    {
+      "path": "pages_merchant/setting/phone.vue",
+      "sha256": "f171ec8b8e444cf31fcca2b92c8311519ac91538a671a40723bfbb5eab12d709",
+      "bytes": 1889
+    },
+    {
+      "path": "pages_merchant/setting/register.vue",
+      "sha256": "9acc30eb88d3cf464e43966449a49adc9b33e3fdb6818e2dc370f6eb266904b5",
+      "bytes": 3404
+    },
+    {
+      "path": "pages_merchant/setting/wecard/color.vue",
+      "sha256": "3ea10428b08bbc90f8b12b316861c122909a8b194d2021a1d4cdc209720e1f7c",
+      "bytes": 3814
+    },
+    {
+      "path": "pages_merchant/setting/wecard/image.vue",
+      "sha256": "e6e5b6bce0d88814785da23c569f95e2bab04613a76143ce641347b165498266",
+      "bytes": 5712
+    },
+    {
+      "path": "pages_merchant/setting/wecard/index.vue",
+      "sha256": "da61641c2b6188f5a2b69718196f8cd81d0c6bd5073e8a7407d109d7a6aef260",
+      "bytes": 2338
+    },
+    {
+      "path": "pages_merchant/setting/wecard/logo.vue",
+      "sha256": "380e74e1c97a53ab80bc03032aba3119b7f647ed133063e6614f02f6f23bdec6",
+      "bytes": 5702
+    },
+    {
+      "path": "pages_merchant/staff/change_creator.vue",
+      "sha256": "7e042aba9f8d64d899ae6c6d9996be42d15bdfd6577268dd7b63f1b023bac1f2",
+      "bytes": 2648
+    },
+    {
+      "path": "pages_merchant/staff/detail.vue",
+      "sha256": "18616c0cb459021de3497704737570cf07d81ecdd34bc1da405bcaa00be47f76",
+      "bytes": 7426
+    },
+    {
+      "path": "pages_merchant/staff/edit.vue",
+      "sha256": "5360925ca76770c0dc555d5b7c2c3f61ef87115cf6f41bd85c6e2ee2046f917c",
+      "bytes": 5455
+    },
+    {
+      "path": "pages_merchant/staff/index.vue",
+      "sha256": "07edaea223158b527b07602bb82f07c97408c35ddcf462a86d7cb4a4721045c0",
+      "bytes": 14358
+    },
+    {
+      "path": "pages_merchant/staff/invite.vue",
+      "sha256": "86e7f36e06f3aca24f4fcbb31553da475ad56b455ef256e022d0150dba3b7a99",
+      "bytes": 6284
+    },
+    {
+      "path": "pages_merchant/staff/join.vue",
+      "sha256": "9fdfd64c392e02585afe71c721306f7c6d36d5ea4a9622e98cfbd6d00c144488",
+      "bytes": 6794
+    },
+    {
+      "path": "pages_merchant/staff/operation_log.vue",
+      "sha256": "db2e196b4f2e9c4e36b2a511db2b5052133fb2b2d36d859843224ef69b5ff38f",
+      "bytes": 6002
+    },
+    {
+      "path": "pages_merchant/staff/pending.vue",
+      "sha256": "c68ff41515b9e4ecb5c2223c9db259396b6b2af7808fac826f35c7e8ffa428e1",
+      "bytes": 5971
+    },
+    {
+      "path": "pages_merchant/staff_inbox/detail.vue",
+      "sha256": "b4d7a119ef2e4c5277a8346d4ed0d8609c4a65894971fb235a61fddc00254bf9",
+      "bytes": 5420
+    },
+    {
+      "path": "pages_merchant/staff_inbox/list.vue",
+      "sha256": "47d7e8ee7344c3b4978b228bbd52cea6fd1acfb06850dd61382e8071794f76be",
+      "bytes": 4318
+    },
+    {
+      "path": "pages_merchant/store/create.vue",
+      "sha256": "7ba4cb5ab92c8f47f26d4355a71213e335a3f9adcc33858b3fef2df593985009",
+      "bytes": 5803
+    },
+    {
+      "path": "pages_merchant/store/detail.vue",
+      "sha256": "e6ba82eee6fd94691113b29cbba13f71caa07035cf48e5d999c47c7a6c2ff345",
+      "bytes": 9193
+    },
+    {
+      "path": "pages_merchant/store/index.vue",
+      "sha256": "e0480622c4839f8cc122e0dbdead21a2bb93c7af0ff1165660d462552361d3f3",
+      "bytes": 14621
+    },
+    {
+      "path": "pages_merchant/store/update_address.vue",
+      "sha256": "dcc81215e676466df59e5ba1925f39343019d9564716053982e31bee41f2b6c3",
+      "bytes": 3231
+    },
+    {
+      "path": "pages_merchant/store/update_industry.vue",
+      "sha256": "e6fa1a00fb844b48f621f4ff166e3bc658a60cff212796ad964b4d13718c61ad",
+      "bytes": 1759
+    },
+    {
+      "path": "pages_merchant/store/update_logo.vue",
+      "sha256": "4f1179bb94f81398292d140fd40558897e477075aadee26dda6e4fcd138a2bd3",
+      "bytes": 4698
+    },
+    {
+      "path": "pages_merchant/store/update_major.vue",
+      "sha256": "e7f4e02ef80daeca8b12dec52b1e3899768a6431b6293068e56373d79077d53b",
+      "bytes": 1998
+    },
+    {
+      "path": "pages_merchant/store/update_name.vue",
+      "sha256": "1835d4e873d062dadb729680f4ed853b4fdedc788bfef7e4c08e42dcdeae5d85",
+      "bytes": 1707
+    },
+    {
+      "path": "pages_merchant/store/update_open_hour.vue",
+      "sha256": "7d0882a03fb7604c59778b7b1d1a79a178e6d8e810fbdb09aed1136504c59360",
+      "bytes": 2182
+    },
+    {
+      "path": "pages_merchant/store/update_phone.vue",
+      "sha256": "56647732b2e24cb953bceb8d4c9196a131dee918d9fa8760dc45d5884a05eded",
+      "bytes": 1663
+    },
+    {
+      "path": "pages_point/about/index.vue",
+      "sha256": "ad5cf6807aa5487273327f23a64e7520965ed4c37a12f7df24acb1391f499004",
+      "bytes": 1707
+    },
+    {
+      "path": "pages_point/log/list.vue",
+      "sha256": "da3aa2815d9324331b941a4d653fa1b8415551aa5a562cb9dd2481420d5401cc",
+      "bytes": 13345
+    },
+    {
+      "path": "pages_point/point/decrease.vue",
+      "sha256": "7c6fa1d3d79db5b8069280a658bcfd80a4664698628f7f43983c9d895b8a94a9",
+      "bytes": 15972
+    },
+    {
+      "path": "pages_point/point/increase.vue",
+      "sha256": "ca5eb716c7b8681a2d81c43d2517564dee7035dce2cc735332f2386fde1e4a7f",
+      "bytes": 15890
+    },
+    {
+      "path": "pages_point/point/index.vue",
+      "sha256": "0f3896894c510cfeed6b786c964197693cdb43a27451b76f2ac6aa56992db262",
+      "bytes": 4391
+    },
+    {
+      "path": "pages_point/staff/list.vue",
+      "sha256": "3d8b4c7bfe245d630297716bc54c8566420a9270f439878b2f85d6d2c7427217",
+      "bytes": 2546
+    },
+    {
+      "path": "pages_point/staff/update_staff.vue",
+      "sha256": "550c08cc530dbb783dfaacf70853e4a4d71bd47040ac255a1bcdd588e3249be2",
+      "bytes": 2052
+    },
+    {
+      "path": "pages_point/stat/index.vue",
+      "sha256": "04f71a7ad574bda7d28074008e17c0a231449e3308a264613fc093e33b52660d",
+      "bytes": 2283
+    },
+    {
+      "path": "pages_point/type/index.vue",
+      "sha256": "6c728e582a99fc825c521e07fd12ea420a789cd768523d32f17c6b6d62d2167c",
+      "bytes": 7662
+    },
+    {
+      "path": "pages_user/activity_poster/detail.vue",
+      "sha256": "397fd2b2256b2cc8f9d97c1f32e2b141a90aca976b7e571e3fdad90c02443f62",
+      "bytes": 12533
+    },
+    {
+      "path": "pages_user/bundle/detail.vue",
+      "sha256": "3b1d0280c1ef9322ea62b996d3e5877e1704d5c2674d7b83de5fb649e79366ad",
+      "bytes": 15702
+    },
+    {
+      "path": "pages_user/bundle/index.vue",
+      "sha256": "544ab673f45d72bdbb47f9e09a2fbbf9f16936ac0a1991979141bed7b1285d4f",
+      "bytes": 7068
+    },
+    {
+      "path": "pages_user/bundle/private_receive.vue",
+      "sha256": "2fbe984c4619538a377f5100acd9da60017d687947acf22d8cecd5e81c4f942a",
+      "bytes": 34830
+    },
+    {
+      "path": "pages_user/card/detail.vue",
+      "sha256": "22518b0cf476340ad909f2beb957073bf37905dd812c22dde2a9c26b58e28e49",
+      "bytes": 19071
+    },
+    {
+      "path": "pages_user/card/index.vue",
+      "sha256": "317d97a63e5c99e6f142b2bf54979410928dadab8c27280ec39fcd40758cc5e6",
+      "bytes": 4611
+    },
+    {
+      "path": "pages_user/card/private_receive.vue",
+      "sha256": "d230b4fa3bf68bc86f6689e9ccc0082a8123c0d7a325a3f3e129264ae98e973b",
+      "bytes": 15081
+    },
+    {
+      "path": "pages_user/card/transfer_receive.vue",
+      "sha256": "d6d2f03b11b856ee24d71e8940f4d2172a4b1f1ded42204518be100972bb325e",
+      "bytes": 12382
+    },
+    {
+      "path": "pages_user/card/verify_list.vue",
+      "sha256": "28bb0bacde080de7272c7d29736ef6b94ef36c0888d08b625e9207a683a93f62",
+      "bytes": 4154
+    },
+    {
+      "path": "pages_user/coupon/detail.vue",
+      "sha256": "82fa6d67ccf4b3540021ec78a0e0615ff279c2375da945d65603156bfe08db1b",
+      "bytes": 24899
+    },
+    {
+      "path": "pages_user/coupon/index.vue",
+      "sha256": "1c4c3482e96a5e78a6e31899f747fb2092a8d0d6ef67611b39c676ae2bc492d5",
+      "bytes": 11662
+    },
+    {
+      "path": "pages_user/coupon/private_receive.vue",
+      "sha256": "008e6c6525dc64bbe9838209f77e819cb65936912f043eaca305118fc520c766",
+      "bytes": 15423
+    },
+    {
+      "path": "pages_user/coupon/public_receive.vue",
+      "sha256": "e01f465d0b4093e1485e61947ff44beb3c828e6d6e5d0e0446c0bb6832ca3d55",
+      "bytes": 19720
+    },
+    {
+      "path": "pages_user/coupon/transfer_list.vue",
+      "sha256": "75e816d0b118e75cead053e936e3dbcb30868e61ed60dd09ee48c0a9cf1ca40f",
+      "bytes": 18986
+    },
+    {
+      "path": "pages_user/coupon/transfer_receive.vue",
+      "sha256": "249a0ba0f478b71c0da178abb6b64ec6c4a0a7966c1765fe96574aa1f72c7dfd",
+      "bytes": 19108
+    },
+    {
+      "path": "pages_user/feedback/detail.vue",
+      "sha256": "92eeb786587917fba54ea970c8dfd138147d9ea1c8701a93e7342233ddda4d44",
+      "bytes": 3544
+    },
+    {
+      "path": "pages_user/feedback/list.vue",
+      "sha256": "832eb5e7a9c495a3741ff7bffd0bd20cc34d84ae9c01e7e919d629a23d85d0c4",
+      "bytes": 3459
+    },
+    {
+      "path": "pages_user/merchant/home.vue",
+      "sha256": "ddca74e6a53b8cf59fb50286ead3f5fc5af6c5c139dbc79564f702e022e07b79",
+      "bytes": 31126
+    },
+    {
+      "path": "pages_user/merchant/index.vue",
+      "sha256": "d943342dc630a384a3b752faca43d71582a3c874c9288e6edc02df07ba838ef0",
+      "bytes": 6374
+    },
+    {
+      "path": "pages_user/merchant/member-benefit.vue",
+      "sha256": "c3a3d33a618a3ab91692cd6e168b29a6bb073ef15dcbfa74b9b3f82f4ccc4391",
+      "bytes": 8153
+    },
+    {
+      "path": "pages_user/point/list.vue",
+      "sha256": "c9cedeb6e164c933537ccc337851b2e5b29fc49214a3390c4c109ef8d6071775",
+      "bytes": 9203
+    },
+    {
+      "path": "pages_user/setting/cancel.vue",
+      "sha256": "bf1694cb03402dbc9fc5be630485453a8137e58a044f1e9828494f0ed506d791",
+      "bytes": 3041
+    },
+    {
+      "path": "pages_user/setting/index.vue",
+      "sha256": "3fb9efa9d725ebf3c88ee3d21a4ec1810b20d4f76f62c321f9a27e974997c822",
+      "bytes": 3318
+    },
+    {
+      "path": "pages_wecom/batch/help.vue",
+      "sha256": "37fa243bed812b01a57cbbd39a784ccf7618f48ab9f3915455b72a4b08169d4f",
+      "bytes": 104
+    },
+    {
+      "path": "pages_wecom/bot/help.vue",
+      "sha256": "67283e5607c96baeadd2e717395e05555e6e66e271cd0a970f206b4b1e7a8d53",
+      "bytes": 247
+    },
+    {
+      "path": "pages_wecom/group/add.vue",
+      "sha256": "ebf6c529c8bcacf04195b4291ff7d85dae7701691067bdd8f1484bde5de64ac4",
+      "bytes": 3332
+    },
+    {
+      "path": "pages_wecom/group/edit.vue",
+      "sha256": "2ff04794099e11a7271009109f990277f48fc744cb3ce111501b595cb8a94b86",
+      "bytes": 3464
+    },
+    {
+      "path": "pages_wecom/group/help.vue",
+      "sha256": "220012d354bd7d9d5b3969b9ad1a565d87b2253d9825dd7be1fcf5f0bd289b61",
+      "bytes": 249
+    },
+    {
+      "path": "pages_wecom/group/list.vue",
+      "sha256": "6faee525c613d265178d6bfe7bd5c77e75ebf5dc8e9d3d0040c79119f73c4024",
+      "bytes": 6573
+    },
+    {
+      "path": "pages_wecom/staff/add.vue",
+      "sha256": "41cdf86a2818684479f505dc07643464a0d0301145d0ee0ab2f463aad25e9186",
+      "bytes": 10174
+    },
+    {
+      "path": "pages_wecom/staff/detail.vue",
+      "sha256": "4e3434f9fe040c9a181707f8e19936c4d903737dc9b84f70b9bc449cc497315f",
+      "bytes": 2889
+    },
+    {
+      "path": "pages_wecom/staff/edit.vue",
+      "sha256": "5522d1ad37208a2623b0baef5a64f7d54af9f51112540fb54d772342f74237d1",
+      "bytes": 5554
+    },
+    {
+      "path": "pages_wecom/staff/list.vue",
+      "sha256": "883f9eac2f589fb0d5c7aa9441e99dab2b869d43e41f5511c7247e73daf4bafa",
+      "bytes": 7853
+    },
+    {
+      "path": "pages_wecom/staff/log.vue",
+      "sha256": "1f5ecaa676d8cb721174cd3a71b48846234f5ad814f81e2396092c0f3e61d8c4",
+      "bytes": 3244
+    },
+    {
+      "path": "pages_wecom/staff/manage.vue",
+      "sha256": "01d5b2255434f03542ec7d37a8903574bc41812446f7301359925c7b97e16855",
+      "bytes": 5738
+    },
+    {
+      "path": "pages_wecom/wecom/auth.vue",
+      "sha256": "5e1b200245cdcd46a7a92a6a7db0ca3573433aa4d03bc1f0f0622be592e7a527",
+      "bytes": 6920
+    },
+    {
+      "path": "pages_wecom/wecom/bind.vue",
+      "sha256": "960046861f2a4941c5b173b437eca9fcf6842bc7800d586cd0ed679fade00a97",
+      "bytes": 25548
+    },
+    {
+      "path": "pages_wecom/wecom/index.vue",
+      "sha256": "67c8e8c21ca2cbae67076d0dc5e68a9bebccb56cd292bcf0b03562ea82197871",
+      "bytes": 5897
+    },
+    {
+      "path": "stores/session.js",
+      "sha256": "220c67b936f72bac5cdfe2eb2b847e2a10fe69b74c631830f7a4c5744466d947",
+      "bytes": 4287
+    },
+    {
+      "path": "utils/homeTheme.js",
+      "sha256": "5ae513bd4ac6078bd9e3ebe3a4e5e472841e80b65be97927bd9ca6b4c53a1e77",
+      "bytes": 2389
+    },
+    {
+      "path": "utils/loading.js",
+      "sha256": "da36c091698bd72fe2a2f75482df9d2ffe6f5b74199c787e0b0fe501b594c2b6",
+      "bytes": 616
+    },
+    {
+      "path": "utils/monitor.js",
+      "sha256": "b766f9001d6716063e4c9ed1ac0b95d206495c1173b1b94f124115aecf9fe19e",
+      "bytes": 907
+    },
+    {
+      "path": "utils/theme.js",
+      "sha256": "8ccbed1e84e957e43520b8898b1c1627616125b6d84a868f85f72b3547270f4f",
+      "bytes": 1803
+    },
+    {
+      "path": "utils/upload.js",
+      "sha256": "194b8232fe715752770385e46b073edc2f45cca2a6eb708dcd5af5df5212f64e",
+      "bytes": 710
+    },
+    {
+      "path": "utils/utils.js",
+      "sha256": "b470a346664985fadd26a169f9f1dc86b82df8495a776717fef16b122b116691",
+      "bytes": 16533
+    }
   ]
 }

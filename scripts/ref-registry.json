@@ -66,7 +66,7 @@
         "tutorial": "OBSERVE"
       }
     },
-    "note": null,
+    "note": "消费状态（2026-09-24 CHANGE-20260924-044 实测）：contentLines 级声明的消费方＝check-bg／check-motif-card／check-layout-diversity／check-similarity／check-voice-brand／gate-all（safearea／motion 两键）；**已登记声明但尚未接线**的 4 键＝check-ui-truth／check-voice-discipline／check-redlines／check-facts（它们声明 tutorial＝APPLY 但不读本表；教程线首条 f01 时接线——在那之前教程线无产物，接线无验收对象）。",
     "nonDeclaredFailureStates": {
       "UNKNOWN_TARGET": "目标无法判定内容线（不在 contentLines 声明内）→ 运行时硬失败；它不是声明值，故不入 values 枚举"
     },

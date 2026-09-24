@@ -1,6 +1,8 @@
-# CI contract: source-of-truth map and fresh g11 keyframes are part of verification evidence.
-# 2026-09-15 convergence run: verify Product Truth, side-crop safety, and production g11 scale together.
-# Safe-area evidence: content-only probe removes full-bleed atmosphere; production render remains unchanged.
+# CI contract（2026-09-24 CHANGE-20260924-044 分层）：
+#   gates   —— 每次 push/PR 跑「稳定闸门」：materialize 快照 → 负向测试 → 视觉契约 → 诊断 → gate-all
+#   renders —— g11 关键帧渲染/上传/安全区诊断：改为**手动触发**（workflow_dispatch）。
+#              它是 2026-09-15 收敛运行的一次性证据抓取；片号会推进，把它挂成长期硬闸门必然失真。
+# 快照文件数的断言改为读 manifest（`file_count`），不再写死 298。
 name: visual-shot-contract
 
 on:
@@ -12,6 +14,7 @@ on:
       - 'scripts/check-doc-references.mjs'
       - 'scripts/check-ui-truth.mjs'
       - 'scripts/probe-safe-area.mjs'
+      - 'scripts/build-applet-snapshot.mjs'
       - 'docs/internal/R9-视觉导演与审美决策.md'
       - 'docs/internal/R9-视觉映射表.md'
       - 'docs/internal/R10-产品事实源解析协议.md'
@@ -20,8 +23,6 @@ on:
       - 'spec/product-truth/**'
       - 'video/src/VTemplate.tsx'
       - 'video/src/index.tsx'
-      - 'video/src/videos/g11/**'
-      - 'video/src/data/g11.ts'
       - '.github/workflows/visual-shot-contract.yml'
   pull_request:
     paths:
@@ -31,25 +32,20 @@ on:
       - 'scripts/check-doc-references.mjs'
       - 'scripts/check-ui-truth.mjs'
       - 'scripts/probe-safe-area.mjs'
+      - 'scripts/build-applet-snapshot.mjs'
       - 'docs/internal/R9-视觉导演与审美决策.md'
       - 'docs/internal/R9-视觉映射表.md'
       - 'docs/internal/R10-产品事实源解析协议.md'
       - 'docs/internal/R7-Remotion组件库.md'
       - 'docs/changes/**'
       - 'spec/product-truth/**'
-      - 'video/src/VTemplate.tsx'
-      - 'video/src/index.tsx'
-      - 'video/src/videos/g11/**'
-      - 'video/src/data/g11.ts'
-      - '.github/workflows/visual-shot-contract.yml'
+  workflow_dispatch:
 
 jobs:
-  visual-shot-contract:
+  gates:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install video dependencies
-        run: npm ci --prefix video
       - name: Materialize APPLET snapshot when present
         shell: bash
         run: |
@@ -58,17 +54,17 @@ jobs:
           if [ -f "spec/product-truth/applet/source.tar.xz" ]; then
             mkdir -p ../applet
             tar -xJf spec/product-truth/applet/source.tar.xz -C ../applet
-            count=$(find ../applet -type f \( -name '*.vue' -o -name '*.js' -o -name '*.json' \) | wc -l | tr -d ' ')
-            test "$count" = "298"
-            echo "APPLET Product Truth Snapshot materialized: $count source files."
           elif find spec/product-truth/applet -type f \( -name '*.vue' -o -name '*.js' -o -name '*.json' \) ! -name 'manifest.json' -print -quit | grep -q .; then
             mkdir -p ../applet
             find spec/product-truth/applet -type f \( -name '*.vue' -o -name '*.js' -o -name '*.json' \) ! -name 'manifest.json' -exec cp --parents '{}' ../applet/ \;
-            count=$(find ../applet -type f \( -name '*.vue' -o -name '*.js' -o -name '*.json' \) | wc -l | tr -d ' ')
-            test "$count" = "298"
-            echo "APPLET snapshot materialized from committed source files: $count."
           else
             echo "APPLET Product Truth source is not committed; check-ui-truth remains a hard-fail."
+          fi
+          if [ -d ../applet ]; then
+            count=$(find ../applet -type f \( -name '*.vue' -o -name '*.js' -o -name '*.json' \) | wc -l | tr -d ' ')
+            expected=$(node -e "const m=require('./spec/product-truth/applet/manifest.json'); console.log(m.file_count)")
+            test "$count" = "$expected"
+            echo "APPLET Product Truth Snapshot materialized: $count source files (manifest expects $expected)."
           fi
       - name: Negative test
         run: node scripts/test-visual-shot-contract-negative.mjs
@@ -83,6 +79,16 @@ jobs:
       - name: Diagnostic - facts
         run: node scripts/check-facts.mjs
         continue-on-error: true
+      - name: Gate all
+        run: node scripts/gate-all.mjs
+
+  renders:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install video dependencies
+        run: npm ci --prefix video
       - name: Render fresh g11 content-only keyframes for pixel-level verification
         shell: bash
         run: |
@@ -103,8 +109,6 @@ jobs:
       - name: Diagnostic - safe area coordinates
         run: node scripts/probe-safe-area.mjs outputs/g11-烧烤/frames/ci-safe-180.png outputs/g11-烧烤/frames/ci-safe-630.png outputs/g11-烧烤/frames/ci-safe-1200.png outputs/g11-烧烤/frames/ci-safe-1830.png outputs/g11-烧烤/frames/ci-safe-2460.png outputs/g11-烧烤/frames/ci-safe-2880.png
         continue-on-error: true
-      - name: Gate all
-        run: node scripts/gate-all.mjs
       - name: Render fresh production g11 keyframes for visual review
         shell: bash
         run: |
