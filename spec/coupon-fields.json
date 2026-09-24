@@ -4,7 +4,7 @@
   "source": "applet/pages_coupon/coupon/create.vue（制券页全量，含 594-612/692-697 联动 watch）+ constants/coupon.js（枚举语义）+ issue/private.vue（私密发放需设数据）+ verify/verify.vue（核销页重要信息）+ pages_user/coupon/detail.vue（顾客侧文案）",
   "lastVerified": "2026-09-24",
   "lastSrcRewrite": "2026-09-24 CHANGE-20260924-045：src 行号随 APPLET 快照 09-24 重建回写（49 字段 + 15 分组范围）；check-ui-truth ⑤/⑤b 复跑零漂移。",
-  "lastEvidenceSweep": "2026-09-24 CHANGE-20260924-048／050 两轮体检：linkages 10 条＋verify/customerSidePhrases 4 条按源码实际锚点修正；核验后判为吻合的 13 条保留；非源码引用 1 条保留；**待人工 4 条**＝linkages[8]（候选池逻辑）／messageReminders（订阅授权 watch 需重定位）／offScript.items[0][1]（需按条目文本重定位）。自动改写经实测不安全，一律逐条人工定位。",
+  "lastEvidenceSweep": "2026-09-24 CHANGE-20260924-048／050 两轮体检：linkages 10 条＋verify/customerSidePhrases 4 条按源码实际锚点修正；核验后判为吻合的 13 条保留；非源码引用 1 条保留；**待人工 4 条已于 053 清完**（linkages[8]→`create.vue:424-426`〔m-coupon-select 的 tip 原话〕／messageReminders→`config.prod.js:17`＋三领取页订阅调用行／offScript.items[0]→`detail.vue:114,154`／items[1]→`create.vue:390-393`）；顺带发现并移除一个**悬空跨文件引用** `facts.plays.transferReward`（该字段在 `spec/facts.json` 不存在）。自动改写经实测不安全，一律逐条人工定位。",
   "usage": "字段名与提示语逐字取用（onScreen=true 的可直接上屏）；limits/defaults 是画面里能写的数字；visibleWhen/linkages 决定'这一屏该不该出现这一行'；playLeverage 是把设置项变成玩法话术的映射。改功能先改本表再改内容。",
   "machineCheck": "video/src 与 outputs 里的字段名由 scripts/check-ui-truth.mjs 回 applet 源码逐字对账；本表内 hiddenFromScreen 条目同时由 spec/redlines.json 的红线层拦截。"
  },
@@ -705,7 +705,7 @@
   },
   {
    "rule": "转赠奖励券的候选池 = 已存在的、有效的、发放方式为私密发放的券",
-   "src": "create.vue:515-518 + facts.plays.transferReward"
+   "src": "create.vue:424-426"
   },
   {
    "rule": "选「券包」发放方式时：除既有的关闭限领总量/口令/指定手机号/清空发券员工外，**还联动关闭「填写手机号」与「仅新客户可领」并清空 allowMobiles**（create.vue:679-688,884-891）",
@@ -834,7 +834,7 @@
   "rule": "片尾要说后台，只能用上面这些真词。页面上没有'已领取/已核销'这两个统计标签（那是次卡、券包页面的字），别说成商家在优惠券统计里看得到的东西。"
  },
  "messageReminders": {
-  "src": "applet/config.js:10-16（订阅模板 ID 表，前端只登记了 couponReceive 两个 ID）+ pages_user/coupon/public_receive.vue:205-220 / private_receive.vue:168-183 / transfer_receive.vue:221-236（领取页请求订阅授权）+ m-subscribe-message-guide 组件。注：pages_coupon/coupon/detail.vue 全文不含订阅相关代码，别再引它。到账类通知由 server 侧发送、前端无对应模板 ID，其存在性取自 2026-08-30 用户服务端口径，types 里逐条标了可证程度。",
+  "src": "config.prod.js:17 / config.test.js:18（订阅模板 ID 表，前端只登记了 couponReceive 两个 ID）+ pages_user/coupon/public_receive.vue:212-235 / private_receive.vue:195 / transfer_receive.vue:235（领取页请求订阅授权）+ m-subscribe-message-guide 组件。注：pages_coupon/coupon/detail.vue 全文不含订阅相关代码，别再引它。到账类通知由 server 侧发送、前端无对应模板 ID，其存在性取自 2026-08-30 用户服务端口径，types 里逐条标了可证程度。",
   "types": [
    {
     "trigger": "顾客领取卡券（优惠券）",
@@ -926,13 +926,13 @@
   "items": [
    {
     "fact": "转赠中可随时取消转赠",
-    "src": "pages_user/coupon/detail.vue:109,132 / transfer_list.vue:128",
+    "src": "pages_user/coupon/detail.vue:114,154",
     "decision": "2026-08-30 用户口径：不重要，不需要说。讲转赠链只讲「仅首位领取好友可获得本券」这个先到先得的结果。",
     "exception": "「优惠券转赠中，暂不可核销」是商家会撞上的核销拦截提示，与'可取消'不是一回事，按核销页重要信息保留。"
    },
    {
     "fact": "开启动态核销码 / 核销码过期条",
-    "src": "create.vue:315-349",
+    "src": "create.vue:390-393",
     "decision": "行标题含禁词，永不上屏、永不念（见 createGroups 同组 note）。"
    },
    {

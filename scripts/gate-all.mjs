@@ -51,6 +51,7 @@ const GATES = [
   { key: 'refs', label: '文档引用闸门（引用断链）', args: ['scripts/check-doc-references.mjs'] },
   { key: 'facts', label: '事实闸门（资产路径与素材对账）', args: ['scripts/check-facts.mjs'] },
   { key: 'similarity', label: '相似度闸门（整屏结构不得复用）', args: ['scripts/check-similarity.mjs'] },
+  { key: 'stylerotation', label: '风格轮换闸门（同风格不得连续复用）', args: ['scripts/check-style-rotation.mjs'] },
   { key: 'layout', label: '布局指纹闸门（新片不得复用上一条布局）', args: ['scripts/check-layout-diversity.mjs'] },
   { key: 'bg', label: '背景底闸门（每片必用背景图）', args: ['scripts/check-bg.mjs'] },
   { key: 'motifcard', label: '母题卡闸门（按风格声明取值：视觉定位卡四栏+素材张数）', args: ['scripts/check-motif-card.mjs'] },
