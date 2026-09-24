@@ -1,5 +1,5 @@
 {
-  "description": "权威文档注册表 + 检查器登记表：**读者面以实际代码为准，勿在此写死条数**（除文档引用与事实闸门外，背景、布局多样性、相似度与总闸门等脚本同样读取本文件）。维护规则：新增权威文档时在此登记；文档清单变化时更新 aliases；高危口径改值或新踩漂移坑时维护 caliberOwners（pattern+owner，属主外复述=硬失败）。本文件另承载各闸门的历史豁免与废止话头登记（背景 / 布局 / 相似度 / 动作豁免、deprecatedTerms 等）。**不承载变更事务状态**（依 `R10` 第 67 行）。（2026-09-15 文档最终收口：R7/R8/R9/R10 纳入权威别名，安全区属主口径同步为左右信息安全边界。）",
+  "description": "权威文档注册表 + 检查器登记表：**读者面以实际代码为准，勿在此写死条数**（除文档引用与事实闸门外，背景、布局多样性、相似度与总闸门等脚本同样读取本文件）。维护规则：新增权威文档时在此登记；文档清单变化时更新 aliases；高危口径改值或新踩漂移坑时维护 caliberOwners（pattern+owner，属主外复述=硬失败）。本文件另承载各闸门的历史豁免与废止话头登记（背景 / 布局 / 相似度 / 动作豁免、deprecatedTerms 等）。独立静态贴图风格包另由 `posterStyles` 声明，**不进入视频 `styles` 的片认领、轮换或闸门适用性体系**。**不承载变更事务状态**（依 `R10` 第 67 行）。（2026-09-15 文档最终收口：R7/R8/R9/R10 纳入权威别名，安全区属主口径同步为左右信息安全边界。）",
   "contentLines": [
     {
       "id": "industry",
@@ -157,12 +157,30 @@
     "marker": "Legacy 隔离声明",
     "declaration": "outputs/LEGACY-ISOLATION.md",
     "items": [
-      { "piece": "g06", "file": "outputs/g06-教培托管/01-内容输入包.md" },
-      { "piece": "g07", "file": "outputs/g07-咖啡茶饮/00-交付说明.md" },
-      { "piece": "g08", "file": "outputs/g08-火锅/01-内容输入包.md" },
-      { "piece": "g09", "file": "outputs/g09-宠物店/01-内容输入包.md" },
-      { "piece": "g10", "file": "outputs/g10-美容沙龙/01-内容输入包.md" },
-      { "piece": "g11", "file": "outputs/g11-烧烤/01-内容输入包.md" }
+      {
+        "piece": "g06",
+        "file": "outputs/g06-教培托管/01-内容输入包.md"
+      },
+      {
+        "piece": "g07",
+        "file": "outputs/g07-咖啡茶饮/00-交付说明.md"
+      },
+      {
+        "piece": "g08",
+        "file": "outputs/g08-火锅/01-内容输入包.md"
+      },
+      {
+        "piece": "g09",
+        "file": "outputs/g09-宠物店/01-内容输入包.md"
+      },
+      {
+        "piece": "g10",
+        "file": "outputs/g10-美容沙龙/01-内容输入包.md"
+      },
+      {
+        "piece": "g11",
+        "file": "outputs/g11-烧烤/01-内容输入包.md"
+      }
     ]
   },
   "docsDir": "docs/internal",
@@ -182,6 +200,8 @@
     "knowledge/洞察库.md",
     "knowledge/玩法版图.md",
     "docs/internal/贴图宣传作业规范.md",
+    "poster/styles/_template/SKILL.md",
+    "poster/styles/light-saas-3d/SKILL.md",
     "knowledge/爆款文案技能包/SKILL.md",
     "knowledge/爆款文案技能包/README.md"
   ],
@@ -199,7 +219,8 @@
     "整片解剖": "knowledge/爆款整片解剖.md",
     "洞察库": "knowledge/洞察库.md",
     "玩法版图": "knowledge/玩法版图.md",
-    "贴图宣传": "docs/internal/贴图宣传作业规范.md"
+    "贴图宣传": "docs/internal/贴图宣传作业规范.md",
+    "贴图风格": "poster/styles/light-saas-3d/SKILL.md"
   },
   "factChecks": [
     {
@@ -632,5 +653,26 @@
       "desc": "「本表即当前…」式身份宣称"
     }
   ],
-  "styleRotationWaivers": []
+  "styleRotationWaivers": [],
+  "posterStyles": {
+    "_说明": "独立静态宣传贴图风格包声明源。方法 Owner＝docs/internal/贴图宣传作业规范.md；本区只登记表达能力包的 id／路径／状态与来源，不承载选题、攻略结构、平台发布或内容流程。与 video/styles 完全隔离；不得把 poster PNG 资产接入 video/styles 的 piecePatterns、styleRotation 或视频闸门。",
+    "version": 1,
+    "defaultStyleId": "light-saas-3d",
+    "itemSchema": [
+      "id",
+      "label",
+      "packPath",
+      "status",
+      "source"
+    ],
+    "items": [
+      {
+        "id": "light-saas-3d",
+        "label": "轻 3D SaaS 现代产品",
+        "packPath": "poster/styles/light-saas-3d/",
+        "status": "active",
+        "source": "CHANGE-20260924-063：承接既有「券到卡包功能介绍」9 张作品的蓝白／轻 3D／现代 SaaS 视觉共性；固化表达语言，不复制旧图构图"
+      }
+    ]
+  }
 }
