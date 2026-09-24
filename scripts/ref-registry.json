@@ -181,6 +181,7 @@
     "knowledge/爆款整片解剖.md",
     "knowledge/洞察库.md",
     "knowledge/玩法版图.md",
+    "docs/internal/贴图宣传作业规范.md",
     "knowledge/爆款文案技能包/SKILL.md",
     "knowledge/爆款文案技能包/README.md"
   ],
@@ -197,7 +198,8 @@
     "SKILL": "SKILL.md",
     "整片解剖": "knowledge/爆款整片解剖.md",
     "洞察库": "knowledge/洞察库.md",
-    "玩法版图": "knowledge/玩法版图.md"
+    "玩法版图": "knowledge/玩法版图.md",
+    "贴图宣传": "docs/internal/贴图宣传作业规范.md"
   },
   "factChecks": [
     {
