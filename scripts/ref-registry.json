@@ -73,7 +73,7 @@
     "valueValidation": "content-lines.mjs 对 defaultApplicability 与 gateOverrides 取值做枚举校验；写入 OBSERVE2/PENDING/OPTIONAL 等非法值即报错，不静默当作合法态；并拒绝 EXPLICIT_REQUIRED 出现在 gateOverrides（默认位专用策略值，见 CHANGE-20260920-032 §3.5.1）"
   },
   "styles": {
-    "_说明": "视频风格包声明源（CHANGE-20260923-039）。新增一种风格 = video/styles/<id>/ 一个目录 + 本表登记一行；未声明闸门适用性即硬错误（EXPLICIT_REQUIRED），不得静默继承为 Remotion 帧设计的判据。风格包只是表达能力声明，不拥有内容流程/审核流程/状态来源/Owner 权限。首个风格由 039 批 2a 四候选（白板/商业漫画/动态设计/商业电影感）评估、经用户选定后再登记；whiteboard 以 experimental 登记（039 批 2b）；remotion-components 以 active 登记（039 批 5a：旧链归位）；扫描面派生（批 4-1）与三闸门按风格认领（批 4-2/A2）已接线。**跨风格验收＝导演稿替换测试（同一份《导演稿》换包不得要求改写叙事结构／信息释放／观看路径／情绪曲线；长期有效）**。**片→风格认领（方案 C，2026-09-23）**：闸门按 items[].piecePatterns 认领片归属——模板 `{id}`＝片号（如 g11）、`{dir}`＝该片在 outputs/ 下的目录名（如 g11-烧烤）；命中 ≥2 个非缺省风格＝硬失败（拒绝猜）；无专属命中＝缺省 defaultStyleId。新增风格仍＝一个目录＋本表一行（piecePatterns 就登记在这一行里）；建包骨架＝复制 `video/styles/_template/`（骨架本身不是风格、不登记、不进闸门认领）。",
+    "_说明": "视频风格包声明源（CHANGE-20260923-039）。新增一种风格 = video/styles/<id>/ 一个目录 + 本表登记一行；未声明闸门适用性即硬错误（EXPLICIT_REQUIRED），不得静默继承为 Remotion 帧设计的判据。风格包只是表达能力声明，不拥有内容流程/审核流程/状态来源/Owner 权限。首个风格由 039 批 2a 四候选（白板/商业漫画/动态设计/商业电影感）评估、经用户选定后再登记；whiteboard 以 experimental 登记（039 批 2b）；remotion-components 以 active 登记（039 批 5a：旧链归位）；扫描面派生（批 4-1）与三闸门按风格认领（批 4-2/A2）已接线。**跨风格验收＝导演稿替换测试（同一份《导演稿》换包不得要求改写叙事结构／信息释放／观看路径／情绪曲线；长期有效）**。**片→风格认领（方案 C，2026-09-23）**：闸门按 items[].piecePatterns 认领片归属——模板 `{id}`＝片号（如 g11）、`{dir}`＝该片在 outputs/ 下的目录名（如 g11-烧烤）；命中 ≥2 个非缺省风格＝硬失败（拒绝猜）；无专属命中＝缺省 defaultStyleId。新增风格仍＝一个目录＋本表一行（piecePatterns 就登记在这一行里）；建包骨架＝复制 `video/styles/_template/`（骨架本身不是风格、不登记、不进闸门认领）。**服务对象＝两条内容线**（经各线唯一 Owner 路由）；**教程线启用风格包前**，其「线声明 × 风格声明」的逐闸门取值合成规则须先专项定稿（不得默认继承行业线的口径）。",
     "version": 2,
     "defaultStyleId": "remotion-components",
     "itemSchema": [
@@ -165,7 +165,9 @@
     "outputs/archive/官网资源库落地规划.md",
     "knowledge/爆款整片解剖.md",
     "knowledge/洞察库.md",
-    "knowledge/玩法版图.md"
+    "knowledge/玩法版图.md",
+    "knowledge/爆款文案技能包/SKILL.md",
+    "knowledge/爆款文案技能包/README.md"
   ],
   "excludeDirs": [],
   "aliases": {
