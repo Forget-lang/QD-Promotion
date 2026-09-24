@@ -13,7 +13,7 @@
 ## 正确调用方式
 
 1. 先在 `SKILL.md` 当前步骤中明确“这一条到底教什么”。
-2. 再按行业/经营问题检索 `knowledge/cases.jsonl` 的 3–5 个相近案例（检索不到时明确记录“语料稀疏”，不得硬凑）。
+2. 再按行业/经营问题、**用标注字段**（`domain`／`tags`／`hook_type`／`structure`／`proof_devices`／`retention_devices`）检索 `knowledge/爆款文案技能包/knowledge/cases.jsonl`：**分层抽样** ≥3 篇同赛道 Tier A（点赞 Top 10%）＋ ≥1 篇低表现**对照**（检索不到时明确记录“语料稀疏”，不得硬凑）。
 3. 只研究 Hook、结构、信息增量、教学节奏、证明方式、反模式等传播规律。
 4. 把研究结果回填到当前内容输入包/研究 trace，并由 `SKILL.md` 继续推进。
 5. 产品功能、字段、数字、限制、截图对应关系一律回 `spec/` / APPLET / Product Truth 验证。
