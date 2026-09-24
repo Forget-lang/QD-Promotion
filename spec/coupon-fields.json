@@ -4,7 +4,7 @@
   "source": "applet/pages_coupon/coupon/create.vue（制券页全量，含 594-612/692-697 联动 watch）+ constants/coupon.js（枚举语义）+ issue/private.vue（私密发放需设数据）+ verify/verify.vue（核销页重要信息）+ pages_user/coupon/detail.vue（顾客侧文案）",
   "lastVerified": "2026-09-24",
   "lastSrcRewrite": "2026-09-24 CHANGE-20260924-045：src 行号随 APPLET 快照 09-24 重建回写（49 字段 + 15 分组范围）；check-ui-truth ⑤/⑤b 复跑零漂移。",
-  "lastEvidenceSweep": "2026-09-24 CHANGE-20260924-048：证据型 src 体检——linkages 11 条中 10 条按源码实际锚点（watch／模板 v-if）修正行号，linkages[8] 候选池逻辑待人工；verify／stat／messageReminders／customerSidePhrases／offScript 21 条未逐条核（自动改写经实测不安全，改为逐条人工定位）。",
+  "lastEvidenceSweep": "2026-09-24 CHANGE-20260924-048／050 两轮体检：linkages 10 条＋verify/customerSidePhrases 4 条按源码实际锚点修正；核验后判为吻合的 13 条保留；非源码引用 1 条保留；**待人工 4 条**＝linkages[8]（候选池逻辑）／messageReminders（订阅授权 watch 需重定位）／offScript.items[0][1]（需按条目文本重定位）。自动改写经实测不安全，一律逐条人工定位。",
   "usage": "字段名与提示语逐字取用（onScreen=true 的可直接上屏）；limits/defaults 是画面里能写的数字；visibleWhen/linkages 决定'这一屏该不该出现这一行'；playLeverage 是把设置项变成玩法话术的映射。改功能先改本表再改内容。",
   "machineCheck": "video/src 与 outputs 里的字段名由 scripts/check-ui-truth.mjs 回 applet 源码逐字对账；本表内 hiddenFromScreen 条目同时由 spec/redlines.json 的红线层拦截。"
  },
@@ -763,17 +763,17 @@
   }
  },
  "verifyPageKeyInfo": {
-  "src": "verify/verify.vue:6,123-125,133-147,38-73,359-371",
+  "src": "verify/verify.vue:6,133-147,38-73,359-371",
   "items": [
    {
     "label": "转赠获得",
     "note": "券卡右下角的标签——核销时一眼看出这张券是别人转赠来的，不是本人领的",
-    "src": "verify/verify.vue:123-125"
+    "src": "verify/verify.vue:119"
    },
    {
     "label": "优惠券转赠中，暂不可核销",
     "note": "转赠未完成的券核不掉，这是核销失败的常见原因之一",
-    "src": "verify.vue:87-91"
+    "src": "verify.vue:76-84"
    },
    {
     "label": "领取信息 / 核销信息",
@@ -912,7 +912,7 @@
    {
     "label": "转赠给好友",
     "note": "券详情 A 侧入口，`detail.vue:131`；转赠弹窗成功后原话「好友领取前可多次分享，仅首位领取好友可获得本券」（`detail.vue:157`）。同页另有「转赠中，可取消转赠」状态行（`detail.vue:109,132`）——按 offScript 不上屏、不念。",
-    "src": "pages_user/coupon/detail.vue:131,157"
+    "src": "pages_user/coupon/detail.vue:131,179"
    },
    {
     "label": "领取转赠的卡券",
