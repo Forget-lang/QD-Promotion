@@ -4,7 +4,7 @@
   "source_tree_sha256": "e99fe68ce1cba67ee071f4f172a0c11f1f4803939bfe1fb42adfad84d6c02dd0",
   "provenance_note": "本次输入＝本机 live source（无来源 archive）：source_tree_sha256＝对「相对路径＋内容 SHA-256」排序串取 SHA-256 的源集摘要，作来源身份；archive_sha256 留空（R10 §4 的 archive 位仅 archive 模式使用）",
   "snapshot_archive": "source.tar.xz",
-  "snapshot_sha256": "795a9c2a4535b7a457f0071b266d6a3042752c9434c849376d97954f736481b9",
+  "snapshot_sha256": "209744c2803678dca1162306f38910e5d01bdd468adaf79a35bbaac41042fddc",
   "file_count": 298,
   "scope": "all .vue/.js/.json source files, excluding node_modules, unpackage, uni_modules, .git and macOS metadata",
   "generated_at": "2026-09-24",

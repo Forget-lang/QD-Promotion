@@ -68,14 +68,28 @@ rmSync(target, { recursive: true, force: true });
 mkdirSync(target, { recursive: true });
 const tarPath = join(target, 'source.tar.xz');
 const isGnuTar = (spawnSync('tar', ['--version'], { encoding: 'utf8' }).stdout || '').includes('GNU tar');
+// macOS 的 bsdtar 默认会把扩展属性写成 `._*`（AppleDouble）条目：本机 bsdtar 解包会把它吸收回 xattr，
+// 但 Linux 的 GNU tar 会把它们解成真文件 —— 于 .vue/.js/.json 的文件计数在 CI 上翻倍（CHANGE-20260924-049 实测）。
+// 因此：① 复制前关掉 copyfile 元数据；② bsdtar 显式 --no-mac-metadata/--no-xattrs/--exclude '._*'。
+const tarEnv = { ...process.env, COPYFILE_DISABLE: '1' };
 const tarArgs = isGnuTar
   ? ['-cJf', tarPath, '--sort=name', `--mtime=${today} 00:00:00 UTC`, '--owner=0', '--group=0', '--numeric-owner', '-C', staging, '.']
-  : ['-cJf', tarPath, '-C', staging, '.'];
-const tarRun = spawnSync('tar', tarArgs, { stdio: 'inherit' });
+  : ['-cJf', tarPath, '--no-mac-metadata', '--no-xattrs', '--exclude', '._*', '-C', staging, '.'];
+const tarRun = spawnSync('tar', tarArgs, { stdio: 'inherit', env: tarEnv });
 if (tarRun.status !== 0) throw new Error(`tar failed with status ${tarRun.status}`);
 rmSync(staging, { recursive: true, force: true });
 
 // 3) live 模式：源集摘要（对「路径＋内容 SHA-256」排序串取 SHA-256）＝来源身份，替代 archive SHA-256
+// 自检（CHANGE-20260924-049）：归档内不得出现 `._*` AppleDouble 条目，且成员里 .vue/.js/.json 数量须等于 entries.length
+{
+  const listing = spawnSync('tar', ['-tJf', tarPath], { encoding: 'utf8' }).stdout || '';
+  const names = listing.split('\n').filter(Boolean);
+  const apple = names.filter((n) => n.split('/').some((seg) => seg.startsWith('._')));
+  const counted = names.filter((n) => /\.(vue|js|json)$/.test(n)).length;
+  if (apple.length) throw new Error(`tar 自检失败：含 ${apple.length} 个 AppleDouble(._*) 条目（会让 Linux 侧文件计数翻倍）`);
+  if (counted !== entries.length) throw new Error(`tar 自检失败：归档内 .vue/.js/.json 计数 ${counted} ≠ ${entries.length}`);
+}
+
 const sourceTreeSha256 = createHash('sha256')
   .update(entries.map((e) => `${e.path}\0${e.sha256}\n`).join(''))
   .digest('hex');

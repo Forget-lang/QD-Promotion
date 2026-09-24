@@ -7,10 +7,12 @@
 - 输入：**本机 live source `../applet`**（本次无来源 zip／archive，按 R10 §7「以用户提供的最新产品源码为准重新生成 snapshot」执行）
 - 源集摘要 `source_tree_sha256`（＝对「相对路径＋内容 SHA-256」排序串取 SHA-256）：`e99fe68ce1cba67ee071f4f172a0c11f1f4803939bfe1fb42adfad84d6c02dd0`
 - Snapshot 文件数：**298**（与上一版文件集**完全一致**：0 增 0 减；其中 **20 个文件内容更新**）
-- Snapshot archive SHA-256（`source.tar.xz`）：`795a9c2a4535b7a457f0071b266d6a3042752c9434c849376d97954f736481b9`
-- Snapshot Git Blob SHA（`spec/product-truth/applet/source.tar.xz` 的 Git 对象身份）：`9e0e9fc805f506fd762e0fc846f0fff1e31030d2`
+- Snapshot archive SHA-256（`source.tar.xz`）：见下方「归档修订」——当前值以 `manifest.json` 的 `snapshot_sha256` 为准（2026-09-24 第二次修订：清掉 macOS AppleDouble 条目后重打）
+- Snapshot Git Blob SHA：以 `git hash-object spec/product-truth/applet/source.tar.xz` 现取为准（同上，归档已二次修订）
 - Snapshot 范围：仅 `.vue` / `.js` / `.json`；排除 `node_modules`、`unpackage`、`uni_modules`、`.git` 及 macOS `._*` 元数据。
 - 逐文件清单（R10 §4）：`spec/product-truth/applet/manifest.json` 的 `files[]`（`path`／`sha256`／`bytes`）。
+
+**归档修订（2026-09-24 第二次，CHANGE-20260924-049）**：首次重打的 tar 由 macOS bsdtar 生成，未禁用扩展属性 → 归档内含 `._*`（AppleDouble）条目；本机 bsdtar 解包会吸收回 xattr（本机计数仍 298），但 **Linux 的 GNU tar 会解成真文件**，CI 的文件计数翻倍（596≠298）→ CI 红。修法：打包禁用 mac 元数据（`--no-mac-metadata/--no-xattrs/--exclude '._*'`＋`COPYFILE_DISABLE=1`），并在构建脚本内**自检**（不得含 `._*`、源文件计数须等于清单条数）。当前 tar：见 `manifest.json` 的 `snapshot_sha256`；`source_tree_sha256` 未变（源集内容不变）。
 
 **版本谱系**：首版 2026-09-15（输入 `applet.zip`，archive SHA-256 `afb1b038…`，同时修正了误纳入的 `.git` 与生成物目录，确立"298 文件＝干净范围"）→ **2026-09-24 重建**（同一 298 文件集；更新 20 个文件：`pages_coupon/coupon/create.vue`（真值表主锚）、`pages_card/card/create.vue`、`pages_bundle/bundle/create.vue`＋`update.vue`、`pages_coupon/coupon/detail.vue`／`info.vue`／`update.vue`、`pages_coupon/issue/wechat.vue`、`pages_merchant/**` 5 件、`pages_point/point/increase.vue`、`pages_user/coupon/public_receive.vue`、`components/m/m-vip-upgrade/m-vip-upgrade.vue`、`constants/edition.js`、`config.prod.js`、`manifest.json` 等）。重建后本机实测：**物化快照与 live source 298/298 逐字一致**。
 
