@@ -4,6 +4,7 @@
   "source": "applet/pages_coupon/coupon/create.vue（制券页全量，含 594-612/692-697 联动 watch）+ constants/coupon.js（枚举语义）+ issue/private.vue（私密发放需设数据）+ verify/verify.vue（核销页重要信息）+ pages_user/coupon/detail.vue（顾客侧文案）",
   "lastVerified": "2026-09-24",
   "lastSrcRewrite": "2026-09-24 CHANGE-20260924-045：src 行号随 APPLET 快照 09-24 重建回写（49 字段 + 15 分组范围）；check-ui-truth ⑤/⑤b 复跑零漂移。",
+  "lastEvidenceSweep": "2026-09-24 CHANGE-20260924-048：证据型 src 体检——linkages 11 条中 10 条按源码实际锚点（watch／模板 v-if）修正行号，linkages[8] 候选池逻辑待人工；verify／stat／messageReminders／customerSidePhrases／offScript 21 条未逐条核（自动改写经实测不安全，改为逐条人工定位）。",
   "usage": "字段名与提示语逐字取用（onScreen=true 的可直接上屏）；limits/defaults 是画面里能写的数字；visibleWhen/linkages 决定'这一屏该不该出现这一行'；playLeverage 是把设置项变成玩法话术的映射。改功能先改本表再改内容。",
   "machineCheck": "video/src 与 outputs 里的字段名由 scripts/check-ui-truth.mjs 回 applet 源码逐字对账；本表内 hiddenFromScreen 条目同时由 spec/redlines.json 的红线层拦截。"
  },
@@ -672,35 +673,35 @@
  "linkages": [
   {
    "rule": "发放方式 = 券包 → 自动关闭限领总量、清空领取口令、关掉指定手机号可领取、清空发券员工",
-   "src": "create.vue:594-603,701-706"
+   "src": "create.vue:703-718"
   },
   {
    "rule": "指定手机号可领取 = 开 → 自动打开「填写手机号」并把那颗开关禁用（关不掉）",
-   "src": "create.vue:605-612,471"
+   "src": "create.vue:719-726,545"
   },
   {
    "rule": "允许转赠 = 关 → 自动关掉转赠奖励并清空已选奖励券",
-   "src": "create.vue:692-697"
+   "src": "create.vue:811-818"
   },
   {
    "rule": "允许分享 只在公开领取下出现；私密发放与券包没有这颗开关",
-   "src": "create.vue:498"
+   "src": "create.vue:578-580"
   },
   {
    "rule": "每次领取数量 / 领取周期 / 每人每天（每周、每月、每年）最多可领 这三行只在'未开限领总量'或'每人限领总量 > 1'时出现；第三行的标签由「领取周期」的取值动态拼出",
-   "src": "create.vue:269-270"
+   "src": "create.vue:313,331-334"
   },
   {
    "rule": "有效期类型 = 固定有效期 → 换成起止日期两行，'有效期天数'那行消失",
-   "src": "create.vue:152,164-183"
+   "src": "create.vue:178,200-215"
   },
   {
    "rule": "可用时段 = 定制 → 多出周几与时段两块，时段最多 2 段",
-   "src": "create.vue:190-195"
+   "src": "create.vue:215-226"
   },
   {
    "rule": "封面图片第一张自动作为转发封面",
-   "src": "create.vue:683-689"
+   "src": "create.vue:569,801"
   },
   {
    "rule": "转赠奖励券的候选池 = 已存在的、有效的、发放方式为私密发放的券",
@@ -708,11 +709,11 @@
   },
   {
    "rule": "选「券包」发放方式时：除既有的关闭限领总量/口令/指定手机号/清空发券员工外，**还联动关闭「填写手机号」与「仅新客户可领」并清空 allowMobiles**（create.vue:679-688,884-891）",
-   "src": "create.vue:679-688,884-891"
+   "src": "create.vue:703-718,884-891"
   },
   {
    "rule": "开启「加入微信卡包」后：转赠整块隐藏，替换为「允许转赠 · 已关闭 · 开启微信卡包后不支持转赠」；有效期上限封顶 365 天",
-   "src": "create.vue:552-575,843-848"
+   "src": "create.vue:428-430"
   }
  ],
  "issueChannels": {
