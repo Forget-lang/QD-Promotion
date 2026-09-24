@@ -46,8 +46,15 @@ const LIMITS = { staticPct: 45, medianDiff: 0.35, occupancy: 70 };
 
 const args = process.argv.slice(2).filter((a) => !a.startsWith('--'));
 const asJson = process.argv.includes('--json');
-if (!args.length) { console.error('用法：node scripts/check-motion.mjs <mp4 | 图片...>'); process.exit(2); }
-if (!existsSync(FFMPEG)) { console.error(`❌ 找不到 ffmpeg：${FFMPEG}`); process.exit(2); }
+/**
+ * 探针状态（CHANGE-20260924-057）：豁免只允许裁「判据红」，不允许裁「探针没跑起来」。
+ * `VERDICT`＝真的量过并给出判据（达标/未达标都算）；`UNAVAILABLE`＝环境/输入问题，没量成。
+ * 汇总层（`gate-all`）据此判定该红是否落在豁免范围——缺状态行的未知情形一律按不可裁处理。
+ * `--json` 模式不打印状态行（保持 stdout 为纯 JSON）。
+ */
+const emitStatus = (s) => { if (!asJson) console.log(`PROBE_STATUS=${s}`); };
+if (!args.length) { console.error('用法：node scripts/check-motion.mjs <mp4 | 图片...>'); emitStatus('UNAVAILABLE'); process.exit(2); }
+if (!existsSync(FFMPEG)) { console.error(`❌ 找不到 ffmpeg：${FFMPEG}`); emitStatus('UNAVAILABLE'); process.exit(2); }
 
 const videos = args.filter((p) => ['.mp4', '.mov', '.m4v', '.webm'].includes(extname(p).toLowerCase()));
 const images = args.filter((p) => ['.png', '.jpg', '.jpeg', '.webp'].includes(extname(p).toLowerCase()));
@@ -57,7 +64,7 @@ function grabFrames(file) {
   const r = spawnSync(FFMPEG, ['-hide_banner', '-loglevel', 'error', '-i', file,
     '-vf', `fps=${FPS},scale=${SIDE}:${SIDE}`, '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-'],
     { maxBuffer: 1 << 28 });
-  if (r.status !== 0) { console.error(`❌ ffmpeg 解码失败：${file}\n${r.stderr?.toString().slice(0, 300)}`); process.exit(1); }
+  if (r.status !== 0) { console.error(`❌ ffmpeg 解码失败：${file}\n${r.stderr?.toString().slice(0, 300)}`); emitStatus('UNAVAILABLE'); process.exit(1); }
   const buf = r.stdout, n = SIDE * SIDE * 3, frames = [];
   for (let i = 0; i + n <= buf.length; i += n) frames.push(buf.subarray(i, i + n));
   return frames;
@@ -86,7 +93,7 @@ const results = [];
 
 for (const v of videos) {
   const frames = grabFrames(v);
-  if (frames.length < 4) { console.error(`❌ ${v} 采样帧过少（${frames.length}），拒绝在解析失败时判通过`); process.exit(1); }
+  if (frames.length < 4) { console.error(`❌ ${v} 采样帧过少（${frames.length}），拒绝在解析失败时判通过`); emitStatus('UNAVAILABLE'); process.exit(1); }
   const diffs = [];
   for (let i = 1; i < frames.length; i++) {
     let s = 0; const a = frames[i - 1], b = frames[i];
@@ -111,7 +118,7 @@ if (images.length) {
   const occ = images.map((p) => {
     const r = spawnSync(FFMPEG, ['-hide_banner', '-loglevel', 'error', '-i', p,
       '-vf', `scale=${SIDE}:${SIDE}`, '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-'], { maxBuffer: 1 << 26 });
-    if (r.status !== 0) { console.error(`❌ 解码失败：${p}`); process.exit(1); }
+    if (r.status !== 0) { console.error(`❌ 解码失败：${p}`); emitStatus('UNAVAILABLE'); process.exit(1); }
     return { file: p, occupancy: +occupancy(r.stdout).toFixed(0) };
   });
   if (asJson) console.log(JSON.stringify({ images: occ }, null, 1));
@@ -126,7 +133,7 @@ if (images.length) {
 }
 
 // 2026-08-30 修：图片模式占用率不达标必须反映到退出码（旧版写死 exit 0，红字绿码）
-if (!videos.length) process.exit(imageFails ? 1 : 0);
+if (!videos.length) { emitStatus('VERDICT'); process.exit(imageFails ? 1 : 0); }
 
 if (asJson) { console.log(JSON.stringify(results, null, 1)); }
 else {
@@ -141,4 +148,5 @@ else {
 const fails = results.filter((r) => r.staticPct > LIMITS.staticPct || r.medianDiff < LIMITS.medianDiff
   || r.occupancy < LIMITS.occupancy);
 if (!asJson) console.log(fails.length ? `\n❌ ${fails.length}/${results.length} 个文件未达合格线` : '\n✅ 全部达标');
+emitStatus('VERDICT');
 process.exit(fails.length ? 1 : 0);

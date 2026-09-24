@@ -33,13 +33,19 @@ const FULL_BLEED_RATIO = 0.75;
 const files = process.argv.slice(2).filter((a) => !a.startsWith('--'));
 const inkArg = process.argv.indexOf('--ink');
 const INK_T = inkArg > -1 ? Number(process.argv[inkArg + 1]) : 100;
-if (!files.length) { console.error('用法：node scripts/probe-safe-area.mjs [--ink 100] <png...>'); process.exit(2); }
-if (!existsSync(FFMPEG)) { console.error(`❌ 找不到 ffmpeg：${FFMPEG}`); process.exit(2); }
+/**
+ * 探针状态（CHANGE-20260924-057）：豁免只允许裁「判据红」，不允许裁「探针没跑起来」。
+ * `VERDICT`＝真的量过并给出判据（红或绿都算）；`UNAVAILABLE`＝环境/输入问题，没量成。
+ * 汇总层（`gate-all`）据此判定该红是否落在豁免范围——缺状态行的未知情形一律按不可裁处理。
+ */
+const emitStatus = (s) => console.log(`PROBE_STATUS=${s}`);
+if (!files.length) { console.error('用法：node scripts/probe-safe-area.mjs [--ink 100] <png...>'); emitStatus('UNAVAILABLE'); process.exit(2); }
+if (!existsSync(FFMPEG)) { console.error(`❌ 找不到 ffmpeg：${FFMPEG}`); emitStatus('UNAVAILABLE'); process.exit(2); }
 
 function decode(p) {
   const r = spawnSync(FFMPEG, ['-hide_banner', '-loglevel', 'error', '-i', p,
     '-vf', `scale=${W}:${H}`, '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-'], { maxBuffer: 1 << 28 });
-  if (r.status !== 0) { console.error(`❌ 解码失败：${p}`); process.exit(1); }
+  if (r.status !== 0) { console.error(`❌ 解码失败：${p}`); emitStatus('UNAVAILABLE'); process.exit(1); }
   return r.stdout;
 }
 
@@ -139,4 +145,5 @@ for (const p of files) {
 console.log(anyFail
   ? `\n❌ 至少一屏有信息内容侵入左右安全边带或字幕字形越线。请回真图确认后修正，不为过闸门盲目缩小整片。`
   : `\n✅ 全部样本未见信息内容侵入左右安全边带；顶部仅作诊断，最终由真图审确认是否明显贴边。`);
+emitStatus('VERDICT');
 process.exit(anyFail ? 1 : 0);

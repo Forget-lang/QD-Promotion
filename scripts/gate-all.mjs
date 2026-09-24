@@ -44,6 +44,15 @@ const safeAreaWaiver = (framePaths) => {   // CHANGE-20260918-029：与 motionWa
   const key = pieceKeyOf(framePaths.join('/'), LINES);
   return key ? (list.find((w) => String(w.video).toLowerCase() === key) || null) : null;
 };
+/**
+ * 探针状态（CHANGE-20260924-057）：豁免**只裁"判据红"**，不裁"探针没跑起来"。
+ * 探针自报 `PROBE_STATUS=VERDICT`（真量过）／`UNAVAILABLE`（缺 ffmpeg、解码失败、输入不合法…）；
+ * 缺状态行（探针崩溃/被替换）按不可裁处理——**fail-safe 方向是"不许裁"**。
+ */
+const probeStatusOf = (out) => {
+  const m = [...String(out).matchAll(/PROBE_STATUS=([A-Z_]+)/g)];
+  return m.length ? m[m.length - 1][1] : 'UNKNOWN';
+};
 const GATES = [
   { key: 'changecontract', label: '变更收敛闸门（Change Contract）', args: ['scripts/check-change-contract.mjs'] },
   { key: 'visualshot', label: '视觉导演闸门（R9 Shot Contract）', args: ['scripts/check-visual-shot-contract.mjs'] },
@@ -202,7 +211,11 @@ if (targetProblems.length) {
           const lastLine = out.trim().split('\n').filter(Boolean).pop() || '(无输出)';
           const prow = { ok: code === 0, label, msg: lastLine.replace(/^[\s✅❌⚠️]+/, '').trim().slice(0, 96), warns: [] };
           const swv = safeAreaWaiver(frames);
-          if (!prow.ok && swv) { prow.ok = true; prow.skipped = true; prow.label = `${label.slice(0, -1)}·已裁）`; prow.msg = `已裁放行（${swv.approvedBy || '未记批准人'}）· 原判照旧显示 ｜${prow.msg}｜理由：${swv.reason || '已登记例外'}`; }
+          if (!prow.ok && swv && probeStatusOf(out) === 'VERDICT') {
+            prow.ok = true; prow.skipped = true; prow.label = `${label.slice(0, -1)}·已裁）`; prow.msg = `已裁放行（${swv.approvedBy || '未记批准人'}）· 原判照旧显示 ｜${prow.msg}｜理由：${swv.reason || '已登记例外'}`;
+          } else if (!prow.ok && swv) {
+            prow.msg = `⚠️ 本红不在豁免范围（探针状态 ${probeStatusOf(out)}）——豁免只裁「判据红」，探针不可用须修环境后重跑 ｜原判：${prow.msg}`.slice(0, 96);
+          }
           rows.push(prow);
         } else if (ap === 'OBSERVE') {
           rows.push({ ok: true, observed: true, label: `${label.slice(0, -1)}·观察）`, msg: `已测·观察（不判红）｜${runProbe()}`.slice(0, 96) });
@@ -220,7 +233,8 @@ if (targetProblems.length) {
         const wv = motionWaiver(vid);
         const vidM = require$fs().statSync(vid).mtimeMs;
         const srcM = srcNewest();
-        let row;
+        // 豁免资格：过期证据＝本闸自算的判据红（可裁）；真跑过的探针须自报 VERDICT 才可裁
+        let row, waiverEligible = true, redOrigin = '过期证据（本闸判据）';
         if (srcM > vidM) {
           const diffMs = srcM - vidM;
           const age = diffMs < 1000 ? `仅旧 ${Math.round(diffMs)} 毫秒` : diffMs < 60000 ? `仅旧 ${Math.round(diffMs / 1000)} 秒` : `旧 ${Math.round(diffMs / 60000)} 分钟`;
@@ -228,10 +242,17 @@ if (targetProblems.length) {
           row = { ok: false, label, msg: `过期证据｜${rel} 比 video/src 最新改动${age}${note}：这份数字测的可能是已作废版本，不算通过（设计阶段可带此红继续，交付前必须重渲重测）` };
         } else {
           const { code, out } = run('node', ['scripts/check-motion.mjs', vid], ROOT);
+          const status = probeStatusOf(out);
+          waiverEligible = status === 'VERDICT';
+          redOrigin = `探针状态 ${status}`;
           const m = out.match(/静止占比 (\d+)%/), d = out.match(/中位帧间差 ([\d.]+)/), o = out.match(/画面占用率 (\d+)%/);
           row = { ok: code === 0, label, msg: `${code === 0 ? '达标' : '未达标'}｜${rel}｜静止 ${m?.[1]}% 中位帧差 ${d?.[1]} 占用率 ${o?.[1]}%` };
         }
-        if (!row.ok && wv) { row.ok = true; row.skipped = true; row.label = `${label.slice(0, -1)}·已裁）`; row.msg = `已裁放行（${wv.approvedBy || '未记批准人'}）· 原判照旧显示 ｜${row.msg}｜理由：${wv.reason || '已登记例外'}`; }
+        if (!row.ok && wv && waiverEligible) {
+          row.ok = true; row.skipped = true; row.label = `${label.slice(0, -1)}·已裁）`; row.msg = `已裁放行（${wv.approvedBy || '未记批准人'}）· 原判照旧显示 ｜${row.msg}｜理由：${wv.reason || '已登记例外'}`;
+        } else if (!row.ok && wv) {
+          row.msg = `⚠️ 本红不在豁免范围（${redOrigin}）——豁免只裁「判据红」，探针不可用须修环境后重跑 ｜原判：${row.msg}`.slice(0, 96);
+        }
         rows.push(row);
       } else if (ap === 'OBSERVE') {
         // 观察态：照测照出读数、不判红；不查豁免表、不写 motionWaivers、不用 skipped 通道
