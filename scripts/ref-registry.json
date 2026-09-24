@@ -154,6 +154,7 @@
   },
   "docsDir": "docs/internal",
   "extraDocs": [
+    "AI工作启动指令.md",
     "AGENTS.md",
     "docs/战略简报.md",
     "docs/AI使用手册.md",

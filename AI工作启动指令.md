@@ -92,6 +92,7 @@ Gate / 真实产物 / 用户最终验收
 - 工程组件：`R7`
 - 全局变更治理：`R8`
 - 导演层（导演决策）：`R9`
+- 风格层（表达能力包）：`video/styles/` 下每风格一个自包含目录（清单与逐闸门适用性声明源＝`scripts/ref-registry.json` 的 `styles`）
 - 资源职责边界：`docs/internal/内容资源调用协议.md`
 - 整改前置侦察：`docs/internal/整改作战总纲.md`
 - 历史证据：`outputs/archive/`（只作证据，不承担当前规则）

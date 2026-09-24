@@ -122,10 +122,10 @@ for (const [file, path] of allDocs) {
     const isCounterExample = /(❌|错：|禁止|不使用|不用「)/.test(line);
     if (!isArchivalNote && !isCounterExample) {
       // §A~§B 范围引用：规约为「§A §B」两个 token，交给同一套锚点校验（S3）
-      const scanLine = line.replace(/§([0-9]+(?:\.[0-9]+)*)\s*[~～]\s*§([0-9]+(?:\.[0-9]+)*)/g, '§$1 §$2');
+      const scanLine = line.replace(/§([0-9一二三四五六七八九十]+(?:\.[0-9]+)*)\s*[~～]\s*§([0-9一二三四五六七八九十]+(?:\.[0-9]+)*)/g, '§$1 §$2');
       const secRe = /§([0-9]+(?:\.[0-9]+)*|[^§\s，。；：、（）)」』"`]+)/g;
       while ((m = secRe.exec(scanLine)) !== null) {
-        const sec = m[1].replace(/[/"'，。]+$/, '');
+        const sec = m[1].replace(/[/"'，。~～]+$/, '');
         if (/[a-zA-Z]/.test(sec)) continue;
         let target = null;
         for (const d of docHits) { if (d.idx < m.index) target = d.file; else break; }
