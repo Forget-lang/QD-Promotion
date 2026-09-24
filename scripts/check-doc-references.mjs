@@ -62,6 +62,12 @@ function extractAnchors(filePath) {
 const anchorsByFile = new Map();
 for (const [file, path] of allDocs) anchorsByFile.set(file, extractAnchors(path));
 
+// ── S3 扫描面分层（CHANGE-20260924-052）─────────────────────────────────────
+// 现行面（docs/internal ＋ extraDocs 里的当前文档 ＋ 风格包）受全部机检；
+// **archive 文档只受「历史污染当前」类检查**：不要求它与当前状态一致
+// （034 裁定：历史正文不回填），但不得出现"指挥当前链"的规范性框架。
+const ARCHIVE_DOC = (file) => String(file).startsWith('outputs/archive/');
+
 const hardFails = [];
 const reviews = [];
 
@@ -115,8 +121,10 @@ for (const [file, path] of allDocs) {
     const isArchivalNote = /(?:原\s*[^，。；：]*|(?:0\d|1[0-4])-[^，。；：]*)\s*§/.test(line) || /最后校验/.test(line);
     const isCounterExample = /(❌|错：|禁止|不使用|不用「)/.test(line);
     if (!isArchivalNote && !isCounterExample) {
+      // §A~§B 范围引用：规约为「§A §B」两个 token，交给同一套锚点校验（S3）
+      const scanLine = line.replace(/§([0-9]+(?:\.[0-9]+)*)\s*[~～]\s*§([0-9]+(?:\.[0-9]+)*)/g, '§$1 §$2');
       const secRe = /§([0-9]+(?:\.[0-9]+)*|[^§\s，。；：、（）)」』"`]+)/g;
-      while ((m = secRe.exec(line)) !== null) {
+      while ((m = secRe.exec(scanLine)) !== null) {
         const sec = m[1].replace(/[/"'，。]+$/, '');
         if (/[a-zA-Z]/.test(sec)) continue;
         let target = null;
@@ -137,6 +145,7 @@ const RES_ROOTS = ['outputs/', 'spec/', 'docs/', 'scripts/', 'video/', '背景�
 const placeholderRe = /(XX|NN|\*|\||~|…|\.\.|node_modules|\{[^}]*\})/;
 for (const [file, path] of allDocs) {
   const rel = relative(ROOT, path);
+  if (ARCHIVE_DOC(file)) continue;   // S3 分层：archive 见文末专项检查
   const lines = readFileSync(path, 'utf8').split('\n');
   let inCodeBlock = false;
   lines.forEach((line, i) => {
@@ -159,6 +168,7 @@ const GATE_LABELS = ['红线', '文档引用', '事实', '相似度', '效果尺
 const countRe = /[0-9一二两三四五六七八九十]+\s*(?:大|条|个)?闸门|(?:闸门|检查项)[^。\n]{0,4}[0-9一二三四五六七八九十]+\s*项|\b\d\s*\/\s*\d\s*(?:绿|通过)|[0-9一二两三四五六七八九十]+\s*层\s*(?:机检|机验|检查)/;
 for (const [file, path] of allDocs) {
   const rel = relative(ROOT, path);
+  if (ARCHIVE_DOC(file)) continue;   // S3 分层：archive 见文末专项检查
   const lines = readFileSync(path, 'utf8').split('\n');
   let inCodeBlock = false;
   lines.forEach((line, i) => {
@@ -192,6 +202,7 @@ const caliberOwners = REGISTRY.caliberOwners || [];
 const caliberExemptRe = /(❌|错：|禁止|不使用)/;
 for (const [file, path] of allDocs) {
   const rel = relative(ROOT, path);
+  if (ARCHIVE_DOC(file)) continue;   // S3 分层：archive 见文末专项检查
   const lines = readFileSync(path, 'utf8').split('\n');
   let inCodeBlock = false;
   lines.forEach((line, i) => {
@@ -217,6 +228,7 @@ const deprecatedRules = (REGISTRY.deprecatedTerms || []).map((t) => ({
 }));
 for (const [file, path] of allDocs) {
   const rel = relative(ROOT, path);
+  if (ARCHIVE_DOC(file)) continue;   // S3 分层：archive 见文末专项检查
   const lines = readFileSync(path, 'utf8').split('\n');
   let inCodeBlock = false;
   lines.forEach((line, i) => {
@@ -240,6 +252,31 @@ for (const [file, p] of allDocs) {
       hardFails.push({ file: relative(ROOT, p), line: i + 1, ref: line.trim().slice(0, 48), why: '引用已退役的 changelog 账本（主文件 / 2026-08 分卷均已退役）——变更史见 docs/changes/' });
     }
   });
+}
+
+// ── S3 正向防回流：archive 只查「历史污染当前」类（模式清单登记在 ref-registry.archiveNormativePatterns）──
+const archivePatterns = (REGISTRY.archiveNormativePatterns || []).map((x) => ({ ...x, re: new RegExp(x.pattern) }));
+if (archivePatterns.length) {
+  for (const [file, path] of allDocs) {
+    if (!ARCHIVE_DOC(file)) continue;
+    const rel = relative(ROOT, path);
+    const lines = readFileSync(path, 'utf8').split('\n');
+    let inCodeBlock = false;
+    lines.forEach((line, i) => {
+      if (/^\s*```/.test(line)) { inCodeBlock = !inCodeBlock; return; }
+      if (inCodeBlock) return;
+      for (const x of archivePatterns) {
+        if (x.re.test(line)) {
+          hardFails.push({
+            file: rel,
+            line: i + 1,
+            ref: line.trim().slice(0, 48),
+            why: `archive 规范性残留（历史污染当前）：${x.desc} —— 改为指针或降级为历史叙述（AGENTS §十一：archive 不承担当前规则）`,
+          });
+        }
+      }
+    });
+  }
 }
 
 console.log('\n══════════════ 文档引用守门扫描结果 ══════════════\n');
