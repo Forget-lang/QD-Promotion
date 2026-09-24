@@ -26,6 +26,17 @@ const statusOf = (out) => {
 const failures = [];
 const check = (cond, msg) => { if (!cond) failures.push(msg); };
 
+// 前置：本测试要真跑一次探针（② 需要 VERDICT），所以必须装了 video 依赖才行。
+// 缺依赖时给出指向根因的报错——否则失败信息会像"判据不成立"，实际是环境没装 ffmpeg-static。
+const FFMPEG = path.join(ROOT, 'video/node_modules/ffmpeg-static/ffmpeg');
+if (!existsSync(FFMPEG)) {
+  console.error('PROBE-WAIVER NEGATIVE TEST FAIL（环境问题，非判据问题）：');
+  console.error(`   缺 ${FFMPEG}`);
+  console.error('   本测试的 ② 需要真跑一次探针拿 VERDICT ⇒ 必须先装 video 依赖（CI gates job 已加 `npm ci --prefix video`）。');
+  console.error('   本机请先跑：cd video && npm ci');
+  process.exit(1);
+}
+
 // ① 输入不存在 ⇒ 探针不可用（不可裁）
 const missing = path.join(ROOT, 'outputs', '__不存在的片__.mp4');
 const a = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'check-motion.mjs'), missing], { encoding: 'utf8' });
