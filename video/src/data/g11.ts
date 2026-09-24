@@ -1,7 +1,7 @@
 // g11 · 烧烤夜宵 · 片1 · 数据（有声版 · 7 屏 · 2026-09-18 实测回填）
 // 音频 = TTS（seed-tts 2.0 原速）→ loudnorm -16 LUFS → atempo 1.2，实测见 audio/g11/（raw 在 audio/g11raw/）；
 // dur = voiceOffset 0.27 + voiceDur + 尾读缓冲（制券/数据/CTA 0.9s、其余 0.5s）；字幕句界 = 实测时长 × 字数占比（句间留 3 帧）。
-// 母题：深夜黑板牌（Board）＋ 炭火虚焦深底；色彩取 SKILL §4.5 纯 Remotion 烧烤基准。
+// 母题：深夜黑板牌（Board）＋ 炭火虚焦深底；色彩取 remotion-components 包 §③B「色彩基准」（烧烤项）。
 // 字段真值来源：spec/coupon-fields.json（k: = 产品真实字段名，逐字回 applet 源码；head: = 页面原生组名）
 // 口播：outputs/g11-烧烤/02-口播文案.md（Legacy Baseline）；分镜：07-片1-分镜稿.md；Shot 表：08-R9视觉决策卡.md
 import type { VideoData } from '../types';

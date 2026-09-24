@@ -15,7 +15,7 @@
  *       CHANGE-20260923-039 §八.5、§二十五 25.1、§三十一 方案 C。
  */
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
-import { join, dirname, basename } from 'node:path';
+import { join, dirname, basename, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -100,7 +100,7 @@ export function initContentLines({ label = 'content-lines', root = ROOT } = {}) 
         }
       }
     }
-    return { reg, lines, industry: lines.find((l) => l.id === 'industry') || null };
+    return { reg, lines, industry: lines.find((l) => l.id === INDUSTRY_LINE_ID) || null };
   } catch (e) {
     console.error(`❌ ${label}：内容线声明非法 —— ${e.message}`);
     console.error(
@@ -264,6 +264,9 @@ export function pieceKeyOf(token, lines = getContentLines()) {
   return null;
 }
 
+/** 行业线 id 约定（`initContentLines` 与探针目标解析共用同一处，避免第二份约定） */
+export const INDUSTRY_LINE_ID = 'industry';
+
 /**
  * 片 → 风格认领（方案 C，2026-09-23 用户拍板）：
  *   ① 有风格以 `piecePatterns` 命中该片（模板 `{id}`＝片号、`{dir}`＝outputs 下该片目录名）
@@ -297,4 +300,159 @@ export function claimStyleOfPiece(reg, { id, dirNames = [], root = ROOT } = {}) 
   }
   if (hits.length === 1) return { style: hits[0].style, matched: hits[0].matched, isDefault: false };
   return { style: fallback, matched: null, isDefault: true };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 探针目标解析（CHANGE-20260924-056 · T3：Gate 必须真实扫到风格产物）
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** 递归枚举文件（跳过隐藏项与 node_modules；目录不可读时静默跳过该支） */
+function walkFiles(dir, filter, out = []) {
+  let entries = [];
+  try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return out; }
+  for (const e of entries) {
+    if (e.name.startsWith('.') || e.name === 'node_modules') continue;
+    const p = join(dir, e.name);
+    if (e.isDirectory()) walkFiles(p, filter, out);
+    else if (filter(e.name)) out.push(p);
+  }
+  return out;
+}
+
+/** 按 mtime 新→旧排序（不可 stat 的排最后；旧写法的最新媒体挑选语义不变） */
+function byMtimeDesc(paths) {
+  return paths
+    .map((p) => { let m = 0; try { m = statSync(p).mtimeMs; } catch { /* 保持 0 */ } return { p, m }; })
+    .sort((a, b) => b.m - a.m)
+    .map((x) => x.p);
+}
+
+/** 片目录顶层 `frames/*.png`（既有交付静帧口径） */
+function framesAt(dir) {
+  const fd = join(dir, 'frames');
+  try { if (!statSync(fd).isDirectory()) return []; } catch { return []; }
+  try { return readdirSync(fd).filter((f) => f.endsWith('.png')).sort().map((f) => join(fd, f)); } catch { return []; }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// styleId 声明读取与值域校验（CHANGE-20260924-056 §三.4：唯一格式、唯一值域）
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** 声明格式（唯一）：`styleId: <已登记风格 id>`（容忍全角冒号／等号与包裹引号；值域由调用方校验） */
+export const STYLE_ID_DECL_RE = /styleId\s*[:：=]\s*[`"']?([A-Za-z0-9_-]+)/;
+
+/**
+ * 读取片目录内的 styleId 声明（只读片目录顶层 `*.md`，不递归）。
+ * 返回 `{ styleId, sources }`；未声明 → `{ styleId: null, sources: [] }`。
+ * **多份文档声明了不同值 ⇒ 抛错**（一个片只能有一个风格身份，禁止两个来源各说一个）。
+ */
+export function declaredStyleIdOf(pieceDir) {
+  let names = [];
+  try { names = readdirSync(pieceDir).filter((n) => n.endsWith('.md')).sort(); } catch { return { styleId: null, sources: [] }; }
+  const hits = [];
+  for (const n of names) {
+    let text = '';
+    try { text = readFileSync(join(pieceDir, n), 'utf8'); } catch { continue; }
+    const m = text.match(STYLE_ID_DECL_RE);
+    if (m) hits.push({ file: n, styleId: m[1] });
+  }
+  if (!hits.length) return { styleId: null, sources: [] };
+  const distinct = [...new Set(hits.map((h) => h.styleId))];
+  if (distinct.length > 1) {
+    throw new Error(
+      `content-lines：片目录 ${basename(pieceDir)} 内出现 ${distinct.length} 个互相冲突的 styleId 声明（${hits.map((h) => `${h.file}=${h.styleId}`).join('、')}）——` +
+        '一个片只能有一个风格身份；声明格式见 SKILL.md 第 4.5 步「先选风格」',
+    );
+  }
+  return { styleId: distinct[0], sources: hits };
+}
+
+/** 校验 styleId 值必须是已登记风格（拼写错不得静默变成一个"新风格"） */
+export function assertRegisteredStyleId(reg, styleId, where) {
+  const styles = getStyles(reg);
+  if (!styles) throw new Error(`content-lines：ref-registry.styles 缺失或条目畸形 —— 无法校验 ${where} 的 styleId`);
+  if (styles.some((s) => s.id === styleId)) return styleId;
+  throw new Error(
+    `content-lines：${where} 声明的 styleId「${styleId}」不是已登记风格 —— 合法值：${styles.map((s) => s.id).join(' / ')}；` +
+      '新增风格须先在 ref-registry.styles.items 登记一行（拼写错不得静默当成一个"新风格"）',
+  );
+}
+
+/**
+ * 解析某内容线的探针目标（T3）——「最新一个能提供该产物的片目录 ＋ 其风格认领 ＋ 适用性 ＋ 产物」。
+ * 把"找哪份产物、按谁声明取值"从各闸门里收敛到一处（T3）。
+ *
+ * 寻址（CHANGE-20260924-056 §三.1）：
+ *   - 缺省风格片：片目录顶层 `*.mp4` ＋ 片目录 `frames/*.png`（＝既有口径，对 g06–g11 零漂移）；
+ *   - 非缺省风格片：另加「认领命中的产物根」内**递归** `*.mp4` ＋ 产物根 `frames/*.png`
+ *     （风格包专属产物落在 `outputs/{dir}/<风格子目录>/`，顶层口径扫不到 ⇒ 此前会静默跳过）。
+ * 每种探针只认自己那一类产物（`artifactKind`），沿用既有"两类独立取目标"的语义。
+ *
+ * 适用性（§三.2）：非缺省风格片读 `styles.items[].gateApplicability`（`styleAppliesFor`），
+ * 缺省风格片沿用线级声明（`gateAppliesFor`）。**教程线 × 非缺省风格 = 抛错**——该合成规则
+ * 按 `AGENTS.md` §二 须先专项定稿，本函数不发明，交调用方响亮失败。
+ *
+ * 恒返回对象：`found=false` ＝ 该线在全部已声明目录里都找不到该类产物（调用方须记入未测清单，
+ * 不得静默当通过）；`searched` 列出实际查过的路径形态，供"未测清单"逐条留痕。
+ */
+export function probeTargetFor(reg, { gateKey, artifactKind, line, dirs = [], root = ROOT } = {}) {
+  if (!gateKey) throw new Error('content-lines：probeTargetFor 缺少 gateKey —— 拒绝在闸门身份不明时解析适用性');
+  if (artifactKind !== 'videos' && artifactKind !== 'frames') {
+    throw new Error(`content-lines：probeTargetFor 的 artifactKind 非法（收到 ${artifactKind}）—— 合法值：videos / frames`);
+  }
+  if (!line) {
+    throw new Error(
+      `content-lines：闸门 ${gateKey} 拿到一个无法归属内容线的目标 —— 判线声明缺失或目标命名不在声明内（见 CHANGE-20260920-031 §3.2）`,
+    );
+  }
+  const searched = [];
+  const rel = (p) => relative(root, p).split('\\').join('/');
+  for (let i = dirs.length - 1; i >= 0; i--) {
+    const d = dirs[i];
+    const id = (String(d.name).match(new RegExp(`^${line.outputPrefix}\\d+`, 'i')) || [String(d.name)])[0];
+    const claimed = claimStyleOfPiece(reg, { id, dirNames: [d.name], root });
+    const productRoot = !claimed.isDefault && claimed.matched ? join(root, claimed.matched) : null;
+    const roots = [d.path, ...(productRoot ? [productRoot] : [])];
+    for (const r of roots) {
+      searched.push(`${rel(r)}/**/*.mp4`, `${rel(r)}/frames/*.png`);
+    }
+    const videos = byMtimeDesc(roots.flatMap((r) => walkFiles(r, (f) => f.endsWith('.mp4'))));
+    const frames = byMtimeDesc([...new Set(roots.flatMap((r) => framesAt(r)))]);
+    const artifacts = { videos, frames };
+    if (!artifacts[artifactKind].length) continue;
+    let applies;
+    if (claimed.isDefault) {
+      applies = gateAppliesFor(reg, gateKey, line);
+    } else {
+      if (line.id !== INDUSTRY_LINE_ID) {
+        throw new Error(
+          `content-lines：内容线「${line.label || line.id}」的片 ${id} 认领了非缺省风格「${claimed.style.label || claimed.style.id}」——` +
+            `「线声明 × 风格声明」的逐闸门取值合成规则尚未专项定稿（AGENTS.md §二：教程线启用风格包前须先定稿），拒绝猜一种合成口径`,
+        );
+      }
+      applies = styleAppliesFor(reg, gateKey, claimed.style);
+    }
+    return {
+      found: true,
+      dir: d.path,
+      dirName: d.name,
+      id,
+      style: claimed.style,
+      isDefault: claimed.isDefault,
+      applies,
+      artifacts,
+      searched: [...new Set(searched)],
+    };
+  }
+  return {
+    found: false,
+    dir: null,
+    dirName: null,
+    id: null,
+    style: null,
+    isDefault: null,
+    applies: null,
+    artifacts: { videos: [], frames: [] },
+    searched: [...new Set(searched)],
+  };
 }

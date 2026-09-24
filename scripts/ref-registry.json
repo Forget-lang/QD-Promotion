@@ -152,6 +152,19 @@
     "rule": "nonPiecePatterns 只用于登记「不是任何内容线产物」的工具/素材目录；判定仍优先来自 contentLines。加新线请补 contentLines，不要用白名单掩盖未归因的产物目录。",
     "source": "CHANGE-20260920-031 B3.5"
   },
+  "legacyPieces": {
+    "_说明": "历史片 Legacy 隔离登记（CHANGE-20260924-056）。规则本体 Owner＝`AGENTS.md` §九／`SKILL.md` C-15，本表只登记「片清单 ＋ 标记 token ＋ 承载文件」。片内容零改动，只多一行标记；`items[].file` 必须真实存在且含 `marker`，由 `scripts/check-style-rotation.mjs` 逐条核对（登记与实物不一致即硬失败）。本表只出不进：新的历史片应进 outputs/archive/，不得用本表把活跃片洗成历史。",
+    "marker": "Legacy 隔离声明",
+    "declaration": "outputs/LEGACY-ISOLATION.md",
+    "items": [
+      { "piece": "g06", "file": "outputs/g06-教培托管/01-内容输入包.md" },
+      { "piece": "g07", "file": "outputs/g07-咖啡茶饮/00-交付说明.md" },
+      { "piece": "g08", "file": "outputs/g08-火锅/01-内容输入包.md" },
+      { "piece": "g09", "file": "outputs/g09-宠物店/01-内容输入包.md" },
+      { "piece": "g10", "file": "outputs/g10-美容沙龙/01-内容输入包.md" },
+      { "piece": "g11", "file": "outputs/g11-烧烤/01-内容输入包.md" }
+    ]
+  },
   "docsDir": "docs/internal",
   "extraDocs": [
     "AI工作启动指令.md",
@@ -160,6 +173,7 @@
     "docs/AI使用手册.md",
     "SKILL.md",
     "video/styles/_template/SKILL.md",
+    "outputs/LEGACY-ISOLATION.md",
     "outputs/archive/AI启动提示词.md",
     "outputs/archive/文档架构总览.md",
     "outputs/archive/挂账总览.md",

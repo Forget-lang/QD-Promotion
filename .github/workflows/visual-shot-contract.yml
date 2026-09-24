@@ -68,6 +68,8 @@ jobs:
           fi
       - name: Negative test
         run: node scripts/test-visual-shot-contract-negative.mjs
+      - name: Negative test - style product scan (T3)
+        run: node scripts/test-style-scan-negative.mjs
       - name: Visual shot contract
         run: node scripts/check-visual-shot-contract.mjs
       - name: Diagnostic - redlines

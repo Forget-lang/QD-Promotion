@@ -9,12 +9,17 @@
  *   凡**声明了 `styleId`** 的片（039 新架构下的片），其决策卡必须含「导演稿」节——
  *   节内须逐项含 叙事结构／观看动力／悬念／转折／情绪曲线／信息释放顺序 六项判据关键词，并声明 `styleId`。
  *   未声明 `styleId` 的片＝g06–g11 历史片，按旧口径**跳过、不回溯**；尚无新架构片时输出"接线就位、待首片"。
+ *
+ * styleId 值域（CHANGE-20260924-056 §三.4）：读取格式与"必须是已登记风格"的校验走 `content-lines` 唯一实现；
+ *   声明冲突 / 未登记 id / 导演稿节与片级声明不一致，一律硬失败——不得静默当作"非新架构片"跳过。
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { declaredStyleIdOf, assertRegisteredStyleId, loadRegistry, STYLE_ID_DECL_RE } from './content-lines.mjs';
 
 const root = process.cwd();
 const outputs = path.join(root, 'outputs');
+const REGISTRY = loadRegistry();
 const requiredColumns = ['Shot', 'Visual Subject', 'Visual Metaphor', 'Peak Frame', 'State Change', 'Exit'];
 const DIRECTOR_ITEMS = ['叙事结构', '观看动力', '悬念', '转折', '情绪曲线', '信息释放顺序'];
 
@@ -30,16 +35,28 @@ function walk(dir) {
   return out;
 }
 
-/** 该片是否声明了 styleId（扫同目录 md；新架构片的判据） */
-function pieceDeclaresStyleId(file) {
-  const dir = path.dirname(file);
-  let names = [];
-  try { names = fs.readdirSync(dir); } catch { return false; }
-  for (const n of names) {
-    if (!n.endsWith('.md')) continue;
-    try { if (/styleId/.test(fs.readFileSync(path.join(dir, n), 'utf8'))) return true; } catch { /* 忽略不可读 */ }
+/**
+ * 该片声明的 styleId（新架构片的判据）；无声明 → null（＝历史片）。
+ * 声明冲突或 id 未登记 → 计入 errors 后返回 null（响亮失败，不静默降级为"历史片"）。
+ */
+function pieceStyleId(file, rel) {
+  let hit;
+  try {
+    hit = declaredStyleIdOf(path.dirname(file));
+  } catch (e) {
+    errors += 1;
+    console.error(`${rel}: ${e.message}`);
+    return null;
   }
-  return false;
+  if (!hit.styleId) return null;
+  try {
+    assertRegisteredStyleId(REGISTRY, hit.styleId, `片 ${path.basename(path.dirname(file))}（${hit.sources.map((s) => s.file).join('、')}）`);
+  } catch (e) {
+    errors += 1;
+    console.error(`${rel}: ${e.message}`);
+    return null;
+  }
+  return hit.styleId;
 }
 
 /** 取「导演稿」节正文（从其标题到下一个同级或更高级标题） */
@@ -94,7 +111,8 @@ for (const file of files) {
   }
 
   // ── 导演稿接线（批 1）──
-  if (!pieceDeclaresStyleId(file)) { legacy += 1; continue; }
+  const pieceStyle = pieceStyleId(file, rel);
+  if (!pieceStyle) { legacy += 1; continue; }
   newArch += 1;
   const sec = directorSection(text);
   if (!sec) {
@@ -107,9 +125,21 @@ for (const file of files) {
     errors += 1;
     console.error(`${rel}: 导演稿节缺判据关键词 —— ${miss.join('、')}`);
   }
-  if (!/styleId/.test(sec)) {
+  const secStyle = (sec.match(STYLE_ID_DECL_RE) || [])[1];
+  if (!secStyle) {
     errors += 1;
     console.error(`${rel}: 导演稿节未声明 styleId（本片所选风格包）`);
+  } else {
+    try {
+      assertRegisteredStyleId(REGISTRY, secStyle, `${rel} 的导演稿节`);
+    } catch (e) {
+      errors += 1;
+      console.error(e.message);
+    }
+    if (secStyle !== pieceStyle) {
+      errors += 1;
+      console.error(`${rel}: 导演稿节 styleId（${secStyle}）与片级声明（${pieceStyle}）不一致 —— 一个片只能有一个风格身份`);
+    }
   }
 }
 
