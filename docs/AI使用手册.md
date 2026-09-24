@@ -69,6 +69,7 @@ docs/AI使用手册.md
 | `SKILL.md` | AI | 行业线（行业场景视频）唯一作业流程 | 只能管生产流程 |
 | `docs/internal/产品功能教程作业规范.md` | AI | 教程线（产品功能教程）唯一方法 Owner | 只能管教程线 |
 | `spec/` | AI / Gate | 产品事实、红线、字段等机器真源 | 只管对应真源 |
+| `video/styles/`（风格包） | AI | 行业线片子「画面从哪来」的表达能力包；清单与逐闸门适用性在 `scripts/ref-registry.json` 的 `styles` | **不能**；不拥有流程／叙事／观看路径，不构成入口 |
 | `docs/internal/` | AI | 各自领域 Owner、方法、技术与治理协议 | 只能管自己的领域 |
 | `docs/internal/整改作战总纲.md` | AI | 全局整改前的资源/Owner/冲突/依赖侦察 | 不承担第二生产流程 |
 | `docs/internal/PROJECT-CONSISTENCY-MAP.md` | 人 / AI | 稳定架构恢复索引（权威层级与主链） | 不新增规则，不承担入口，**不提供实时状态** |
@@ -105,7 +106,8 @@ Gate / 验收
 - `AI工作启动指令.md` 不是第二个 AI 自动入口；
 - `docs/AI使用手册.md` 不是规则 Owner；
 - `PROJECT-CONSISTENCY-MAP.md` 不是新会话第一入口；
-- `outputs/archive/` 不能成为当前接班入口。
+- `outputs/archive/` 不能成为当前接班入口；
+- `video/styles/` 下的风格包**不是入口**：行业线片子先声明 `styleId`，再由 `SKILL.md`／`R9` 内部路由到该风格包——「画面从哪来」归风格层，「怎么讲」归导演层（`R9`）。
 
 ---
 
