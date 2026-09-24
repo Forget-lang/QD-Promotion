@@ -2,7 +2,8 @@
  "_meta": {
   "desc": "优惠券制作设置项完整真值表：字段名、上限、默认值、显隐条件、联动关系、玩法杠杆。做券类内容（视频/文章/教程）前必查本表；功能点上禁止猜测与推理，凡本表没有的表述一律不上屏不进口播。",
   "source": "applet/pages_coupon/coupon/create.vue（制券页全量，含 594-612/692-697 联动 watch）+ constants/coupon.js（枚举语义）+ issue/private.vue（私密发放需设数据）+ verify/verify.vue（核销页重要信息）+ pages_user/coupon/detail.vue（顾客侧文案）",
-  "lastVerified": "2026-08-30",
+  "lastVerified": "2026-09-24",
+  "lastSrcRewrite": "2026-09-24 CHANGE-20260924-045：src 行号随 APPLET 快照 09-24 重建回写（49 字段 + 15 分组范围）；check-ui-truth ⑤/⑤b 复跑零漂移。",
   "usage": "字段名与提示语逐字取用（onScreen=true 的可直接上屏）；limits/defaults 是画面里能写的数字；visibleWhen/linkages 决定'这一屏该不该出现这一行'；playLeverage 是把设置项变成玩法话术的映射。改功能先改本表再改内容。",
   "machineCheck": "video/src 与 outputs 里的字段名由 scripts/check-ui-truth.mjs 回 applet 源码逐字对账；本表内 hiddenFromScreen 条目同时由 spec/redlines.json 的红线层拦截。"
  },
@@ -76,7 +77,7 @@
   },
   {
    "label": "优惠券名称",
-   "src": "create.vue:39",
+   "src": "create.vue:69",
    "kind": "input",
    "limits": "最多18个字，支持表情符号",
    "required": true,
@@ -84,21 +85,21 @@
   },
   {
    "label": "制作数量",
-   "src": "create.vue:50",
+   "src": "create.vue:80",
    "kind": "input",
    "limits": "最少1张，最多1万张",
    "playLeverage": "库存是稀缺感的来源；配合公开领取可做出'抢完了'的时点"
   },
   {
    "label": "消费门槛",
-   "src": "create.vue:61",
+   "src": "create.vue:91",
    "kind": "input",
    "limits": "满多少元可用，0为无门槛",
    "playLeverage": "填 0 = 引流券（不花钱也能领）；填客单价附近 = 提额券；这是'拉新还是提客单'的分水岭"
   },
   {
    "label": "原价",
-   "src": "create.vue:73",
+   "src": "create.vue:103",
    "appliesTo": [
     "代金券",
     "套餐券"
@@ -107,7 +108,7 @@
   },
   {
    "label": "券面额",
-   "src": "create.vue:85",
+   "src": "create.vue:115",
    "appliesTo": [
     "代金券",
     "套餐券"
@@ -117,7 +118,7 @@
   },
   {
    "label": "优惠金额",
-   "src": "create.vue:96",
+   "src": "create.vue:126",
    "appliesTo": [
     "满减券"
    ],
@@ -125,7 +126,7 @@
   },
   {
    "label": "折扣",
-   "src": "create.vue:107",
+   "src": "create.vue:137",
    "appliesTo": [
     "折扣券"
    ],
@@ -133,7 +134,7 @@
   },
   {
    "label": "兑换内容",
-   "src": "create.vue:116",
+   "src": "create.vue:146",
    "appliesTo": [
     "兑换券"
    ],
@@ -160,7 +161,7 @@
   },
   {
    "label": "有效期类型",
-   "src": "create.vue:148",
+   "src": "create.vue:178",
    "kind": "select",
    "options": [
     "固定有效期",
@@ -172,25 +173,25 @@
   },
   {
    "label": "有效期",
-   "src": "create.vue:148",
+   "src": "create.vue:178",
    "visibleWhen": "有效期类型 ≠ 固定有效期",
    "limits": "最少 1 天；上限**随版本档位**：免费/标准 180、专业/企业 365（create.vue:843-850 动态「最少1天，最多N天」）；开微信卡包时封顶 365 天"
   },
   {
    "label": "有效开始时间",
-   "src": "create.vue:170",
+   "src": "create.vue:200",
    "visibleWhen": "有效期类型 = 固定有效期",
    "limits": "选择开始时间（日期）"
   },
   {
    "label": "有效结束时间",
-   "src": "create.vue:180",
+   "src": "create.vue:210",
    "visibleWhen": "有效期类型 = 固定有效期",
    "limits": "选择结束时间（日期）"
   },
   {
    "label": "可用时段",
-   "src": "create.vue:185",
+   "src": "create.vue:215",
    "kind": "switch",
    "note": "默认全天可用，可自定义周天及可用时段",
    "options": [
@@ -211,7 +212,7 @@
   },
   {
    "label": "发放方式",
-   "src": "create.vue:200",
+   "src": "create.vue:32",
    "kind": "select",
    "options": [
     "公开领取",
@@ -231,7 +232,7 @@
   },
   {
    "label": "限领总量",
-   "src": "create.vue:231",
+   "src": "create.vue:254",
    "kind": "switch",
    "defaults": "开",
    "note": "每个客户累计领取的总张数，关闭则不限制",
@@ -239,7 +240,7 @@
   },
   {
    "label": "每人限领总量",
-   "src": "create.vue:246",
+   "src": "create.vue:269",
    "visibleWhen": "限领总量 = 开",
    "limits": "最少 1 张，最多 100 张（placeholder 逐字「最少1张，最多100张」）",
    "defaults": "1 张",
@@ -247,13 +248,13 @@
   },
   {
    "label": "公开领取设置",
-   "src": "create.vue:264",
+   "src": "create.vue:287",
    "kind": "group",
    "visibleWhen": "发放方式 = 公开领取"
   },
   {
    "label": "自定义领取时间",
-   "src": "create.vue:266",
+   "src": "create.vue:289",
    "kind": "switch",
    "visibleWhen": "公开领取",
    "note": "默认不限，有效期截止前均可领取",
@@ -261,17 +262,17 @@
   },
   {
    "label": "领取开始时间",
-   "src": "create.vue:275",
+   "src": "create.vue:298",
    "visibleWhen": "自定义领取时间 = 开"
   },
   {
    "label": "领取结束时间",
-   "src": "create.vue:282",
+   "src": "create.vue:305",
    "visibleWhen": "自定义领取时间 = 开"
   },
   {
    "label": "每次领取数量",
-   "src": "create.vue:290",
+   "src": "create.vue:313",
    "visibleWhen": "公开领取 且（未开限领总量 或 每人限领总量 > 1）",
    "limits": "最少1张，最多10张",
    "defaults": "1 张",
@@ -279,7 +280,7 @@
   },
   {
    "label": "领取周期",
-   "src": "create.vue:308",
+   "src": "create.vue:331",
    "visibleWhen": "同上",
    "options": [
     "每人每天最多可领",
@@ -292,27 +293,27 @@
   },
   {
    "label": "每人每天最多可领",
-   "src": "create.vue:311",
+   "src": "create.vue:334",
    "visibleWhen": "同上",
    "limits": "最少1张",
    "note": "**这一行的标签是动态的**（create.vue:632-641 computed）：随「领取周期」取 每人每天/每人每周/每人每月/每人每年最多可领 四种之一，输入框填该周期内的张数。上屏时照观众当前看到的那一句写；**产品里没有「周期内可领张数」这个名字，不得凭印象造**"
   },
   {
    "label": "开启每天核销限制",
-   "src": "create.vue:333",
+   "src": "create.vue:356",
    "kind": "switch",
    "defaults": "关"
   },
   {
    "label": "每人每天限核销",
-   "src": "create.vue:340",
+   "src": "create.vue:363",
    "visibleWhen": "开启每天核销限制 = 开",
    "limits": "最少1张，最多10张",
    "playLeverage": "防一天多张一起砸；也是'每天只能用一张'的连续到店节奏"
   },
   {
    "label": "开启核销后赠券",
-   "src": "create.vue:359",
+   "src": "create.vue:382",
    "kind": "switch",
    "note": "核销后立奖本券一张，直接到账",
    "defaults": "关",
@@ -327,7 +328,7 @@
   },
   {
    "label": "线下收款口令 / 开启领取口令",
-   "src": "create.vue:380-385",
+   "src": "create.vue:433-438",
    "kind": "switch",
    "visibleWhen": "发放方式 ≠ 券包",
    "note": "开启后顾客领取须输入口令",
@@ -335,45 +336,45 @@
   },
   {
    "label": "固定口令",
-   "src": "create.vue:397",
+   "src": "create.vue:450",
    "visibleWhen": "开启领取口令 且 类型=固定口令",
    "limits": "请输入5位数字（maxlength 5）"
   },
   {
    "label": "随机口令",
-   "src": "create.vue:401",
+   "src": "create.vue:454",
    "visibleWhen": "开启领取口令 且 类型=随机口令",
    "note": "每3分钟变化一次，可手工更新"
   },
   {
    "label": "适用门店",
-   "src": "create.vue:413",
+   "src": "create.vue:233",
    "kind": "select",
    "required": true,
    "note": "多选，默认自动选中"
   },
   {
    "label": "发券员工",
-   "src": "create.vue:423",
+   "src": "create.vue:244",
    "visibleWhen": "发放方式 = 公开领取 或 私密发放",
    "note": "多选；券包类型不显示该行——发券员工只与这两条路有关"
   },
   {
    "label": "使用须知",
-   "src": "create.vue:433",
+   "src": "create.vue:465",
    "kind": "textarea",
    "limits": "最多 500 字（indicator 显示字数）",
    "playLeverage": "服务明细的家：兑换内容装不下的都写这里；也是行业话术最能体现专业度的地方"
   },
   {
    "label": "活动长图",
-   "src": "create.vue:444",
+   "src": "create.vue:476",
    "limits": "最多 1 张",
    "note": "可上传活动长图、店内环境、菜单等图片"
   },
   {
    "label": "一键套用模版",
-   "src": "create.vue:451",
+   "src": "create.vue:483",
    "options": [
     "通用模版"
    ],
@@ -381,13 +382,13 @@
   },
   {
    "label": "套餐设置 / 填写套餐组合",
-   "src": "create.vue:462-463",
+   "src": "create.vue:494-495",
    "kind": "switch",
    "note": "开关后出现套餐组合编辑器；该组在源码中未按券种隐藏，讲兑换/满减时不必上屏"
   },
   {
    "label": "提前预约",
-   "src": "create.vue:472",
+   "src": "create.vue:504",
    "kind": "switch",
    "note": "开启后，顾客使用前需按说明提前预约",
    "defaults": "关",
@@ -395,7 +396,7 @@
   },
   {
    "label": "预约说明",
-   "src": "create.vue:479",
+   "src": "create.vue:511",
    "visibleWhen": "提前预约 = 开",
    "limits": "最多 32 字，如提前几天、电话、到店时间等"
   },
@@ -409,7 +410,7 @@
   },
   {
    "label": "提前提醒",
-   "src": "create.vue:495",
+   "src": "create.vue:527",
    "visibleWhen": "到期提醒 = 开",
    "limits": "到期当天 或 提前 1~30 天",
    "defaults": "到期当天",
@@ -417,7 +418,7 @@
   },
   {
    "label": "填写手机号",
-   "src": "create.vue:508",
+   "src": "create.vue:540",
    "kind": "switch",
    "visibleWhen": "发放方式 ≠ 券包",
    "defaults": "关",
@@ -425,7 +426,7 @@
   },
   {
    "label": "指定手机号可领取",
-   "src": "create.vue:519",
+   "src": "create.vue:551",
    "kind": "switch",
    "visibleWhen": "发放方式 ≠ 券包",
    "note": "导入可领取手机号，最多500个。",
@@ -433,23 +434,23 @@
   },
   {
    "label": "可领取手机号",
-   "src": "create.vue:516",
+   "src": "create.vue:548",
    "visibleWhen": "指定手机号可领取 = 开",
    "note": "每行一个，最多 500 个，重复自动跳过（见 facts.mobileWhitelist）"
   },
   {
    "label": "分享标题",
-   "src": "create.vue:535",
+   "src": "create.vue:567",
    "limits": "选填，最多32个字。"
   },
   {
    "label": "转发封面",
-   "src": "create.vue:537",
+   "src": "create.vue:569",
    "note": "请先上传封面图片，默认使用封面图片的第一张"
   },
   {
    "label": "允许分享",
-   "src": "create.vue:546",
+   "src": "create.vue:580",
    "kind": "switch",
    "visibleWhen": "发放方式 = 公开领取",
    "defaults": "关",
@@ -457,14 +458,14 @@
   },
   {
    "label": "允许转赠",
-   "src": "create.vue:553",
+   "src": "create.vue:663",
    "kind": "switch",
    "defaults": "关",
    "playLeverage": "老带新的入口：家长在自己券详情里点「转赠给好友」；一张券仅首位领取好友可得（可取消转赠按 offScript 不进内容）"
   },
   {
    "label": "开启转赠奖励",
-   "src": "create.vue:562",
+   "src": "create.vue:664",
    "kind": "switch",
    "visibleWhen": "允许转赠 = 开",
    "note": "转赠后，受赠人领取并核销后再赠选择的优惠券一张。",
@@ -472,14 +473,14 @@
   },
   {
    "label": "转赠奖励券",
-   "src": "create.vue:571",
+   "src": "create.vue:665",
    "visibleWhen": "允许转赠 = 开 且 开启转赠奖励 = 开",
    "limits": "仅可选择「私密发放」类型的有效优惠券",
    "playLeverage": "必须先另做一张私密券当奖品——所以这条玩法天生要两张券，教程里得提前说"
   },
   {
    "label": "创建优惠券",
-   "src": "create.vue:580",
+   "src": "create.vue:603",
    "kind": "button",
    "note": "结果页原话：创建成功 / 立刻发放我的卡券 / 前往发券 / 返回（:2-9）"
   },
@@ -493,7 +494,7 @@
   },
   {
    "label": "仅新客户可领",
-   "src": "pages_coupon/coupon/create.vue:252",
+   "src": "pages_coupon/coupon/create.vue:275",
    "limits": "开关；判定逐字「该商户下从未领过优惠券、券包、次卡的顾客才可领取」（后端判定）",
    "note": "**需标准版及以上**（受限文案「仅新客户可领功能，标准版及以上版本支持，请升级版本。」）；发放方式选「券包」时强制关闭",
    "visibleWhen": "限领总量 同组",
@@ -510,7 +511,7 @@
    "note": "无标题；页面最顶部的封面上传块（create.vue:16 原话「封面图片」，最多 5 张、5:4）。它不在 30-142 那块里，别混。"
   },
   {
-   "range": "create.vue:39-116",
+   "range": "create.vue:69-146",
    "title": null,
    "rows": [
     "优惠券名称",
@@ -527,7 +528,7 @@
    "note": "无标题分组。券面类字段全在这一屏最上面一块，按券类型显示其中几行。"
   },
   {
-   "range": "create.vue:148-185",
+   "range": "create.vue:178-215",
    "title": null,
    "rows": [
     "有效期类型",
@@ -539,7 +540,7 @@
    "note": "无标题分组。教程里想指这块只能说'期限那一块'，不能编一个组名。"
   },
   {
-   "range": "create.vue:200",
+   "range": "create.vue:32",
    "title": null,
    "rows": [
     "发放方式"
@@ -547,7 +548,7 @@
    "note": "无标题分组。发放方式单独一块，下面三行彩色说明含站外生态词，只可转述不可引用。"
   },
   {
-   "range": "create.vue:246",
+   "range": "create.vue:254-269",
    "title": null,
    "rows": [
     "限领总量",
@@ -556,7 +557,7 @@
    "note": "无标题分组，且整块 v-if 发放方式≠券包。"
   },
   {
-   "range": "create.vue:266-314",
+   "range": "create.vue:289-337",
    "title": "公开领取设置",
    "rows": [
     "自定义领取时间",
@@ -572,7 +573,7 @@
    "note": "v-if 发放方式=公开领取。选了私密发放或券包，这一整组不出现——两屏对照就演这一条。后四句是**同一行**的标签（create.vue:632-641 computed，随「领取周期」变），不是四行；「每次领取数量/领取周期/每人X最多可领」三行只在未开限领总量或每人限领总量>1 时出现。**页面没有「自定义领取名额」这一行**。"
   },
   {
-   "range": "create.vue:333-359",
+   "range": "create.vue:356-382",
    "title": null,
    "rows": [
     "开启每天核销限制",
@@ -583,7 +584,7 @@
    "note": "无标题分组。「开启动态核销码」这行标题含禁词，永不上屏、永不念；片 2 讲核销后赠券时只用「开启核销后赠券」这一行名。"
   },
   {
-   "range": "create.vue:385",
+   "range": "create.vue:433-438",
    "title": "线下收款口令",
    "rows": [
     "开启领取口令",
@@ -592,7 +593,7 @@
    "note": "v-if 发放方式≠券包。"
   },
   {
-   "range": "create.vue:413-423",
+   "range": "create.vue:233-244",
    "title": null,
    "rows": [
     "适用门店",
@@ -601,7 +602,7 @@
    "note": "无标题分组。片 4 讲门店与员工时，分组标题只能自述，别写成'适用范围'。"
   },
   {
-   "range": "create.vue:437-454",
+   "range": "create.vue:465-486",
    "title": null,
    "rows": [
     "使用须知",
@@ -611,7 +612,7 @@
    "note": "无标题分组。使用须知是 textarea，maxlength 500；工具行原话「不会写？一键套用模版」+ 按钮「通用模版」。**这一组没有封面行**——「封面图片」在页面最顶部（见 range 10-29 那组），本段的 m-cover-uploader 只有提示语「可上传活动长图、店内环境、菜单等图片」，活动长图不是行名。"
   },
   {
-   "range": "create.vue:463",
+   "range": "create.vue:495",
    "title": "套餐设置",
    "rows": [
     "填写套餐组合"
@@ -619,7 +620,7 @@
    "note": "仅套餐券。行名原话 create.vue:427「填写套餐组合」——**页面没有「套餐明细」这一行**，套餐条目在 m-coupon-combo 组件里填。"
   },
   {
-   "range": "create.vue:628-629",
+   "range": "create.vue:651-652",
    "title": "预约设置",
    "rows": [
     "提前预约",
@@ -628,7 +629,7 @@
    "note": "行名原话 create.vue:436 title=\"提前预约\"。注意：「需提前预约」只出现在 create.vue:563 的校验提示语里，不是这一行的名字，别拿它当行名上屏。"
   },
   {
-   "range": "create.vue:495",
+   "range": "create.vue:527",
    "title": "到期提醒",
    "rows": [
     "到期提醒",
@@ -637,7 +638,7 @@
    "note": "独立分组，组名与行名同为「到期提醒」。不要把到期提醒挂到「领券顾客信息」下面——那是另一组，两行也不同。组内 description 原句含站外生态词，不引用。"
   },
   {
-   "range": "create.vue:508-519",
+   "range": "create.vue:540-551",
    "title": "领券顾客信息",
    "rows": [
     "填写手机号",
@@ -647,7 +648,7 @@
    "note": "v-if 发放方式≠券包。这一组只有手机号三行；私密发放同样有这一组，所以'指定手机号可领取 + 私密发放'可以同用在一张券上。"
   },
   {
-   "range": "create.vue:535-537",
+   "range": "create.vue:567-569",
    "title": "自定义分享卡片",
    "rows": [
     "分享标题",
@@ -656,7 +657,7 @@
    "note": ""
   },
   {
-   "range": "create.vue:637-641",
+   "range": "create.vue:660-665",
    "title": "分享与转赠",
    "rows": [
     "允许分享",
