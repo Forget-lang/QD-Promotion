@@ -21,6 +21,7 @@
 | AI 自动入口 / 项目治理 | `AGENTS.md` | 路由、边界、全局纪律 |
 | 行业场景视频生产 | `SKILL.md` | 行业线一条视频从开工到发布的完整工作流 |
 | 产品功能教程生产 | `docs/internal/产品功能教程作业规范.md` | 教程线方法 Owner（判线与闸门适用性声明源在 `scripts/ref-registry.json`） |
+| 贴图宣传策划与制作 | `docs/internal/贴图宣传作业规范.md` | 静态宣传贴图从选题、官网研究、原创攻略、视觉设计到成品验收的方法 Owner；不负责最终发布 |
 | 产品能力/字段/数字/限制 | `APPLET / spec/` | Product Truth |
 | 产品事实源解析 | `docs/internal/R10-产品事实源解析协议.md` | 如何定位 Product Truth |
 | 内容资源职责边界 | `docs/internal/内容资源调用协议.md` | 官网、爆款、玩法版图、Product Truth 的职责边界 |
@@ -40,7 +41,26 @@
 
 **两条生产职责共享同一套基建与真值层**（`spec/` 真值与红线、`scripts/` 闸门、`video/` 工程、`docs/changes/` 事务）：共享层不得复制出第二份；方法层不得互相继承（一条规则只写进它所属的 Owner）。判线的唯一声明源是 `scripts/ref-registry.json` 的 `contentLines`。
 
-## 三、双内容职责主干
+## 三、内容职责主干
+
+当前项目存在两条视频内容线，以及一条独立的静态贴图宣传生产职责：
+
+- 行业场景视频 → `SKILL.md`
+- 产品功能教程 → `docs/internal/产品功能教程作业规范.md`
+- 贴图宣传策划与制作 → `docs/internal/贴图宣传作业规范.md`
+
+贴图宣传不是视频 content line，不进入 `scripts/ref-registry.json` 的视频 `contentLines`，不借用行业线/教程线的视频 Gate；它有自己的方法 Owner，但继续共享 Product Truth、内容资源边界与平台红线真源。正常路由：
+
+```text
+AGENTS（唯一入口）
+→ 行业场景视频：SKILL.md
+→ 产品功能教程：docs/internal/产品功能教程作业规范.md
+→ 贴图宣传：docs/internal/贴图宣传作业规范.md
+→ 当前产物
+→ 各自适用的验收
+```
+
+原“双内容职责”所描述的视频两线关系继续有效，仅补充第三类静态贴图职责。
 
 正常生产只沿统一入口，并按内容职责分流：
 
