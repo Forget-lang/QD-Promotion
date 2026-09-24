@@ -50,6 +50,18 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install video dependencies (probes need ffmpeg-static)
         run: npm ci --prefix video
+      - name: Probe dependency self-check
+        shell: bash
+        run: |
+          set -euo pipefail
+          FF=video/node_modules/ffmpeg-static/ffmpeg
+          if [ ! -x "$FF" ]; then
+            echo "::error:: 缺 $FF（或不可执行）—— gates job 必须装 video 依赖。"
+            echo "::error:: 否则 check-motion／probe-safe-area 根本没量过却被记为跳过；057 后这类红不可被豁免裁掉。"
+            exit 1
+          fi
+          echo "ffmpeg-static OK：$("$FF" -version | head -1)"
+          echo "size=$(wc -c < "$FF" | tr -d ' ') bytes"
       - name: Materialize APPLET snapshot when present
         shell: bash
         run: |

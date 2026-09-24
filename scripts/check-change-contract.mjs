@@ -229,6 +229,28 @@ if (transactions.length === 0 && rootTransactionFiles.length === 0) {
   process.exit(0);
 }
 
+// 唯一性守卫（CHANGE-20260924-061）：同一 changeId 只能有一份落盘。
+// 为什么必须机检：R8 §十一 的关闭顺序要求"标 CLOSED ＋ 移入 closed/ ＋ 删 active/ 那份"同批完成；
+// 漏删 active/ 时会留下两份拷贝（常见形态是 active/ 那份内容还是 VERIFYING、closed/ 那份已 CLOSED）——
+// 两份各自都"合法"，逐份检查抓不到，但事实上一件事有了两个状态源。
+// 本机盲区提示：本闸门读文件系统而非 git 索引，所以"已提交但工作区已删"看不见；
+// 本守卫覆盖的是"两份同时存在"这一种，也是实际踩过的那一种。
+const locationsById = new Map();
+for (const transaction of transactions) {
+  const id = idOf(transaction.file);
+  if (!id) continue;
+  if (!locationsById.has(id)) locationsById.set(id, []);
+  locationsById.get(id).push(`${transaction.state}/${transaction.file}`);
+}
+for (const [id, locations] of locationsById) {
+  if (locations.length > 1) {
+    fail(
+      `${id}: 同一事务存在 ${locations.length} 份拷贝（${locations.join(' ＋ ')}）—— 一个事务只能有一个状态源；` +
+        '移入 closed/ 必须同批删除 active/ 那份（R8 §十一 关闭顺序第 4 步）',
+    );
+  }
+}
+
 for (const transaction of transactions) {
   const stripped = stripMarks(
     fs.readFileSync(path.join(transaction.dir, transaction.file), 'utf8'),

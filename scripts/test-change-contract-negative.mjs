@@ -412,6 +412,24 @@ const groups = [
         },
         expect: 0,
       },
+      {
+        // CHANGE-20260924-061 守卫：两份各自都"合法"（active 那份 VERIFYING、closed 那份 CLOSED），
+        // 逐份检查抓不到 ⇒ 必须由唯一性守卫拦下（实际踩过：关闭提交漏删 active/ 那份）。
+        label: 'same changeId in active/ and closed/ fails (one transaction, two state sources)',
+        files: {
+          ...activeIn('CHANGE-20200101-001', activeDoc({ status: 'VERIFYING' })),
+          ...closedIn('CHANGE-20200101-001', closedDoc()),
+        },
+        expect: 1, match: '一个事务只能有一个状态源',
+      },
+      {
+        label: 'same changeId twice inside closed/ fails',
+        files: {
+          'docs/changes/closed/CHANGE-20200101-001-甲.md': closedDoc(),
+          'docs/changes/closed/CHANGE-20200101-001-乙.md': closedDoc(),
+        },
+        expect: 1, match: '同一事务存在 2 份拷贝',
+      },
     ],
   },
 ];
